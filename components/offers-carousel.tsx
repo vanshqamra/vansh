@@ -56,7 +56,7 @@ export function OffersCarousel() {
         ))}
       </CarouselContent>
       <CarouselPrevious className="left-[-50px]" />
-      <CarouselNext className="right-[-50px]" />
+      <CarouselNext className="right-[-50px] border-0" />
     </Carousel>
   )
 }
