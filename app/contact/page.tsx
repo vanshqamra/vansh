@@ -52,7 +52,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold">Email</h3>
                     <p className="text-slate-600">
-                      <a href="mailto:info@chemicalcorporation.in" className="hover:text-blue-600">
+                      <a href="mailto:chemicalcorporation.ldh@gmail.com" className="hover:text-blue-600">
                         info@chemicalcorporation.in
                       </a>
                     </p>

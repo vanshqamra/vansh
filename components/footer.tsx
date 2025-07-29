@@ -61,20 +61,13 @@ export function Footer() {
             </li>
             <li className="flex items-center gap-3">
               <Mail className="h-5 w-5 text-teal-400" />
-              <a href="mailto:info@chemicalcorporation.in" className="hover:text-teal-400">
-                info@chemicalcorporation.in
+              <a href="mailto:chemicalcorporation.ldh@gmail.com" className="hover:text-teal-400">
+                chemicalcorporation.ldh@gmail.com
               </a>
             </li>
           </ul>
         </div>
-        <div>
-          <h3 className="mb-4 text-lg font-semibold text-white">Clientele</h3>
-          <div className="flex flex-wrap gap-4 opacity-70">
-            <Image src="/images/client-logo-1.png" alt="Client Logo 1" width={100} height={32} className="h-8 w-auto" />
-            <Image src="/images/client-logo-2.png" alt="Client Logo 2" width={100} height={32} className="h-8 w-auto" />
-            <Image src="/images/client-logo-3.png" alt="Client Logo 3" width={100} height={32} className="h-8 w-auto" />
-          </div>
-        </div>
+        
       </div>
       <div className="bg-black/20 py-4">
         <div className="container mx-auto px-4 md:px-6 text-center text-sm text-slate-500">

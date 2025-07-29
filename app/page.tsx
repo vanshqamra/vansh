@@ -5,6 +5,39 @@ import Link from "next/link"
 import { OffersCarousel } from "@/components/offers-carousel"
 import Image from "next/image"
 import { labSupplyBrands } from "@/lib/data"
+import { useState } from "react"
+
+function BrandLogo({
+  slug,
+  name,
+}: {
+  slug: string
+  name: string
+}) {
+  const [failed, setFailed] = useState(false)
+
+  return (
+    <Link href={`/brand/${slug}`} className="block">
+      <div className="relative h-12 w-36 transition-all">
+        {!failed ? (
+          <Image
+            src={`/images/logo-${slug}.png`}
+            alt={`${name} Logo`}
+            fill
+            style={{ objectFit: "contain" }}
+            sizes="144px"
+            onError={() => setFailed(true)}
+            priority={false}
+          />
+        ) : (
+          <div className="flex h-12 w-36 items-center justify-center rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700">
+            {name}
+          </div>
+        )}
+      </div>
+    </Link>
+  )
+}
 
 export default function HomePage() {
   const brands = Object.entries(labSupplyBrands)
@@ -17,19 +50,19 @@ export default function HomePage() {
           <Image
             src="/images/hero-background.png"
             alt="Hero Background"
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: "cover" }}
             quality={90}
             priority
           />
-          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute inset-0 bg-black/50" />
         </div>
         <div className="absolute inset-0 z-10 animate-subtle-float">
           <Image
             src="/images/hero-overlay.png"
             alt="Holographic lab equipment"
-            layout="fill"
-            objectFit="contain"
+            fill
+            style={{ objectFit: "contain" }}
             className="opacity-20"
           />
         </div>
@@ -118,21 +151,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Our Brands Section */}
-      <section className="py-16 bg-slate-50">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl font-bold text-center mb-10">Our Associated Brands</h2>
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
-            {brands.map(([key, brand]) => (
-              <Link href={`/brand/${key}`} key={key} className="block">
-                <div className="relative h-12 w-36 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
-                  <Image src={`/images/logo-${key}.png`} alt={`${brand.name} Logo`} layout="fill" objectFit="contain" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Our Brands Section (manually listed, selected brands removed) */}
+<section className="py-16 bg-slate-50">
+  <div className="container mx-auto px-4 md:px-6">
+    <h2 className="text-3xl font-bold text-center mb-10">Our Associated Brands</h2>
+    <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
+      <BrandLogo slug="fisher" name="Fisher Scientific" />
+      <BrandLogo slug="himedia" name="HiMedia" />
+      <BrandLogo slug="sigma" name="Sigma-Aldrich" />
+      <BrandLogo slug="thermo" name="Thermo Fisher" />
+      <BrandLogo slug="merck" name="Merck" />
+      <BrandLogo slug="loba" name="Loba Chemie" />
+      <BrandLogo slug="remi" name="Remi" />
+      <BrandLogo slug="eppendorf" name="Eppendorf" />
+      <BrandLogo slug="coleparmer" name="Cole-Parmer" />
+      <BrandLogo slug="bio-rad" name="Bio-Rad" />
+      <BrandLogo slug="vwr" name="VWR" />
+      <BrandLogo slug="gilson" name="Gilson" />
+      <BrandLogo slug="mettler" name="Mettler Toledo" />
+      <BrandLogo slug="sartorius" name="Sartorius" />
+      <BrandLogo slug="perkinelmer" name="PerkinElmer" />
+      <BrandLogo slug="labindia" name="LabIndia" />
+      <BrandLogo slug="reliable" name="Reliable Lab Equipment" />
+    </div>
+  </div>
+</section>
+
+
     </>
   )
 }
