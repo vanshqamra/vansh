@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chemical-corporation-portal.vercel.app/sitemap.xml
