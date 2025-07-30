@@ -7,11 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
-import Image from "next/image"
 import Link from "next/link"
 
 export default function CartPage() {
-  const { state, updateQuantity, removeItem, clearCart, getTotalPrice, isLoaded } = useCart()
+  const { items, updateQuantity, removeItem, clearCart, totalPrice, isLoaded } = useCart()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -35,7 +34,7 @@ export default function CartPage() {
     )
   }
 
-  if (state.items.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto text-center">
@@ -64,52 +63,56 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {state.items.map((item) => (
+            {items.map((item) => (
               <Card key={item.id}>
                 <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="relative h-20 w-20 flex-shrink-0">
-                      <Image
-                        src={item.image || "/placeholder.svg?height=80&width=80"}
-                        alt={item.name}
-                        fill
-                        className="object-cover rounded-md"
-                      />
-                    </div>
+                  <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-slate-900 truncate">{item.name}</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{item.name}</h3>
                       <p className="text-sm text-slate-600">{item.brand}</p>
                       <p className="text-sm text-slate-600">{item.category}</p>
-                      <p className="text-lg font-bold text-blue-600 mt-1">₹{item.price.toLocaleString()}</p>
+                      {item.packSize && <p className="text-sm text-slate-600">Pack: {item.packSize}</p>}
+                      {item.material && <p className="text-sm text-slate-600">Material: {item.material}</p>}
+                      <p className="text-lg font-bold text-blue-600 mt-2">
+                        {typeof item.price === "number" ? `₹${item.price.toLocaleString()}` : item.price}
+                      </p>
                     </div>
-                    <div className="flex items-center space-x-2">
+
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => updateQuantity(item.id, Number.parseInt(e.target.value) || 1)}
+                          className="w-20 text-center"
+                          min="1"
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        disabled={item.quantity <= 1}
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-600 hover:text-red-700"
                       >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateQuantity(item.id, Number.parseInt(e.target.value) || 1)}
-                        className="w-20 text-center"
-                        min="1"
-                      />
-                      <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
-                        <Plus className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -124,21 +127,21 @@ export default function CartPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
-                  <span>Subtotal ({state.items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
-                  <span>₹{getTotalPrice().toLocaleString()}</span>
+                  <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                  <span>₹{totalPrice.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className="text-green-600">Free</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>₹{Math.round(getTotalPrice() * 0.18).toLocaleString()}</span>
+                  <span>Tax (18%)</span>
+                  <span>₹{Math.round(totalPrice * 0.18).toLocaleString()}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>₹{Math.round(getTotalPrice() * 1.18).toLocaleString()}</span>
+                  <span>₹{Math.round(totalPrice * 1.18).toLocaleString()}</span>
                 </div>
                 <Button className="w-full" size="lg">
                   Proceed to Checkout
