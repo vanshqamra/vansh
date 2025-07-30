@@ -39,10 +39,10 @@ function SearchResults() {
     const qualigensResults = qualigensProducts
       .filter(
         (product) =>
-          product.name.toLowerCase().includes(searchLower) ||
-          product.code.toLowerCase().includes(searchLower) ||
-          product.cas.includes(searchLower) ||
-          product.category.toLowerCase().includes(searchLower),
+          (product.name && product.name.toLowerCase().includes(searchLower)) ||
+          (product.code && product.code.toLowerCase().includes(searchLower)) ||
+          (product.cas && product.cas.toLowerCase().includes(searchLower)) ||
+          (product.category && product.category.toLowerCase().includes(searchLower)),
       )
       .map((product) => ({ ...product, source: "qualigens" }))
 
@@ -50,9 +50,9 @@ function SearchResults() {
     const commercialResults = commercialChemicals
       .filter(
         (product) =>
-          product.name.toLowerCase().includes(searchLower) ||
-          product.code.toLowerCase().includes(searchLower) ||
-          product.category.toLowerCase().includes(searchLower),
+          (product.name && product.name.toLowerCase().includes(searchLower)) ||
+          (product.code && product.code.toLowerCase().includes(searchLower)) ||
+          (product.category && product.category.toLowerCase().includes(searchLower)),
       )
       .map((product) => ({ ...product, source: "commercial" }))
 

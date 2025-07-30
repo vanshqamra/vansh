@@ -19,6 +19,7 @@ type QualigensProduct = {
   price: number
   purity: string
   brand: string
+  hsn: string
 }
 
 interface QualiProductGridProps {
@@ -53,7 +54,7 @@ export function QualiProductGrid({ products }: QualiProductGridProps) {
       id: product.id,
       name: product.name,
       price: product.price,
-      brand: product.brand,
+      brand: "Qualigens",
       category: product.category,
       packSize: product.packSize,
       material: product.material,
@@ -100,10 +101,16 @@ export function QualiProductGrid({ products }: QualiProductGridProps) {
             <CardContent className="flex-grow">
               <div className="space-y-1 text-xs">
                 <p>
+                  <span className="font-medium">Category:</span> {product.category}
+                </p>
+                <p>
                   <span className="font-medium">Pack:</span> {product.packSize} ({product.material})
                 </p>
                 <p>
                   <span className="font-medium">Purity:</span> {product.purity}
+                </p>
+                <p>
+                  <span className="font-medium">HSN:</span> {product.hsn}
                 </p>
                 <p className="font-semibold text-blue-600">₹{product.price.toLocaleString()}</p>
               </div>

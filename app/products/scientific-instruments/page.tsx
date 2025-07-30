@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { labSupplyBrands } from "@/lib/data"
 import type { Metadata } from "next"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
@@ -28,8 +27,8 @@ export default function ScientificInstrumentsPage() {
         {instrumentBrands.map(([key, brand]) => (
           <Card key={key} className="flex flex-col justify-between shadow-sm bg-slate-50 glow-on-hover">
             <CardHeader>
-              <div className="relative h-16 w-32 mb-4">
-                <Image src={`/images/logo-${key}.png`} alt={`${brand.name} Logo`} layout="fill" objectFit="contain" />
+              <div className="h-16 w-32 mb-4 flex items-center justify-center bg-white rounded border">
+                <span className="text-sm font-semibold text-slate-600">{brand.name}</span>
               </div>
               <CardTitle className="text-lg font-semibold text-slate-800">{brand.name}</CardTitle>
             </CardHeader>

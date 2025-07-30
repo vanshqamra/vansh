@@ -1,180 +1,109 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { Menu, X, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Search, ShoppingCart, Menu, X, Phone, Mail, FileText } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
-import { useQuote } from "@/app/context/quote-context"
+
+const navigation = [
+  { name: "Home", href: "/" },
+  { name: "Products", href: "/products" },
+  { name: "About", href: "/about" },
+  { name: "Contact", href: "/contact" },
+]
 
 export default function HeaderClient() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [mounted, setMounted] = useState(false)
-  const router = useRouter()
-  const { totalItems: cartItems, isLoaded: cartLoaded } = useCart()
-  const { totalItems: quoteItems, isLoaded: quoteLoaded } = useQuote()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { items } = useCart()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/products/search?q=${encodeURIComponent(searchQuery)}`)
-      setSearchQuery("")
-    }
-  }
-
-  const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Products", href: "/products" },
-    { name: "Brands", href: "/brands" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ]
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CC</span>
-            </div>
-            <span className="font-bold text-xl text-slate-900">Chemical Corp</span>
+    <>
+      {/* Desktop Navigation */}
+      <div className="hidden lg:flex lg:gap-x-12">
+        {navigation.map((item) => (
+          <Link
+            key={item.name}
+            href={item.href}
+            className="text-sm font-semibold leading-6 text-slate-900 hover:text-blue-600 transition-colors"
+          >
+            {item.name}
           </Link>
+        ))}
+      </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-slate-600 hover:text-blue-600 font-medium transition-colors"
-              >
-                {item.name}
+      {/* Cart and Mobile Menu Button */}
+      <div className="flex lg:hidden">
+        <Link href="/cart" className="relative p-2 text-slate-700 hover:text-blue-600 transition-colors">
+          <ShoppingCart className="h-6 w-6" />
+          {totalItems > 0 && (
+            <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {totalItems}
+            </span>
+          )}
+        </Link>
+        <Button
+          variant="ghost"
+          className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-slate-700"
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <span className="sr-only">Open main menu</span>
+          <Menu className="h-6 w-6" aria-hidden="true" />
+        </Button>
+      </div>
+
+      {/* Desktop Cart */}
+      <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+        <Link href="/cart" className="relative p-2 text-slate-700 hover:text-blue-600 transition-colors">
+          <ShoppingCart className="h-6 w-6" />
+          {totalItems > 0 && (
+            <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {totalItems}
+            </span>
+          )}
+        </Link>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden">
+          <div className="fixed inset-0 z-50" />
+          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-slate-900/10">
+            <div className="flex items-center justify-between">
+              <Link href="/" className="-m-1.5 p-1.5">
+                <span className="sr-only">Chemical Corporation</span>
+                <div className="h-8 w-auto text-xl font-bold text-blue-600">ChemCorp</div>
               </Link>
-            ))}
-          </nav>
-
-          {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden lg:flex items-center space-x-2 flex-1 max-w-md mx-8">
-            <Input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" size="sm" variant="outline">
-              <Search className="h-4 w-4" />
-            </Button>
-          </form>
-
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Contact Info - Desktop */}
-            <div className="hidden xl:flex items-center space-x-4 text-sm text-slate-600">
-              <div className="flex items-center space-x-1">
-                <Phone className="h-4 w-4" />
-                <span>+91 98765 43210</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Mail className="h-4 w-4" />
-                <span>info@chemcorp.com</span>
-              </div>
+              <Button
+                variant="ghost"
+                className="-m-2.5 rounded-md p-2.5 text-slate-700"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="sr-only">Close menu</span>
+                <X className="h-6 w-6" aria-hidden="true" />
+              </Button>
             </div>
-
-            {/* Quote Cart */}
-            <Link href="/dashboard/quote-cart">
-              <Button variant="outline" size="sm" className="relative bg-transparent">
-                <FileText className="h-4 w-4" />
-                {mounted && quoteLoaded && quoteItems > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                    {quoteItems}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
-
-            {/* Shopping Cart */}
-            <Link href="/cart">
-              <Button variant="outline" size="sm" className="relative bg-transparent">
-                <ShoppingCart className="h-4 w-4" />
-                {mounted && cartLoaded && cartItems > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                    {cartItems}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
-
-            {/* Mobile Menu Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="md:hidden bg-transparent"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Search Bar */}
-        <div className="lg:hidden py-3 border-t">
-          <form onSubmit={handleSearch} className="flex items-center space-x-2">
-            <Input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" size="sm" variant="outline">
-              <Search className="h-4 w-4" />
-            </Button>
-          </form>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t bg-white">
-            <nav className="py-4 space-y-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="block px-4 py-2 text-slate-600 hover:text-blue-600 hover:bg-slate-50 font-medium transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="px-4 py-2 border-t mt-4 pt-4">
-                <div className="space-y-2 text-sm text-slate-600">
-                  <div className="flex items-center space-x-2">
-                    <Phone className="h-4 w-4" />
-                    <span>+91 98765 43210</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Mail className="h-4 w-4" />
-                    <span>info@chemcorp.com</span>
-                  </div>
+            <div className="mt-6 flow-root">
+              <div className="-my-6 divide-y divide-slate-500/10">
+                <div className="space-y-2 py-6">
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-slate-900 hover:bg-slate-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
                 </div>
               </div>
-            </nav>
+            </div>
           </div>
-        )}
-      </div>
-    </header>
+        </div>
+      )}
+    </>
   )
 }
