@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
 type Product = {
   code: string
@@ -20,20 +20,45 @@ interface QuoteContextType {
   removeItem: (code: string) => void
   updateQuantity: (code: string, quantity: number) => void
   clearQuote: () => void
+  isLoaded: boolean
 }
 
 const QuoteContext = createContext<QuoteContextType | undefined>(undefined)
 
 export function QuoteProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<QuoteItem[]>([])
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedQuote = localStorage.getItem("quote-items")
+        if (savedQuote) {
+          setItems(JSON.parse(savedQuote))
+        }
+      } catch (error) {
+        console.error("Error loading quote from localStorage:", error)
+      } finally {
+        setIsLoaded(true)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isLoaded && typeof window !== "undefined") {
+      try {
+        localStorage.setItem("quote-items", JSON.stringify(items))
+      } catch (error) {
+        console.error("Error saving quote to localStorage:", error)
+      }
+    }
+  }, [items, isLoaded])
 
   const addItem = (item: QuoteItem) => {
     setItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.code === item.code)
       if (existingItem) {
-        return prevItems.map((i) =>
-          i.code === item.code ? { ...i, quantity: i.quantity + item.quantity } : i
-        )
+        return prevItems.map((i) => (i.code === item.code ? { ...i, quantity: i.quantity + item.quantity } : i))
       }
       return [...prevItems, item]
     })
@@ -47,11 +72,7 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     if (quantity <= 0) {
       removeItem(code)
     } else {
-      setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.code === code ? { ...item, quantity } : item
-        )
-      )
+      setItems((prevItems) => prevItems.map((item) => (item.code === code ? { ...item, quantity } : item)))
     }
   }
 
@@ -60,7 +81,7 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <QuoteContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearQuote }}>
+    <QuoteContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearQuote, isLoaded }}>
       {children}
     </QuoteContext.Provider>
   )

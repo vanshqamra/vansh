@@ -5,24 +5,17 @@ import "./globals.css"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { WhatsAppButton } from "@/components/whatsapp-button"
-import { ParallaxBackground } from "@/components/parallax-background"
-import { Toaster } from "@/components/ui/toaster"
-import { QuoteProvider } from "@/app/context/quote-context"
 import { CartProvider } from "@/app/context/CartContext"
+import { QuoteProvider } from "@/app/context/quote-context"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Chemical Corporation - B2B Laboratory Supply Portal",
+  title: "Chemical Corporation - Premium Laboratory Chemicals & Equipment",
   description:
-    "Your trusted partner for bulk chemicals, laboratory supplies, and scientific instruments. Modern B2B portal for chemical vendors and suppliers.",
-  keywords: "chemicals, laboratory supplies, B2B, bulk chemicals, scientific instruments, chemical vendors",
-  authors: [{ name: "Chemical Corporation" }],
-  openGraph: {
-    title: "Chemical Corporation - B2B Laboratory Supply Portal",
-    description: "Your trusted partner for bulk chemicals, laboratory supplies, and scientific instruments.",
-    type: "website",
-  },
+    "Leading supplier of high-quality laboratory chemicals, scientific instruments, and research equipment. Trusted by laboratories worldwide.",
+  keywords: "laboratory chemicals, scientific instruments, research equipment, chemical supplier",
     generator: 'v0.dev'
 }
 
@@ -36,12 +29,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <CartProvider>
           <QuoteProvider>
-            <ParallaxBackground />
-            <div className="relative z-10 min-h-screen flex flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
             <WhatsAppButton />
             <Toaster />
           </QuoteProvider>

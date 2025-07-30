@@ -1,24 +1,21 @@
-import { createClient } from "@/lib/supabase/server"
+import { Suspense } from "react"
 import HeaderClient from "./header-client"
-import type { User } from "@supabase/supabase-js"
 
-export async function Header() {
-  let user: User | null = null
-
-  try {
-    // This will attempt to create a Supabase client.
-    // If the environment variables are missing, it will throw an error
-    // which is caught by the catch block below.
-    const supabase = createClient()
-    const {
-      data: { user: fetchedUser },
-    } = await supabase.auth.getUser()
-    user = fetchedUser
-  } catch (error) {
-    // This block gracefully handles the case where Supabase credentials are not set.
-    // The UI will render in a logged-out state without crashing the application.
-    console.error("Could not fetch user. Supabase credentials might be missing.", error)
-  }
-
-  return <HeaderClient user={user} />
+export function Header() {
+  return (
+    <Suspense
+      fallback={
+        <header className="bg-white shadow-sm border-b">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-blue-600">Chemical Corporation</div>
+              <div className="animate-pulse bg-gray-200 h-8 w-32 rounded"></div>
+            </div>
+          </div>
+        </header>
+      }
+    >
+      <HeaderClient />
+    </Suspense>
+  )
 }

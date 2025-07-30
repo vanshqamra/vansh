@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuote } from "@/context/quote-context"
+import { useQuote } from "@/app/context/quote-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,10 +8,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { useState, useEffect } from "react"
 
 export default function QuoteCartPage() {
-  const { items, updateQuantity, removeItem, clearQuote } = useQuote()
+  const { items, updateQuantity, removeItem, clearQuote, isLoaded } = useQuote()
   const { toast } = useToast()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmitQuote = () => {
     // Server action would go here
@@ -21,6 +27,25 @@ export default function QuoteCartPage() {
       title: "Quote Request Sent!",
       description: "Thank you! We have received your request and will contact you shortly.",
     })
+  }
+
+  if (!mounted || !isLoaded) {
+    return (
+      <div className="container mx-auto py-16">
+        <Card className="bg-white/80 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle>Loading Quote Cart...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (items.length === 0) {
