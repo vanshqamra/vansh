@@ -1,31 +1,31 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import type React from "react"
+import { createContext, useContext, useState, useEffect } from "react"
 
-type Product = {
-  code: string
+interface QuoteItem {
+  id: string
   name: string
-  category: string
-  pack_size: string
+  brand: string
   price: string
-}
-
-type QuoteItem = Product & {
   quantity: number
+  packSize?: string
+  material?: string
 }
 
 interface QuoteContextType {
   items: QuoteItem[]
-  addItem: (item: QuoteItem) => void
-  removeItem: (code: string) => void
-  updateQuantity: (code: string, quantity: number) => void
+  addItem: (item: Omit<QuoteItem, "quantity">) => void
+  removeItem: (id: string) => void
+  updateQuantity: (id: string, quantity: number) => void
   clearQuote: () => void
+  totalItems: number
   isLoaded: boolean
 }
 
 const QuoteContext = createContext<QuoteContextType | undefined>(undefined)
 
-export function QuoteProvider({ children }: { children: ReactNode }) {
+export function QuoteProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<QuoteItem[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -54,34 +54,46 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     }
   }, [items, isLoaded])
 
-  const addItem = (item: QuoteItem) => {
-    setItems((prevItems) => {
-      const existingItem = prevItems.find((i) => i.code === item.code)
+  const addItem = (newItem: Omit<QuoteItem, "quantity">) => {
+    setItems((prev) => {
+      const existingItem = prev.find((item) => item.id === newItem.id)
       if (existingItem) {
-        return prevItems.map((i) => (i.code === item.code ? { ...i, quantity: i.quantity + item.quantity } : i))
+        return prev.map((item) => (item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item))
       }
-      return [...prevItems, item]
+      return [...prev, { ...newItem, quantity: 1 }]
     })
   }
 
-  const removeItem = (code: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.code !== code))
+  const removeItem = (id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id))
   }
 
-  const updateQuantity = (code: string, quantity: number) => {
+  const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(code)
-    } else {
-      setItems((prevItems) => prevItems.map((item) => (item.code === code ? { ...item, quantity } : item)))
+      removeItem(id)
+      return
     }
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)))
   }
 
   const clearQuote = () => {
     setItems([])
   }
 
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
+
   return (
-    <QuoteContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearQuote, isLoaded }}>
+    <QuoteContext.Provider
+      value={{
+        items,
+        addItem,
+        removeItem,
+        updateQuantity,
+        clearQuote,
+        totalItems,
+        isLoaded,
+      }}
+    >
       {children}
     </QuoteContext.Provider>
   )

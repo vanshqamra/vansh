@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,7 +8,6 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Plus, Filter } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { qualigensProducts } from "@/lib/qualigens-products"
-import Image from "next/image"
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 
@@ -34,7 +31,8 @@ export default function QualigensPage() {
         (product) =>
           product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           product.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.cas.includes(searchQuery),
+          product.cas.includes(searchQuery) ||
+          product.category.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     }
 
@@ -46,20 +44,17 @@ export default function QualigensPage() {
     setFilteredProducts(filtered)
   }, [searchQuery, selectedLetter])
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-  }
-
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: (typeof qualigensProducts)[0]) => {
     if (!mounted || !isLoaded) return
 
     addItem({
-      id: product.code,
+      id: product.id,
       name: product.name,
       price: product.price,
       brand: "Qualigens",
       category: product.category,
-      image: "/images/product-qualigens.png",
+      packSize: product.packSize,
+      material: product.material,
     })
   }
 
@@ -88,17 +83,17 @@ export default function QualigensPage() {
           <p className="text-slate-600 mb-6">High-quality laboratory chemicals and reagents from Qualigens</p>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="flex gap-4 max-w-md mb-6">
+          <div className="flex gap-4 max-w-md mb-6">
             <Input
-              placeholder="Search by name, code, or CAS..."
+              placeholder="Search by name, code, CAS, or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
             />
-            <Button type="submit" variant="outline">
+            <Button variant="outline">
               <Search className="h-4 w-4" />
             </Button>
-          </form>
+          </div>
 
           {/* Alphabet Filter */}
           <div className="mb-6">
@@ -136,16 +131,8 @@ export default function QualigensPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <Card key={product.code} className="hover:shadow-lg transition-shadow">
+            <Card key={product.id} className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-4">
-                <div className="relative h-48 mb-4">
-                  <Image
-                    src="/images/product-qualigens.png"
-                    alt={product.name}
-                    fill
-                    className="object-cover rounded-md"
-                  />
-                </div>
                 <CardTitle className="text-lg">{product.name}</CardTitle>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">Qualigens</Badge>
@@ -158,6 +145,7 @@ export default function QualigensPage() {
                   <p className="text-sm text-slate-600">CAS: {product.cas}</p>
                   <p className="text-sm text-slate-600">Purity: {product.purity}</p>
                   <p className="text-sm text-slate-600">Pack Size: {product.packSize}</p>
+                  <p className="text-sm text-slate-600">Material: {product.material}</p>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-blue-600">₹{product.price.toLocaleString()}</span>

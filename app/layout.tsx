@@ -4,19 +4,19 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { ParallaxBackground } from "@/components/parallax-background"
 import { WhatsAppButton } from "@/components/whatsapp-button"
-import { Toaster } from "@/components/ui/toaster"
 import { CartProvider } from "@/app/context/CartContext"
 import { QuoteProvider } from "@/app/context/quote-context"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Chemical Corporation - Premium Laboratory Chemicals & Equipment",
+  title: "Chemical Corporation - Laboratory Supplies & Chemicals",
   description:
-    "Leading supplier of high-quality laboratory chemicals, scientific instruments, and research equipment. Trusted by laboratories worldwide.",
-  keywords: "laboratory chemicals, scientific instruments, research equipment, analytical reagents, lab supplies",
+    "Leading supplier of laboratory chemicals, equipment, and scientific instruments. Quality products from trusted brands like Qualigens, Borosil, Whatman, and more.",
+  keywords:
+    "laboratory chemicals, scientific instruments, lab equipment, chemical supplies, Qualigens, Borosil, Whatman",
     generator: 'v0.dev'
 }
 
@@ -30,10 +30,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <CartProvider>
           <QuoteProvider>
-            <ParallaxBackground />
-            <div className="relative z-10">
+            <div className="min-h-screen flex flex-col">
               <Header />
-              <main className="min-h-screen">{children}</main>
+              <main className="flex-1">{children}</main>
               <Footer />
               <WhatsAppButton />
               <Toaster />

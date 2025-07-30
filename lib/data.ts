@@ -1,3 +1,28 @@
+export const commercialChemicals = [
+  { code: "CC0001", name: "Acetic Acid Glacial", category: "Acids", pack_size: "500ml", price: "₹450" },
+  { code: "CC0002", name: "Acetone", category: "Solvents", pack_size: "1L", price: "₹320" },
+  { code: "CC0003", name: "Acetonitrile", category: "Solvents", pack_size: "1L", price: "₹850" },
+  { code: "CC0004", name: "Alum (Non Ferric /Ferric)", category: "Salts", pack_size: "500g", price: "₹180" },
+  { code: "CC0005", name: "Ammonium Bi Sulphite", category: "Salts", pack_size: "500g", price: "₹220" },
+  { code: "CC0006", name: "Ammonium Chloride", category: "Salts", pack_size: "500g", price: "₹160" },
+  { code: "CC0007", name: "Aniline", category: "Reagents", pack_size: "500ml", price: "₹380" },
+  { code: "CC0008", name: "Benzene", category: "Solvents", pack_size: "500ml", price: "₹450" },
+  { code: "CC0009", name: "Borox", category: "Salts", pack_size: "500g", price: "₹140" },
+  { code: "CC0010", name: "Boric Acid Powder", category: "Acids", pack_size: "500g", price: "₹120" },
+  { code: "CC0011", name: "Bleaching Powder", category: "Reagents", pack_size: "1kg", price: "₹80" },
+  { code: "CC0012", name: "Butyl Acetate", category: "Solvents", pack_size: "1L", price: "₹420" },
+  { code: "CC0013", name: "Butyl Cellosolve", category: "Solvents", pack_size: "1L", price: "₹480" },
+  { code: "CC0014", name: "Butyl Alcohol", category: "Solvents", pack_size: "1L", price: "₹380" },
+  { code: "CC0015", name: "Cab O Sil (Silicon Di Oxide)", category: "Reagents", pack_size: "500g", price: "₹650" },
+  { code: "CC0016", name: "Calcium Chloride Lumps", category: "Salts", pack_size: "1kg", price: "₹120" },
+  { code: "CC0017", name: "Caustic Potash Flakes", category: "Bases", pack_size: "500g", price: "₹280" },
+  { code: "CC0018", name: "Caustic Soda Flakes", category: "Bases", pack_size: "500g", price: "₹180" },
+  { code: "CC0019", name: "Citric Acid", category: "Acids", pack_size: "500g", price: "₹160" },
+  { code: "CC0020", name: "Copper Sulphate", category: "Salts", pack_size: "500g", price: "₹220" },
+]
+
+export const chemicalCategories = ["All", "Acids", "Solvents", "Bases", "Salts", "Reagents"]
+
 export const labSupplyBrands = {
   qualigens: {
     name: "Qualigens",
@@ -30,75 +55,3 @@ export const labSupplyBrands = {
     categories: ["HPLC Grade Solvents", "Analytical Reagents", "Acids", "Bases"],
   },
 }
-
-export const bulkChemicals = [
-  {
-    id: "1",
-    name: "Sulfuric Acid 98%",
-    brand: "Qualigens",
-    category: "Acids",
-    price: 2500,
-    unit: "25L",
-    cas: "7664-93-9",
-    purity: "98%",
-    image: "/images/product-acid.png",
-  },
-  {
-    id: "2",
-    name: "Sodium Hydroxide Pellets",
-    brand: "Rankem",
-    category: "Bases",
-    price: 1800,
-    unit: "25kg",
-    cas: "1310-73-2",
-    purity: "99%",
-    image: "/images/product-salt.png",
-  },
-  {
-    id: "3",
-    name: "Ethanol Absolute",
-    brand: "J.T. Baker",
-    category: "Solvents",
-    price: 3200,
-    unit: "20L",
-    cas: "64-17-5",
-    purity: "99.9%",
-    image: "/images/product-solvent.png",
-  },
-]
-
-export const laboratorySupplies = [
-  {
-    id: "4",
-    name: "Borosilicate Glass Beakers Set",
-    brand: "Borosil",
-    category: "Glassware",
-    price: 1200,
-    unit: "Set of 6",
-    description: "High-quality borosilicate glass beakers",
-    image: "/images/product-glassware.png",
-  },
-  {
-    id: "5",
-    name: "Whatman Filter Paper Grade 1",
-    brand: "Whatman",
-    category: "Filtration",
-    price: 450,
-    unit: "100 sheets",
-    description: "Standard grade qualitative filter paper",
-    image: "/images/product-filter.png",
-  },
-]
-
-export const scientificInstruments = [
-  {
-    id: "6",
-    name: "Digital pH Meter",
-    brand: "Borosil",
-    category: "Measuring Instruments",
-    price: 8500,
-    unit: "1 piece",
-    description: "High-precision digital pH meter with calibration solutions",
-    image: "/images/product-instrument.png",
-  },
-]
