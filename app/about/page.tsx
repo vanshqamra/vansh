@@ -5,39 +5,45 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Explore the journey of Chemical Corporation — from a humble beginning to becoming a trusted name in lab supplies for over 500 clients across India.",
+    "Explore the journey of Chemical Corporation — from humble beginnings to serving 500+ clients across India with trusted lab and industrial chemical supplies.",
 }
 
 const timelineEvents = [
   {
     year: "1948",
     event: "Company Founded",
-    description: "Chemical Corporation was established in Ludhiana to serve regional industry needs with essential chemicals.",
+    description:
+      "Chemical Corporation was established in Ludhiana to serve regional industry needs with essential chemicals.",
   },
   {
     year: "1962",
     event: "100 Clients Milestone",
-    description: "Built strong regional partnerships and crossed 100 loyal industrial and lab clients.",
+    description:
+      "Built strong regional partnerships and crossed 100 loyal industrial and lab clients.",
   },
   {
     year: "1981",
     event: "Expanded Offerings",
-    description: "Product range diversified to include specialty laboratory and industrial chemicals.",
-  }
-  {
-    year: "2010",
-    event: "250 Clients & Major Industry Entry",
-    description: "Grew to over 250 clients and began serving major clients including Hindustan Unilever and Tata Group.",
+    description:
+      "Product range diversified to include specialty laboratory and industrial chemicals.",
   },
   {
-    year: "2022",
+    year: "2000",
+    event: "250 Clients & Major Industry Entry",
+    description:
+      "Grew to over 250 clients and began serving major clients including Hindustan Unilever and Tata Group.",
+  },
+  {
+    year: "2012",
     event: "500 Clients & National Reach",
-    description: "Achieved the milestone of 500 active clients including Hindustan Petroleum and government institutions.",
+    description:
+      "Achieved the milestone of 500 active clients including Hindustan Petroleum and government institutions.",
   },
   {
     year: "2025",
     event: "Digital B2B Portal Launch",
-    description: "Launched an advanced vendor portal to enable seamless B2B procurement across India.",
+    description:
+      "Launched an advanced vendor portal to enable seamless B2B procurement across India.",
   },
 ]
 
@@ -46,10 +52,12 @@ export default function AboutPage() {
     <div className="bg-white py-16">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">About Chemical Corporation</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
+            About Chemical Corporation
+          </h1>
           <p className="mt-3 max-w-3xl mx-auto text-lg text-slate-600">
-            For over 77 years, Chemical Corporation has been a trusted partner to industries and laboratories, known for
-            our integrity, reliability, and consistent quality.
+            For over 75 years, Chemical Corporation has empowered scientific and industrial growth with trusted
+            chemical solutions and unmatched customer support.
           </p>
         </div>
 
@@ -60,9 +68,15 @@ export default function AboutPage() {
             {timelineEvents.map((item, index) => (
               <div
                 key={item.year}
-                className={`flex items-center w-full mb-8 ${index % 2 === 0 ? "justify-start" : "justify-end"}`}
+                className={`flex items-center w-full mb-8 ${
+                  index % 2 === 0 ? "justify-start" : "justify-end"
+                }`}
               >
-                <div className={`w-1/2 ${index % 2 === 0 ? "pr-8 text-right" : "pl-8 text-left"}`}>
+                <div
+                  className={`w-1/2 ${
+                    index % 2 === 0 ? "pr-8 text-right" : "pl-8 text-left"
+                  }`}
+                >
                   <div className="p-4 bg-slate-50 rounded-lg shadow-md">
                     <p className="text-sm font-semibold text-blue-600">{item.year}</p>
                     <h3 className="text-lg font-bold">{item.event}</h3>
@@ -84,8 +98,8 @@ export default function AboutPage() {
               partner for industries, research institutions, and educational labs.
             </p>
             <p className="text-slate-600">
-              From startups to Fortune 500 clients, we’re committed to providing high-purity chemicals with excellent service
-              and reliable delivery.
+              From startups to Fortune 500 clients, we’re committed to providing high-purity chemicals with excellent
+              service and reliable delivery.
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6">
