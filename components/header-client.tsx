@@ -1,132 +1,184 @@
 "use client"
 
 import type React from "react"
-
+import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Search, ShoppingCart, Menu, X } from "lucide-react"
+import { useRouter } from "next/navigation"
+import type { User } from "@supabase/supabase-js"
+import { FlaskConical, Menu, Search, ShoppingCart, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+import { useQuote } from "@/app/context/quote-context"
 import { useCart } from "@/app/context/CartContext"
-import Link from "next/link"
+import { SignOutButton } from "./sign-out-button"
 
-export default function HeaderClient() {
+interface HeaderClientProps {
+  user: User | null
+}
+
+export default function HeaderClient({ user }: HeaderClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [mounted, setMounted] = useState(false)
+  const { items } = useQuote()
+  const { getTotalItems, isLoaded } = useCart()
   const router = useRouter()
-  const { state, isLoaded } = useCart()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/products", label: "Products" },
+    { href: "/about", label: "About Us" },
+    { href: "/contact", label: "Contact" },
+    { href: "/offers", label: "Offers" },
+  ]
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/products/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/products/search?query=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery("")
+      setIsMenuOpen(false)
     }
   }
 
-  const cartItemCount = mounted && isLoaded ? state.items.reduce((sum, item) => sum + item.quantity, 0) : 0
+  // Show loading state for cart count until cart is loaded and component is mounted
+  const cartItemCount = mounted && isLoaded ? getTotalItems() : 0
+  const showCartBadge = mounted && isLoaded && cartItemCount > 0
 
   return (
-    <>
-      {/* Mobile menu button */}
-      <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-        {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-      </Button>
-
-      {/* Desktop navigation */}
-      <nav className="hidden md:flex items-center space-x-8">
-        <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors">
-          Home
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
+        <Link href="/" className="flex items-center gap-2">
+          <FlaskConical className="h-8 w-8 text-blue-600" />
+          <span className="text-2xl font-bold tracking-tight text-slate-900">Chemical Corporation</span>
         </Link>
-        <Link href="/products" className="text-gray-700 hover:text-blue-600 transition-colors">
-          Products
-        </Link>
-        <Link href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">
-          About
-        </Link>
-        <Link href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
-          Contact
-        </Link>
-      </nav>
 
-      {/* Search bar */}
-      <form onSubmit={handleSearch} className="hidden md:flex items-center space-x-2">
-        <Input
-          type="text"
-          placeholder="Search products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-64"
-        />
-        <Button type="submit" size="icon" variant="outline">
-          <Search className="h-4 w-4" />
-        </Button>
-      </form>
+        <div className="hidden lg:flex flex-1 justify-center">
+          <form onSubmit={handleSearch} className="relative w-full max-w-md flex">
+            <Input
+              placeholder="Search by name, code, or CAS..."
+              className="pl-10 pr-12"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <Button type="submit" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8">
+              Search
+            </Button>
+          </form>
+        </div>
 
-      {/* Cart button */}
-      <Link href="/cart">
-        <Button variant="outline" size="icon" className="relative bg-transparent">
-          <ShoppingCart className="h-4 w-4" />
-          {mounted && isLoaded && cartItemCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {cartItemCount}
-            </span>
-          )}
-        </Button>
-      </Link>
+        <nav className="hidden items-center gap-4 md:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-blue-600"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
-      {/* Mobile menu */}
+        <div className="flex items-center gap-2">
+          <Link href="/cart" className="relative p-2">
+            <ShoppingCart className="h-6 w-6 text-slate-600 hover:text-blue-600" />
+            {showCartBadge && (
+              <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
+          <Link href="/dashboard/quote-cart" className="relative p-2">
+            <div className="h-6 w-6 flex items-center justify-center text-slate-600 hover:text-blue-600 font-bold text-sm">
+              Q
+            </div>
+            {items.length > 0 && (
+              <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                {items.length}
+              </span>
+            )}
+          </Link>
+          <div className="hidden md:flex items-center gap-2">
+            {user ? (
+              <>
+                <Button asChild size="sm" variant="ghost">
+                  <Link href="/dashboard">Dashboard</Link>
+                </Button>
+                <SignOutButton />
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/register">Register</Link>
+                </Button>
+              </>
+            )}
+          </div>
+          <button className="ml-2 p-2 md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white border-t border-gray-200 md:hidden z-50">
-          <div className="px-4 py-2 space-y-2">
-            <form onSubmit={handleSearch} className="flex items-center space-x-2 mb-4">
+        <div className="md:hidden bg-white/95 backdrop-blur-lg">
+          <div className="container mx-auto px-4 py-4">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="mb-4 flex">
               <Input
-                type="text"
                 placeholder="Search products..."
+                className="flex-1"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
               />
-              <Button type="submit" size="icon" variant="outline">
+              <Button type="submit" size="sm" className="ml-2">
                 <Search className="h-4 w-4" />
               </Button>
             </form>
-            <Link
-              href="/"
-              className="block py-2 text-gray-700 hover:text-blue-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              href="/products"
-              className="block py-2 text-gray-700 hover:text-blue-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Products
-            </Link>
-            <Link
-              href="/about"
-              className="block py-2 text-gray-700 hover:text-blue-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className="block py-2 text-gray-700 hover:text-blue-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Contact
-            </Link>
+
+            <nav className="flex flex-col items-center gap-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-lg font-medium text-slate-700 transition-colors hover:text-blue-600"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <div className="mt-4 flex flex-col items-center gap-4 w-full">
+                {user ? (
+                  <>
+                    <Button asChild className="w-full">
+                      <Link href="/dashboard">Dashboard</Link>
+                    </Button>
+                    <SignOutButton />
+                  </>
+                ) : (
+                  <>
+                    <Button asChild variant="outline" className="w-full bg-transparent">
+                      <Link href="/login">Login</Link>
+                    </Button>
+                    <Button asChild className="w-full">
+                      <Link href="/register">Register</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
+            </nav>
           </div>
         </div>
       )}
-    </>
+    </header>
   )
 }

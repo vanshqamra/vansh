@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { HeaderClient } from "./header-client"
+import HeaderClient from "./header-client"
 import type { User } from "@supabase/supabase-js"
 
 export async function Header() {

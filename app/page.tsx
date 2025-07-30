@@ -1,224 +1,183 @@
-import { Suspense } from "react"
-import Image from "next/image"
-import Link from "next/link"
+"use client"
+
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, Award, Clock, Shield, Truck } from "lucide-react"
-import ParallaxBackground from "@/components/parallax-background"
-import OffersCarousel from "@/components/offers-carousel"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowRight, Beaker, Microscope, TestTube } from "lucide-react"
+import Link from "next/link"
+import { OffersCarousel } from "@/components/offers-carousel"
+import Image from "next/image"
+import { labSupplyBrands } from "@/lib/data"
+import { useState, useEffect } from "react"
 
-const brands = [
-  { name: "Qualigens", logo: "/images/logo-qualigens.png", href: "/brand/qualigens" },
-  { name: "Borosil", logo: "/images/logo-borosil.png", href: "/brand/borosil" },
-  { name: "Whatman", logo: "/images/logo-whatman.png", href: "/brand/whatman" },
-  { name: "Rankem", logo: "/images/logo-rankem.png", href: "/brand/rankem" },
-  { name: "J.T. Baker", logo: "/images/logo-jtbaker.png", href: "/brand/jtbaker" },
-]
+function BrandLogo({ slug, name }: { slug: string; name: string }) {
+  const [failed, setFailed] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-const features = [
-  {
-    icon: Award,
-    title: "Premium Quality",
-    description: "ISO certified products from trusted global manufacturers",
-  },
-  {
-    icon: Truck,
-    title: "Fast Delivery",
-    description: "Quick and reliable shipping across India",
-  },
-  {
-    icon: Shield,
-    title: "Safety First",
-    description: "Proper handling and storage of all chemical products",
-  },
-  {
-    icon: Clock,
-    title: "24/7 Support",
-    description: "Expert technical support whenever you need it",
-  },
-]
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-const productCategories = [
-  {
-    title: "Bulk Chemicals",
-    description: "High-purity chemicals for industrial and research applications",
-    image: "/images/product-acid.png",
-    href: "/products/bulk-chemicals",
-  },
-  {
-    title: "Laboratory Supplies",
-    description: "Complete range of lab equipment and consumables",
-    image: "/images/product-solvent.png",
-    href: "/products/laboratory-supplies",
-  },
-  {
-    title: "Scientific Instruments",
-    description: "Precision instruments for accurate measurements",
-    image: "/images/product-salt.png",
-    href: "/products/scientific-instruments",
-  },
-]
+  if (!mounted) {
+    return <div className="h-12 w-36 bg-slate-200 animate-pulse rounded-md" />
+  }
 
-function HeroSection() {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-      <ParallaxBackground />
-      <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
-        <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">
-          Trusted Chemical Supplier Since 1995
-        </Badge>
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-          Premium Chemicals for
-          <span className="text-blue-400 block">Scientific Excellence</span>
-        </h1>
-        <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-          Your trusted partner for high-quality laboratory chemicals, equipment, and scientific instruments
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-            <Link href="/products" className="flex items-center">
-              Browse Products
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-white text-white hover:bg-white hover:text-gray-900 bg-transparent"
-          >
-            <Link href="/contact">Get Quote</Link>
-          </Button>
-        </div>
+    <Link href={`/brand/${slug}`} className="block">
+      <div className="relative h-12 w-36 transition-all">
+        {!failed ? (
+          <Image
+            src={`/images/logo-${slug}.png`}
+            alt={`${name} Logo`}
+            fill
+            style={{ objectFit: "contain" }}
+            sizes="144px"
+            onError={() => setFailed(true)}
+            priority={false}
+          />
+        ) : (
+          <div className="flex h-12 w-36 items-center justify-center rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700">
+            {name}
+          </div>
+        )}
       </div>
-    </section>
-  )
-}
-
-function FeaturesSection() {
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Us?</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            We provide exceptional service and quality products to support your scientific endeavors
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <feature.icon className="h-8 w-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-600">{feature.description}</CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function ProductCategoriesSection() {
-  return (
-    <section className="py-20">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Product Categories</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Explore our comprehensive range of scientific products and equipment
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {productCategories.map((category, index) => (
-            <Card key={index} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
-              <div className="relative h-48 overflow-hidden">
-                <Image
-                  src={category.image || "/placeholder.svg"}
-                  alt={category.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">{category.title}</CardTitle>
-                <CardDescription>{category.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="outline"
-                  className="w-full group-hover:bg-blue-600 group-hover:text-white transition-colors bg-transparent"
-                >
-                  <Link href={category.href} className="flex items-center justify-center">
-                    Explore Category
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function BrandsSection() {
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Trusted Brands</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            We partner with leading global manufacturers to bring you the best products
-          </p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          {brands.map((brand, index) => (
-            <Link key={index} href={brand.href}>
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group">
-                <div className="relative h-16 mb-4">
-                  <Image
-                    src={brand.logo || "/placeholder.svg"}
-                    alt={brand.name}
-                    fill
-                    className="object-contain group-hover:scale-105 transition-transform"
-                  />
-                </div>
-                <p className="text-center font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
-                  {brand.name}
-                </p>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
+    </Link>
   )
 }
 
 export default function HomePage() {
+  const [mounted, setMounted] = useState(false)
+  const brands = Object.entries(labSupplyBrands)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
-    <div className="min-h-screen">
-      <HeroSection />
-      <FeaturesSection />
-      <ProductCategoriesSection />
-      <BrandsSection />
-      <Suspense
-        fallback={
-          <div className="py-20">
-            <div className="container mx-auto px-4 text-center">Loading offers...</div>
+    <>
+      {/* Hero Section */}
+      <section className="relative py-24 md:py-40 overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hero-background.png"
+            alt="Hero Background"
+            fill
+            style={{ objectFit: "cover" }}
+            quality={90}
+            priority
+          />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+        <div className="absolute inset-0 z-10 animate-subtle-float">
+          <Image
+            src="/images/hero-overlay.png"
+            alt="Holographic lab equipment"
+            fill
+            style={{ objectFit: "contain" }}
+            className="opacity-20"
+          />
+        </div>
+        <div className="container relative z-20 mx-auto px-4 md:px-6 text-center text-white">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-glow">
+            The Future of Laboratory Supply
+          </h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-200">
+            An ultra-modern B2B portal designed for precision, speed, and reliability.
+          </p>
+          <div className="mt-8 flex justify-center gap-4">
+            <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-slate-200">
+              <Link href="/products">Explore Products</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-white text-white hover:bg-white/10 bg-transparent"
+            >
+              <Link href="/register">Become a Vendor</Link>
+            </Button>
           </div>
-        }
-      >
-        <OffersCarousel />
-      </Suspense>
-    </div>
+        </div>
+      </section>
+
+      {/* Offers Carousel Section */}
+      <section className="py-16 bg-white/80 backdrop-blur-md">
+        <div className="container mx-auto px-4 md:px-6">
+          <h2 className="text-3xl font-bold text-center mb-10">Exclusive Vendor Offers</h2>
+          {mounted ? (
+            <OffersCarousel />
+          ) : (
+            <div className="flex justify-center">
+              <div className="w-full max-w-4xl h-64 bg-slate-200 animate-pulse rounded-lg" />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold">One-Stop Solution for Your Needs</h2>
+            <p className="mt-2 text-slate-600">From bulk chemicals to precision instruments, we have you covered.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Link href="/products/bulk-chemicals" className="group block">
+              <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80">
+                <CardHeader className="flex-row items-center gap-4">
+                  <Beaker className="w-10 h-10 text-teal-500" />
+                  <CardTitle>Bulk Chemicals</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-slate-600 mb-4">High-volume, industrial-grade chemicals.</p>
+                  <span className="font-semibold text-blue-600 flex items-center gap-2">
+                    Browse <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href="/products/laboratory-supplies" className="group block">
+              <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80">
+                <CardHeader className="flex-row items-center gap-4">
+                  <TestTube className="w-10 h-10 text-teal-500" />
+                  <CardTitle>Laboratory Supplies</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-slate-600 mb-4">Glassware, reagents, and consumables.</p>
+                  <span className="font-semibold text-blue-600 flex items-center gap-2">
+                    Explore <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href="/products/scientific-instruments" className="group block">
+              <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80">
+                <CardHeader className="flex-row items-center gap-4">
+                  <Microscope className="w-10 h-10 text-teal-500" />
+                  <CardTitle>Scientific Instruments</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-slate-600 mb-4">Precision instruments and equipment.</p>
+                  <span className="font-semibold text-blue-600 flex items-center gap-2">
+                    Discover <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Brands Section (limited brands) */}
+      <section className="py-16 bg-slate-50">
+        <div className="container mx-auto px-4 md:px-6">
+          <h2 className="text-3xl font-bold text-center mb-10">Our Associated Brands</h2>
+          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
+            {brands.map(([slug, brand]) => (
+              <BrandLogo key={slug} slug={slug} name={brand.name} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   )
 }
