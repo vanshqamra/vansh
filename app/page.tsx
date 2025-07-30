@@ -1,4 +1,5 @@
-"use client";
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, Beaker, Microscope, TestTube } from "lucide-react"
@@ -6,16 +7,19 @@ import Link from "next/link"
 import { OffersCarousel } from "@/components/offers-carousel"
 import Image from "next/image"
 import { labSupplyBrands } from "@/lib/data"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
-function BrandLogo({
-  slug,
-  name,
-}: {
-  slug: string
-  name: string
-}) {
+function BrandLogo({ slug, name }: { slug: string; name: string }) {
   const [failed, setFailed] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className="h-12 w-36 bg-slate-200 animate-pulse rounded-md" />
+  }
 
   return (
     <Link href={`/brand/${slug}`} className="block">
@@ -41,7 +45,12 @@ function BrandLogo({
 }
 
 export default function HomePage() {
+  const [mounted, setMounted] = useState(false)
   const brands = Object.entries(labSupplyBrands)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <>
@@ -94,7 +103,13 @@ export default function HomePage() {
       <section className="py-16 bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 md:px-6">
           <h2 className="text-3xl font-bold text-center mb-10">Exclusive Vendor Offers</h2>
-          <OffersCarousel />
+          {mounted ? (
+            <OffersCarousel />
+          ) : (
+            <div className="flex justify-center">
+              <div className="w-full max-w-4xl h-64 bg-slate-200 animate-pulse rounded-lg" />
+            </div>
+          )}
         </div>
       </section>
 
@@ -152,33 +167,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Our Brands Section (manually listed, selected brands removed) */}
-<section className="py-16 bg-slate-50">
-  <div className="container mx-auto px-4 md:px-6">
-    <h2 className="text-3xl font-bold text-center mb-10">Our Associated Brands</h2>
-    <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
-      <BrandLogo slug="fisher" name="Fisher Scientific" />
-      <BrandLogo slug="himedia" name="HiMedia" />
-      <BrandLogo slug="sigma" name="Sigma-Aldrich" />
-      <BrandLogo slug="thermo" name="Thermo Fisher" />
-      <BrandLogo slug="merck" name="Merck" />
-      <BrandLogo slug="loba" name="Loba Chemie" />
-      <BrandLogo slug="remi" name="Remi" />
-      <BrandLogo slug="eppendorf" name="Eppendorf" />
-      <BrandLogo slug="coleparmer" name="Cole-Parmer" />
-      <BrandLogo slug="bio-rad" name="Bio-Rad" />
-      <BrandLogo slug="vwr" name="VWR" />
-      <BrandLogo slug="gilson" name="Gilson" />
-      <BrandLogo slug="mettler" name="Mettler Toledo" />
-      <BrandLogo slug="sartorius" name="Sartorius" />
-      <BrandLogo slug="perkinelmer" name="PerkinElmer" />
-      <BrandLogo slug="labindia" name="LabIndia" />
-      <BrandLogo slug="reliable" name="Reliable Lab Equipment" />
-    </div>
-  </div>
-</section>
-
-
+      {/* Our Brands Section (limited brands) */}
+      <section className="py-16 bg-slate-50">
+        <div className="container mx-auto px-4 md:px-6">
+          <h2 className="text-3xl font-bold text-center mb-10">Our Associated Brands</h2>
+          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
+            {brands.map(([slug, brand]) => (
+              <BrandLogo key={slug} slug={slug} name={brand.name} />
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   )
 }

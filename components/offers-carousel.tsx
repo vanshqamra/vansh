@@ -2,15 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import Image from "next/image"
 import { Button } from "./ui/button"
+import Link from "next/link"
 
 const offers = [
   {
@@ -31,12 +26,12 @@ const offers = [
   {
     title: "15% Off Whatman Filters",
     description: "Get 15% off on genuine Whatman filter papers — perfect for lab use.",
-    img: "https://ucarecdn.com/8ea7953b-bca0-4568-b562-bdbfd906aa11/-/preview/1000x1000",
+    img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cellulose_filter_paper_quantitative_hardened_low_ash_grade_50_13890-m08jan21_5_1200x1200.jpg-IMPmkpUd73OqsMPSUW5859nkiMYovp.jpeg",
   },
   {
     title: "New Borosil Glassware",
     description: "Explore the latest 2025 Borosil catalog — special intro prices!",
-    img: "https://ucarecdn.com/82dea84f-9906-498f-be71-65b931c60ab4/-/preview/1000x817/",
+    img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1a-1.jpg-uPlgGFUrUaBGN2tIcVUaSWjA34OMBx.jpeg",
   },
 ]
 
@@ -46,7 +41,7 @@ export function OffersCarousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % offers.length)
-    }, 2000)
+    }, 4000)
 
     return () => clearInterval(interval)
   }, [])
@@ -58,18 +53,13 @@ export function OffersCarousel() {
           <CarouselItem key={index} className="basis-full shrink-0 grow-0">
             <Card className="overflow-hidden">
               <CardContent className="relative flex aspect-video items-center justify-center p-0">
-                <Image
-                  src={offer.img}
-                  alt={offer.title}
-                  layout="fill"
-                  objectFit="cover"
-                />
+                <Image src={offer.img || "/placeholder.svg"} alt={offer.title} fill style={{ objectFit: "cover" }} />
                 <div className="absolute inset-0 bg-black/60" />
                 <div className="relative z-10 text-center text-white p-6">
                   <h3 className="text-3xl font-bold">{offer.title}</h3>
                   <p className="mt-2 text-lg">{offer.description}</p>
                   <Button className="mt-4" variant="secondary" asChild>
-                    <a href="/offers">See All Offers</a>
+                    <Link href="/offers">See All Offers</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -78,7 +68,7 @@ export function OffersCarousel() {
         ))}
       </CarouselContent>
       <CarouselPrevious className="left-[-50px]" />
-      <CarouselNext className="right-[-50px] border-0" />
+      <CarouselNext className="right-[-50px]" />
     </Carousel>
   )
 }

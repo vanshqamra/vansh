@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, ReactNode } from "react"
 
 type Product = {
   code: string
@@ -25,14 +24,16 @@ interface QuoteContextType {
 
 const QuoteContext = createContext<QuoteContextType | undefined>(undefined)
 
-export function QuoteProvider({ children }: { children: React.ReactNode }) {
+export function QuoteProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<QuoteItem[]>([])
 
   const addItem = (item: QuoteItem) => {
     setItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.code === item.code)
       if (existingItem) {
-        return prevItems.map((i) => (i.code === item.code ? { ...i, quantity: i.quantity + item.quantity } : i))
+        return prevItems.map((i) =>
+          i.code === item.code ? { ...i, quantity: i.quantity + item.quantity } : i
+        )
       }
       return [...prevItems, item]
     })
@@ -46,7 +47,11 @@ export function QuoteProvider({ children }: { children: React.ReactNode }) {
     if (quantity <= 0) {
       removeItem(code)
     } else {
-      setItems((prevItems) => prevItems.map((item) => (item.code === code ? { ...item, quantity } : item)))
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          item.code === code ? { ...item, quantity } : item
+        )
+      )
     }
   }
 
