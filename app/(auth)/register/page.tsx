@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
+import { useFormStatus } from "react-dom"
 
 export default function RegisterPage() {
-  const [state, formAction] = useFormState(signup, undefined)
+  const [state, formAction] = useActionState(signup, undefined)
 
   return (
     <div className="container mx-auto flex items-center justify-center py-16">
