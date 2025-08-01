@@ -1,100 +1,151 @@
 "use client"
 
-import Image from "next/image"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import type { QualigensProduct } from "@/lib/qualigens-products"
-import { useQuote } from "@/app/context/quote-context"
-import { useToast } from "@/components/ui/use-toast"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
+import { useCart } from "@/app/context/CartContext"
+import { useToast } from "@/hooks/use-toast"
+
+type QualigensProduct = {
+  id: string
+  code: string
+  name: string
+  cas: string
+  category: string
+  packSize: string
+  material: string
+  price: number
+  purity: string
+  brand: string
+  hsn: string
+}
 
 interface QualiProductGridProps {
   products: QualigensProduct[]
 }
 
 export function QualiProductGrid({ products }: QualiProductGridProps) {
-  const { addToQuote } = useQuote()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const productsPerPage = 24
+  const { addItem } = useCart()
   const { toast } = useToast()
 
-  const handleAddToQuote = (product: QualigensProduct) => {
-    addToQuote({
-      name: product["Product Name"],
-      quantity: 1,
-      unit: product["Pack Size"],
-      price: product["Price (INR)"],
-    })
+  const filteredProducts = useMemo(() => {
+    if (!products || !Array.isArray(products)) return []
+
+    return products.filter(
+      (product) =>
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.cas?.includes(searchTerm) ||
+        product.category?.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+  }, [products, searchTerm])
+
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+  const startIndex = (currentPage - 1) * productsPerPage
+  const displayedProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage)
+
+  const handleAddToCart = (product: QualigensProduct) => {
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      brand: "Qualigens",
+      category: product.category,
+      packSize: product.packSize,
+      material: product.material,
+    }
+    addItem(cartItem)
     toast({
-      title: "Added to Quote Cart",
-      description: `${product["Product Name"]} (${product["Pack Size"]}) has been added to your quote cart.`,
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
     })
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {products.map((product) => (
-        <Card
-          key={product["Cat. No."]}
-          className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-        >
-          <div className="relative h-48 w-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-t-lg">
-            {/* Placeholder for product image, as Qualigens data doesn't have image URLs */}
-            <Image
-              src="/placeholder.svg?height=150&width=150"
-              alt={product["Product Name"]}
-              width={150}
-              height={150}
-              objectFit="contain"
-            />
-          </div>
-          <CardHeader className="p-4 pb-2 flex-grow">
-            <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 line-clamp-2">
-              {product["Product Name"]}
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
-              Cat. No.: {product["Cat. No."]} | HSN: {product["HSN Code"]}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-gray-900 dark:text-gray-50">
-                ₹{product["Price (INR)"].toFixed(2)}
-              </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">/ {product["Pack Size"]}</span>
-            </div>
-          </CardContent>
-          <CardFooter className="p-4 pt-0">
-            <Button className="w-full" onClick={() => handleAddToQuote(product)}>
-              Add to Quote
-            </Button>
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
-  )
-}
+    <div className="space-y-6">
+      {/* Search Bar */}
+      <div className="relative max-w-md mx-auto">
+        <Input
+          placeholder="Search by product name or code..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value)
+            setCurrentPage(1)
+          }}
+          className="pl-10"
+        />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+      </div>
 
-export function QualiProductGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <Card key={index} className="flex flex-col overflow-hidden shadow-lg">
-          <Skeleton className="h-48 w-full rounded-t-lg" />
-          <CardHeader className="p-4 pb-2 flex-grow">
-            <Skeleton className="h-6 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-4 w-12" />
-            </div>
-          </CardContent>
-          <CardFooter className="p-4 pt-0">
-            <Skeleton className="h-10 w-full" />
-          </CardFooter>
-        </Card>
-      ))}
+      {/* Results Count */}
+      <div className="text-center text-slate-600">
+        Showing {displayedProducts.length} of {filteredProducts.length} products
+      </div>
+
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {displayedProducts.map((product) => (
+          <Card key={product.id} className="flex flex-col justify-between bg-white/80 backdrop-blur-sm glow-on-hover">
+            <CardHeader>
+              <CardTitle className="text-sm font-semibold leading-snug line-clamp-2">{product.name}</CardTitle>
+              <div className="space-y-1">
+                <p className="text-xs text-slate-500">Code: {product.code}</p>
+                <p className="text-xs text-slate-500">CAS: {product.cas}</p>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <div className="space-y-1 text-xs">
+                <p>
+                  <span className="font-medium">Category:</span> {product.category}
+                </p>
+                <p>
+                  <span className="font-medium">Pack:</span> {product.packSize} ({product.material})
+                </p>
+                <p>
+                  <span className="font-medium">Purity:</span> {product.purity}
+                </p>
+                <p>
+                  <span className="font-medium">HSN:</span> {product.hsn}
+                </p>
+                <p className="font-semibold text-blue-600">₹{product.price.toLocaleString()}</p>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full" onClick={() => handleAddToCart(product)} size="sm">
+                Add to Cart
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-8">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="flex items-center px-4">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

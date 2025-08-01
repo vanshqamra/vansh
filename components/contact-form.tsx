@@ -1,84 +1,110 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useForm, type SubmitHandler } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
-import { Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+
+type FormValues = {
+  name: string
+  email: string
+  phone: string
+  message: string
+}
 
 export function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  })
-  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<FormValues>({
+    mode: "onBlur",
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    console.log("Form submitted:", data)
 
-    // Simulate API call for sending email
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    console.log("Contact form submitted:", formData)
-
-    // Simulate success or failure
-    const success = Math.random() > 0.1 // 90% success rate for demo
-
-    if (success) {
-      toast({
-        title: "Message Sent!",
-        description: "Thank you for your message. We will get back to you shortly.",
-      })
-      setFormData({ name: "", email: "", subject: "", message: "" }) // Clear form
-    } else {
-      toast({
-        title: "Failed to Send Message",
-        description: "There was an issue sending your message. Please try again.",
-        variant: "destructive",
-      })
-    }
-    setLoading(false)
+    toast({
+      title: "Message Sent!",
+      description: "Thank you for contacting us. We will get back to you shortly.",
+    })
+    reset()
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-2">
-        <Label htmlFor="name">Your Name</Label>
-        <Input id="name" value={formData.name} onChange={handleChange} required />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="email">Your Email</Label>
-        <Input id="email" type="email" value={formData.email} onChange={handleChange} required />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="subject">Subject</Label>
-        <Input id="subject" value={formData.subject} onChange={handleChange} required />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="message">Message</Label>
-        <Textarea id="message" value={formData.message} onChange={handleChange} rows={5} required />
-      </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...
-          </>
-        ) : (
-          "Send Message"
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-4 p-6 border rounded-lg bg-white shadow-sm"
+    >
+      <div>
+        <Input
+          placeholder="Your Name"
+          {...register("name", {
+            required: "Name is required",
+            minLength: {
+              value: 2,
+              message: "Name must be at least 2 characters.",
+            },
+          })}
+        />
+        {errors.name && (
+          <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
         )}
+      </div>
+      <div>
+        <Input
+          placeholder="Email Address"
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: "Invalid email address",
+            },
+          })}
+        />
+        {errors.email && (
+          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+        )}
+      </div>
+      <div>
+        <Input
+          placeholder="Phone Number"
+          {...register("phone", {
+            required: "Phone number is required",
+            minLength: {
+              value: 10,
+              message: "Please enter a valid phone number",
+            },
+          })}
+        />
+        {errors.phone && (
+          <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
+        )}
+      </div>
+      <div>
+        <Textarea
+          placeholder="Your Message"
+          rows={5}
+          {...register("message", {
+            required: "Message is required",
+            minLength: {
+              value: 10,
+              message: "Message must be at least 10 characters",
+            },
+          })}
+        />
+        {errors.message && (
+          <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>
+        )}
+      </div>
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? "Sending..." : "Send Message"}
       </Button>
     </form>
   )

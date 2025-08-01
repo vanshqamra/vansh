@@ -3,9 +3,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Beaker, Microscope, TestTube, FlaskConical, Thermometer } from "lucide-react"
 import Link from "next/link"
-import ProductGrid, { ProductGridSkeleton } from "@/components/product-grid"
-import { getLaboratorySupplies, getProductsByCategory } from "@/lib/data"
-import { Suspense } from "react"
 
 const laboratoryBrands = [
   {
@@ -50,82 +47,82 @@ const laboratoryBrands = [
   },
 ]
 
-export default async function LaboratorySuppliesPage() {
-  const supplies = await getLaboratorySupplies()
-  const products = await getProductsByCategory("laboratory-supplies")
-
+export default function LaboratorySuppliesPage() {
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">Laboratory Supplies</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
-          Find essential laboratory supplies, glassware, and consumables for your research and experiments.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">Laboratory Supplies</h1>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            Discover premium laboratory equipment, chemicals, and supplies from leading brands. Everything you need for
+            research, analysis, and quality control.
+          </p>
+        </div>
 
-      {/* Brands Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {laboratoryBrands.map((brand) => {
-          const IconComponent = brand.icon
-          return (
-            <Card
-              key={brand.name}
-              className="hover:shadow-lg transition-shadow duration-300 bg-white/80 backdrop-blur-sm"
-            >
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <IconComponent className="h-8 w-8 text-blue-600" />
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    {brand.productCount} Products
-                  </Badge>
-                </div>
-                <CardTitle className="text-xl font-bold text-slate-900">{brand.name}</CardTitle>
-                <CardDescription className="text-slate-600">{brand.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <h4 className="font-semibold text-sm text-slate-700 mb-2">Specialties:</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {brand.specialties.map((specialty) => (
-                      <Badge key={specialty} variant="outline" className="text-xs">
-                        {specialty}
-                      </Badge>
-                    ))}
+        {/* Brands Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {laboratoryBrands.map((brand) => {
+            const IconComponent = brand.icon
+            return (
+              <Card
+                key={brand.name}
+                className="hover:shadow-lg transition-shadow duration-300 bg-white/80 backdrop-blur-sm"
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <IconComponent className="h-8 w-8 text-blue-600" />
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      {brand.productCount} Products
+                    </Badge>
                   </div>
-                </div>
-                <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
-                  <Link href={brand.href}>View Products</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+                  <CardTitle className="text-xl font-bold text-slate-900">{brand.name}</CardTitle>
+                  <CardDescription className="text-slate-600">{brand.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-sm text-slate-700 mb-2">Specialties:</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {brand.specialties.map((specialty) => (
+                        <Badge key={specialty} variant="outline" className="text-xs">
+                          {specialty}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
+                    <Link href={brand.href}>View Products</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
 
-      {/* Categories Section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 shadow-lg mb-12">
-        <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Product Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            "Analytical Reagents",
-            "Laboratory Glassware",
-            "Safety Equipment",
-            "Measuring Instruments",
-            "Chromatography Supplies",
-            "Microscopy Equipment",
-            "Sample Preparation",
-            "Quality Control",
-          ].map((category) => (
-            <div key={category} className="text-center p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-              <p className="font-medium text-slate-700">{category}</p>
-            </div>
-          ))}
+        {/* Categories Section */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 shadow-lg">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Product Categories</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              "Analytical Reagents",
+              "Laboratory Glassware",
+              "Safety Equipment",
+              "Measuring Instruments",
+              "Chromatography Supplies",
+              "Microscopy Equipment",
+              "Sample Preparation",
+              "Quality Control",
+            ].map((category) => (
+              <div
+                key={category}
+                className="text-center p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+              >
+                <p className="font-medium text-slate-700">{category}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-
-      <Suspense fallback={<ProductGridSkeleton />}>
-        <ProductGrid products={products} />
-      </Suspense>
     </div>
   )
 }

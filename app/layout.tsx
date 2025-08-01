@@ -2,44 +2,43 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { QuoteProvider } from "@/app/context/quote-context"
+import { AuthProvider } from "@/app/context/auth-context"
+import { CartProvider } from "@/app/context/CartContext"
 import { Toaster } from "@/components/ui/toaster"
-import { CartProvider } from "./context/CartContext"
-import { QuoteProvider } from "./context/quote-context"
-import { AuthProvider } from "./context/auth-context"
-import { WhatsappButton } from "@/components/whatsapp-button"
+import { WhatsAppButton } from "@/components/whatsapp-button"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Chemical Corporation",
-  description: "Your trusted partner for high-quality chemicals and laboratory supplies.",
+  title: "Chemical Corporation - Premium Laboratory Chemicals & Equipment",
+  description:
+    "Leading supplier of high-quality laboratory chemicals, scientific instruments, and laboratory supplies. Trusted by research institutions and industries worldwide.",
+  keywords: "laboratory chemicals, scientific instruments, chemical supplies, research chemicals, lab equipment",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <AuthProvider>
+        <AuthProvider>
+          <QuoteProvider>
             <CartProvider>
-              <QuoteProvider>
-                <Header />
-                <main className="flex-grow">{children}</main>
-                <Footer />
-                <Toaster />
-                <WhatsappButton />
-              </QuoteProvider>
+              <Header />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+              <WhatsAppButton />
+              <Toaster />
             </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
+          </QuoteProvider>
+        </AuthProvider>
       </body>
     </html>
   )

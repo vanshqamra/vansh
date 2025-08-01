@@ -1,85 +1,26 @@
 import type { MetadataRoute } from "next"
-import { getProducts, getBrands } from "@/lib/data"
+import { labSupplyBrands } from "@/lib/data"
+
+const BASE_URL = "https://chemical-corporation-portal.vercel.app"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://chemical-corp-portal.vercel.app" // Replace with your actual domain
-
-  const products = getProducts().map((product) => ({
-    url: `${baseUrl}/products/${product.id}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
+  const staticRoutes = [
+    "",
+    "/products",
+    "/products/bulk-chemicals",
+    "/products/laboratory-supplies",
+    "/products/scientific-instruments",
+    "/about",
+    "/contact",
+  ].map((route) => ({
+    url: `${BASE_URL}${route}`,
+    lastModified: new Date(),
   }))
 
-  const brands = getBrands().map((brand) => ({
-    url: `${baseUrl}/brand/${brand.slug}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
+  const brandRoutes = Object.keys(labSupplyBrands).map((brandKey) => ({
+    url: `${BASE_URL}/brand/${brandKey}`,
+    lastModified: new Date(),
   }))
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "daily",
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/products`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/offers`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/brands`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/login`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "monthly",
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/register`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "monthly",
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "monthly",
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/payments`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "monthly",
-      priority: 0.3,
-    },
-    ...products,
-    ...brands,
-  ]
+  return [...staticRoutes, ...brandRoutes]
 }

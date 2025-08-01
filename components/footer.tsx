@@ -1,125 +1,78 @@
 import Link from "next/link"
+import { FlaskConical, Mail, MapPin, Phone, Microscope } from "lucide-react"
 import Image from "next/image"
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-10 md:py-12">
-      <div className="container mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Company Info */}
-        <div className="flex flex-col items-start">
+    <footer className="bg-slate-900 text-slate-300 relative overflow-hidden">
+      <div className="absolute -bottom-10 -right-10">
+        <Microscope className="w-48 h-48 text-slate-700/50" />
+      </div>
+      <div className="container mx-auto grid grid-cols-1 gap-8 px-4 py-12 md:grid-cols-4 md:px-6 relative z-10">
+        <div>
           <Link href="/" className="flex items-center gap-2 mb-4">
-            <Image
-              src="/generic-brand-logo.png"
-              alt="Chemical Corp Logo"
-              width={40}
-              height={40}
-              className="h-8 w-auto"
-            />
-            <span className="text-xl font-bold text-white">Chemical Corp</span>
+            <FlaskConical className="h-7 w-7 text-teal-400" />
+            <span className="text-xl font-bold text-white">Chemical Corporation</span>
           </Link>
-          <p className="text-sm mb-4">
-            Your trusted partner for high-quality chemicals, laboratory supplies, and scientific instruments.
+          <p className="text-sm text-slate-400">
+            Serving laboratories and industries with quality chemicals and supplies since 1947.
           </p>
-          <div className="flex gap-4">
-            <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-              <Facebook className="h-6 w-6" />
-              <span className="sr-only">Facebook</span>
-            </Link>
-            <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-              <Twitter className="h-6 w-6" />
-              <span className="sr-only">Twitter</span>
-            </Link>
-            <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-              <Instagram className="h-6 w-6" />
-              <span className="sr-only">Instagram</span>
-            </Link>
-            <Link href="#" className="text-gray-400 hover:text-white transition-colors">
-              <Linkedin className="h-6 w-6" />
-              <span className="sr-only">LinkedIn</span>
-            </Link>
+          <div className="mt-4 text-teal-400 font-bold border border-teal-400/50 rounded-lg px-3 py-1 inline-block">
+            Serving Labs Since 1947 – 77+ Years Strong
           </div>
         </div>
-
-        {/* Quick Links */}
         <div>
-          <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
-          <ul className="space-y-2">
+          <h3 className="mb-4 text-lg font-semibold text-white">Products</h3>
+          <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/products" className="text-sm hover:text-white transition-colors">
-                Products
+              <Link href="/products/commercial" className="hover:text-teal-400">
+                Commercial Chemicals
               </Link>
             </li>
             <li>
-              <Link href="/offers" className="text-sm hover:text-white transition-colors">
-                Offers
+              <Link href="/brand/borosil" className="hover:text-teal-400">
+                Borosil Glassware
               </Link>
             </li>
             <li>
-              <Link href="/brands" className="text-sm hover:text-white transition-colors">
-                Brands
+              <Link href="/brand/whatman" className="hover:text-teal-400">
+                Whatman Filter Papers
               </Link>
             </li>
             <li>
-              <Link href="/about" className="text-sm hover:text-white transition-colors">
-                About Us
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="text-sm hover:text-white transition-colors">
-                Contact
+              <Link href="/brand/rankem" className="hover:text-teal-400">
+                Rankem Reagents
               </Link>
             </li>
           </ul>
         </div>
-
-        {/* Customer Service */}
         <div>
-          <h3 className="text-lg font-semibold text-white mb-4">Customer Service</h3>
-          <ul className="space-y-2">
-            <li>
-              <Link href="/dashboard/history" className="text-sm hover:text-white transition-colors">
-                Order History
-              </Link>
+          <h3 className="mb-4 text-lg font-semibold text-white">Contact Us</h3>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-start gap-3">
+              <MapPin className="h-5 w-5 flex-shrink-0 text-teal-400 mt-0.5" />
+              <span>Gokal Road, Ludhiana, Punjab</span>
             </li>
-            <li>
-              <Link href="/dashboard/quote-cart" className="text-sm hover:text-white transition-colors">
-                Quote Cart
-              </Link>
+            <li className="flex items-center gap-3">
+              <Phone className="h-5 w-5 text-teal-400" />
+              <a href="tel:+919915533998" className="hover:text-teal-400">
+                +91 9915533998
+              </a>
             </li>
-            <li>
-              <Link href="/payments" className="text-sm hover:text-white transition-colors">
-                Payment Options
-              </Link>
-            </li>
-            <li>
-              <Link href="/terms" className="text-sm hover:text-white transition-colors">
-                Terms & Conditions
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy" className="text-sm hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
+            <li className="flex items-center gap-3">
+              <Mail className="h-5 w-5 text-teal-400" />
+              <a href="mailto:chemicalcorporation.ldh@gmail.com" className="hover:text-teal-400">
+                chemicalcorporation.ldh@gmail.com
+              </a>
             </li>
           </ul>
         </div>
-
-        {/* Contact Info */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
-          <address className="not-italic space-y-2 text-sm">
-            <p>123 Science Avenue,</p>
-            <p>Innovation City, State - 123456,</p>
-            <p>India</p>
-            <p>Email: info@chemicalcorp.com</p>
-            <p>Phone: +91 12345 67890</p>
-          </address>
-        </div>
+        
       </div>
-
-      <div className="border-t border-gray-700 mt-8 pt-6 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} Chemical Corporation. All rights reserved.
+      <div className="bg-black/20 py-4">
+        <div className="container mx-auto px-4 md:px-6 text-center text-sm text-slate-500">
+          &copy; {new Date().getFullYear()} Chemical Corporation. All Rights Reserved.
+        </div>
       </div>
     </footer>
   )

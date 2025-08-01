@@ -1,221 +1,291 @@
 "use client"
 
-import Link from "next/link"
-
 import type React from "react"
-
-import { useState } from "react"
-import { useCart } from "@/app/context/CartContext"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import Image from "next/image"
+import { Checkbox } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useCart } from "@/app/context/CartContext"
+import { useAuth } from "@/app/context/auth-context"
 import { useRouter } from "next/navigation"
-import { useToast } from "@/components/ui/use-toast"
-import { Loader2 } from "lucide-react"
+import { CreditCard, Truck, Shield } from "lucide-react"
+import Link from "next/link"
 
 export default function CheckoutPage() {
-  const { cartItems, getCartTotal, clearCart } = useCart()
+  const { items, totalPrice, totalItems, clearCart } = useCart()
+  const { user } = useAuth()
   const router = useRouter()
-  const { toast } = useToast()
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer")
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    paymentMethod: "",
-    notes: "",
-  })
-  const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
+  useEffect(() => {
+    if (mounted && !user) {
+      router.push("/login?redirect=/checkout")
+    }
+  }, [user, router, mounted])
 
-  const handleSelectChange = (value: string, id: string) => {
-    setFormData((prev) => ({ ...prev, [id]: value }))
-  }
+  useEffect(() => {
+    if (mounted && items.length === 0) {
+      router.push("/cart")
+    }
+  }, [items.length, router, mounted])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    if (!acceptedTerms) {
+      alert("Please accept the terms and conditions")
+      return
+    }
 
-    // Simulate API call
+    setIsSubmitting(true)
+
+    // Simulate order processing
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    // In a real application, you would send formData and cartItems to your backend
-    console.log("Order submitted:", {
-      customerInfo: formData,
-      items: cartItems,
-      total: getCartTotal(),
-    })
-
-    // Simulate success or failure
-    const success = Math.random() > 0.1 // 90% success rate for demo
-
-    if (success) {
-      toast({
-        title: "Order Placed!",
-        description: "Your order has been successfully placed. Redirecting...",
-      })
-      clearCart() // Clear cart after successful order
-      router.push("/order-success")
-    } else {
-      toast({
-        title: "Order Failed",
-        description: "There was an issue placing your order. Please try again.",
-        variant: "destructive",
-      })
-    }
-    setLoading(false)
+    // Clear cart and redirect to success page
+    clearCart()
+    router.push("/order-success")
   }
 
-  if (cartItems.length === 0) {
+  if (!mounted) {
     return (
-      <div className="container mx-auto px-4 py-8 md:py-12 text-center">
-        <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
-        <p className="text-lg text-gray-600 mb-8">Add some products to your cart to proceed to checkout.</p>
-        <Button asChild>
-          <Link href="/products">Browse Products</Link>
-        </Button>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
+        </div>
       </div>
     )
   }
 
+  if (!user) {
+    return null
+  }
+
+  if (items.length === 0) {
+    return null
+  }
+
+  const taxAmount = Math.round(totalPrice * 0.18)
+  const finalTotal = totalPrice + taxAmount
+
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Shipping Information</CardTitle>
-            <CardDescription>Please provide your shipping details.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input id="fullName" value={formData.fullName} onChange={handleInputChange} required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={formData.email} onChange={handleInputChange} required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" type="tel" value={formData.phone} onChange={handleInputChange} required />
-              </div>
-              <div className="grid gap-2 md:col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" value={formData.address} onChange={handleInputChange} required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="city">City</Label>
-                <Input id="city" value={formData.city} onChange={handleInputChange} required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="state">State</Label>
-                <Input id="state" value={formData.state} onChange={handleInputChange} required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="zip">Zip Code</Label>
-                <Input id="zip" value={formData.zip} onChange={handleInputChange} required />
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Payment Method</CardTitle>
-            <CardDescription>Select your preferred payment option.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Select
-              onValueChange={(value) => handleSelectChange(value, "paymentMethod")}
-              value={formData.paymentMethod}
-              required
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a payment method" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bank_transfer">Bank Transfer (NEFT/RTGS)</SelectItem>
-                <SelectItem value="credit_card">Credit/Debit Card</SelectItem>
-                <SelectItem value="upi">UPI</SelectItem>
-                <SelectItem value="cod">Cash on Delivery (COD)</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Order Notes (Optional)</CardTitle>
-            <CardDescription>Add any special instructions or delivery preferences.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={handleInputChange}
-              rows={4}
-              placeholder="e.g., Leave package at the back door..."
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="lg:col-span-1">
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-4">
-                  <Image
-                    src={item.imageUrl || "/placeholder.svg"}
-                    alt={item.name}
-                    width={64}
-                    height={64}
-                    className="rounded-md object-cover"
-                  />
-                  <div className="flex-grow">
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Checkout Form */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Shipping Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Truck className="h-5 w-5" />
+                  Shipping Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input id="firstName" required />
                   </div>
-                  <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
+                  <div>
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input id="lastName" required />
+                  </div>
                 </div>
-              ))}
-              <Separator />
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total:</span>
-                <span>₹{getCartTotal().toFixed(2)}</span>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={handleSubmit} className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Placing Order...
-                </>
-              ) : (
-                "Place Order"
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
+                <div>
+                  <Label htmlFor="company">Company Name</Label>
+                  <Input id="company" required />
+                </div>
+                <div>
+                  <Label htmlFor="address">Address</Label>
+                  <Textarea id="address" required />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input id="state" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="pincode">PIN Code</Label>
+                    <Input id="pincode" required />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" type="tel" required />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Payment Method */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Payment Method
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                    <RadioGroupItem value="bank_transfer" id="bank_transfer" />
+                    <Label htmlFor="bank_transfer" className="flex-1">
+                      <div className="font-medium">Bank Transfer / NEFT</div>
+                      <div className="text-sm text-gray-600">Payment after order confirmation</div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                    <RadioGroupItem value="credit_terms" id="credit_terms" />
+                    <Label htmlFor="credit_terms" className="flex-1">
+                      <div className="font-medium">Credit Terms</div>
+                      <div className="text-sm text-gray-600">Net 30 days payment terms</div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                    <RadioGroupItem value="cheque" id="cheque" />
+                    <Label htmlFor="cheque" className="flex-1">
+                      <div className="font-medium">Cheque Payment</div>
+                      <div className="text-sm text-gray-600">Post-dated cheque on delivery</div>
+                    </Label>
+                  </div>
+                </RadioGroup>
+
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="text-sm">
+                      <div className="font-medium text-blue-900">Payment Security</div>
+                      <div className="text-blue-700">
+                        Payment will only be processed after we confirm your order and provide final pricing. No charges
+                        will be made at this stage.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Special Instructions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Special Instructions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="Any special handling requirements, delivery instructions, or additional notes..."
+                  rows={4}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Terms and Conditions */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                  />
+                  <Label htmlFor="terms" className="text-sm leading-relaxed">
+                    I agree to the{" "}
+                    <Link href="/terms" className="text-blue-600 hover:underline" target="_blank">
+                      Terms and Conditions
+                    </Link>{" "}
+                    and understand that payment will only be processed after order confirmation.
+                  </Label>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-4">
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {items.map((item) => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <div className="flex-1">
+                        <div className="font-medium">{item.name}</div>
+                        <div className="text-gray-600">Qty: {item.quantity}</div>
+                      </div>
+                      <div className="font-medium">{item.price}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Subtotal ({totalItems} items)</span>
+                    <span>₹{totalPrice.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Shipping</span>
+                    <span className="text-green-600">Free</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tax (18%)</span>
+                    <span>₹{taxAmount.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span>₹{finalTotal.toLocaleString()}</span>
+                </div>
+
+                <div className="text-xs text-gray-600 space-y-1">
+                  <p>• Final pricing subject to confirmation</p>
+                  <p>• Payment only after order approval</p>
+                  <p>• Free shipping included</p>
+                </div>
+
+                <Separator />
+
+                <form onSubmit={handleSubmitOrder}>
+                  <Button type="submit" className="w-full" size="lg" disabled={!acceptedTerms || isSubmitting}>
+                    {isSubmitting ? "Processing Order..." : "Place Order"}
+                  </Button>
+                </form>
+
+                <div className="text-center">
+                  <Link href="/cart" className="text-sm text-blue-600 hover:underline">
+                    ← Back to Cart
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   )

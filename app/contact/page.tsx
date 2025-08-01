@@ -1,97 +1,83 @@
-import { CardDescription } from "@/components/ui/card"
-import { Mail, Phone, MapPin } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ContactForm } from "@/components/contact-form"
+import { Mail, MapPin, Phone } from "lucide-react"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description:
+    "Get in touch with Chemical Corporation. Find our address in Ludhiana, contact details, or send us a message through our contact form.",
+}
 
 export default function ContactPage() {
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <section className="text-center mb-12">
-        <h1 className="text-5xl font-extrabold text-gray-900 dark:text-gray-50 mb-4">Get in Touch</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          We&apos;re here to assist you with any inquiries, orders, or support you may need.
-        </p>
-      </section>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="space-y-8">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold">Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Mail className="h-6 w-6 text-blue-600" />
-                <div>
-                  <h3 className="font-medium">Email Us</h3>
-                  <p className="text-gray-600 dark:text-gray-400">info@chemicalcorp.com</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <Phone className="h-6 w-6 text-blue-600" />
-                <div>
-                  <h3 className="font-medium">Call Us</h3>
-                  <p className="text-gray-600 dark:text-gray-400">+91 12345 67890</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <MapPin className="h-6 w-6 text-blue-600 shrink-0 mt-1" />
-                <div>
-                  <h3 className="font-medium">Visit Our Office</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Chemical Corporation Headquarters,
-                    <br />
-                    123 Science Avenue,
-                    <br />
-                    Innovation City, State - 123456, India
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold">Business Hours</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-gray-700 dark:text-gray-300">
-              <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-              <p>Saturday: 10:00 AM - 2:00 PM</p>
-              <p>Sunday: Closed</p>
-            </CardContent>
-          </Card>
+    <div className="py-16">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Contact Us</h1>
+          <p className="mt-3 max-w-2xl mx-auto text-lg text-slate-600">
+            We're here to help. Reach out to us for quotes, questions, or support.
+          </p>
         </div>
 
-        <div>
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold">Send Us a Message</CardTitle>
-              <CardDescription>
-                Fill out the form below and we&apos;ll get back to you as soon as possible.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ContactForm />
-            </CardContent>
-          </Card>
+        <div className="grid md:grid-cols-2 gap-12">
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Our Location</h2>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <MapPin className="w-6 h-6 text-blue-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold">Address</h3>
+                    <p className="text-slate-600">Gokal Road, Ludhiana, Punjab</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Phone className="w-6 h-6 text-blue-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold">Contact Person: Manoj Kumar</h3>
+                    <p className="text-slate-600">
+                      <a href="tel:+919915533998" className="hover:text-blue-600">
+                        +91 9915533998
+                      </a>
+                    </p>
+                    <p className="text-slate-600">
+                      <a href="tel:+919417250691" className="hover:text-blue-600">
+                        +91 9417250691
+                      </a>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Mail className="w-6 h-6 text-blue-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold">Email</h3>
+                    <p className="text-slate-600">
+                      <a href="mailto:chemicalcorporation.ldh@gmail.com" className="hover:text-blue-600">
+                        info@chemicalcorporation.in
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3423.66215400198!2d75.8442353151354!3d30.89648698158098!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391a8395e526787b%3A0x9f4030d651333f7f!2sGokal%20Rd%2C%20Ludhiana%2C%20Punjab!5e0!3m2!1sen!2sin!4v1678886456789!5m2!1sen!2sin"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Send us a Message</h2>
+            <ContactForm />
+          </div>
         </div>
       </div>
-
-      <section className="mt-12">
-        <h2 className="text-4xl font-bold text-center mb-8">Find Us on the Map</h2>
-        <div className="relative h-[400px] w-full rounded-lg overflow-hidden shadow-lg">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.7000000000007!2d-74.0060!3d40.7128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDQwJzQ3LjEiTiA3NMKwNTknNTkuMCJX!5e0!3m2!1sen!2sus!4v1678901234567!5m2!1sen!2sus"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen={false}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Our Location on Map"
-          ></iframe>
-        </div>
-      </section>
     </div>
   )
 }

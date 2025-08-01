@@ -1,98 +1,116 @@
 "use client"
 
-import Image from "next/image"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import type { Product } from "@/lib/data"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/app/context/CartContext"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
+import { ShoppingCart, Beaker } from "lucide-react"
 
-interface ProductGridProps {
-  products: Product[]
+interface Product {
+  id: string
+  name: string
+  price: number
+  category: string
+  brand: string
+  description?: string
+  image?: string
 }
 
-export function ProductGrid({ products }: ProductGridProps) {
-  const { addToCart } = useCart()
+const products: Product[] = [
+  {
+    id: "1",
+    name: "Sulfuric Acid (H2SO4)",
+    price: 2500,
+    category: "Acids",
+    brand: "Qualigens",
+    description: "High purity sulfuric acid for laboratory use",
+  },
+  {
+    id: "2",
+    name: "Sodium Hydroxide (NaOH)",
+    price: 1800,
+    category: "Bases",
+    brand: "Qualigens",
+    description: "Analytical grade sodium hydroxide pellets",
+  },
+  {
+    id: "3",
+    name: "Hydrochloric Acid (HCl)",
+    price: 2200,
+    category: "Acids",
+    brand: "Qualigens",
+    description: "Concentrated hydrochloric acid solution",
+  },
+  {
+    id: "4",
+    name: "Acetone (C3H6O)",
+    price: 3200,
+    category: "Solvents",
+    brand: "Qualigens",
+    description: "HPLC grade acetone for analytical applications",
+  },
+  {
+    id: "5",
+    name: "Methanol (CH3OH)",
+    price: 2800,
+    category: "Solvents",
+    brand: "Qualigens",
+    description: "High purity methanol for laboratory use",
+  },
+  {
+    id: "6",
+    name: "Potassium Permanganate (KMnO4)",
+    price: 1500,
+    category: "Salts",
+    brand: "Qualigens",
+    description: "Analytical grade potassium permanganate crystals",
+  },
+]
+
+export function ProductGrid() {
+  const { addItem } = useCart()
   const { toast } = useToast()
 
   const handleAddToCart = (product: Product) => {
-    addToCart({
+    addItem({
       id: product.id,
       name: product.name,
       price: product.price,
-      imageUrl: product.imageUrl,
-      quantity: 1,
+      brand: product.brand,
+      category: product.category,
+      image: product.image,
     })
+
     toast({
-      title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart`,
     })
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
-        <Card
-          key={product.id}
-          className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-        >
-          <Link href={`/products/${product.id}`} className="relative h-48 w-full block">
-            <Image
-              src={product.imageUrl || "/placeholder.svg"}
-              alt={product.name}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-t-lg"
-            />
-          </Link>
-          <CardHeader className="p-4 pb-2 flex-grow">
-            <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100 line-clamp-2">
-              <Link href={`/products/${product.id}`} className="hover:underline">
-                {product.name}
-              </Link>
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-              {product.description}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-gray-900 dark:text-gray-50">₹{product.price.toFixed(2)}</span>
-              {product.unit && <span className="text-sm text-gray-500 dark:text-gray-400">/ {product.unit}</span>}
+        <Card key={product.id} className="flex flex-col">
+          <CardHeader>
+            <div className="w-full h-48 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg flex items-center justify-center mb-4">
+              <Beaker className="h-16 w-16 text-blue-600" />
             </div>
+            <CardTitle className="text-lg">{product.name}</CardTitle>
+            <div className="flex gap-2">
+              <Badge variant="secondary">{product.category}</Badge>
+              <Badge variant="outline">{product.brand}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-1">
+            <p className="text-sm text-gray-600 mb-4">{product.description}</p>
+            <p className="text-2xl font-bold text-blue-600">₹{product.price.toLocaleString()}</p>
           </CardContent>
-          <CardFooter className="p-4 pt-0">
-            <Button className="w-full" onClick={() => handleAddToCart(product)}>
+          <CardFooter>
+            <Button onClick={() => handleAddToCart(product)} className="w-full">
+              <ShoppingCart className="mr-2 h-4 w-4" />
               Add to Cart
             </Button>
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
-  )
-}
-
-export function ProductGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <Card key={index} className="flex flex-col overflow-hidden shadow-lg">
-          <Skeleton className="h-48 w-full rounded-t-lg" />
-          <CardHeader className="p-4 pb-2 flex-grow">
-            <Skeleton className="h-6 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-4 w-12" />
-            </div>
-          </CardContent>
-          <CardFooter className="p-4 pt-0">
-            <Skeleton className="h-10 w-full" />
           </CardFooter>
         </Card>
       ))}

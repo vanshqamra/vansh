@@ -1,57 +1,75 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
-import { headers } from "next/headers"
+import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
 
-export async function signIn(formData: FormData) {
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
+export async function login(prevState: any, formData: FormData) {
   const supabase = createClient()
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
+  const email = formData.get("email")
+  const password = formData.get("password")
 
-  if (error) {
-    console.error("Sign-in error:", error.message)
-    return redirect("/login?message=Could not authenticate user")
+  if (!email || !password) {
+    return { error: "Email and password are required." }
   }
 
-  return redirect("/dashboard")
+  const data = {
+    email: email as string,
+    password: password as string,
+  }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    return { error: "Could not authenticate user. Please check your credentials." }
+  }
+
+  revalidatePath("/", "layout")
+  redirect("/dashboard")
 }
 
-export async function signUp(formData: FormData) {
-  const origin = headers().get("origin")
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
+export async function signup(prevState: any, formData: FormData) {
   const supabase = createClient()
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  })
+  const email = formData.get("email")
+  const password = formData.get("password")
+  const name = formData.get("name")
+  const company = formData.get("company")
+  const gst = formData.get("gst")
+  const phone = formData.get("phone")
+  const address = formData.get("address")
 
-  if (error) {
-    console.error("Sign-up error:", error.message)
-    return redirect("/register?message=Could not authenticate user")
+  if (!email || !password || !name || !company || !gst || !phone || !address) {
+    return { error: "All fields are required." }
   }
 
-  return redirect("/register?message=Check email to continue sign in process")
+  const data = {
+    email: email as string,
+    password: password as string,
+    options: {
+      data: {
+        full_name: name as string,
+        company_name: company as string,
+        gst_no: gst as string,
+        contact_number: phone as string,
+        address: address as string,
+      },
+    },
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    console.error("Sign up error:", error)
+    return { error: "Could not authenticate user. An account with this email may already exist." }
+  }
+
+  return { success: "Please check your email to confirm your account." }
 }
 
 export async function signOut() {
   const supabase = createClient()
-  const { error } = await supabase.auth.signOut()
-
-  if (error) {
-    console.error("Sign-out error:", error.message)
-    // Optionally, handle the error more gracefully, e.g., show a toast
-  }
-
-  return redirect("/login")
+  await supabase.auth.signOut()
+  redirect("/login")
 }

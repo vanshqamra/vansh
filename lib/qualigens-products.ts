@@ -1,19 +1,34 @@
-import qualigensProductsData from "./qualigens-products.json"
-
 export interface QualigensProduct {
-  "Sr. No.": number
-  "Product Name": string
-  "Pack Size": string
-  "HSN Code": string
-  "CAS No.": string
-  "Cat. No.": string
-  "Price (INR)": number
+  code: string
+  cas: string
+  name: string
+  packSize: string
+  material: string
+  price: string
+  hsn: string
+  category?: string
+  purity?: string
+  brand?: string
+  id?: string
 }
 
-export function getQualigensProducts(): QualigensProduct[] {
-  return qualigensProductsData as QualigensProduct[]
-}
+// Import the JSON data and convert it to the proper format
+import qualigensData from "./qualigens-products.json"
 
-export function getQualigensProductByCatNo(catNo: string): QualigensProduct | undefined {
-  return qualigensProductsData.find((product) => product["Cat. No."] === catNo) as QualigensProduct | undefined
-}
+export const qualigensProducts: QualigensProduct[] = qualigensData.map(
+  ([code, cas, name, packSize, material, price, hsn]) => ({
+    code,
+    cas: cas || "",
+    name,
+    packSize,
+    material,
+    price,
+    hsn,
+    category: "Laboratory Chemical",
+    purity: "SQ",
+    brand: "Qualigens",
+    id: code,
+  }),
+)
+
+export default qualigensProducts
