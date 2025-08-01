@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Plus } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
+import { useToast } from "@/hooks/use-toast"
 import { qualigensProducts } from "@/lib/qualigens-products"
 import { commercialChemicals } from "@/lib/data"
 
@@ -20,6 +21,7 @@ function SearchResults() {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [mounted, setMounted] = useState(false)
   const { addItem, isLoaded } = useCart()
+  const { toast } = useToast()
 
   useEffect(() => {
     setMounted(true)
@@ -67,18 +69,48 @@ function SearchResults() {
   }
 
   const handleAddToCart = (product: any) => {
-    if (!mounted || !isLoaded) return
+    if (!mounted || !isLoaded) {
+      toast({
+        title: "Loading...",
+        description: "Please wait while the cart loads",
+        variant: "destructive",
+      })
+      return
+    }
 
-    addItem({
-      id: product.id || product.code,
-      name: product.name,
-      price:
-        typeof product.price === "number" ? product.price : Number.parseFloat(product.price.replace(/[^\d.]/g, "")),
-      brand: product.source === "qualigens" ? "Qualigens" : "Commercial",
-      category: product.category,
-      packSize: product.packSize || product.pack_size,
-      material: product.material,
-    })
+    try {
+      const price =
+        typeof product.price === "number" ? product.price : Number.parseFloat(product.price.replace(/[^\d.]/g, ""))
+
+      if (isNaN(price) || price <= 0) {
+        toast({
+          title: "Invalid Price",
+          description: "Unable to add item with invalid price.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      addItem({
+        id: product.id || product.code,
+        name: product.name,
+        price: price,
+        brand: product.source === "qualigens" ? "Qualigens" : "Commercial",
+        category: product.category,
+      })
+
+      toast({
+        title: "Added to Cart",
+        description: `${product.name} has been added to your cart`,
+      })
+    } catch (error) {
+      console.error("Error adding to cart:", error)
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   if (!mounted) {
@@ -156,7 +188,7 @@ function SearchResults() {
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Add to Cart
+                      {isLoaded ? "Add to Cart" : "Loading..."}
                     </Button>
                   </div>
                 </CardContent>

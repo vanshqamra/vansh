@@ -14,7 +14,7 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export default function CartPage() {
-  const { state, updateQuantity, removeItem, clearCart } = useCart()
+  const { state, updateQuantity, removeItem, clearCart, isLoaded } = useCart()
   const { user } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
@@ -24,6 +24,8 @@ export default function CartPage() {
   const total = state?.total || 0
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
+    if (!isLoaded) return
+
     if (newQuantity < 1) {
       removeItem(id)
       toast({
@@ -36,6 +38,8 @@ export default function CartPage() {
   }
 
   const handleRemoveItem = (id: string, name: string) => {
+    if (!isLoaded) return
+
     removeItem(id)
     toast({
       title: "Item removed",
@@ -44,6 +48,8 @@ export default function CartPage() {
   }
 
   const handleClearCart = () => {
+    if (!isLoaded) return
+
     clearCart()
     toast({
       title: "Cart cleared",
@@ -71,6 +77,24 @@ export default function CartPage() {
       })
       clearCart()
     }, 2000)
+  }
+
+  // Show loading state while cart is initializing
+  if (!isLoaded) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-8"></div>
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (items.length === 0) {
@@ -138,6 +162,7 @@ export default function CartPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                        disabled={!isLoaded}
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
@@ -147,11 +172,13 @@ export default function CartPage() {
                         onChange={(e) => handleQuantityChange(item.id, Number.parseInt(e.target.value) || 1)}
                         className="w-20 text-center"
                         min="1"
+                        disabled={!isLoaded}
                       />
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        disabled={!isLoaded}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -166,6 +193,7 @@ export default function CartPage() {
                         size="sm"
                         onClick={() => handleRemoveItem(item.id, item.name)}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 mt-2"
+                        disabled={!isLoaded}
                       >
                         <Trash2 className="h-4 w-4 mr-1" />
                         Remove
@@ -177,7 +205,7 @@ export default function CartPage() {
             ))}
 
             <div className="flex justify-between items-center pt-4">
-              <Button variant="outline" onClick={handleClearCart}>
+              <Button variant="outline" onClick={handleClearCart} disabled={!isLoaded}>
                 Clear Cart
               </Button>
               <Button variant="outline" asChild>
@@ -216,7 +244,7 @@ export default function CartPage() {
 
                 <div className="space-y-3 pt-4">
                   {user ? (
-                    <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isLoading}>
+                    <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isLoading || !isLoaded}>
                       {isLoading ? "Processing..." : "Proceed to Checkout"}
                     </Button>
                   ) : (

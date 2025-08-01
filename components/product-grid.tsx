@@ -69,23 +69,41 @@ const products: Product[] = [
 ]
 
 export function ProductGrid() {
-  const { addItem } = useCart()
+  const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
 
   const handleAddToCart = (product: Product) => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      brand: product.brand,
-      category: product.category,
-      image: product.image,
-    })
+    if (!isLoaded) {
+      toast({
+        title: "Loading...",
+        description: "Please wait while the cart loads",
+        variant: "destructive",
+      })
+      return
+    }
 
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart`,
-    })
+    try {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        brand: product.brand,
+        category: product.category,
+        image: product.image,
+      })
+
+      toast({
+        title: "Added to cart",
+        description: `${product.name} has been added to your cart`,
+      })
+    } catch (error) {
+      console.error("Error adding to cart:", error)
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -107,9 +125,9 @@ export function ProductGrid() {
             <p className="text-2xl font-bold text-blue-600">₹{product.price.toLocaleString()}</p>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => handleAddToCart(product)} className="w-full">
+            <Button onClick={() => handleAddToCart(product)} className="w-full" disabled={!isLoaded}>
               <ShoppingCart className="mr-2 h-4 w-4" />
-              Add to Cart
+              {isLoaded ? "Add to Cart" : "Loading..."}
             </Button>
           </CardFooter>
         </Card>

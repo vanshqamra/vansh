@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useReducer, useEffect } from "react"
+import { createContext, useContext, useReducer, useEffect, useState } from "react"
 
 export interface CartItem {
   id: string
@@ -104,49 +104,69 @@ interface CartContextType {
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
+  isLoaded: boolean
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem("cart")
-    if (savedCart) {
-      try {
-        const parsedCart = JSON.parse(savedCart)
-        dispatch({ type: "LOAD_CART", payload: parsedCart })
-      } catch (error) {
-        console.error("Error loading cart from localStorage:", error)
+    if (typeof window !== "undefined") {
+      const savedCart = localStorage.getItem("cart")
+      if (savedCart) {
+        try {
+          const parsedCart = JSON.parse(savedCart)
+          // Validate the parsed cart structure
+          if (parsedCart && typeof parsedCart === "object" && Array.isArray(parsedCart.items)) {
+            dispatch({ type: "LOAD_CART", payload: parsedCart })
+          }
+        } catch (error) {
+          console.error("Error loading cart from localStorage:", error)
+          // Clear invalid cart data
+          localStorage.removeItem("cart")
+        }
       }
+      setIsLoaded(true)
     }
   }, [])
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes (but only after initial load)
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(state))
-  }, [state])
+    if (isLoaded && typeof window !== "undefined") {
+      try {
+        localStorage.setItem("cart", JSON.stringify(state))
+      } catch (error) {
+        console.error("Error saving cart to localStorage:", error)
+      }
+    }
+  }, [state, isLoaded])
 
   const addItem = (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
+    if (!isLoaded) return
     dispatch({ type: "ADD_ITEM", payload: item })
   }
 
   const removeItem = (id: string) => {
+    if (!isLoaded) return
     dispatch({ type: "REMOVE_ITEM", payload: id })
   }
 
   const updateQuantity = (id: string, quantity: number) => {
+    if (!isLoaded) return
     dispatch({ type: "UPDATE_QUANTITY", payload: { id, quantity } })
   }
 
   const clearCart = () => {
+    if (!isLoaded) return
     dispatch({ type: "CLEAR_CART" })
   }
 
   return (
-    <CartContext.Provider value={{ state, addItem, removeItem, updateQuantity, clearCart }}>
+    <CartContext.Provider value={{ state, addItem, removeItem, updateQuantity, clearCart, isLoaded }}>
       {children}
     </CartContext.Provider>
   )
