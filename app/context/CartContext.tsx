@@ -1,82 +1,70 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 
-interface CartItem {
+export interface CartItem {
   id: string
   name: string
-  brand: string
-  price: string | number
+  price: string
   quantity: number
   image?: string
-  category?: string
-  packSize?: string
-  material?: string
+  brand?: string
+  casNumber?: string
 }
 
 interface CartContextType {
   items: CartItem[]
-  addItem: (item: Omit<CartItem, "quantity">) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
-  clearCart: () => void
   totalItems: number
   totalPrice: number
-  isLoaded: boolean
+  addToCart: (item: Omit<CartItem, "quantity">) => void
+  removeFromCart: (id: string) => void
+  updateQuantity: (id: string, quantity: number) => void
+  clearCart: () => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
-  const [isLoaded, setIsLoaded] = useState(false)
 
+  // Load cart from localStorage on mount
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    const savedCart = localStorage.getItem("chemical-corp-cart")
+    if (savedCart) {
       try {
-        const savedCart = localStorage.getItem("cart-items")
-        if (savedCart) {
-          setItems(JSON.parse(savedCart))
-        }
+        setItems(JSON.parse(savedCart))
       } catch (error) {
         console.error("Error loading cart from localStorage:", error)
-      } finally {
-        setIsLoaded(true)
       }
     }
   }, [])
 
+  // Save cart to localStorage whenever items change
   useEffect(() => {
-    if (isLoaded && typeof window !== "undefined") {
-      try {
-        localStorage.setItem("cart-items", JSON.stringify(items))
-      } catch (error) {
-        console.error("Error saving cart to localStorage:", error)
-      }
-    }
-  }, [items, isLoaded])
+    localStorage.setItem("chemical-corp-cart", JSON.stringify(items))
+  }, [items])
 
-  const addItem = (newItem: Omit<CartItem, "quantity">) => {
-    setItems((prev) => {
-      const existingItem = prev.find((item) => item.id === newItem.id)
+  const addToCart = (newItem: Omit<CartItem, "quantity">) => {
+    setItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === newItem.id)
       if (existingItem) {
-        return prev.map((item) => (item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item))
+        return prevItems.map((item) => (item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item))
       }
-      return [...prev, { ...newItem, quantity: 1 }]
+      return [...prevItems, { ...newItem, quantity: 1 }]
     })
   }
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id))
+  const removeFromCart = (id: string) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id))
   }
 
   const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(id)
+      removeFromCart(id)
       return
     }
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)))
+    setItems((prevItems) => prevItems.map((item) => (item.id === id ? { ...item, quantity } : item)))
   }
 
   const clearCart = () => {
@@ -84,9 +72,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
-
   const totalPrice = items.reduce((sum, item) => {
-    const price = typeof item.price === "string" ? Number.parseFloat(item.price.replace(/[^\d.]/g, "")) : item.price
+    const price = Number.parseFloat(item.price.replace(/[₹,]/g, "")) || 0
     return sum + price * item.quantity
   }, 0)
 
@@ -94,13 +81,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     <CartContext.Provider
       value={{
         items,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearCart,
         totalItems,
         totalPrice,
-        isLoaded,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
       }}
     >
       {children}

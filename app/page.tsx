@@ -1,105 +1,94 @@
-"use client"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, Beaker, Microscope, TestTube } from "lucide-react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { ParallaxBackground } from "@/components/parallax-background"
+import { ProductGrid } from "@/components/product-grid"
 import { OffersCarousel } from "@/components/offers-carousel"
-import Image from "next/image"
-import { labSupplyBrands } from "@/lib/data"
-import { useState, useEffect } from "react"
+import { ArrowRight, Beaker, Shield, Truck, Award, Users, Globe, Phone, Mail, Star } from "lucide-react"
 
-function BrandLogo({ slug, name }: { slug: string; name: string }) {
-  const [failed, setFailed] = useState(false)
-  const [mounted, setMounted] = useState(false)
+const stats = [
+  { number: "10,000+", label: "Products Available" },
+  { number: "500+", label: "Happy Clients" },
+  { number: "15+", label: "Years Experience" },
+  { number: "50+", label: "Global Brands" },
+]
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+const features = [
+  {
+    icon: Shield,
+    title: "Quality Assured",
+    description: "All products undergo rigorous quality testing and come with certificates of analysis",
+  },
+  {
+    icon: Truck,
+    title: "Fast Delivery",
+    description: "Quick and secure delivery with proper handling of hazardous materials",
+  },
+  {
+    icon: Award,
+    title: "Expert Support",
+    description: "Technical support from experienced chemists and laboratory professionals",
+  },
+  {
+    icon: Users,
+    title: "Trusted Partner",
+    description: "Serving research institutions, universities, and industries for over 15 years",
+  },
+]
 
-  if (!mounted) {
-    return <div className="h-12 w-36 bg-slate-200 animate-pulse rounded-md" />
-  }
-
-  return (
-    <Link href={`/brand/${slug}`} className="block">
-      <div className="relative h-12 w-36 transition-all">
-        {!failed ? (
-          <Image
-            src={`/images/logo-${slug}.png`}
-            alt={`${name} Logo`}
-            fill
-            style={{ objectFit: "contain" }}
-            sizes="144px"
-            onError={() => setFailed(true)}
-            priority={false}
-          />
-        ) : (
-          <div className="flex h-12 w-36 items-center justify-center rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700">
-            {name}
-          </div>
-        )}
-      </div>
-    </Link>
-  )
-}
+const testimonials = [
+  {
+    name: "Dr. Sarah Johnson",
+    role: "Research Director, BioTech Labs",
+    content:
+      "Chemical Corporation has been our trusted partner for laboratory supplies. Their quality and service are unmatched.",
+    rating: 5,
+  },
+  {
+    name: "Prof. Michael Chen",
+    role: "Chemistry Department, State University",
+    content: "Excellent product range and technical support. They understand the needs of academic research.",
+    rating: 5,
+  },
+  {
+    name: "Rajesh Kumar",
+    role: "QC Manager, Pharma Industries",
+    content: "Reliable supplier with consistent quality. Their analytical grade chemicals meet all our specifications.",
+    rating: 5,
+  },
+]
 
 export default function HomePage() {
-  const [mounted, setMounted] = useState(false)
-  const brands = Object.entries(labSupplyBrands)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   return (
-    <>
+    <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative py-24 md:py-40 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/hero-background.png"
-            alt="Hero Background"
-            fill
-            style={{ objectFit: "cover" }}
-            quality={90}
-            priority
-          />
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
-        <div className="absolute inset-0 z-10 animate-subtle-float">
-          <Image
-            src="/images/hero-overlay.png"
-            alt="Holographic lab equipment"
-            fill
-            style={{ objectFit: "contain" }}
-            className="opacity-20"
-          />
-        </div>
-        <div className="container relative z-20 mx-auto px-4 md:px-6 text-center text-white">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-glow">
-            The Future of Laboratory Supply
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        <ParallaxBackground />
+        <div className="relative z-10 container mx-auto px-4 text-center text-white">
+          <Badge className="mb-6 bg-white/20 text-white border-white/30 text-sm px-4 py-2">
+            Trusted by 500+ Research Institutions
+          </Badge>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            Premium Laboratory
+            <br />
+            <span className="text-blue-300">Chemicals & Equipment</span>
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-200">
-            An ultra-modern B2B portal designed for precision, speed, and reliability.
+          <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-3xl mx-auto leading-relaxed">
+            Your trusted partner for high-quality laboratory chemicals, scientific instruments, and research supplies
+            from leading global brands
           </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-slate-200">
-              <Link href="/products">Explore Products</Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg" asChild>
+              <Link href="/products">
+                Explore Products <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
             <Button
-              asChild
-              variant="outline"
               size="lg"
-              className="border-white text-white hover:bg-white/10 bg-transparent"
-            >
-              <Link href="/register">Become a Client</Link>
-            </Button>
-            <Button
-              asChild
               variant="outline"
-              size="lg"
-              className="border-white text-white hover:bg-white/10 bg-transparent"
+              className="border-white text-white hover:bg-white hover:text-gray-900 bg-transparent px-8 py-4 text-lg"
+              asChild
             >
               <Link href="/login">Client Login</Link>
             </Button>
@@ -107,85 +96,193 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Offers Carousel Section */}
-      <section className="py-16 bg-white/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl font-bold text-center mb-10">Exclusive Client Offers</h2>
-          {mounted ? (
-            <OffersCarousel />
-          ) : (
-            <div className="flex justify-center">
-              <div className="w-full max-w-4xl h-64 bg-slate-200 animate-pulse rounded-lg" />
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">One-Stop Solution for Your Needs</h2>
-            <p className="mt-2 text-slate-600">From bulk chemicals to precision instruments, we have you covered.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Link href="/products/bulk-chemicals" className="group block">
-              <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80">
-                <CardHeader className="flex-row items-center gap-4">
-                  <Beaker className="w-10 h-10 text-teal-500" />
-                  <CardTitle>Bulk Chemicals</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 mb-4">High-volume, industrial-grade chemicals.</p>
-                  <span className="font-semibold text-blue-600 flex items-center gap-2">
-                    Browse <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-            <Link href="/products/laboratory-supplies" className="group block">
-              <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80">
-                <CardHeader className="flex-row items-center gap-4">
-                  <TestTube className="w-10 h-10 text-teal-500" />
-                  <CardTitle>Laboratory Supplies</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 mb-4">Glassware, reagents, and consumables.</p>
-                  <span className="font-semibold text-blue-600 flex items-center gap-2">
-                    Explore <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-            <Link href="/products/scientific-instruments" className="group block">
-              <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80">
-                <CardHeader className="flex-row items-center gap-4">
-                  <Microscope className="w-10 h-10 text-teal-500" />
-                  <CardTitle>Scientific Instruments</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 mb-4">Precision instruments and equipment.</p>
-                  <span className="font-semibold text-blue-600 flex items-center gap-2">
-                    Discover <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Brands Section (limited brands) */}
+      {/* Stats Section */}
       <section className="py-16 bg-slate-50">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl font-bold text-center mb-10">Our Associated Brands</h2>
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
-            {brands.map(([slug, brand]) => (
-              <BrandLogo key={slug} slug={slug} name={brand.name} />
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">{stat.number}</div>
+                <div className="text-slate-600 font-medium">{stat.label}</div>
+              </div>
             ))}
           </div>
         </div>
       </section>
-    </>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Chemical Corporation?</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              We provide comprehensive solutions for all your laboratory needs with unmatched quality and service
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index} className="text-center hover:shadow-lg transition-shadow border-slate-200">
+                <CardHeader>
+                  <feature.icon className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-slate-600">{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Products</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Discover our most popular laboratory chemicals and equipment from trusted brands
+            </p>
+          </div>
+          <ProductGrid />
+          <div className="text-center mt-12">
+            <Button size="lg" asChild className="px-8 py-4 text-lg">
+              <Link href="/products">View All Products</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Special Offers */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Special Offers</h2>
+            <p className="text-xl text-gray-600">Limited time deals on premium products</p>
+          </div>
+          <OffersCarousel />
+        </div>
+      </section>
+
+      {/* Product Categories */}
+      <section className="py-20 bg-slate-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Product Categories</h2>
+            <p className="text-xl text-gray-600">Comprehensive range of laboratory supplies</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200" asChild>
+              <Link href="/products/bulk-chemicals">
+                <CardHeader className="text-center">
+                  <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
+                    <Beaker className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <CardTitle className="group-hover:text-blue-600 transition-colors">Bulk Chemicals</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription>
+                    High-purity chemicals for research, analysis, and industrial applications
+                  </CardDescription>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200" asChild>
+              <Link href="/dashboard/history">
+                <CardHeader className="text-center">
+                  <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
+                    <Users className="h-8 w-8 text-green-600" />
+                  </div>
+                  <CardTitle className="group-hover:text-green-600 transition-colors">Order History</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription>Track your orders and manage your purchase history</CardDescription>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200" asChild>
+              <Link href="/dashboard/upload">
+                <CardHeader className="text-center">
+                  <div className="h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
+                    <Globe className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <CardTitle className="group-hover:text-purple-600 transition-colors">Upload Requirements</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription>Upload your requirements and get customized quotes</CardDescription>
+                </CardContent>
+              </Link>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Clients Say</h2>
+            <p className="text-xl text-gray-600">Trusted by leading research institutions and industries</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="border-slate-200">
+                <CardContent className="p-6">
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-slate-600 mb-4 italic">"{testimonial.content}"</p>
+                  <div>
+                    <p className="font-semibold text-slate-900">{testimonial.name}</p>
+                    <p className="text-sm text-slate-500">{testimonial.role}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
+          <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
+            Contact us today for personalized quotes and expert consultation on your laboratory needs
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4"
+              asChild
+            >
+              <Link href="/contact">
+                <Phone className="h-5 w-5 mr-2" />
+                Call Now
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent px-8 py-4"
+              asChild
+            >
+              <Link href="/contact">
+                <Mail className="h-5 w-5 mr-2" />
+                Email Us
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }
