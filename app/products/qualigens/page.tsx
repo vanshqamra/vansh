@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Search, ShoppingCart } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import qualigensProducts from "@/lib/qualigens-products.json"
+import { qualigensProducts } from "@/lib/qualigens-products"
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 
@@ -20,7 +20,7 @@ export default function QualigensPage() {
 
   // Sort products alphabetically by name
   const sortedProducts = useMemo(() => {
-    return [...qualigensProducts].sort((a, b) => a[2].localeCompare(b[2]))
+    return [...qualigensProducts].sort((a, b) => a.name.localeCompare(b.name))
   }, [])
 
   // Filter products based on search and letter selection
@@ -31,39 +31,61 @@ export default function QualigensPage() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
-        ([code, cas, name]) =>
-          name.toLowerCase().includes(query) || code.toLowerCase().includes(query) || cas.toLowerCase().includes(query),
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.code.toLowerCase().includes(query) ||
+          product.cas.toLowerCase().includes(query),
       )
     }
 
     // Filter by selected letter
     if (selectedLetter) {
-      filtered = filtered.filter(([, , name]) => name.toUpperCase().startsWith(selectedLetter))
+      filtered = filtered.filter((product) => product.name.toUpperCase().startsWith(selectedLetter))
     }
 
     return filtered
   }, [sortedProducts, searchQuery, selectedLetter])
 
-  const handleAddToCart = (product: (typeof qualigensProducts)[0]) => {
-    const [code, cas, name, packSize, material, price] = product
-
+  const handleAddToCart = (product: any) => {
     try {
-      // Convert price to number, handle "POR" case
-      const numericPrice = price === "POR" ? 0 : Number.parseFloat(price.toString())
+      // Handle POR (Price on Request) items
+      if (product.price === "POR") {
+        toast({
+          title: "Price on Request",
+          description: "Please contact us for pricing on this item.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Convert price to number if it's a string
+      let numericPrice = product.price
+      if (typeof product.price === "string") {
+        numericPrice = Number.parseFloat(product.price.toString())
+      }
+
+      if (isNaN(numericPrice) || numericPrice <= 0) {
+        toast({
+          title: "Error",
+          description: "Invalid price format. Please contact us for this item.",
+          variant: "destructive",
+        })
+        return
+      }
 
       addToCart({
-        id: code,
-        name: name,
+        id: product.id || product.code,
+        name: product.name,
         price: numericPrice,
         brand: "Qualigens",
-        category: "Laboratory Chemical",
-        packSize: packSize,
-        casNumber: cas,
+        category: product.category || "Laboratory Chemical",
+        packSize: product.packSize,
+        casNumber: product.cas,
       })
 
       toast({
         title: "Added to Cart",
-        description: `${name} has been added to your cart.`,
+        description: `${product.name} has been added to your cart.`,
       })
     } catch (error) {
       console.error("Error adding to cart:", error)
@@ -137,57 +159,57 @@ export default function QualigensPage() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => {
-            const [code, cas, name, packSize, material, price, hsn] = product
-            return (
-              <Card key={code} className="hover:shadow-lg transition-shadow bg-white/80 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg font-semibold leading-tight line-clamp-2">{name}</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">Qualigens</Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {code}
-                    </Badge>
+          {filteredProducts.map((product) => (
+            <Card
+              key={product.id || product.code}
+              className="hover:shadow-lg transition-shadow bg-white/80 backdrop-blur-sm"
+            >
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold leading-tight line-clamp-2">{product.name}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">Qualigens</Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {product.code}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">CAS:</span>
+                    <span className="text-slate-800">{product.cas || "N/A"}</span>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">CAS:</span>
-                      <span className="text-slate-800">{cas || "N/A"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">Pack:</span>
-                      <span className="text-slate-800">{packSize}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">Material:</span>
-                      <span className="text-slate-800">{material}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">HSN:</span>
-                      <span className="text-slate-800">{hsn}</span>
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">Pack:</span>
+                    <span className="text-slate-800">{product.packSize}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">Material:</span>
+                    <span className="text-slate-800">{product.material}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">HSN:</span>
+                    <span className="text-slate-800">{product.hsn}</span>
+                  </div>
+                </div>
 
-                  <div className="pt-2 border-t">
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-blue-600">
-                        {price === "POR" ? "Price on Request" : `₹${price}`}
-                      </span>
-                    </div>
-                    <Button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full mt-3 bg-green-600 hover:bg-green-700"
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                    </Button>
+                <div className="pt-2 border-t">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-blue-600">
+                      {product.price === "POR" ? "Price on Request" : `₹${product.price}`}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
-            )
-          })}
+                  <Button
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full mt-3 bg-green-600 hover:bg-green-700"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    {product.price === "POR" ? "Request Quote" : "Add to Cart"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* No Results */}

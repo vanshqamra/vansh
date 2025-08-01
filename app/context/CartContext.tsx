@@ -12,6 +12,8 @@ export interface CartItem {
   category?: string
   packSize?: string
   material?: string
+  casNumber?: string
+  image?: string
 }
 
 interface CartState {
@@ -27,13 +29,15 @@ type CartAction =
   | { type: "CLEAR_CART" }
   | { type: "LOAD_CART"; payload: CartState }
 
-const CartContext = createContext<{
+interface CartContextType {
   state: CartState
-  addItem: (item: Omit<CartItem, "quantity">) => void
-  removeItem: (id: string) => void
+  addToCart: (item: Omit<CartItem, "quantity">) => void
+  removeFromCart: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
-} | null>(null)
+}
+
+const CartContext = createContext<CartContextType | undefined>(undefined)
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
@@ -136,11 +140,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state])
 
-  const addItem = (item: Omit<CartItem, "quantity">) => {
+  const addToCart = (item: Omit<CartItem, "quantity">) => {
     dispatch({ type: "ADD_ITEM", payload: item })
   }
 
-  const removeItem = (id: string) => {
+  const removeFromCart = (id: string) => {
     dispatch({ type: "REMOVE_ITEM", payload: id })
   }
 
@@ -156,8 +160,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     <CartContext.Provider
       value={{
         state,
-        addItem,
-        removeItem,
+        addToCart,
+        removeFromCart,
         updateQuantity,
         clearCart,
       }}
@@ -169,7 +173,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const context = useContext(CartContext)
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useCart must be used within a CartProvider")
   }
   return context

@@ -7,7 +7,7 @@ import { notFound } from "next/navigation"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Search, ShoppingCart } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
@@ -20,7 +20,7 @@ export default function BrandPage({ params }: Props) {
   const [searchTerm, setSearchTerm] = useState("")
   const brandKey = params.brandName as keyof typeof labSupplyBrands
   const brand = labSupplyBrands[brandKey]
-  const { addItem } = useCart()
+  const { addToCart } = useCart()
   const { toast } = useToast()
 
   if (!brand) {
@@ -39,44 +39,56 @@ export default function BrandPage({ params }: Props) {
   )
 
   const handleAddToCart = (product: any) => {
-    // Handle POR (Price on Request) items
-    if (product.price === "POR") {
+    try {
+      // Handle POR (Price on Request) items
+      if (product.price === "POR") {
+        toast({
+          title: "Price on Request",
+          description: "Please contact us for pricing on this item.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Convert price to number if it's a string
+      let numericPrice = product.price
+      if (typeof product.price === "string") {
+        numericPrice = Number.parseFloat(product.price.replace(/[^\d.-]/g, ""))
+      }
+
+      if (isNaN(numericPrice) || numericPrice <= 0) {
+        toast({
+          title: "Error",
+          description: "Invalid price format. Please contact us for this item.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const cartItem = {
+        id: product.id || product.code,
+        name: product.name,
+        price: numericPrice,
+        brand: brand.name,
+        category: product.category || "Laboratory Chemical",
+        packSize: product.packSize,
+        material: product.material,
+      }
+
+      addToCart(cartItem)
+
       toast({
-        title: "Price on Request",
-        description: "Please contact us for pricing on this item.",
-        variant: "destructive",
+        title: "Added to Cart",
+        description: `${product.name} has been added to your cart.`,
       })
-      return
-    }
-
-    // Convert price to number if it's a string
-    const numericPrice =
-      typeof product.price === "string" ? Number.parseFloat(product.price.replace(/[^\d.-]/g, "")) : product.price
-
-    if (isNaN(numericPrice)) {
+    } catch (error) {
+      console.error("Error adding to cart:", error)
       toast({
         title: "Error",
-        description: "Invalid price format. Please contact us for this item.",
+        description: "Failed to add item to cart. Please try again.",
         variant: "destructive",
       })
-      return
     }
-
-    const cartItem = {
-      id: product.id || product.code,
-      name: product.name,
-      price: numericPrice,
-      brand: brand.name,
-      category: product.category || "Laboratory Chemical",
-      packSize: product.packSize,
-      material: product.material,
-    }
-
-    addItem(cartItem)
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
-    })
   }
 
   return (
@@ -117,7 +129,7 @@ export default function BrandPage({ params }: Props) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
-            <Card key={product.id || product.code} className="shadow-sm bg-white">
+            <Card key={product.id || product.code} className="shadow-sm bg-white hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="text-base font-semibold text-slate-700 line-clamp-2">{product.name}</CardTitle>
                 <p className="text-sm text-slate-500">Code: {product.code}</p>
@@ -136,7 +148,7 @@ export default function BrandPage({ params }: Props) {
                   <p>
                     <span className="font-medium">HSN:</span> {product.hsn}
                   </p>
-                  <p className="text-sm font-bold mt-2 text-blue-600">
+                  <p className="text-lg font-bold mt-2 text-blue-600">
                     {product.price === "POR"
                       ? "Price on Request"
                       : `₹${typeof product.price === "number" ? product.price.toLocaleString() : product.price}`}
@@ -144,7 +156,12 @@ export default function BrandPage({ params }: Props) {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="default" className="w-full" onClick={() => handleAddToCart(product)}>
+                <Button
+                  variant="default"
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  onClick={() => handleAddToCart(product)}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
                   {product.price === "POR" ? "Request Quote" : "Add to Cart"}
                 </Button>
               </CardFooter>
