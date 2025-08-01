@@ -58,7 +58,7 @@ export default function HomePage() {
               <div className="text-sm text-blue-300">Clients</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200">25+</div>
+              <div className="text-3xl font-bold text-blue-200">77+</div>
               <div className="text-sm text-blue-300">Years</div>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function HomePage() {
                 <Globe className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-slate-900 mb-2">Global Reach</h3>
-              <p className="text-slate-600 text-sm">Serving laboratories in over 50 countries</p>
+              <p className="text-slate-600 text-sm">Serving 500+ clients  </p>
             </div>
           </div>
         </div>
