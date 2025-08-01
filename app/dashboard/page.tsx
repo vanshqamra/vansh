@@ -1,95 +1,79 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Package, History, Upload, MessageCircle, Settings } from "lucide-react"
+import Link from "next/link"
+import { Package, History, Upload, Settings } from "lucide-react"
 
 export default async function DashboardPage() {
   const supabase = createClient()
-
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return redirect("/login")
+    redirect("/login")
   }
-
-  const isAdmin = user.user_metadata?.role === "admin"
-  const isVendor = user.user_metadata?.role === "vendor"
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <h1 className="text-4xl font-bold text-center mb-8">Welcome, {user.email}!</h1>
+      <h1 className="text-4xl font-bold text-center mb-8">Welcome to Your Dashboard, {user.email}!</h1>
+      <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
+        Here you can manage your orders, quotes, and account settings.
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="flex flex-col items-center justify-center p-6 text-center">
+          <Package className="h-12 w-12 text-blue-600 mb-4" />
           <CardHeader>
-            <Package className="h-8 w-8 text-primary mb-2" />
-            <CardTitle className="text-2xl font-semibold">My Dashboard</CardTitle>
+            <CardTitle>My Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 mb-4">View your personalized dashboard with quick access to key features.</p>
+            <p className="text-gray-600 mb-4">View your past orders and track their status.</p>
             <Button asChild>
-              <Link href="/dashboard">Go to Dashboard</Link>
+              <Link href="/dashboard/history">Go to Orders</Link>
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="flex flex-col items-center justify-center p-6 text-center">
+          <Upload className="h-12 w-12 text-green-600 mb-4" />
           <CardHeader>
-            <History className="h-8 w-8 text-primary mb-2" />
-            <CardTitle className="text-2xl font-semibold">Order History</CardTitle>
+            <CardTitle>Upload Quote Request</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 mb-4">Track your past orders and quote requests.</p>
+            <p className="text-gray-600 mb-4">Submit a new quote request or upload relevant documents.</p>
             <Button asChild>
-              <Link href="/dashboard/history">View History</Link>
+              <Link href="/dashboard/upload">Upload Document</Link>
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="flex flex-col items-center justify-center p-6 text-center">
+          <History className="h-12 w-12 text-purple-600 mb-4" />
           <CardHeader>
-            <Upload className="h-8 w-8 text-primary mb-2" />
-            <CardTitle className="text-2xl font-semibold">Upload Quote</CardTitle>
+            <CardTitle>Quote Cart</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 mb-4">Request custom quotes for bulk orders or specific products.</p>
+            <p className="text-gray-600 mb-4">Review and manage items in your current quote cart.</p>
             <Button asChild>
-              <Link href="/dashboard/upload">Upload Quote</Link>
+              <Link href="/dashboard/quote-cart">Go to Quote Cart</Link>
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="flex flex-col items-center justify-center p-6 text-center">
+          <Settings className="h-12 w-12 text-orange-600 mb-4" />
           <CardHeader>
-            <MessageCircle className="h-8 w-8 text-primary mb-2" />
-            <CardTitle className="text-2xl font-semibold">Quote Cart</CardTitle>
+            <CardTitle>Account Settings</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 mb-4">Review and submit items added to your quote cart.</p>
+            <p className="text-gray-600 mb-4">Update your profile information and preferences.</p>
             <Button asChild>
-              <Link href="/dashboard/quote-cart">View Quote Cart</Link>
+              <Link href="/dashboard/settings">Manage Settings</Link>
             </Button>
           </CardContent>
         </Card>
-
-        {isAdmin && (
-          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader>
-              <Settings className="h-8 w-8 text-primary mb-2" />
-              <CardTitle className="text-2xl font-semibold">Admin Panel</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-700 mb-4">Manage users, orders, and site settings.</p>
-              <Button asChild>
-                <Link href="/dashboard/admin">Go to Admin</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   )

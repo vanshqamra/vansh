@@ -3,24 +3,25 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import Autoplay from "autoplay"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import Autoplay from "autoplay" // Corrected import
 
 interface Offer {
-  id: number
+  id: string
   title: string
   description: string
   image: string
-  link: string
+  ctaText: string
+  ctaLink: string
 }
 
 interface OffersCarouselProps {
   offers: Offer[]
 }
 
-export default function OffersCarousel({ offers }: OffersCarouselProps) {
+export function OffersCarousel({ offers }: OffersCarouselProps) {
   const plugin = React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true }))
 
   return (
@@ -33,28 +34,28 @@ export default function OffersCarousel({ offers }: OffersCarouselProps) {
       <CarouselContent>
         {offers.map((offer) => (
           <CarouselItem key={offer.id}>
-            <div className="p-1">
-              <Card className="overflow-hidden shadow-lg">
-                <CardContent className="flex flex-col md:flex-row items-center p-0">
-                  <div className="relative w-full md:w-1/2 h-64 md:h-80">
-                    <Image
-                      src={offer.image || "/placeholder.svg"}
-                      alt={offer.title}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
-                    />
-                  </div>
-                  <div className="p-6 md:p-8 w-full md:w-1/2 space-y-4">
-                    <h3 className="text-3xl font-bold text-gray-900">{offer.title}</h3>
-                    <p className="text-gray-700">{offer.description}</p>
-                    <Button asChild>
-                      <Link href={offer.link}>View Offer</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="overflow-hidden shadow-lg">
+              <div className="relative h-64 w-full">
+                <Image
+                  src={offer.image || "/placeholder.svg"}
+                  alt={offer.title}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-t-lg"
+                />
+              </div>
+              <CardHeader className="p-6">
+                <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">{offer.title}</CardTitle>
+                <CardDescription className="text-md text-gray-600 dark:text-gray-400">
+                  {offer.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6 pt-0">
+                <Button asChild className="w-full">
+                  <Link href={offer.ctaLink}>{offer.ctaText}</Link>
+                </Button>
+              </CardContent>
+            </Card>
           </CarouselItem>
         ))}
       </CarouselContent>

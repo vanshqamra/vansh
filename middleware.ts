@@ -1,62 +1,27 @@
-import { createServerClient } from "@supabase/ssr"
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 import { NextResponse, type NextRequest } from "next/server"
 
-export async function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: any) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          })
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          })
-        },
-      },
-    },
-  )
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Refresh session if expired - required for Server Components
-  // and Server Actions to be able to send requests to Supabase
-  // with the user's session
-  await supabase.auth.getSession()
+  // If user is not logged in and trying to access dashboard or admin pages, redirect to login
+  if (!user && (req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/admin"))) {
+    return NextResponse.redirect(new URL("/login", req.url))
+  }
 
-  return response
+  // If user is logged in and trying to access login or register pages, redirect to dashboard
+  if (user && (req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/register"))) {
+    return NextResponse.redirect(new URL("/dashboard", req.url))
+  }
+
+  return res
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/register"],
 }

@@ -1,197 +1,167 @@
-"use client"
-
-import Link from "next/link"
-
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useToast } from "@/hooks/use-toast"
+import { Download } from "lucide-react"
 
-interface QuoteItem {
-  id: string
-  name: string
-  brand?: string
-  packSize?: string
-  casNumber?: string
-  quantity: number
-}
-
-interface Quote {
-  id: string
-  user_id: string
-  items: QuoteItem[]
-  status: "pending" | "approved" | "rejected" | "completed"
-  requested_at: string
-}
-
-export default function OrderHistoryPage() {
-  const [quotes, setQuotes] = useState<Quote[]>([])
-  const [loading, setLoading] = useState(true)
+export default async function OrderHistoryPage() {
   const supabase = createClient()
-  const { toast } = useToast()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  useEffect(() => {
-    fetchUserQuotes()
-  }, [])
-
-  const fetchUserQuotes = async () => {
-    setLoading(true)
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-
-    if (userError || !user) {
-      console.error("User not logged in:", userError?.message)
-      toast({
-        title: "Authentication Error",
-        description: "Please log in to view your order history.",
-        variant: "destructive",
-      })
-      setLoading(false)
-      return
-    }
-
-    const { data: quotesData, error } = await supabase
-      .from("quotes")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("requested_at", { ascending: false })
-
-    if (error) {
-      console.error("Error fetching user quotes:", error)
-      toast({
-        title: "Error",
-        description: "Failed to fetch your quote requests.",
-        variant: "destructive",
-      })
-    } else {
-      setQuotes(quotesData as Quote[])
-    }
-    setLoading(false)
+  if (!user) {
+    redirect("/login")
   }
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Your Order History</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Loading Order History...</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Please wait while we fetch your past quote requests.</p>
-          </CardContent>
-        </Card>
-      </div>
-    )
+  const { data: orders, error: ordersError } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+
+  const { data: quotes, error: quotesError } = await supabase
+    .from("quote_requests")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+
+  const { data: uploads, error: uploadsError } = await supabase
+    .from("user_uploads")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("uploaded_at", { ascending: false })
+
+  if (ordersError || quotesError || uploadsError) {
+    console.error("Error fetching history:", ordersError || quotesError || uploadsError)
+    return <div className="container mx-auto p-8">Error loading history.</div>
   }
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <h1 className="text-4xl font-bold text-center mb-8">Your Order History</h1>
+      <h1 className="text-4xl font-bold text-center mb-8">Your History</h1>
+      <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
+        Track your past orders, quote requests, and uploaded documents.
+      </p>
 
-      {quotes.length === 0 ? (
-        <Card className="max-w-2xl mx-auto text-center py-12">
-          <CardTitle className="mb-4">No Order History Found</CardTitle>
-          <CardContent>
-            <p className="text-gray-600">You haven't submitted any quote requests yet.</p>
-            <Button className="mt-6" asChild>
-              <Link href="/products">Start Browsing Products</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <Card>
           <CardHeader>
-            <CardTitle>Your Quote Requests</CardTitle>
+            <CardTitle>Order History</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Quote ID</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Requested At</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {quotes.map((quote) => (
-                  <TableRow key={quote.id}>
-                    <TableCell className="font-medium">{quote.id.substring(0, 8)}...</TableCell>
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="link" className="p-0 h-auto">
-                            View {quote.items.length} Items
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
-                          <DialogHeader>
-                            <DialogTitle>Items for Quote ID: {quote.id.substring(0, 8)}</DialogTitle>
-                          </DialogHeader>
-                          <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-                            <ul className="space-y-2">
-                              {quote.items.map((item, index) => (
-                                <li key={index} className="flex items-center gap-2">
-                                  <img
-                                    src={item.image || "/placeholder.svg"}
-                                    alt={item.name}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-md object-cover"
-                                  />
-                                  <div>
-                                    <p className="font-medium">{item.name}</p>
-                                    <p className="text-sm text-gray-500">
-                                      Qty: {item.quantity} | Pack: {item.packSize || "N/A"} | CAS:{" "}
-                                      {item.casNumber || "N/A"}
-                                    </p>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          </ScrollArea>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          quote.status === "pending"
-                            ? "secondary"
-                            : quote.status === "approved"
-                              ? "default"
-                              : quote.status === "rejected"
-                                ? "destructive"
-                                : "outline"
-                        }
-                      >
-                        {quote.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{format(new Date(quote.requested_at), "PPP p")}</TableCell>
-                    <TableCell className="text-right">
-                      {/* Add actions here if needed, e.g., view details, re-request */}
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/dashboard/quote-cart?quoteId=${quote.id}`}>View Details</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {orders.length === 0 ? (
+              <p className="text-center text-gray-500">No orders placed yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Order ID</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {orders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-medium">{order.id.substring(0, 8)}...</TableCell>
+                        <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>₹{order.total_amount?.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{order.status}</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Quote Requests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {quotes.length === 0 ? (
+              <p className="text-center text-gray-500">No quote requests submitted yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Quote ID</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {quotes.map((quote) => (
+                      <TableRow key={quote.id}>
+                        <TableCell className="font-medium">{quote.id.substring(0, 8)}...</TableCell>
+                        <TableCell>{new Date(quote.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{quote.status}</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Uploaded Documents</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {uploads.length === 0 ? (
+              <p className="text-center text-gray-500">No documents uploaded yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>File Name</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Uploaded At</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {uploads.map((upload) => (
+                      <TableRow key={upload.id}>
+                        <TableCell className="font-medium">{upload.file_name}</TableCell>
+                        <TableCell>{upload.description || "N/A"}</TableCell>
+                        <TableCell>{new Date(upload.uploaded_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <Button asChild variant="outline" size="sm">
+                            <Link
+                              href={`https://chemical-corp-portal.supabase.co/storage/v1/object/public/quote-uploads/${upload.file_path}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Download className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

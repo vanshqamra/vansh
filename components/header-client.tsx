@@ -1,25 +1,39 @@
 "use client"
 
+import type React from "react"
+
+import { useRouter } from "next/navigation"
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Input, Button } from "@/components/ui"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, ShoppingCart, Package, History, Upload, Settings, MessageCircle } from "lucide-react"
+import {
+  Menu,
+  ShoppingCart,
+  FlaskConical,
+  Tag,
+  Info,
+  Phone,
+  Home,
+  LogIn,
+  UserPlus,
+  LayoutDashboard,
+  Search,
+} from "lucide-react"
 import { usePathname } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import SignOutButton from "@/components/sign-out-button"
 import { useCart } from "@/app/context/CartContext"
 import { useQuote } from "@/app/context/quote-context"
-import Image from "next/image"
+import { createClient } from "@/lib/supabase/client"
 
-export default function HeaderClient() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [isAdmin, setIsAdmin] = useState(false)
+export function HeaderClient() {
   const pathname = usePathname()
-  const supabase = createClient()
-  const { state: cartState } = useCart()
+  const { totalItems: cartTotalItems } = useCart()
   const { quoteItems } = useQuote()
+  const [user, setUser] = useState<any>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const supabase = createClient()
+  const router = useRouter()
 
   useEffect(() => {
     const getUser = async () => {
@@ -27,186 +41,175 @@ export default function HeaderClient() {
         data: { user },
       } = await supabase.auth.getUser()
       setUser(user)
-      if (user && user.user_metadata?.role === "admin") {
-        setIsAdmin(true)
-      } else {
-        setIsAdmin(false)
-      }
     }
-
     getUser()
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null)
-      if (session?.user?.user_metadata?.role === "admin") {
-        setIsAdmin(true)
-      } else {
-        setIsAdmin(false)
-      }
     })
 
     return () => {
-      authListener.unsubscribe()
+      authListener.subscription.unsubscribe()
     }
   }, [supabase])
 
-  const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Products", href: "/products" },
-    { name: "Offers", href: "/offers" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
+  const navLinks = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/products", label: "Products", icon: FlaskConical },
+    { href: "/offers", label: "Offers", icon: Tag },
+    { href: "/about", label: "About Us", icon: Info },
+    { href: "/contact", label: "Contact Us", icon: Phone },
   ]
 
-  const dashboardNavItems = [
-    { name: "Dashboard", href: "/dashboard", icon: Package },
-    { name: "Order History", href: "/dashboard/history", icon: History },
-    { name: "Upload Quote", href: "/dashboard/upload", icon: Upload },
-    { name: "Quote Cart", href: "/dashboard/quote-cart", icon: MessageCircle, count: quoteItems.length },
-  ]
-
-  const adminNavItems = [{ name: "Admin Panel", href: "/dashboard/admin", icon: Settings }]
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/products/search?query=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white shadow-sm">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 text-lg font-semibold" prefetch={false}>
-          <Image src="/generic-brand-logo.png" alt="Chemical Corp Logo" width={40} height={40} />
+    <header className="bg-white dark:bg-gray-950 shadow-sm sticky top-0 z-40">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+        <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
+          <FlaskConical className="h-6 w-6 text-primary" />
           <span className="sr-only">Chemical Corp</span>
+          <span className="hidden sm:inline text-gray-900 dark:text-gray-50">Chemical Corp</span>
         </Link>
-
-        {/* Desktop Navigation */}
+        <form onSubmit={handleSearch} className="relative flex-grow">
+          <Input
+            type="search"
+            placeholder="Search products..."
+            className="w-full pr-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Button type="submit" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2">
+            <Search className="h-4 w-4 text-gray-500" />
+            <span className="sr-only">Search</span>
+          </Button>
+        </form>
         <nav className="hidden md:flex items-center gap-6">
-          {navItems.map((item) => (
+          {navLinks.map((link) => (
             <Link
-              key={item.name}
-              href={item.href}
+              key={link.href}
+              href={link.href}
               className={`text-sm font-medium transition-colors hover:text-primary ${
-                pathname === item.href ? "text-primary" : "text-gray-600"
+                pathname === link.href ? "text-primary" : "text-gray-600 dark:text-gray-400"
               }`}
-              prefetch={false}
             >
-              {item.name}
+              {link.label}
             </Link>
           ))}
-          {user ? (
-            <>
-              <Link
-                href="/dashboard"
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  pathname.startsWith("/dashboard") ? "text-primary" : "text-gray-600"
-                }`}
-                prefetch={false}
-              >
-                Dashboard
-              </Link>
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/cart">
-                  <ShoppingCart className="h-5 w-5" />
-                  {cartState.itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                      {cartState.itemCount}
-                    </span>
-                  )}
-                </Link>
-              </Button>
-            </>
-          ) : (
-            <Button asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-          )}
         </nav>
-
-        {/* Mobile Navigation */}
-        <div className="flex items-center gap-4 md:hidden">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/cart" className="relative">
+        <div className="flex items-center gap-4">
+          <Link href="/cart">
+            <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
-              {cartState.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {cartState.itemCount}
+              {cartTotalItems > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">
+                  {cartTotalItems}
                 </span>
               )}
-            </Link>
-          </Button>
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
+              <span className="sr-only">Shopping Cart</span>
+            </Button>
+          </Link>
+          <Link href="/dashboard/quote-cart">
+            <Button variant="ghost" size="icon" className="relative">
+              <Tag className="h-5 w-5" /> {/* Using Tag icon for quote cart */}
+              {quoteItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">
+                  {quoteItems.length}
+                </span>
+              )}
+              <span className="sr-only">Quote Cart</span>
+            </Button>
+          </Link>
+          {user ? (
+            <Link href="/dashboard">
               <Button variant="ghost" size="icon">
+                <LayoutDashboard className="h-5 w-5" />
+                <span className="sr-only">Dashboard</span>
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost" size="icon">
+                  <LogIn className="h-5 w-5" />
+                  <span className="sr-only">Login</span>
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button variant="ghost" size="icon">
+                  <UserPlus className="h-5 w-5" />
+                  <span className="sr-only">Register</span>
+                </Button>
+              </Link>
+            </>
+          )}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col gap-6 p-6">
-                {navItems.map((item) => (
+            <SheetContent side="right" className="w-64 sm:w-80">
+              <div className="flex flex-col gap-4 p-4">
+                {navLinks.map((link) => (
                   <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`text-lg font-medium transition-colors hover:text-primary ${
-                      pathname === item.href ? "text-primary" : "text-gray-700"
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                      pathname === link.href
+                        ? "bg-gray-100 text-primary dark:bg-gray-800"
+                        : "text-gray-900 dark:text-gray-50"
                     }`}
-                    onClick={() => setIsOpen(false)}
-                    prefetch={false}
                   >
-                    {item.name}
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
                   </Link>
                 ))}
                 {user ? (
-                  <>
-                    <div className="border-t pt-4 mt-4">
-                      <h3 className="text-sm font-semibold text-gray-500 mb-2">Dashboard</h3>
-                      {dashboardNavItems.map((item) => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-700 transition-all hover:text-primary ${
-                            pathname.startsWith(item.href) ? "bg-gray-100 text-primary" : ""
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                          prefetch={false}
-                        >
-                          <item.icon className="h-5 w-5" />
-                          {item.name}
-                          {item.count !== undefined && item.count > 0 && (
-                            <span className="ml-auto bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                              {item.count}
-                            </span>
-                          )}
-                        </Link>
-                      ))}
-                    </div>
-                    {isAdmin && (
-                      <div className="border-t pt-4 mt-4">
-                        <h3 className="text-sm font-semibold text-gray-500 mb-2">Admin</h3>
-                        {adminNavItems.map((item) => (
-                          <Link
-                            key={item.name}
-                            href={item.href}
-                            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-700 transition-all hover:text-primary ${
-                              pathname.startsWith(item.href) ? "bg-gray-100 text-primary" : ""
-                            }`}
-                            onClick={() => setIsOpen(false)}
-                            prefetch={false}
-                          >
-                            <item.icon className="h-5 w-5" />
-                            {item.name}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                    <div className="border-t pt-4 mt-4">
-                      <SignOutButton />
-                    </div>
-                  </>
+                  <Link
+                    href="/dashboard"
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                      pathname === "/dashboard"
+                        ? "bg-gray-100 text-primary dark:bg-gray-800"
+                        : "text-gray-900 dark:text-gray-50"
+                    }`}
+                  >
+                    <LayoutDashboard className="h-5 w-5" />
+                    Dashboard
+                  </Link>
                 ) : (
-                  <Button asChild className="w-full">
-                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                  <>
+                    <Link
+                      href="/login"
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                        pathname === "/login"
+                          ? "bg-gray-100 text-primary dark:bg-gray-800"
+                          : "text-gray-900 dark:text-gray-50"
+                      }`}
+                    >
+                      <LogIn className="h-5 w-5" />
                       Login
                     </Link>
-                  </Button>
+                    <Link
+                      href="/register"
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                        pathname === "/register"
+                          ? "bg-gray-100 text-primary dark:bg-gray-800"
+                          : "text-gray-900 dark:text-gray-50"
+                      }`}
+                    >
+                      <UserPlus className="h-5 w-5" />
+                      Register
+                    </Link>
+                  </>
                 )}
-              </nav>
+              </div>
             </SheetContent>
           </Sheet>
         </div>

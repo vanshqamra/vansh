@@ -1,72 +1,85 @@
 import type { MetadataRoute } from "next"
+import { getProducts, getBrands } from "@/lib/data"
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://chemical-corp-portal.vercel.app" // Replace with your actual domain
+
+  const products = getProducts().map((product) => ({
+    url: `${baseUrl}/products/${product.id}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }))
+
+  const brands = getBrands().map((brand) => ({
+    url: `${baseUrl}/brand/${brand.slug}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }))
+
   return [
     {
-      url: "https://chemicalcorp.com",
-      lastModified: new Date(),
-      changeFrequency: "yearly",
+      url: baseUrl,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: "https://chemicalcorp.com/about",
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: "https://chemicalcorp.com/products",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
+      url: `${baseUrl}/products`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: "https://chemicalcorp.com/contact",
-      lastModified: new Date(),
-      changeFrequency: "monthly",
+      url: `${baseUrl}/offers`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/brands`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: "https://chemicalcorp.com/offers",
-      lastModified: new Date(),
+      url: `${baseUrl}/about`,
+      lastModified: new Date().toISOString(),
       changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: "https://chemicalcorp.com/cart",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: "https://chemicalcorp.com/checkout",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
       priority: 0.5,
     },
     {
-      url: "https://chemicalcorp.com/dashboard",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
+      url: `${baseUrl}/contact`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: "https://chemicalcorp.com/terms",
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.4,
-    },
-    {
-      url: "https://chemicalcorp.com/login",
-      lastModified: new Date(),
+      url: `${baseUrl}/login`,
+      lastModified: new Date().toISOString(),
       changeFrequency: "monthly",
       priority: 0.3,
     },
     {
-      url: "https://chemicalcorp.com/register",
-      lastModified: new Date(),
+      url: `${baseUrl}/register`,
+      lastModified: new Date().toISOString(),
       changeFrequency: "monthly",
       priority: 0.3,
     },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/payments`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    ...products,
+    ...brands,
   ]
 }

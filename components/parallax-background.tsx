@@ -1,53 +1,49 @@
 "use client"
 
 import type React from "react"
-import { useRef, useEffect, useState } from "react"
+import { useRef } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
+import Image from "next/image"
 
 interface ParallaxBackgroundProps {
-  imageSrc: string
+  image1: string
+  image2: string
   children: React.ReactNode
-  speed?: number // Parallax speed, default to 0.5
-  className?: string
 }
 
-export default function ParallaxBackground({ imageSrc, children, speed = 0.5, className }: ParallaxBackgroundProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [offsetY, setOffsetY] = useState(0)
+export function ParallaxBackground({ image1, image2, children }: ParallaxBackgroundProps) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  })
 
-  const handleScroll = () => {
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect()
-      // Calculate how much of the element is visible in the viewport
-      const viewportHeight = window.innerHeight
-      const elementTopInViewport = rect.top
-      const elementBottomInViewport = rect.bottom
-
-      // Only apply parallax if the element is in or near the viewport
-      if (elementBottomInViewport > 0 && elementTopInViewport < viewportHeight) {
-        // Calculate scroll position relative to the element's visibility
-        // This centers the parallax effect when the element is in the middle of the viewport
-        const scrollPosition = (viewportHeight - elementTopInViewport) / viewportHeight
-        setOffsetY(scrollPosition * speed * 100) // Adjust multiplier for desired effect
-      }
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll)
-    handleScroll() // Set initial position
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [speed])
+  const y1 = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
+  const y2 = useTransform(scrollYProgress, [0, 1], ["-20%", "20%"])
 
   return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      <div
-        className="parallax-bg"
-        style={{
-          transform: `translateY(${offsetY}px)`,
-          backgroundImage: `url(${imageSrc})`,
-        }}
-      />
-      <div className="relative z-10">{children}</div>
+    <div ref={ref} className="relative w-full h-screen overflow-hidden">
+      <motion.div className="absolute inset-0 z-0" style={{ y: y1 }}>
+        <Image
+          src={image1 || "/placeholder.svg"}
+          alt="Parallax Background Layer 1"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          priority
+        />
+      </motion.div>
+      <motion.div className="absolute inset-0 z-10" style={{ y: y2 }}>
+        <Image
+          src={image2 || "/placeholder.svg"}
+          alt="Parallax Background Layer 2"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          priority
+        />
+      </motion.div>
+      <div className="relative z-20 flex items-center justify-center h-full">{children}</div>
     </div>
   )
 }

@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import QualiProductGrid from "@/components/quali-product-grid"
+import QualiProductGrid, { QualiProductGridSkeleton } from "@/components/quali-product-grid"
 import { getQualigensProducts } from "@/lib/qualigens-products"
 import { getBrandByName } from "@/lib/data"
 import Image from "next/image"
 import { Suspense } from "react"
-import Loading from "./loading"
+import QualigensLoading from "./loading"
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 
@@ -89,21 +89,19 @@ export default async function QualigensPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Brand Header */}
-        <div className="flex flex-col items-center justify-center mb-8">
-          {brand.logo && (
-            <Image
-              src={brand.logo || "/placeholder.svg"}
-              alt={`${brand.name} Logo`}
-              width={200}
-              height={100}
-              objectFit="contain"
-              className="mb-4"
-            />
-          )}
-          <h1 className="text-4xl font-bold text-center mb-8">Qualigens Products</h1>
-          <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
-            Explore our comprehensive range of Qualigens brand chemicals and reagents, known for their quality and
-            reliability.
+        <div className="flex flex-col items-center text-center mb-8">
+          <Image
+            src="/images/logo-qualigens.png"
+            alt="Qualigens Logo"
+            width={200}
+            height={100}
+            objectFit="contain"
+            className="mb-4"
+          />
+          <h1 className="text-4xl font-bold mb-4">Qualigens Products</h1>
+          <p className="text-lg text-gray-600 max-w-3xl">
+            Explore our comprehensive range of Qualigens products, known for their quality and reliability in laboratory
+            and industrial applications.
           </p>
         </div>
 
@@ -156,7 +154,7 @@ export default async function QualigensPage() {
         </div>
 
         {/* Products Grid */}
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<QualiProductGridSkeleton />}>
           <QualiProductGrid products={filteredProducts} handleAddToCart={handleAddToCart} />
         </Suspense>
 
@@ -178,6 +176,11 @@ export default async function QualigensPage() {
             </Button>
           </div>
         )}
+
+        {/* Updated Product List */}
+        <Suspense fallback={<QualigensLoading />}>
+          <QualiProductList products={qualiProducts} />
+        </Suspense>
       </div>
     </div>
   )

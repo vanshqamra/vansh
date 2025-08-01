@@ -1,24 +1,19 @@
-import { promises as fs } from "fs"
-import path from "path"
+import qualigensProductsData from "./qualigens-products.json"
 
 export interface QualigensProduct {
-  id: string
-  name: string
-  brand: string
-  packSize: string
-  casNumber: string
-  price: number
-  image: string
+  "Sr. No.": number
+  "Product Name": string
+  "Pack Size": string
+  "HSN Code": string
+  "CAS No.": string
+  "Cat. No.": string
+  "Price (INR)": number
 }
 
-export async function getQualigensProducts(): Promise<QualigensProduct[]> {
-  try {
-    const filePath = path.join(process.cwd(), "lib", "qualigens-products.json")
-    const jsonData = await fs.readFile(filePath, "utf-8")
-    const products: QualigensProduct[] = JSON.parse(jsonData)
-    return products
-  } catch (error) {
-    console.error("Error reading qualigens-products.json:", error)
-    return []
-  }
+export function getQualigensProducts(): QualigensProduct[] {
+  return qualigensProductsData as QualigensProduct[]
+}
+
+export function getQualigensProductByCatNo(catNo: string): QualigensProduct | undefined {
+  return qualigensProductsData.find((product) => product["Cat. No."] === catNo) as QualigensProduct | undefined
 }

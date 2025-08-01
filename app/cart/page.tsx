@@ -2,140 +2,131 @@
 
 import { useCart } from "@/app/context/CartContext"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Input } from "@/components/ui/input"
-import { Trash2, MinusCircle, PlusCircle, ShoppingCart } from "lucide-react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { Input } from "@/components/ui/input"
+import { MinusCircle, PlusCircle, Trash2 } from "lucide-react"
 
 export default function CartPage() {
-  const { state, removeItem, updateQuantity, clearCart } = useCart()
-  const { items, total: subtotal, itemCount, shippingCost } = state
-  const router = useRouter()
-  const { toast } = useToast()
+  const { cartItems, updateCartQuantity, removeFromCart, getCartTotal } = useCart()
 
-  const handleUpdateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity < 1) {
-      toast({
-        title: "Quantity Error",
-        description: "Quantity cannot be less than 1. Item removed if quantity is 0.",
-        variant: "destructive",
-      })
-      removeItem(id)
+  const handleQuantityChange = (id: string, newQuantity: number) => {
+    if (newQuantity > 0) {
+      updateCartQuantity(id, newQuantity)
     } else {
-      updateQuantity(id, newQuantity)
+      removeFromCart(id)
     }
-  }
-
-  const handleCheckout = () => {
-    if (items.length === 0) {
-      toast({
-        title: "Cart Empty",
-        description: "Your cart is empty. Please add items before checking out.",
-        variant: "destructive",
-      })
-      return
-    }
-    router.push("/checkout")
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">Your Cart</h1>
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <h1 className="text-4xl font-bold text-center mb-8">Your Shopping Cart</h1>
+      <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
+        Review your selected products before proceeding to checkout.
+      </p>
 
-      {itemCount === 0 ? (
-        <Card className="max-w-md mx-auto text-center py-12">
-          <CardContent className="space-y-4">
-            <ShoppingCart className="mx-auto h-16 w-16 text-gray-400" />
-            <p className="text-xl font-semibold text-gray-700">Your cart is empty</p>
-            <p className="text-gray-500">Looks like you haven't added anything to your cart yet.</p>
-            <Button asChild>
-              <Link href="/products/qualigens">Start Shopping</Link>
-            </Button>
-          </CardContent>
+      {cartItems.length === 0 ? (
+        <Card className="max-w-md mx-auto text-center p-8">
+          <CardTitle className="mb-4">Your Cart is Empty</CardTitle>
+          <CardDescription className="mb-6">
+            Looks like you haven&apos;t added anything to your cart yet.
+          </CardDescription>
+          <Button asChild>
+            <Link href="/products">Start Shopping</Link>
+          </Button>
         </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
+          <div className="lg:col-span-2 space-y-6">
+            {cartItems.map((item) => (
               <Card key={item.id} className="flex items-center p-4 shadow-sm">
-                <Image
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.name}
-                  width={80}
-                  height={80}
-                  className="rounded-md object-cover mr-4"
-                />
-                <div className="flex-grow">
-                  <h2 className="font-semibold text-lg">{item.name}</h2>
-                  <p className="text-sm text-gray-500">Brand: {item.brand || "N/A"}</p>
-                  <p className="text-sm text-gray-500">Pack: {item.packSize || "N/A"}</p>
-                  <p className="text-sm text-gray-500">CAS: {item.casNumber || "N/A"}</p>
-                </div>
-                <div className="flex items-center gap-2 mr-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                  >
-                    <MinusCircle className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) => handleUpdateQuantity(item.id, Number.parseInt(e.target.value))}
-                    className="w-16 text-center"
-                    min="1"
+                <div className="relative w-24 h-24 shrink-0">
+                  <Image
+                    src={item.imageUrl || "/placeholder.svg"}
+                    alt={item.name}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-md"
                   />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                  >
-                    <PlusCircle className="h-4 w-4" />
-                  </Button>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-lg">₹{(item.price * item.quantity).toLocaleString()}</p>
-                  <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)} className="text-red-500">
-                    <Trash2 className="h-5 w-5" />
-                  </Button>
+                <div className="ml-4 flex-grow">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">{item.name}</h2>
+                  <p className="text-gray-600 dark:text-gray-400">₹{item.price.toFixed(2)}</p>
+                  <div className="flex items-center mt-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                      className="h-8 w-8"
+                    >
+                      <MinusCircle className="h-4 w-4" />
+                      <span className="sr-only">Decrease quantity</span>
+                    </Button>
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => handleQuantityChange(item.id, Number.parseInt(e.target.value))}
+                      className="w-16 text-center mx-2"
+                      min="1"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                      className="h-8 w-8"
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      <span className="sr-only">Increase quantity</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeFromCart(item.id)}
+                      className="ml-4 text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                      <span className="sr-only">Remove item</span>
+                    </Button>
+                  </div>
+                </div>
+                <div className="ml-auto text-lg font-bold text-gray-900 dark:text-gray-50">
+                  ₹{(item.price * item.quantity).toFixed(2)}
                 </div>
               </Card>
             ))}
-            <Button variant="outline" onClick={clearCart} className="w-full mt-4 bg-transparent">
-              Clear Cart
-            </Button>
           </div>
 
-          <Card className="lg:col-span-1 h-fit sticky top-4">
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span>Subtotal ({itemCount} items)</span>
-                <span>₹{subtotal.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping Cost</span>
-                <span>{shippingCost === 0 ? "Free" : `₹${shippingCost.toLocaleString()}`}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-bold text-xl">
-                <span>Total</span>
-                <span>₹{(subtotal + shippingCost).toLocaleString()}</span>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={handleCheckout} className="w-full">
-                Proceed to Checkout
-              </Button>
-            </CardFooter>
-          </Card>
+          <div className="lg:col-span-1">
+            <Card className="p-6 sticky top-20">
+              <CardHeader className="p-0 mb-4">
+                <CardTitle className="text-2xl font-bold">Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 space-y-4">
+                <div className="flex justify-between text-gray-700 dark:text-gray-300">
+                  <span>Subtotal:</span>
+                  <span>₹{getCartTotal().toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-gray-700 dark:text-gray-300">
+                  <span>Shipping:</span>
+                  <span>Free</span> {/* Assuming free shipping for simplicity */}
+                </div>
+                <div className="flex justify-between text-gray-700 dark:text-gray-300">
+                  <span>Taxes:</span>
+                  <span>₹0.00</span> {/* Assuming taxes are handled later or included */}
+                </div>
+                <div className="border-t pt-4 flex justify-between font-bold text-xl text-gray-900 dark:text-gray-50">
+                  <span>Total:</span>
+                  <span>₹{getCartTotal().toFixed(2)}</span>
+                </div>
+              </CardContent>
+              <CardFooter className="p-0 mt-6">
+                <Button asChild className="w-full text-lg py-3">
+                  <Link href="/checkout">Proceed to Checkout</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
         </div>
       )}
     </div>

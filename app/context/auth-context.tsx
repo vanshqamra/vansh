@@ -1,14 +1,13 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import type { User } from "@supabase/supabase-js"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
 
 interface AuthContextType {
   user: User | null
   loading: boolean
-  isAdmin: boolean
-  isVendor: boolean
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -16,46 +15,41 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isVendor, setIsVendor] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
-    const getSession = async () => {
+    const getUser = async () => {
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user || null)
-      if (session?.user) {
-        setIsAdmin(session.user.user_metadata?.role === "admin")
-        setIsVendor(session.user.user_metadata?.role === "vendor")
-      } else {
-        setIsAdmin(false)
-        setIsVendor(false)
-      }
+        data: { user },
+      } = await supabase.auth.getUser()
+      setUser(user)
       setLoading(false)
     }
 
-    getSession()
+    getUser()
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null)
-      if (session?.user) {
-        setIsAdmin(session.user.user_metadata?.role === "admin")
-        setIsVendor(session.user.user_metadata?.role === "vendor")
-      } else {
-        setIsAdmin(false)
-        setIsVendor(false)
-      }
       setLoading(false)
     })
 
     return () => {
-      authListener.unsubscribe()
+      authListener?.unsubscribe()
     }
   }, [supabase])
 
-  return <AuthContext.Provider value={{ user, loading, isAdmin, isVendor }}>{children}</AuthContext.Provider>
+  const signOut = async () => {
+    setLoading(true)
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error("Error signing out:", error.message)
+    } else {
+      setUser(null)
+    }
+    setLoading(false)
+  }
+
+  return <AuthContext.Provider value={{ user, loading, signOut }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

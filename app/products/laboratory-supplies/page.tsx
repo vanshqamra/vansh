@@ -3,10 +3,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Beaker, Microscope, TestTube, FlaskConical, Thermometer } from "lucide-react"
 import Link from "next/link"
-import ProductGrid from "@/components/product-grid"
-import { getProductsByCategory } from "@/lib/data"
+import ProductGrid, { ProductGridSkeleton } from "@/components/product-grid"
+import { getLaboratorySupplies, getProductsByCategory } from "@/lib/data"
 import { Suspense } from "react"
-import Loading from "./loading"
 
 const laboratoryBrands = [
   {
@@ -52,14 +51,17 @@ const laboratoryBrands = [
 ]
 
 export default async function LaboratorySuppliesPage() {
-  const laboratorySupplies = await getProductsByCategory("Laboratory Supplies")
+  const supplies = await getLaboratorySupplies()
+  const products = await getProductsByCategory("laboratory-supplies")
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <h1 className="text-4xl font-bold text-center mb-8">Laboratory Supplies</h1>
-      <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
-        Find all the essential laboratory supplies, consumables, and equipment for your research and experiments.
-      </p>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">Laboratory Supplies</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400">
+          Find essential laboratory supplies, glassware, and consumables for your research and experiments.
+        </p>
+      </div>
 
       {/* Brands Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -121,8 +123,8 @@ export default async function LaboratorySuppliesPage() {
         </div>
       </div>
 
-      <Suspense fallback={<Loading />}>
-        <ProductGrid products={laboratorySupplies} />
+      <Suspense fallback={<ProductGridSkeleton />}>
+        <ProductGrid products={products} />
       </Suspense>
     </div>
   )

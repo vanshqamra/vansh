@@ -4,7 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -13,20 +13,8 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import {
-  CreditCard,
-  Building2,
-  FileText,
-  Truck,
-  Shield,
-  AlertCircle,
-  CheckCircle,
-  Phone,
-  Mail,
-  Banknote,
-  QrCode,
-} from "lucide-react"
 import Link from "next/link"
+import { CheckCircle, Banknote, CreditCard, QrCode } from "lucide-react"
 
 export default function PaymentsPage() {
   const { state, clearCart } = useCart()
@@ -111,7 +99,7 @@ export default function PaymentsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-8">
-            <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <Banknote className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Cart is Empty</h2>
             <p className="text-gray-600 mb-6">Add some products to your cart before proceeding to payment.</p>
             <Button asChild>
@@ -138,7 +126,7 @@ export default function PaymentsPage() {
             <Card className="border-orange-200 bg-orange-50">
               <CardHeader>
                 <CardTitle className="flex items-center text-orange-800">
-                  <AlertCircle className="h-5 w-5 mr-2" />
+                  <Banknote className="h-5 w-5 mr-2" />
                   Important Notice
                 </CardTitle>
               </CardHeader>
@@ -168,7 +156,7 @@ export default function PaymentsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Building2 className="h-5 w-5 mr-2" />
+                  <Banknote className="h-5 w-5 mr-2" />
                   Company Information
                 </CardTitle>
               </CardHeader>
@@ -234,7 +222,7 @@ export default function PaymentsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Truck className="h-5 w-5 mr-2" />
+                  <Banknote className="h-5 w-5 mr-2" />
                   Shipping Address
                 </CardTitle>
               </CardHeader>
@@ -271,7 +259,7 @@ export default function PaymentsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <CreditCard className="h-5 w-5 mr-2" />
+                  <Banknote className="h-5 w-5 mr-2" />
                   Payment Method
                 </CardTitle>
               </CardHeader>
@@ -288,7 +276,7 @@ export default function PaymentsPage() {
                       className="h-4 w-4"
                     />
                     <Label htmlFor="bank_transfer" className="flex items-center">
-                      <Building2 className="h-4 w-4 mr-2" />
+                      <Banknote className="h-4 w-4 mr-2" />
                       Bank Transfer / NEFT / RTGS
                     </Label>
                   </div>
@@ -303,7 +291,7 @@ export default function PaymentsPage() {
                       className="h-4 w-4"
                     />
                     <Label htmlFor="credit_terms" className="flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
+                      <CreditCard className="h-4 w-4 mr-2" />
                       Credit Terms (Net 30) - Corporate Only
                     </Label>
                   </div>
@@ -318,7 +306,7 @@ export default function PaymentsPage() {
                       className="h-4 w-4"
                     />
                     <Label htmlFor="cheque" className="flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
+                      <Banknote className="h-4 w-4 mr-2" />
                       Cheque Payment
                     </Label>
                   </div>
@@ -326,7 +314,7 @@ export default function PaymentsPage() {
 
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="flex items-start">
-                    <Shield className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
+                    <Banknote className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
                     <div className="text-sm text-blue-800">
                       <p className="font-medium mb-1">Secure Payment Process</p>
                       <p>No upfront payment required. Payment details will be shared after order confirmation.</p>
@@ -444,11 +432,11 @@ export default function PaymentsPage() {
                   <p className="font-medium mb-2">Need Help?</p>
                   <div className="space-y-1 text-gray-600">
                     <div className="flex items-center">
-                      <Phone className="h-3 w-3 mr-2" />
+                      <Banknote className="h-3 w-3 mr-2" />
                       <span>+91 98765 43210</span>
                     </div>
                     <div className="flex items-center">
-                      <Mail className="h-3 w-3 mr-2" />
+                      <Banknote className="h-3 w-3 mr-2" />
                       <span>orders@chemcorp.com</span>
                     </div>
                   </div>
@@ -489,7 +477,7 @@ export default function PaymentsPage() {
                   <li>Visa</li>
                   <li>Mastercard</li>
                   <li>American Express</li>
-                  <li>Discover</li>
+                  <li>RuPay</li>
                 </ul>
                 <p className="text-sm text-gray-500 mt-4">
                   All card transactions are processed securely through our encrypted payment gateway.
@@ -549,6 +537,17 @@ export default function PaymentsPage() {
                 <p className="text-sm text-gray-500 mt-2">(Please check availability during checkout)</p>
               </CardContent>
             </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Cheque / Demand Draft</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-700">
+                  Payments via Cheque or Demand Draft are accepted. Orders will be dispatched upon successful clearance
+                  of the instrument.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -586,68 +585,95 @@ export default function PaymentsPage() {
 
         {/* New Payment Options Section */}
         <section className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold text-gray-900 mb-4">Payment Options</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We offer a variety of secure and convenient payment methods to make your purchasing experience smooth.
+          <h1 className="text-5xl font-extrabold text-gray-900 dark:text-gray-50 mb-4">Payment Options</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            We offer a variety of secure and convenient payment methods to make your purchasing experience smooth and
+            hassle-free.
           </p>
         </section>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          <Card className="text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
             <CardHeader>
               <CreditCard className="mx-auto h-16 w-16 text-primary mb-4" />
-              <CardTitle className="text-2xl font-semibold">Credit/Debit Card</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">Credit/Debit Cards</CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="mb-4">
-                Securely pay with all major credit and debit cards. Fast and reliable.
-              </CardDescription>
-              <Button variant="outline" disabled>
-                Pay with Card (Coming Soon)
-              </Button>
+            <CardContent className="text-lg text-gray-700 dark:text-gray-300">
+              <p className="mb-4">
+                We accept all major credit and debit cards, including Visa, MasterCard, American Express, and RuPay.
+                Payments are processed securely through our encrypted gateway.
+              </p>
+              <ul className="list-disc list-inside text-left mx-auto max-w-xs">
+                <li>Instant processing</li>
+                <li>Secure transactions</li>
+                <li>Widely accepted</li>
+              </ul>
             </CardContent>
           </Card>
 
-          <Card className="text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
             <CardHeader>
               <Banknote className="mx-auto h-16 w-16 text-primary mb-4" />
-              <CardTitle className="text-2xl font-semibold">Bank Transfer</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                Bank Transfer (NEFT/RTGS)
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="mb-4">
-                Make direct bank transfers for larger orders or corporate accounts.
-              </CardDescription>
-              <Button variant="outline" disabled>
-                Bank Transfer Details (Coming Soon)
-              </Button>
+            <CardContent className="text-lg text-gray-700 dark:text-gray-300">
+              <p className="mb-4">
+                For larger orders or institutional purchases, you can opt for direct bank transfers. Our bank details
+                will be provided upon order confirmation.
+              </p>
+              <ul className="list-disc list-inside text-left mx-auto max-w-xs">
+                <li>Ideal for bulk orders</li>
+                <li>No transaction fees</li>
+                <li>Secure and traceable</li>
+              </ul>
             </CardContent>
           </Card>
 
-          <Card className="text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
             <CardHeader>
               <QrCode className="mx-auto h-16 w-16 text-primary mb-4" />
-              <CardTitle className="text-2xl font-semibold">UPI / QR Code</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                UPI / QR Code Payments
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="mb-4">
-                Conveniently pay using UPI apps or by scanning a QR code.
-              </CardDescription>
-              <Button variant="outline" disabled>
-                Pay with UPI (Coming Soon)
-              </Button>
+            <CardContent className="text-lg text-gray-700 dark:text-gray-300">
+              <p className="mb-4">
+                Make quick and easy payments using UPI apps or by scanning our QR code. This option is available for
+                instant payments.
+              </p>
+              <ul className="list-disc list-inside text-left mx-auto max-w-xs">
+                <li>Fast and convenient</li>
+                <li>Zero transaction charges</li>
+                <li>Supported by all major UPI apps</li>
+              </ul>
             </CardContent>
           </Card>
         </div>
 
         {/* New Assistance Section */}
-        <section className="text-center bg-gray-50 py-12 rounded-lg shadow-inner">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Need Assistance with Payments?</h2>
-          <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">
-            Our customer support team is available to help you with any payment-related queries or issues.
+        <section className="text-center bg-gray-100 dark:bg-gray-800 p-8 rounded-lg">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50 mb-4">Secure Transactions</h2>
+          <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
+            Your security is our top priority. All online transactions are protected with industry-standard encryption
+            and fraud prevention measures.
           </p>
-          <Button asChild size="lg">
-            <Link href="/contact">Contact Support</Link>
-          </Button>
+          <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+        </section>
+
+        <section className="mt-12 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50 mb-4">Need Assistance?</h2>
+          <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
+            If you have any questions regarding payments or need help with your order, please don&apos;t hesitate to
+            contact our support team.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Contact Support
+          </Link>
         </section>
       </div>
     </div>

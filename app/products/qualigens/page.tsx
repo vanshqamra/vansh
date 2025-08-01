@@ -8,9 +8,8 @@ import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import QualiProductGrid from "@/components/quali-product-grid"
 import { Suspense } from "react"
-import Loading from "./loading"
+import { QualiProductGrid, QualiProductGridSkeleton } from "@/components/quali-product-grid"
 
 export default async function QualigensPage() {
   const qualiProducts = await getQualigensProducts()
@@ -81,21 +80,19 @@ export default async function QualigensPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <div className="flex flex-col items-center justify-center mb-8">
-        {brand.logo && (
-          <Image
-            src={brand.logo || "/placeholder.svg"}
-            alt={`${brand.name} Logo`}
-            width={200}
-            height={100}
-            objectFit="contain"
-            className="mb-4"
-          />
-        )}
-        <h1 className="text-4xl font-bold text-center">Qualigens Products</h1>
-        <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
-          Explore our comprehensive range of Qualigens brand chemicals and reagents, known for their quality and
-          reliability.
+      <div className="flex flex-col items-center text-center mb-8">
+        <Image
+          src="/images/logo-qualigens.png"
+          alt="Qualigens Logo"
+          width={200}
+          height={100}
+          objectFit="contain"
+          className="mb-4"
+        />
+        <h1 className="text-4xl font-bold mb-4">Qualigens Products</h1>
+        <p className="text-lg text-gray-600 max-w-3xl">
+          Explore our comprehensive range of Qualigens products, known for their quality and reliability in laboratory
+          and industrial applications.
         </p>
       </div>
       <div className="relative mb-8 max-w-md mx-auto">
@@ -108,11 +105,11 @@ export default async function QualigensPage() {
         />
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
       </div>
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<QualiProductGridSkeleton />}>
         {filteredProducts.length === 0 ? (
           <div className="text-center text-gray-600 text-xl">No products found matching your search.</div>
         ) : (
-          <QualiProductGrid products={filteredProducts} handleAddToCart={handleAddToCart} />
+          <QualiProductGrid products={filteredProducts} />
         )}
       </Suspense>
     </div>
