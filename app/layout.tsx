@@ -3,16 +3,18 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import Header from "@/components/header" // Corrected import to default
+import Header from "@/components/header"
+import Footer from "@/components/footer"
 import { Toaster } from "@/components/ui/toaster"
-import { AuthProvider } from "@/app/context/auth-context"
-import { CartProvider } from "@/app/context/CartContext"
+import { CartProvider } from "./context/CartContext"
+import { AuthProvider } from "./context/auth-context"
+import { QuoteProvider } from "./context/quote-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Chemical Corporation",
-  description: "Your one-stop shop for all chemical needs.",
+  description: "Your trusted partner for chemical solutions and laboratory supplies.",
     generator: 'v0.dev'
 }
 
@@ -22,14 +24,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <CartProvider>
-              <Header />
-              <main>{children}</main>
-              <Toaster />
+              <QuoteProvider>
+                <div className="flex flex-col min-h-screen">
+                  <Header />
+                  <main className="flex-grow">{children}</main>
+                  <Footer />
+                  <Toaster />
+                </div>
+              </QuoteProvider>
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>

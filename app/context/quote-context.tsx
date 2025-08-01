@@ -1,103 +1,49 @@
 "use client"
 
-import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useState, type ReactNode } from "react"
 
 interface QuoteItem {
   id: string
   name: string
-  brand: string
-  price: string
-  quantity: number
+  image?: string
+  brand?: string
   packSize?: string
-  material?: string
-  code: string
+  casNumber?: string
+  quantity: number
 }
 
 interface QuoteContextType {
-  items: QuoteItem[]
-  addItem: (item: Omit<QuoteItem, "quantity">) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
+  quoteItems: QuoteItem[]
+  addItemToQuote: (item: QuoteItem) => void
+  removeItemFromQuote: (id: string) => void
   clearQuote: () => void
-  totalItems: number
-  isLoaded: boolean
 }
 
 const QuoteContext = createContext<QuoteContextType | undefined>(undefined)
 
-export function QuoteProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<QuoteItem[]>([])
-  const [isLoaded, setIsLoaded] = useState(false)
+export function QuoteProvider({ children }: { children: ReactNode }) {
+  const [quoteItems, setQuoteItems] = useState<QuoteItem[]>([])
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const savedQuote = localStorage.getItem("quote-items")
-        if (savedQuote) {
-          setItems(JSON.parse(savedQuote))
-        }
-      } catch (error) {
-        console.error("Error loading quote from localStorage:", error)
-      } finally {
-        setIsLoaded(true)
-      }
-    } else {
-      // Server-side rendering
-      setIsLoaded(true)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (isLoaded && typeof window !== "undefined") {
-      try {
-        localStorage.setItem("quote-items", JSON.stringify(items))
-      } catch (error) {
-        console.error("Error saving quote to localStorage:", error)
-      }
-    }
-  }, [items, isLoaded])
-
-  const addItem = (newItem: Omit<QuoteItem, "quantity">) => {
-    setItems((prev) => {
-      const existingItem = prev.find((item) => item.id === newItem.id)
+  const addItemToQuote = (item: QuoteItem) => {
+    setQuoteItems((prevItems) => {
+      const existingItem = prevItems.find((i) => i.id === item.id)
       if (existingItem) {
-        return prev.map((item) => (item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item))
+        return prevItems.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i))
       }
-      return [...prev, { ...newItem, quantity: 1 }]
+      return [...prevItems, { ...item, quantity: item.quantity || 1 }]
     })
   }
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id))
-  }
-
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(id)
-      return
-    }
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)))
+  const removeItemFromQuote = (id: string) => {
+    setQuoteItems((prevItems) => prevItems.filter((item) => item.id !== id))
   }
 
   const clearQuote = () => {
-    setItems([])
+    setQuoteItems([])
   }
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
-
   return (
-    <QuoteContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearQuote,
-        totalItems,
-        isLoaded,
-      }}
-    >
+    <QuoteContext.Provider value={{ quoteItems, addItemToQuote, removeItemFromQuote, clearQuote }}>
       {children}
     </QuoteContext.Provider>
   )

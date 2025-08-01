@@ -1,34 +1,24 @@
+import { promises as fs } from "fs"
+import path from "path"
+
 export interface QualigensProduct {
-  code: string
-  cas: string
+  id: string
   name: string
+  brand: string
   packSize: string
-  material: string
-  price: string
-  hsn: string
-  category?: string
-  purity?: string
-  brand?: string
-  id?: string
+  casNumber: string
+  price: number
+  image: string
 }
 
-// Import the JSON data and convert it to the proper format
-import qualigensData from "./qualigens-products.json"
-
-export const qualigensProducts: QualigensProduct[] = qualigensData.map(
-  ([code, cas, name, packSize, material, price, hsn]) => ({
-    code,
-    cas: cas || "",
-    name,
-    packSize,
-    material,
-    price,
-    hsn,
-    category: "Laboratory Chemical",
-    purity: "SQ",
-    brand: "Qualigens",
-    id: code,
-  }),
-)
-
-export default qualigensProducts
+export async function getQualigensProducts(): Promise<QualigensProduct[]> {
+  try {
+    const filePath = path.join(process.cwd(), "lib", "qualigens-products.json")
+    const jsonData = await fs.readFile(filePath, "utf-8")
+    const products: QualigensProduct[] = JSON.parse(jsonData)
+    return products
+  } catch (error) {
+    console.error("Error reading qualigens-products.json:", error)
+    return []
+  }
+}

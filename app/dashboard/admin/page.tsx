@@ -1,84 +1,131 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+"use client"
+
+import { useEffect, useState } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { revalidatePath } from "next/cache"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
 
-export default async function AdminDashboardPage() {
+interface UserProfile {
+  id: string
+  email: string
+  role: "user" | "admin" | "vendor"
+}
+
+export default function AdminPage() {
+  const [users, setUsers] = useState<UserProfile[]>([])
+  const [loading, setLoading] = useState(true)
   const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { toast } = useToast()
 
-  if (!user) redirect("/login")
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
-  // Get admin profile
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+  const fetchUsers = async () => {
+    setLoading(true)
+    const { data: usersData, error } = await supabase.from("profiles").select("id, email, role")
 
-  if (profile?.role !== "admin") {
-    redirect("/dashboard")
+    if (error) {
+      console.error("Error fetching users:", error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch user data.",
+        variant: "destructive",
+      })
+    } else {
+      setUsers(usersData as UserProfile[])
+    }
+    setLoading(false)
   }
 
-  const { data: clients } = await supabase
-    .from("profiles")
-    .select("id, full_name, email, company_name, gst_no, contact_number, address, approved")
-    .order("created_at", { ascending: false })
+  const updateUserRole = async (userId: string, newRole: UserProfile["role"]) => {
+    const { error } = await supabase.from("profiles").update({ role: newRole }).eq("id", userId)
 
-  async function approveClient(formData: FormData) {
-    "use server"
-    const supabase = createClient()
-    const clientId = formData.get("clientId") as string
-    const status = formData.get("status") === "true"
+    if (error) {
+      console.error("Error updating user role:", error)
+      toast({
+        title: "Error",
+        description: `Failed to update role for user ${userId}.`,
+        variant: "destructive",
+      })
+    } else {
+      toast({
+        title: "Success",
+        description: `User role updated to ${newRole}.`,
+        variant: "default",
+      })
+      fetchUsers() // Re-fetch users to update the UI
+    }
+  }
 
-    await supabase.from("profiles").update({ approved: status }).eq("id", clientId)
-    revalidatePath("/dashboard/admin")
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-8">Admin Panel</h1>
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading Users...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Please wait while we fetch user data.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-6">Client Approvals</h1>
-      <div className="grid gap-6">
-        {clients?.map((client) => (
-          <Card key={client.id}>
-            <CardHeader>
-              <CardTitle>
-                {client.company_name} ({client.full_name})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>
-                <strong>Email:</strong> {client.email}
-              </p>
-              <p>
-                <strong>GST:</strong> {client.gst_no}
-              </p>
-              <p>
-                <strong>Phone:</strong> {client.contact_number}
-              </p>
-              <p>
-                <strong>Address:</strong> {client.address}
-              </p>
-              <div className="mt-4 flex gap-2">
-                {!client.approved ? (
-                  <form action={approveClient}>
-                    <input type="hidden" name="clientId" value={client.id} />
-                    <input type="hidden" name="status" value="true" />
-                    <Button type="submit">Approve</Button>
-                  </form>
-                ) : (
-                  <form action={approveClient}>
-                    <input type="hidden" name="clientId" value={client.id} />
-                    <input type="hidden" name="status" value="false" />
-                    <Button type="submit" variant="destructive">
-                      Revoke
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <h1 className="text-4xl font-bold text-center mb-8">Admin Panel</h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Users</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User ID</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.id.substring(0, 8)}...</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <Select
+                      value={user.role}
+                      onValueChange={(newRole: UserProfile["role"]) => updateUserRole(user.id, newRole)}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select Role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="vendor">Vendor</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline" size="sm">
+                      View Details
                     </Button>
-                  </form>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   )
 }

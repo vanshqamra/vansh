@@ -1,109 +1,112 @@
 "use client"
 
-import { useForm, type SubmitHandler } from "react-hook-form"
+import type React from "react"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 
-type FormValues = {
-  name: string
-  email: string
-  phone: string
-  message: string
-}
-
-export function ContactForm() {
+export default function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<FormValues>({
-    mode: "onBlur",
-  })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }))
+  }
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    console.log("Form submitted:", data)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
+    // In a real application, you would send formData to your backend here
+    console.log("Form submitted:", formData)
+
+    setIsSubmitting(false)
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    })
 
     toast({
       title: "Message Sent!",
       description: "Thank you for contacting us. We will get back to you shortly.",
+      variant: "default",
     })
-    reset()
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4 p-6 border rounded-lg bg-white shadow-sm"
-    >
+    <form onSubmit={handleSubmit} className="space-y-6 p-6 border rounded-lg shadow-md">
       <div>
+        <Label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          Name
+        </Label>
         <Input
-          placeholder="Your Name"
-          {...register("name", {
-            required: "Name is required",
-            minLength: {
-              value: 2,
-              message: "Name must be at least 2 characters.",
-            },
-          })}
+          type="text"
+          id="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
         />
-        {errors.name && (
-          <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
-        )}
       </div>
       <div>
+        <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </Label>
         <Input
-          placeholder="Email Address"
-          {...register("email", {
-            required: "Email is required",
-            pattern: {
-              value: /\S+@\S+\.\S+/,
-              message: "Invalid email address",
-            },
-          })}
+          type="email"
+          id="email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
         />
-        {errors.email && (
-          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-        )}
       </div>
       <div>
+        <Label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+          Subject
+        </Label>
         <Input
-          placeholder="Phone Number"
-          {...register("phone", {
-            required: "Phone number is required",
-            minLength: {
-              value: 10,
-              message: "Please enter a valid phone number",
-            },
-          })}
+          type="text"
+          id="subject"
+          value={formData.subject}
+          onChange={handleChange}
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
         />
-        {errors.phone && (
-          <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
-        )}
       </div>
       <div>
+        <Label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+          Message
+        </Label>
         <Textarea
-          placeholder="Your Message"
+          id="message"
+          value={formData.message}
+          onChange={handleChange}
+          required
           rows={5}
-          {...register("message", {
-            required: "Message is required",
-            minLength: {
-              value: 10,
-              message: "Message must be at least 10 characters",
-            },
-          })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
         />
-        {errors.message && (
-          <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>
-        )}
       </div>
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+      <Button type="submit" className="w-full py-2" disabled={isSubmitting}>
         {isSubmitting ? "Sending..." : "Send Message"}
       </Button>
     </form>

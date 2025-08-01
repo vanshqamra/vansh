@@ -1,93 +1,196 @@
-export const commercialChemicals = [
-  { code: "CC0001", name: "Acetic Acid Glacial", category: "Acids", pack_size: "500ml", price: "₹450" },
-  { code: "CC0002", name: "Acetone", category: "Solvents", pack_size: "1L", price: "₹320" },
-  { code: "CC0003", name: "Acetonitrile", category: "Solvents", pack_size: "1L", price: "₹850" },
-  { code: "CC0004", name: "Alum (Non Ferric /Ferric)", category: "Salts", pack_size: "500g", price: "₹180" },
-  { code: "CC0005", name: "Ammonium Bi Sulphite", category: "Salts", pack_size: "500g", price: "₹220" },
-  { code: "CC0006", name: "Ammonium Chloride", category: "Salts", pack_size: "500g", price: "₹160" },
-  { code: "CC0007", name: "Aniline", category: "Reagents", pack_size: "500ml", price: "₹380" },
-  { code: "CC0008", name: "Benzene", category: "Solvents", pack_size: "500ml", price: "₹450" },
-  { code: "CC0009", name: "Borox", category: "Salts", pack_size: "500g", price: "₹140" },
-  { code: "CC0010", name: "Boric Acid Powder", category: "Acids", pack_size: "500g", price: "₹120" },
-  { code: "CC0011", name: "Bleaching Powder", category: "Reagents", pack_size: "1kg", price: "₹80" },
-  { code: "CC0012", name: "Butyl Acetate", category: "Solvents", pack_size: "1L", price: "₹420" },
-  { code: "CC0013", name: "Butyl Cellosolve", category: "Solvents", pack_size: "1L", price: "₹480" },
-  { code: "CC0014", name: "Butyl Alcohol", category: "Solvents", pack_size: "1L", price: "₹380" },
-  { code: "CC0015", name: "Cab O Sil (Silicon Di Oxide)", category: "Reagents", pack_size: "500g", price: "₹650" },
-  { code: "CC0016", name: "Calcium Chloride Lumps", category: "Salts", pack_size: "1kg", price: "₹120" },
-  { code: "CC0017", name: "Caustic Potash Flakes", category: "Bases", pack_size: "500g", price: "₹280" },
-  { code: "CC0018", name: "Caustic Soda Flakes", category: "Bases", pack_size: "500g", price: "₹180" },
-  { code: "CC0019", name: "Citric Acid", category: "Acids", pack_size: "500g", price: "₹160" },
-  { code: "CC0020", name: "Copper Sulphate", category: "Salts", pack_size: "500g", price: "₹220" },
-  { code: "CC0021", name: "Cyclohexane", category: "Solvents", pack_size: "1L", price: "₹520" },
-  { code: "CC0022", name: "Diethyl Ether", category: "Solvents", pack_size: "500ml", price: "₹960" },
-  { code: "CC0023", name: "Dimethylformamide (DMF)", category: "Solvents", pack_size: "500ml", price: "₹670" },
-  { code: "CC0024", name: "DMSO (Dimethyl Sulfoxide)", category: "Solvents", pack_size: "500ml", price: "₹780" },
-  { code: "CC0025", name: "EDTA", category: "Reagents", pack_size: "100g", price: "₹450" },
-  { code: "CC0026", name: "Ethyl Acetate", category: "Solvents", pack_size: "1L", price: "₹360" },
-  { code: "CC0027", name: "Ethylene Glycol", category: "Solvents", pack_size: "500ml", price: "₹320" },
-  { code: "CC0028", name: "Ferric Chloride", category: "Salts", pack_size: "500g", price: "₹240" },
-  { code: "CC0029", name: "Formaldehyde", category: "Reagents", pack_size: "500ml", price: "₹150" },
-  { code: "CC0030", name: "Formic Acid", category: "Acids", pack_size: "500ml", price: "₹370" },
-  { code: "CC0031", name: "Glycerol (Glycerine)", category: "Reagents", pack_size: "500ml", price: "₹280" },
-  { code: "CC0032", name: "Hexane", category: "Solvents", pack_size: "1L", price: "₹620" },
-  { code: "CC0033", name: "Hydrochloric Acid", category: "Acids", pack_size: "500ml", price: "₹90" },
-  { code: "CC0034", name: "Hydrogen Peroxide 30%", category: "Reagents", pack_size: "500ml", price: "₹110" },
-  { code: "CC0035", name: "Iso Propyl Alcohol (IPA)", category: "Solvents", pack_size: "1L", price: "₹340" },
-  { code: "CC0036", name: "Lactic Acid", category: "Acids", pack_size: "500ml", price: "₹450" },
-  { code: "CC0037", name: "Magnesium Sulphate", category: "Salts", pack_size: "500g", price: "₹190" },
-  { code: "CC0038", name: "Methanol", category: "Solvents", pack_size: "1L", price: "₹310" },
-  { code: "CC0039", name: "Nitric Acid", category: "Acids", pack_size: "500ml", price: "₹150" },
-  { code: "CC0040", name: "Oxalic Acid", category: "Acids", pack_size: "500g", price: "₹130" },
-  { code: "CC0041", name: "Phenol Crystals", category: "Reagents", pack_size: "250g", price: "₹490" },
-  { code: "CC0042", name: "Phosphoric Acid", category: "Acids", pack_size: "500ml", price: "₹280" },
-  { code: "CC0043", name: "Potassium Dichromate", category: "Salts", pack_size: "250g", price: "₹310" },
-  { code: "CC0044", name: "Potassium Hydroxide", category: "Bases", pack_size: "500g", price: "₹260" },
-  { code: "CC0045", name: "Potassium Iodide", category: "Salts", pack_size: "100g", price: "₹560" },
-  { code: "CC0046", name: "Potassium Permanganate", category: "Salts", pack_size: "250g", price: "₹310" },
-  { code: "CC0047", name: "Silver Nitrate", category: "Salts", pack_size: "25g", price: "₹1800" },
-  { code: "CC0048", name: "Sodium Bicarbonate", category: "Bases", pack_size: "500g", price: "₹90" },
-  { code: "CC0049", name: "Sodium Carbonate", category: "Bases", pack_size: "500g", price: "₹120" },
-  { code: "CC0050", name: "Sodium Hydroxide Pellets", category: "Bases", pack_size: "500g", price: "₹150" },
-  { code: "CC0051", name: "Sodium Nitrate", category: "Salts", pack_size: "500g", price: "₹160" },
-  { code: "CC0052", name: "Sodium Sulphate", category: "Salts", pack_size: "500g", price: "₹130" },
-  { code: "CC0053", name: "Sulphuric Acid", category: "Acids", pack_size: "500ml", price: "₹110" },
-  { code: "CC0054", name: "Toluene", category: "Solvents", pack_size: "1L", price: "₹420" },
-  { code: "CC0055", name: "Trichloroethylene", category: "Solvents", pack_size: "500ml", price: "₹580" },
-  { code: "CC0056", name: "Xylene", category: "Solvents", pack_size: "1L", price: "₹490" },
+import type { Product } from "@/components/product-grid"
+import { promises as fs } from "fs"
+import path from "path"
+
+// Define a type for brands if not already defined
+export interface Brand {
+  id: string
+  name: string
+  logo: string
+  link: string
+}
+
+// Dummy data for brands (replace with actual database fetching)
+export const brands: Brand[] = [
+  { id: "qualigens", name: "Qualigens", logo: "/images/logo-qualigens.png", link: "/brand/qualigens" },
+  {
+    id: "fisher-chemical",
+    name: "Fisher Chemical",
+    logo: "/images/logo-fisher-chemical.png",
+    link: "/brand/fisher-chemical",
+  },
+  { id: "reagecon", name: "Reagecon", logo: "/images/logo-reagecon.png", link: "/brand/reagecon" },
+  {
+    id: "thermo-scientific",
+    name: "Thermo Scientific",
+    logo: "/images/logo-thermo-scientific.png",
+    link: "/brand/thermo-scientific",
+  },
+  { id: "rankem", name: "Rankem", logo: "/images/logo-rankem.png", link: "/brand/rankem" },
+  {
+    id: "acros-organics",
+    name: "Acros Organics",
+    logo: "/images/logo-acros-organics.png",
+    link: "/brand/acros-organics",
+  },
+  { id: "remel", name: "Remel", logo: "/images/logo-remel.png", link: "/brand/remel" },
+  {
+    id: "fisher-bioreagents",
+    name: "Fisher Bioreagents",
+    logo: "/images/logo-fisher-bioreagents.png",
+    link: "/brand/fisher-bioreagents",
+  },
+  { id: "jtbaker", name: "J.T.Baker", logo: "/images/logo-jtbaker.png", link: "/brand/jtbaker" },
+  { id: "decon", name: "Decon", logo: "/images/logo-decon.png", link: "/brand/decon" },
+  {
+    id: "microbiologics",
+    name: "Microbiologics",
+    logo: "/images/logo-microbiologics.png",
+    link: "/brand/microbiologics",
+  },
+  {
+    id: "kimberly-clark",
+    name: "Kimberly-Clark",
+    logo: "/images/logo-kimberly-clark.png",
+    link: "/brand/kimberly-clark",
+  },
+  { id: "riviera", name: "Riviera", logo: "/images/logo-riviera.png", link: "/brand/riviera" },
+  { id: "em-techcolor", name: "EM Techcolor", logo: "/images/logo-em-techcolor.png", link: "/brand/em-techcolor" },
+  { id: "duran-group", name: "Duran Group", logo: "/images/logo-duran-group.png", link: "/brand/duran-group" },
+  { id: "troemner", name: "Troemner", logo: "/images/logo-troemner.png", link: "/brand/troemner" },
+  {
+    id: "johnsondiversey",
+    name: "JohnsonDiversey",
+    logo: "/images/logo-johnsondiversey.png",
+    link: "/brand/johnsondiversey",
+  },
+  { id: "oxoid", name: "Oxoid", logo: "/images/logo-oxoid.png", link: "/brand/oxoid" },
+  { id: "biotek", name: "Biotek", logo: "/images/logo-biotek.png", link: "/brand/biotek" },
+  { id: "corning", name: "Corning", logo: "/images/logo-corning.png", link: "/brand/corning" },
+  { id: "plas-labs", name: "Plas-Labs", logo: "/images/logo-plas-labs.png", link: "/brand/plas-labs" },
+  { id: "lonza", name: "Lonza", logo: "/images/logo-lonza.png", link: "/brand/lonza" },
+  { id: "dupont", name: "DuPont", logo: "/images/logo-dupont.png", link: "/brand/dupont" },
+  { id: "maybridge", name: "Maybridge", logo: "/images/logo-maybridge.png", link: "/brand/maybridge" },
+  { id: "labconco", name: "Labconco", logo: "/images/logo-labconco.png", link: "/brand/labconco" },
+  { id: "superlab", name: "Superlab", logo: "/images/logo-superlab.png", link: "/brand/superlab" },
+  { id: "ika", name: "IKA", logo: "/images/logo-ika.png", link: "/brand/ika" },
+  { id: "borosil", name: "Borosil", logo: "/images/logo-borosil.png", link: "/brand/borosil" },
+  { id: "whatman", name: "Whatman", logo: "/images/logo-whatman.png", link: "/brand/whatman" },
+  { id: "avarice", name: "Avarice", logo: "/images/logo-avarice.png", link: "/brand/avarice" },
 ]
 
-export const chemicalCategories = ["All", "Acids", "Solvents", "Bases", "Salts", "Reagents"]
+// Dummy data for offers (replace with actual database fetching)
+const offersData = [
+  {
+    title: "Free Shipping on Orders Over ₹5000",
+    description: "Get your chemicals delivered right to your doorstep without any shipping charges.",
+    image: "/images/offer-shipping.png",
+    alt: "Shipping box",
+    ctaText: "Shop Now",
+    ctaLink: "/products",
+  },
+  {
+    title: "20% Off on Selected Solvents",
+    description: "Limited time offer on high-purity solvents. Stock up and save!",
+    image: "/images/offer-solvents.png",
+    alt: "Solvent bottles",
+    ctaText: "View Solvents",
+    ctaLink: "/products/bulk-chemicals?category=solvents",
+  },
+  {
+    title: "Buy 2 Get 1 Free on Lab Glassware",
+    description: "Expand your lab with our durable and precise glassware. Offer applies to selected items.",
+    image: "/images/offer-glassware.png",
+    alt: "Lab glassware",
+    ctaText: "Explore Glassware",
+    ctaLink: "/products/laboratory-supplies?category=labware",
+  },
+  {
+    title: "Special Discount on Borosil Glassware",
+    description: "Exclusive prices on the entire range of Borosil laboratory glassware.",
+    image: "/images/offer-borosil-glassware.png",
+    alt: "Borosil glassware",
+    ctaText: "Shop Borosil",
+    ctaLink: "/brand/borosil",
+  },
+  {
+    title: "Whatman Filters - Flat 15% Off",
+    description: "Premium filtration solutions at an unbeatable price. Perfect for all your lab needs.",
+    image: "/images/offer-whatman-filters.png",
+    alt: "Whatman filters",
+    ctaText: "Get Filters",
+    ctaLink: "/brand/whatman",
+  },
+  {
+    title: "Safety Aprons - 10% Off",
+    description: "Ensure safety in your lab with our high-quality chemical-resistant aprons.",
+    image: "/images/offer-apron.png",
+    alt: "Safety apron",
+    ctaText: "Buy Aprons",
+    ctaLink: "/products/laboratory-supplies?category=safety",
+  },
+]
 
-export const labSupplyBrands = {
-  qualigens: {
-    name: "Qualigens",
-    description: "High-quality laboratory chemicals and reagents",
-    logo: "/images/logo-qualigens.png",
-    categories: ["Analytical Reagents", "Solvents", "Acids & Bases", "Salts"],
-  },
-  borosil: {
-    name: "Borosil",
-    description: "Premium laboratory glassware and equipment",
-    logo: "/images/logo-borosil.png",
-    categories: ["Glassware", "Laboratory Equipment", "Measuring Instruments"],
-  },
-  whatman: {
-    name: "Whatman",
-    description: "Filtration and separation products",
-    logo: "/images/logo-whatman.png",
-    categories: ["Filter Papers", "Membranes", "Syringe Filters", "Separation Media"],
-  },
-  rankem: {
-    name: "Rankem",
-    description: "Analytical and laboratory chemicals",
-    logo: "/images/logo-rankem.png",
-    categories: ["Analytical Reagents", "HPLC Solvents", "Buffer Solutions"],
-  },
-  jtbaker: {
-    name: "J.T. Baker",
-    description: "High-purity chemicals and solvents",
-    logo: "/images/logo-jtbaker.png",
-    categories: ["HPLC Grade Solvents", "Analytical Reagents", "Acids", "Bases"],
-  },
+export async function getProducts(): Promise<Product[]> {
+  try {
+    const filePath = path.join(process.cwd(), "lib", "products.json")
+    const jsonData = await fs.readFile(filePath, "utf-8")
+    const products: Product[] = JSON.parse(jsonData)
+    return products
+  } catch (error) {
+    console.error("Error reading products.json:", error)
+    return []
+  }
+}
+
+export async function getFeaturedProducts(): Promise<Product[]> {
+  // In a real application, you would fetch this from a database
+  // For now, return a subset of allProducts
+  const allProducts = await getProducts()
+  return allProducts.slice(0, 4)
+}
+
+export async function getBulkChemicals(): Promise<Product[]> {
+  const allProducts = await getProducts()
+  return allProducts.filter(
+    (product) => product.category === "Acids" || product.category === "Salts" || product.category === "Solvents",
+  )
+}
+
+export async function getLaboratorySupplies(): Promise<Product[]> {
+  const allProducts = await getProducts()
+  return allProducts.filter(
+    (product) => product.category === "Labware" || product.category === "Filtration" || product.category === "Safety",
+  )
+}
+
+export async function getScientificInstruments(): Promise<Product[]> {
+  const allProducts = await getProducts()
+  return allProducts.filter((product) => product.category === "Equipment")
+}
+
+export async function getProductsByCategory(category: string): Promise<Product[]> {
+  const allProducts = await getProducts()
+  return allProducts.filter((product) => product.category === category)
+}
+
+export async function getProductsByBrand(brand: string): Promise<Product[]> {
+  const allProducts = await getProducts()
+  return allProducts.filter((product) => product.brand === brand)
+}
+
+export async function getProductsBySearch(query: string): Promise<Product[]> {
+  const allProducts = await getProducts()
+  const lowerCaseQuery = query.toLowerCase()
+  return allProducts.filter(
+    (product) =>
+      product.name.toLowerCase().includes(lowerCaseQuery) ||
+      product.casNumber?.toLowerCase().includes(lowerCaseQuery) ||
+      product.brand.toLowerCase().includes(lowerCaseQuery) ||
+      product.category.toLowerCase().includes(lowerCaseQuery),
+  )
+}
+
+export async function getOffers() {
+  return offersData
 }

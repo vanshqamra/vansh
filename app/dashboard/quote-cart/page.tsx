@@ -2,110 +2,144 @@
 
 import { useQuote } from "@/app/context/quote-context"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Trash2 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import Image from "next/image"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
 
 export default function QuoteCartPage() {
-  const { items, updateQuantity, removeItem, clearQuote, isLoaded } = useQuote()
+  const { quoteItems, removeItemFromQuote, clearQuote } = useQuote()
   const { toast } = useToast()
-  const [mounted, setMounted] = useState(false)
+  const router = useRouter()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const handleRequestQuote = async () => {
+    if (quoteItems.length === 0) {
+      toast({
+        title: "Quote Cart Empty",
+        description: "Please add items to your quote cart before requesting a quote.",
+        variant: "destructive",
+      })
+      return
+    }
 
-  const handleSubmitQuote = () => {
-    // Server action would go here
-    console.log("Submitting quote:", items)
-    clearQuote()
-    toast({
-      title: "Quote Request Sent!",
-      description: "Thank you! We have received your request and will contact you shortly.",
+    // Simulate API call to submit quote
+    const response = await fetch("/api/upload-quote", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ items: quoteItems }),
     })
-  }
 
-  if (!mounted || !isLoaded) {
-    return (
-      <div className="container mx-auto py-16">
-        <Card className="bg-white/80 backdrop-blur-md">
-          <CardHeader>
-            <CardTitle>Loading Quote Cart...</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="animate-pulse space-y-4">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (items.length === 0) {
-    return (
-      <div className="container mx-auto py-16 text-center">
-        <h1 className="text-3xl font-bold mb-4">Your Quote Cart is Empty</h1>
-        <p className="text-slate-600 mb-6">Browse our products to add items to your quote request.</p>
-        <Button asChild>
-          <Link href="/products/commercial">Browse Products</Link>
-        </Button>
-      </div>
-    )
+    if (response.ok) {
+      toast({
+        title: "Quote Request Sent!",
+        description: "Your quote request has been successfully submitted. We will contact you shortly.",
+        variant: "default",
+      })
+      clearQuote()
+      router.push("/order-success") // Redirect to a success page
+    } else {
+      toast({
+        title: "Quote Request Failed",
+        description: "There was an error submitting your quote. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
-    <div className="container mx-auto py-12">
-      <Card className="bg-white/80 backdrop-blur-md">
-        <CardHeader>
-          <CardTitle>Your Quote Request</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Code</TableHead>
-                <TableHead className="w-[120px]">Quantity</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.code}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>{item.code}</TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) => updateQuantity(item.code, Number.parseInt(e.target.value, 10))}
-                      className="w-20"
-                      min="1"
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => removeItem(item.code)}>
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <div className="flex justify-end mt-6">
-            <Button size="lg" onClick={handleSubmitQuote}>
-              Submit Quote Request
-            </Button>
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <h1 className="text-4xl font-bold text-center mb-8">Your Quote Cart</h1>
+
+      {quoteItems.length === 0 ? (
+        <Card className="max-w-2xl mx-auto text-center py-12">
+          <CardTitle className="mb-4">Your quote cart is empty.</CardTitle>
+          <CardDescription>Add products to your quote cart to request a custom price.</CardDescription>
+          <Link href="/products">
+            <Button className="mt-6">Browse Products</Button>
+          </Link>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Items for Quote</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[100px]">Image</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead className="text-center">Quantity</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {quoteItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          {item.image && (
+                            <Image
+                              src={item.image || "/placeholder.svg"}
+                              alt={item.name}
+                              width={64}
+                              height={64}
+                              objectFit="cover"
+                              className="rounded-md"
+                            />
+                          )}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {item.name}
+                          <p className="text-sm text-gray-500">Brand: {item.brand || "N/A"}</p>
+                          <p className="text-sm text-gray-500">Pack: {item.packSize || "N/A"}</p>
+                          <p className="text-sm text-gray-500">CAS: {item.casNumber || "N/A"}</p>
+                        </TableCell>
+                        <TableCell className="text-center">{item.quantity}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" onClick={() => removeItemFromQuote(item.id)}>
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle>Quote Request</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Submit your selected items to receive a custom quote from our sales team.
+                </p>
+                <Button className="w-full" onClick={handleRequestQuote}>
+                  Request Quote
+                </Button>
+                <Button variant="outline" className="w-full bg-transparent" onClick={clearQuote}>
+                  Clear Quote Cart
+                </Button>
+                <Link href="/products">
+                  <Button variant="link" className="w-full">
+                    Continue Browsing
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

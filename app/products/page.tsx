@@ -1,62 +1,84 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, Beaker, Microscope, TestTube } from "lucide-react"
-import type { Metadata } from "next"
-import Link from "next/link"
+"use client"
 
-export const metadata: Metadata = {
-  title: "Our Products",
-  description: "Explore our main product categories: Bulk Chemicals, Laboratory Supplies, and Scientific Instruments.",
-}
+import ProductGrid from "@/components/product-grid"
+import FilterSidebar from "@/components/filter-sidebar"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
+import { getProducts } from "@/lib/data"
+import { Suspense } from "react"
+import Loading from "./loading"
 
-const productCategories = [
-  {
-    title: "Bulk Chemicals",
-    description: "High-volume, industrial-grade chemicals for your production needs.",
-    href: "/products/bulk-chemicals",
-    icon: <Beaker className="w-10 h-10 text-teal-500" />,
-  },
-  {
-    title: "Laboratory Supplies",
-    description: "A complete range of glassware, consumables, and reagents from leading brands.",
-    href: "/products/laboratory-supplies",
-    icon: <TestTube className="w-10 h-10 text-teal-500" />,
-  },
-  {
-    title: "Scientific Instruments",
-    description: "Precision instruments and equipment to power your research and analysis.",
-    href: "/products/scientific-instruments",
-    icon: <Microscope className="w-10 h-10 text-teal-500" />,
-  },
-]
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const query = searchParams.query as string | undefined
+  const minPrice = searchParams.minPrice ? Number(searchParams.minPrice) : undefined
+  const maxPrice = searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined
+  const brands = typeof searchParams.brands === "string" ? [searchParams.brands] : searchParams.brands
+  const categories = typeof searchParams.categories === "string" ? [searchParams.categories] : searchParams.categories
 
-export default function ProductsPage() {
+  const allProducts = await getProducts()
+
+  const availableBrands = Array.from(new Set(allProducts.map((p) => p.brand))).filter(Boolean) as string[]
+  const availableCategories = Array.from(new Set(allProducts.map((p) => p.category))).filter(Boolean) as string[]
+
+  const filteredProducts = allProducts.filter((product) => {
+    const matchesQuery = query
+      ? product.name.toLowerCase().includes(query.toLowerCase()) ||
+        product.description.toLowerCase().includes(query.toLowerCase()) ||
+        product.brand.toLowerCase().includes(query.toLowerCase()) ||
+        product.casNumber?.toLowerCase().includes(query.toLowerCase())
+      : true
+
+    const matchesPrice =
+      (minPrice === undefined || product.price >= minPrice) && (maxPrice === undefined || product.price <= maxPrice)
+
+    const matchesBrand = brands && brands.length > 0 ? brands.includes(product.brand) : true
+    const matchesCategory = categories && categories.length > 0 ? categories.includes(product.category) : true
+
+    return matchesQuery && matchesPrice && matchesBrand && matchesCategory
+  })
+
   return (
-    <div className="container mx-auto px-4 md:px-6 py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Our Product Categories</h1>
-        <p className="mt-3 max-w-2xl mx-auto text-lg text-slate-600">
-          We provide a comprehensive range of products to meet all your industrial and laboratory requirements.
-        </p>
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <h1 className="text-4xl font-bold text-center mb-8">All Products</h1>
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="relative flex-grow">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+          <Input
+            type="text"
+            placeholder="Search products..."
+            className="w-full pl-10 pr-4 py-2 border rounded-md"
+            defaultValue={query}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const newSearchParams = new URLSearchParams(window.location.search)
+                newSearchParams.set("query", e.currentTarget.value)
+                window.history.pushState(null, "", `?${newSearchParams.toString()}`)
+              }
+            }}
+          />
+        </div>
+        <FilterSidebar
+          onApplyFilters={(filters) => {
+            const newSearchParams = new URLSearchParams()
+            if (query) newSearchParams.set("query", query)
+            if (filters.minPrice !== undefined) newSearchParams.set("minPrice", filters.minPrice.toString())
+            if (filters.maxPrice !== undefined) newSearchParams.set("maxPrice", filters.maxPrice.toString())
+            filters.brands.forEach((brand) => newSearchParams.append("brands", brand))
+            filters.categories.forEach((category) => newSearchParams.append("categories", category))
+            window.history.pushState(null, "", `?${newSearchParams.toString()}`)
+          }}
+          initialFilters={{ minPrice, maxPrice, brands, categories }}
+          availableBrands={availableBrands}
+          availableCategories={availableCategories}
+        />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {productCategories.map((category) => (
-          <Link key={category.title} href={category.href} className="group block">
-            <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80 flex flex-col">
-              <CardHeader className="flex-row items-center gap-4">
-                {category.icon}
-                <CardTitle>{category.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow flex flex-col justify-between">
-                <p className="text-slate-600 mb-4">{category.description}</p>
-                <span className="font-semibold text-blue-600 flex items-center gap-2">
-                  Explore Category <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      <Suspense fallback={<Loading />}>
+        <ProductGrid products={filteredProducts} />
+      </Suspense>
     </div>
   )
 }

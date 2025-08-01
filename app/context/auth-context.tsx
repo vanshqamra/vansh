@@ -1,62 +1,61 @@
 "use client"
 
-import type React from "react"
-import { createContext, useContext, useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import type { User } from "@supabase/supabase-js"
+import { createClient } from "@/lib/supabase/client"
 
 interface AuthContextType {
   user: User | null
   loading: boolean
-  signOut: () => Promise<void>
+  isAdmin: boolean
+  isVendor: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isVendor, setIsVendor] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        setUser(session?.user ?? null)
-      } catch (error) {
-        console.error("Error getting session:", error)
-        setUser(null)
-      } finally {
-        setLoading(false)
+    const getSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setUser(session?.user || null)
+      if (session?.user) {
+        setIsAdmin(session.user.user_metadata?.role === "admin")
+        setIsVendor(session.user.user_metadata?.role === "vendor")
+      } else {
+        setIsAdmin(false)
+        setIsVendor(false)
       }
+      setLoading(false)
     }
 
-    getInitialSession()
+    getSession()
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null)
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+      if (session?.user) {
+        setIsAdmin(session.user.user_metadata?.role === "admin")
+        setIsVendor(session.user.user_metadata?.role === "vendor")
+      } else {
+        setIsAdmin(false)
+        setIsVendor(false)
+      }
       setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
-
-  const signOut = async () => {
-    try {
-      await supabase.auth.signOut()
-      setUser(null)
-    } catch (error) {
-      console.error("Error signing out:", error)
+    return () => {
+      authListener.unsubscribe()
     }
-  }
+  }, [supabase])
 
-  return <AuthContext.Provider value={{ user, loading, signOut }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loading, isAdmin, isVendor }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

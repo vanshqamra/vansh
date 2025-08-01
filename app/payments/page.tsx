@@ -1,11 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,7 +13,19 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import { CreditCard, Building2, FileText, Truck, Shield, AlertCircle, CheckCircle, Phone, Mail } from "lucide-react"
+import {
+  CreditCard,
+  Building2,
+  FileText,
+  Truck,
+  Shield,
+  AlertCircle,
+  CheckCircle,
+  Phone,
+  Mail,
+  Banknote,
+  QrCode,
+} from "lucide-react"
 import Link from "next/link"
 
 export default function PaymentsPage() {
@@ -453,6 +464,191 @@ export default function PaymentsPage() {
             </Card>
           </div>
         </div>
+
+        {/* Payment Information Section */}
+        <section className="mb-12 mt-12">
+          <h1 className="text-4xl font-bold text-center mb-8">Payment Information</h1>
+          <p className="text-lg text-center text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+            We offer various secure and convenient payment methods to ensure a smooth transaction process for our
+            customers.
+          </p>
+        </section>
+
+        <Separator className="my-12" />
+
+        {/* Accepted Payment Methods Section */}
+        <section className="mb-12">
+          <h2 className="text-3xl font-semibold text-center mb-6">Accepted Payment Methods</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Credit/Debit Cards</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                  <li>Visa</li>
+                  <li>Mastercard</li>
+                  <li>American Express</li>
+                  <li>Discover</li>
+                </ul>
+                <p className="text-sm text-gray-500 mt-4">
+                  All card transactions are processed securely through our encrypted payment gateway.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Bank Transfers</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-700 dark:text-gray-300 mb-2">
+                  For larger orders or corporate accounts, we accept direct bank transfers.
+                </p>
+                <p className="text-sm text-gray-500">
+                  Please contact our sales team for bank details and to arrange your transfer.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Purchase Orders (PO)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-700 dark:text-gray-300 mb-2">
+                  Approved institutional and corporate clients can use Purchase Orders.
+                </p>
+                <p className="text-sm text-gray-500">
+                  Please ensure your PO is authorized and includes all necessary details.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">UPI / QR Code Payments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-700">
+                  Conveniently pay using UPI apps or by scanning a QR code. Available for instant payments.
+                </p>
+                <div className="mt-4 flex justify-center gap-2">
+                  <img src="/placeholder.svg?height=30&width=50" alt="UPI" className="h-6" />
+                  <img src="/placeholder.svg?height=30&width=50" alt="Paytm" className="h-6" />
+                  <img src="/placeholder.svg?height=30&width=50" alt="Google Pay" className="h-6" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Cash on Delivery (COD)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-700">
+                  Pay for your order in cash when it is delivered to your doorstep. Available for select locations and
+                  order values.
+                </p>
+                <p className="text-sm text-gray-500 mt-2">(Please check availability during checkout)</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator className="my-12" />
+
+        {/* Payment Security Section */}
+        <section>
+          <h2 className="text-3xl font-semibold text-center mb-6">Payment Security</h2>
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700 dark:text-gray-300">
+                  **SSL Encryption:** Our website uses industry-standard SSL encryption to protect your personal and
+                  payment information during transmission.
+                </p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700 dark:text-gray-300">
+                  **PCI DSS Compliance:** We adhere to Payment Card Industry Data Security Standard (PCI DSS) guidelines
+                  to ensure the secure handling of credit card information.
+                </p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700 dark:text-gray-300">
+                  **Fraud Protection:** We employ advanced fraud detection systems to safeguard your transactions and
+                  prevent unauthorized access.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* New Payment Options Section */}
+        <section className="text-center mb-12">
+          <h1 className="text-5xl font-extrabold text-gray-900 mb-4">Payment Options</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            We offer a variety of secure and convenient payment methods to make your purchasing experience smooth.
+          </p>
+        </section>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <Card className="text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+              <CreditCard className="mx-auto h-16 w-16 text-primary mb-4" />
+              <CardTitle className="text-2xl font-semibold">Credit/Debit Card</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="mb-4">
+                Securely pay with all major credit and debit cards. Fast and reliable.
+              </CardDescription>
+              <Button variant="outline" disabled>
+                Pay with Card (Coming Soon)
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+              <Banknote className="mx-auto h-16 w-16 text-primary mb-4" />
+              <CardTitle className="text-2xl font-semibold">Bank Transfer</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="mb-4">
+                Make direct bank transfers for larger orders or corporate accounts.
+              </CardDescription>
+              <Button variant="outline" disabled>
+                Bank Transfer Details (Coming Soon)
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+              <QrCode className="mx-auto h-16 w-16 text-primary mb-4" />
+              <CardTitle className="text-2xl font-semibold">UPI / QR Code</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="mb-4">
+                Conveniently pay using UPI apps or by scanning a QR code.
+              </CardDescription>
+              <Button variant="outline" disabled>
+                Pay with UPI (Coming Soon)
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* New Assistance Section */}
+        <section className="text-center bg-gray-50 py-12 rounded-lg shadow-inner">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">Need Assistance with Payments?</h2>
+          <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">
+            Our customer support team is available to help you with any payment-related queries or issues.
+          </p>
+          <Button asChild size="lg">
+            <Link href="/contact">Contact Support</Link>
+          </Button>
+        </section>
       </div>
     </div>
   )

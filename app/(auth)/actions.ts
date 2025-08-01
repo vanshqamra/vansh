@@ -1,75 +1,45 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 
-export async function login(prevState: any, formData: FormData) {
+export async function signIn(formData: FormData) {
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
   const supabase = createClient()
 
-  const email = formData.get("email")
-  const password = formData.get("password")
-
-  if (!email || !password) {
-    return { error: "Email and password are required." }
-  }
-
-  const data = {
-    email: email as string,
-    password: password as string,
-  }
-
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
 
   if (error) {
-    return { error: "Could not authenticate user. Please check your credentials." }
+    console.error("Sign-in error:", error.message)
+    return { error: error.message }
   }
 
-  revalidatePath("/", "layout")
   redirect("/dashboard")
 }
 
-export async function signup(prevState: any, formData: FormData) {
+export async function signUp(formData: FormData) {
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
   const supabase = createClient()
 
-  const email = formData.get("email")
-  const password = formData.get("password")
-  const name = formData.get("name")
-  const company = formData.get("company")
-  const gst = formData.get("gst")
-  const phone = formData.get("phone")
-  const address = formData.get("address")
-
-  if (!email || !password || !name || !company || !gst || !phone || !address) {
-    return { error: "All fields are required." }
-  }
-
-  const data = {
-    email: email as string,
-    password: password as string,
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
     options: {
       data: {
-        full_name: name as string,
-        company_name: company as string,
-        gst_no: gst as string,
-        contact_number: phone as string,
-        address: address as string,
+        role: "user", // Default role for new sign-ups
       },
     },
-  }
-
-  const { error } = await supabase.auth.signUp(data)
+  })
 
   if (error) {
-    console.error("Sign up error:", error)
-    return { error: "Could not authenticate user. An account with this email may already exist." }
+    console.error("Sign-up error:", error.message)
+    return { error: error.message }
   }
 
-  return { success: "Please check your email to confirm your account." }
-}
-
-export async function signOut() {
-  const supabase = createClient()
-  await supabase.auth.signOut()
-  redirect("/login")
+  redirect("/dashboard")
 }

@@ -1,15 +1,13 @@
 "use client"
 
-import Link from "next/link"
-
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useToast } from "@/hooks/use-toast"
 
@@ -28,65 +26,84 @@ interface Quote {
   items: QuoteItem[]
   status: "pending" | "approved" | "rejected" | "completed"
   requested_at: string
+  user_email?: string
 }
 
-export default function OrderHistoryPage() {
+export default function AdminUploadsPage() {
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
   const { toast } = useToast()
 
   useEffect(() => {
-    fetchUserQuotes()
+    fetchQuotes()
   }, [])
 
-  const fetchUserQuotes = async () => {
+  const fetchQuotes = async () => {
     setLoading(true)
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-
-    if (userError || !user) {
-      console.error("User not logged in:", userError?.message)
-      toast({
-        title: "Authentication Error",
-        description: "Please log in to view your order history.",
-        variant: "destructive",
-      })
-      setLoading(false)
-      return
-    }
-
     const { data: quotesData, error } = await supabase
       .from("quotes")
       .select("*")
-      .eq("user_id", user.id)
       .order("requested_at", { ascending: false })
 
     if (error) {
-      console.error("Error fetching user quotes:", error)
+      console.error("Error fetching quotes:", error)
       toast({
         title: "Error",
-        description: "Failed to fetch your quote requests.",
+        description: "Failed to fetch quote requests.",
         variant: "destructive",
       })
     } else {
-      setQuotes(quotesData as Quote[])
+      // Fetch user emails for each quote
+      const quotesWithEmails = await Promise.all(
+        quotesData.map(async (quote) => {
+          const { data: userData, error: userError } = await supabase
+            .from("profiles") // Assuming 'profiles' table stores user data including email
+            .select("email")
+            .eq("id", quote.user_id)
+            .single()
+
+          return {
+            ...quote,
+            user_email: userData ? userData.email : "N/A",
+          }
+        }),
+      )
+      setQuotes(quotesWithEmails as Quote[])
     }
     setLoading(false)
+  }
+
+  const updateQuoteStatus = async (quoteId: string, newStatus: Quote["status"]) => {
+    const { error } = await supabase.from("quotes").update({ status: newStatus }).eq("id", quoteId)
+
+    if (error) {
+      console.error("Error updating quote status:", error)
+      toast({
+        title: "Error",
+        description: `Failed to update quote status to ${newStatus}.`,
+        variant: "destructive",
+      })
+    } else {
+      toast({
+        title: "Success",
+        description: `Quote status updated to ${newStatus}.`,
+        variant: "default",
+      })
+      fetchQuotes() // Re-fetch quotes to update the UI
+    }
   }
 
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Your Order History</h1>
+        <h1 className="text-4xl font-bold text-center mb-8">Manage Quote Uploads</h1>
         <Card>
           <CardHeader>
-            <CardTitle>Loading Order History...</CardTitle>
+            <CardTitle>Loading Quote Requests...</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Please wait while we fetch your past quote requests.</p>
+            <p>Please wait while we fetch the latest quote requests.</p>
           </CardContent>
         </Card>
       </div>
@@ -95,28 +112,26 @@ export default function OrderHistoryPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <h1 className="text-4xl font-bold text-center mb-8">Your Order History</h1>
+      <h1 className="text-4xl font-bold text-center mb-8">Manage Quote Uploads</h1>
 
       {quotes.length === 0 ? (
         <Card className="max-w-2xl mx-auto text-center py-12">
-          <CardTitle className="mb-4">No Order History Found</CardTitle>
+          <CardTitle className="mb-4">No Quote Requests Found</CardTitle>
           <CardContent>
-            <p className="text-gray-600">You haven't submitted any quote requests yet.</p>
-            <Button className="mt-6" asChild>
-              <Link href="/products">Start Browsing Products</Link>
-            </Button>
+            <p className="text-gray-600">There are no pending or past quote requests at the moment.</p>
           </CardContent>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>Your Quote Requests</CardTitle>
+            <CardTitle>All Quote Requests</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Quote ID</TableHead>
+                  <TableHead>User Email</TableHead>
                   <TableHead>Items</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Requested At</TableHead>
@@ -127,6 +142,7 @@ export default function OrderHistoryPage() {
                 {quotes.map((quote) => (
                   <TableRow key={quote.id}>
                     <TableCell className="font-medium">{quote.id.substring(0, 8)}...</TableCell>
+                    <TableCell>{quote.user_email || "N/A"}</TableCell>
                     <TableCell>
                       <Dialog>
                         <DialogTrigger asChild>
@@ -180,10 +196,27 @@ export default function OrderHistoryPage() {
                     </TableCell>
                     <TableCell>{format(new Date(quote.requested_at), "PPP p")}</TableCell>
                     <TableCell className="text-right">
-                      {/* Add actions here if needed, e.g., view details, re-request */}
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/dashboard/quote-cart?quoteId=${quote.id}`}>View Details</Link>
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        {quote.status === "pending" && (
+                          <>
+                            <Button size="sm" onClick={() => updateQuoteStatus(quote.id, "approved")}>
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => updateQuoteStatus(quote.id, "rejected")}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                        {quote.status === "approved" && (
+                          <Button size="sm" onClick={() => updateQuoteStatus(quote.id, "completed")}>
+                            Mark as Completed
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

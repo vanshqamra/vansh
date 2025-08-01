@@ -4,15 +4,7 @@ import { cookies } from "next/headers"
 export function createClient() {
   const cookieStore = cookies()
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    // This error is now expected and will be caught by the component that calls this function.
-    throw new Error("Supabase credentials are not set in environment variables.")
-  }
-
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value
@@ -21,14 +13,16 @@ export function createClient() {
         try {
           cookieStore.set({ name, value, ...options })
         } catch (error) {
-          // The `set` method was called from a Server Component.
+          // The `cookies().set()` method can only be called from a Server Component or Server Action.
+          // This error is typically ignored if you're using Next.js with Supabase client-side with a `use client` component.
         }
       },
       remove(name: string, options: CookieOptions) {
         try {
           cookieStore.set({ name, value: "", ...options })
         } catch (error) {
-          // The `delete` method was called from a Server Component.
+          // The `cookies().delete()` method can only be called from a Server Component or Server Action.
+          // This error is typically ignored if you're using Next.js with Supabase client-side with a `use client` component.
         }
       },
     },

@@ -1,129 +1,119 @@
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Users, Zap } from "lucide-react"
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "About Us",
-  description:
-    "Explore the journey of Chemical Corporation — from humble beginnings to serving 500+ clients across India with trusted lab and industrial chemical supplies.",
-}
-
-const timelineEvents = [
-  {
-    year: "1948",
-    event: "Company Founded",
-    description:
-      "Chemical Corporation was established in Ludhiana to serve regional industry needs with essential chemicals.",
-  },
-  {
-    year: "1962",
-    event: "100 Clients Milestone",
-    description:
-      "Built strong regional partnerships and crossed 100 loyal industrial and lab clients.",
-  },
-  {
-    year: "1981",
-    event: "Expanded Offerings",
-    description:
-      "Product range diversified to include specialty laboratory and industrial chemicals.",
-  },
-  {
-    year: "2000",
-    event: "250 Clients & Major Industry Entry",
-    description:
-      "Grew to over 250 clients and began serving major clients including Hindustan Unilever and Tata Group.",
-  },
-  {
-    year: "2012",
-    event: "500 Clients & National Reach",
-    description:
-      "Achieved the milestone of 500 active clients including Hindustan Petroleum and government institutions.",
-  },
-  {
-    year: "2025",
-    event: "Digital B2B Portal Launch",
-    description:
-      "Launched an advanced vendor portal to enable seamless B2B procurement across India.",
-  },
-]
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import Image from "next/image"
+import Link from "next/link"
 
 export default function AboutPage() {
   return (
-    <div className="bg-white py-16">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
-            About Chemical Corporation
-          </h1>
-          <p className="mt-3 max-w-3xl mx-auto text-lg text-slate-600">
-            For over 75 years, Chemical Corporation has empowered scientific and industrial growth with trusted
-            chemical solutions and unmatched customer support.
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <section className="text-center mb-12">
+        <h1 className="text-5xl font-extrabold text-gray-900 mb-4">About Chemical Corporation</h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Your trusted partner in chemical solutions, committed to quality, safety, and innovation.
+        </p>
+      </section>
+
+      <section className="grid md:grid-cols-2 gap-12 items-center mb-12">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            At Chemical Corporation, our mission is to provide high-quality chemical products and innovative solutions
+            that meet the diverse needs of our clients across various industries. We are dedicated to fostering
+            scientific advancement, ensuring environmental responsibility, and maintaining the highest standards of
+            safety and integrity in all our operations.
           </p>
         </div>
-
-        <div className="max-w-4xl mx-auto mb-16">
-          <h2 className="text-2xl font-bold text-center mb-8">Our Journey</h2>
-          <div className="relative">
-            <div className="absolute left-1/2 w-0.5 h-full bg-slate-200 -translate-x-1/2" />
-            {timelineEvents.map((item, index) => (
-              <div
-                key={item.year}
-                className={`flex items-center w-full mb-8 ${
-                  index % 2 === 0 ? "justify-start" : "justify-end"
-                }`}
-              >
-                <div
-                  className={`w-1/2 ${
-                    index % 2 === 0 ? "pr-8 text-right" : "pl-8 text-left"
-                  }`}
-                >
-                  <div className="p-4 bg-slate-50 rounded-lg shadow-md">
-                    <p className="text-sm font-semibold text-blue-600">{item.year}</p>
-                    <h3 className="text-lg font-bold">{item.event}</h3>
-                    <p className="text-sm text-slate-600">{item.description}</p>
-                  </div>
-                </div>
-                <div className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-blue-600 rounded-full border-4 border-white" />
-              </div>
-            ))}
-          </div>
+        <div className="relative h-64 md:h-96 rounded-lg overflow-hidden shadow-lg">
+          <Image
+            src="/placeholder.svg?height=400&width=600&text=Our Mission"
+            alt="Our Mission"
+            layout="fill"
+            objectFit="cover"
+            className="transition-transform duration-300 hover:scale-105"
+          />
         </div>
+      </section>
 
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div>
-            <h2 className="text-3xl font-bold mb-4">Our Values</h2>
-            <p className="text-slate-600 mb-4">
-              We are proud distributors of leading chemical and lab supply brands including{" "}
-              <strong>Qualigens, Borosil, Whatman, Rankem, and JT Baker</strong>. Our aim is to serve as a one-stop
-              partner for industries, research institutions, and educational labs.
-            </p>
-            <p className="text-slate-600">
-              From startups to Fortune 500 clients, we’re committed to providing high-purity chemicals with excellent
-              service and reliable delivery.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Integrity</CardTitle>
-                <CheckCircle className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Innovation</CardTitle>
-                <Zap className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Customer-Centric</CardTitle>
-                <Users className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-            </Card>
-          </div>
+      <Separator className="my-12" />
+
+      <section className="grid md:grid-cols-2 gap-12 items-center mb-12">
+        <div className="relative h-64 md:h-96 rounded-lg overflow-hidden shadow-lg order-2 md:order-1">
+          <Image
+            src="/placeholder.svg?height=400&width=600&text=Our Vision"
+            alt="Our Vision"
+            layout="fill"
+            objectFit="cover"
+            className="transition-transform duration-300 hover:scale-105"
+          />
         </div>
-      </div>
+        <div className="order-1 md:order-2">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Vision</h2>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            We envision a future where Chemical Corporation is recognized globally as a leader in chemical innovation,
+            setting benchmarks for product excellence, sustainable practices, and customer satisfaction. We aim to be
+            the preferred partner for businesses seeking reliable and cutting-edge chemical solutions, contributing to a
+            healthier and more sustainable world.
+          </p>
+        </div>
+      </section>
+
+      <Separator className="my-12" />
+
+      <section className="text-center mb-12">
+        <h2 className="text-4xl font-bold text-gray-900 mb-8">Our Values</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card className="p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold text-gray-800">Integrity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                We conduct our business with the highest ethical standards, ensuring transparency and honesty in all our
+                interactions.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold text-gray-800">Innovation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                We continuously seek new and improved ways to develop products and solutions, pushing the boundaries of
+                chemical science.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold text-gray-800">Sustainability</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                We are committed to environmentally responsible practices, minimizing our footprint and promoting a
+                greener future.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <section className="text-center bg-gray-50 py-12 rounded-lg shadow-inner">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Ready to Partner with Us?</h2>
+        <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">
+          Explore our extensive range of products or get in touch with our expert team to discuss your specific chemical
+          needs.
+        </p>
+        <div className="flex justify-center gap-4">
+          <Button asChild size="lg">
+            <Link href="/products">View Products</Link>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <Link href="/contact">Contact Us</Link>
+          </Button>
+        </div>
+      </section>
     </div>
   )
 }

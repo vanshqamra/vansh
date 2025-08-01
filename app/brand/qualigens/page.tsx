@@ -2,29 +2,31 @@
 
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Search, ShoppingCart, Beaker } from "lucide-react"
+import { Search } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import qualigensProducts from "@/lib/qualigens-products.json"
+import QualiProductGrid from "@/components/quali-product-grid"
+import { getQualigensProducts } from "@/lib/qualigens-products"
+import { getBrandByName } from "@/lib/data"
 import Image from "next/image"
+import { Suspense } from "react"
+import Loading from "./loading"
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 
-export default function QualigensBrandPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
-  const { addToCart } = useCart()
-  const { toast } = useToast()
+export default async function QualigensPage() {
+  const qualiProducts = await getQualigensProducts()
+  const brand = getBrandByName("Qualigens")
 
   // Sort products alphabetically by name
   const sortedProducts = useMemo(() => {
-    return [...qualigensProducts].sort((a, b) => a[2].localeCompare(b[2]))
-  }, [])
+    return [...qualiProducts].sort((a, b) => a.name.localeCompare(b.name))
+  }, [qualiProducts])
 
   // Filter products based on search and letter selection
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
   const filteredProducts = useMemo(() => {
     let filtered = sortedProducts
 
@@ -32,39 +34,42 @@ export default function QualigensBrandPage() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
-        ([code, cas, name]) =>
-          name.toLowerCase().includes(query) || code.toLowerCase().includes(query) || cas.toLowerCase().includes(query),
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.code.toLowerCase().includes(query) ||
+          product.cas.toLowerCase().includes(query),
       )
     }
 
     // Filter by selected letter
     if (selectedLetter) {
-      filtered = filtered.filter(([, , name]) => name.toUpperCase().startsWith(selectedLetter))
+      filtered = filtered.filter((product) => product.name.toUpperCase().startsWith(selectedLetter))
     }
 
     return filtered
   }, [sortedProducts, searchQuery, selectedLetter])
 
-  const handleAddToCart = (product: (typeof qualigensProducts)[0]) => {
-    const [code, cas, name, packSize, material, price] = product
+  const { addToCart } = useCart()
+  const { toast } = useToast()
 
+  const handleAddToCart = (product: any) => {
     try {
       // Convert price to number, handle "POR" case
-      const numericPrice = price === "POR" ? 0 : Number.parseFloat(price.toString())
+      const numericPrice = product.price === "POR" ? 0 : Number.parseFloat(product.price.toString())
 
       addToCart({
-        id: code,
-        name: name,
+        id: product.code,
+        name: product.name,
         price: numericPrice,
-        brand: "Qualigens",
+        brand: brand.name,
         category: "Laboratory Chemical",
-        packSize: packSize,
-        casNumber: cas,
+        packSize: product.packSize,
+        casNumber: product.cas,
       })
 
       toast({
         title: "Added to Cart",
-        description: `${name} has been added to your cart.`,
+        description: `${product.name} has been added to your cart.`,
       })
     } catch (error) {
       console.error("Error adding to cart:", error)
@@ -76,27 +81,29 @@ export default function QualigensBrandPage() {
     }
   }
 
+  if (!brand) {
+    return <div className="container mx-auto px-4 py-8 text-red-500">Brand not found.</div>
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Brand Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
+        <div className="flex flex-col items-center justify-center mb-8">
+          {brand.logo && (
             <Image
-              src="/images/logo-qualigens.png"
-              alt="Qualigens"
-              width={80}
-              height={80}
-              className="object-contain mr-4"
+              src={brand.logo || "/placeholder.svg"}
+              alt={`${brand.name} Logo`}
+              width={200}
+              height={100}
+              objectFit="contain"
+              className="mb-4"
             />
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900">Qualigens Fine Chemicals</h1>
-              <p className="text-lg text-slate-600 mt-2">Premium Laboratory Chemicals & Reagents</p>
-            </div>
-          </div>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            Comprehensive catalog of high-quality laboratory chemicals and reagents from Qualigens. Browse our complete
-            catalog of {qualigensProducts.length}+ products with guaranteed purity and reliability.
+          )}
+          <h1 className="text-4xl font-bold text-center mb-8">Qualigens Products</h1>
+          <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
+            Explore our comprehensive range of Qualigens brand chemicals and reagents, known for their quality and
+            reliability.
           </p>
         </div>
 
@@ -144,64 +151,14 @@ export default function QualigensBrandPage() {
         {/* Results Count */}
         <div className="text-center mb-6">
           <p className="text-slate-600">
-            Showing {filteredProducts.length} of {qualigensProducts.length} products
+            Showing {filteredProducts.length} of {qualiProducts.length} products
           </p>
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => {
-            const [code, cas, name, packSize, material, price, hsn] = product
-            return (
-              <Card key={code} className="hover:shadow-lg transition-shadow bg-white/80 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-center mb-3">
-                    <Beaker className="h-12 w-12 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold leading-tight line-clamp-2 text-center">{name}</CardTitle>
-                  <div className="flex items-center justify-center gap-2">
-                    <Badge variant="secondary">Qualigens</Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {code}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">CAS:</span>
-                      <span className="text-slate-800">{cas || "N/A"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">Pack:</span>
-                      <span className="text-slate-800">{packSize}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">Material:</span>
-                      <span className="text-slate-800">{material}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-slate-600">HSN:</span>
-                      <span className="text-slate-800">{hsn}</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t">
-                    <div className="flex items-center justify-center mb-3">
-                      <span className="text-2xl font-bold text-blue-600">
-                        {price === "POR" ? "Price on Request" : `₹${price}`}
-                      </span>
-                    </div>
-                    <Button onClick={() => handleAddToCart(product)} className="w-full bg-green-600 hover:bg-green-700">
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+        <Suspense fallback={<Loading />}>
+          <QualiProductGrid products={filteredProducts} handleAddToCart={handleAddToCart} />
+        </Suspense>
 
         {/* No Results */}
         {filteredProducts.length === 0 && (

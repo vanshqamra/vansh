@@ -1,156 +1,120 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { getQualigensProducts } from "@/lib/qualigens-products"
+import { getBrandByName } from "@/lib/data"
+import Image from "next/image"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import { Search, ShoppingCart, Package, FlaskConical, Tag } from "lucide-react"
-import { getQualigensProducts } from "@/lib/qualigens-products"
+import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
+import QualiProductGrid from "@/components/quali-product-grid"
+import { Suspense } from "react"
+import Loading from "./loading"
 
-interface Product {
-  id: string
-  code: string
-  cas: string
-  name: string
-  packSize: string
-  material: string
-  price: string | number
-  hsn: string
-  category?: string
-  image?: string
-}
-
-export default function QualigensProductsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+export default async function QualigensPage() {
+  const qualiProducts = await getQualigensProducts()
+  const brand = getBrandByName("Qualigens")
   const { addItem } = useCart()
   const { toast } = useToast()
+  const [searchTerm, setSearchTerm] = useState("")
 
-  const products: Product[] = getQualigensProducts().map((p) => ({
-    id: p.code,
-    code: p.code,
-    cas: p.cas,
-    name: p.name,
-    packSize: p.packSize,
-    material: p.material,
-    price: p.price,
-    hsn: p.hsn,
-    category: p.category,
-    image: p.image,
-  }))
+  const filteredProducts = qualiProducts.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.cas?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.brand?.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
-  useEffect(() => {
-    const lowerCaseSearchTerm = searchTerm.toLowerCase()
-    const results = products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        product.code.toLowerCase().includes(lowerCaseSearchTerm) ||
-        product.cas.toLowerCase().includes(lowerCaseSearchTerm) ||
-        product.packSize.toLowerCase().includes(lowerCaseSearchTerm) ||
-        product.material.toLowerCase().includes(lowerCaseSearchTerm) ||
-        product.category?.toLowerCase().includes(lowerCaseSearchTerm),
-    )
-    setFilteredProducts(results)
-  }, [searchTerm, products])
-
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: any) => {
+    const priceString = product.price?.toString().replace(/[^\d.]/g, "")
     let numericPrice: number
-    if (typeof product.price === "string") {
-      const cleanedPrice = product.price.replace(/[^0-9.]/g, "")
-      numericPrice = Number.parseFloat(cleanedPrice)
+
+    if (priceString === "POR" || !priceString) {
+      toast({
+        title: "Price on Request",
+        description: `${product.name} is Price on Request. Please contact us for a quote.`,
+        variant: "default",
+      })
+      return
+    }
+
+    try {
+      numericPrice = Number.parseFloat(priceString)
       if (isNaN(numericPrice)) {
-        toast({
-          title: "Price Error",
-          description: `"${product.name}" is "Price on Request". Please contact us for pricing.`,
-          variant: "destructive",
-        })
-        return
+        throw new Error("Invalid price format")
       }
-    } else {
-      numericPrice = product.price
+    } catch (error) {
+      console.error("Error parsing price:", error)
+      toast({
+        title: "Error",
+        description: `Could not add ${product.name} to cart due to invalid price.`,
+        variant: "destructive",
+      })
+      return
     }
 
     addItem({
       id: product.id || product.code,
       name: product.name,
       price: numericPrice,
+      quantity: 1,
       brand: "Qualigens",
       category: product.category || "Laboratory Chemical",
       packSize: product.packSize,
       casNumber: product.cas,
       image: product.image || "/placeholder.svg",
-      quantity: 1, // Always add 1 when clicking "Add to Cart"
     })
 
     toast({
       title: "Added to Cart",
       description: `${product.name} has been added to your cart.`,
-      variant: "default",
+      variant: "success",
     })
   }
 
+  if (!brand) {
+    return <div className="container mx-auto px-4 py-8 text-red-500">Brand not found.</div>
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">Qualigens Products</h1>
-
-      <div className="mb-8">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search Qualigens products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="flex flex-col items-center justify-center mb-8">
+        {brand.logo && (
+          <Image
+            src={brand.logo || "/placeholder.svg"}
+            alt={`${brand.name} Logo`}
+            width={200}
+            height={100}
+            objectFit="contain"
+            className="mb-4"
           />
-        </div>
+        )}
+        <h1 className="text-4xl font-bold text-center">Qualigens Products</h1>
+        <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
+          Explore our comprehensive range of Qualigens brand chemicals and reagents, known for their quality and
+          reliability.
+        </p>
       </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-600 text-lg">No products found matching your search.</p>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <Card key={product.id} className="flex flex-col">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold line-clamp-2">{product.name}</CardTitle>
-              <p className="text-sm text-gray-500">Code: {product.code}</p>
-            </CardHeader>
-            <CardContent className="flex-grow flex flex-col justify-between p-4 pt-0">
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FlaskConical className="h-4 w-4 mr-1 text-gray-400" />
-                  <span>CAS: {product.cas || "N/A"}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Package className="h-4 w-4 mr-1 text-gray-400" />
-                  <span>Pack Size: {product.packSize}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Tag className="h-4 w-4 mr-1 text-gray-400" />
-                  <span>Category: {product.category || "N/A"}</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between mt-auto">
-                <p className="text-xl font-bold text-blue-600">
-                  {typeof product.price === "string" && product.price.toLowerCase() === "por"
-                    ? "Price on Request"
-                    : `₹${Number(product.price).toLocaleString()}`}
-                </p>
-                <Button onClick={() => handleAddToCart(product)}>
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="relative mb-8 max-w-md mx-auto">
+        <Input
+          type="text"
+          placeholder="Search Qualigens products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 pr-4 py-2 rounded-full border focus:border-blue-500 focus:ring-blue-500 w-full"
+        />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
       </div>
+      <Suspense fallback={<Loading />}>
+        {filteredProducts.length === 0 ? (
+          <div className="text-center text-gray-600 text-xl">No products found matching your search.</div>
+        ) : (
+          <QualiProductGrid products={filteredProducts} handleAddToCart={handleAddToCart} />
+        )}
+      </Suspense>
     </div>
   )
 }

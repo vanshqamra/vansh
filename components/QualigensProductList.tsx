@@ -4,20 +4,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
-import type { Product } from "@/lib/data"
+import type { QualigensProduct } from "@/lib/qualigens-products"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
 
-interface BulkChemicalListProps {
-  products: Product[]
+interface QualigensProductListProps {
+  products: QualigensProduct[]
 }
 
-export default function BulkChemicalList({ products }: BulkChemicalListProps) {
+export default function QualigensProductList({ products }: QualigensProductListProps) {
   const { addItem } = useCart()
   const { toast } = useToast()
 
-  const handleAddToCart = (product: Product) => {
-    addItem(product)
+  const handleAddToCart = (product: QualigensProduct) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      brand: product.brand,
+      packSize: product.packSize,
+      casNumber: product.casNumber,
+      quantity: 1, // Default quantity
+    })
     toast({
       title: "Added to Cart!",
       description: `${product.name} has been added to your cart.`,
@@ -28,7 +37,7 @@ export default function BulkChemicalList({ products }: BulkChemicalListProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bulk Chemicals</CardTitle>
+        <CardTitle>Qualigens Products</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -36,7 +45,6 @@ export default function BulkChemicalList({ products }: BulkChemicalListProps) {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>CAS No.</TableHead>
-              <TableHead>Purity</TableHead>
               <TableHead>Pack Size</TableHead>
               <TableHead className="text-right">Price</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -47,7 +55,6 @@ export default function BulkChemicalList({ products }: BulkChemicalListProps) {
               <TableRow key={product.id}>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>{product.casNumber}</TableCell>
-                <TableCell>{product.purity}</TableCell>
                 <TableCell>{product.packSize}</TableCell>
                 <TableCell className="text-right">₹{product.price.toLocaleString()}</TableCell>
                 <TableCell className="text-right">
