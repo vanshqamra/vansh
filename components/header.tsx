@@ -1,281 +1,312 @@
 "use client"
 
-import type React from "react"
-
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import {
-  ShoppingCart,
-  User,
-  LogOut,
-  Settings,
-  Package,
-  Search,
-  Menu,
-  X,
-  FlaskConical,
-  LayoutDashboard,
-} from "lucide-react"
-import { useCart } from "@/app/context/CartContext"
-import { useAuth } from "@/app/context/auth-context"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import {
+  Search,
+  ShoppingCart,
+  Menu,
+  User,
+  LogOut,
+  LayoutDashboard,
+  FileText,
+  Upload,
+  History,
+  FlaskRoundIcon as Flask,
+  ChevronDown,
+} from "lucide-react"
+import { useCart } from "@/app/context/CartContext"
+import { useAuth } from "@/app/context/auth-context"
+import { useRouter } from "next/navigation"
 
 export function Header() {
   const { totalItems } = useCart()
   const { user, loading, signOut } = useAuth()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSignOut = async () => {
     await signOut()
     router.push("/")
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/products/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery("")
-    }
+  if (!mounted) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="container flex h-16 items-center">
+          <div className="animate-pulse flex items-center space-x-4">
+            <div className="h-8 w-8 bg-gray-200 rounded"></div>
+            <div className="h-6 w-32 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow-lg">
-              <FlaskConical className="h-6 w-6 text-white" />
+      <div className="container flex h-16 items-center">
+        {/* Logo */}
+        <div className="mr-4">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="relative">
+              <Flask className="h-8 w-8 text-blue-600" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full opacity-20 animate-pulse"></div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold text-slate-900">Chemical Corporation</span>
-              <span className="text-xs text-slate-500 -mt-1">Laboratory Solutions</span>
-            </div>
+            <span className="hidden font-bold sm:inline-block bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              Chemical Corporation
+            </span>
+          </Link>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium flex-1">
+          <Link href="/" className="transition-colors hover:text-blue-600 text-foreground/60 hover:text-foreground/80">
+            Home
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            <Link href="/products" className="text-sm font-medium hover:text-blue-600 transition-colors">
-              Products
-            </Link>
-            <Link href="/offers" className="text-sm font-medium hover:text-blue-600 transition-colors">
-              Offers
-            </Link>
-            <Link href="/about" className="text-sm font-medium hover:text-blue-600 transition-colors">
-              About
-            </Link>
-            <Link href="/contact" className="text-sm font-medium hover:text-blue-600 transition-colors">
-              Contact
-            </Link>
-            {user && (
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </Link>
-            )}
-          </nav>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center space-x-1 transition-colors hover:text-blue-600 text-foreground/60 hover:text-foreground/80">
+              <span>Products</span>
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 z-[100]">
+              <DropdownMenuItem asChild>
+                <Link href="/products/bulk-chemicals">Bulk Chemicals</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/products/laboratory-supplies">Laboratory Supplies</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/products/scientific-instruments">Scientific Instruments</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/products/qualigens">Qualigens Products</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/products">All Products</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-          {/* Search Bar - Desktop */}
-          <div className="hidden md:block flex-1 max-w-md mx-8">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search products, codes, or CAS..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </form>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center space-x-1 transition-colors hover:text-blue-600 text-foreground/60 hover:text-foreground/80">
+              <span>Brands</span>
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 z-[100]">
+              <DropdownMenuItem asChild>
+                <Link href="/brand/qualigens">Qualigens</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/brand/fisher-scientific">Fisher Scientific</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/brand/thermo-scientific">Thermo Scientific</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Cart */}
-            <Link href="/cart" className="relative">
-              <Button variant="ghost" size="sm" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-blue-600">
-                    {totalItems}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
+          <Link
+            href="/about"
+            className="transition-colors hover:text-blue-600 text-foreground/60 hover:text-foreground/80"
+          >
+            About
+          </Link>
+          <Link
+            href="/contact"
+            className="transition-colors hover:text-blue-600 text-foreground/60 hover:text-foreground/80"
+          >
+            Contact
+          </Link>
+        </nav>
 
-            {/* Auth Section */}
-            {loading ? (
-              <div className="h-9 w-20 bg-gray-200 animate-pulse rounded" />
-            ) : user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">{user.email?.split("@")[0]}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 z-[100]">
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="flex items-center">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/history" className="flex items-center">
-                      <Package className="mr-2 h-4 w-4" />
-                      Order History
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/upload" className="flex items-center">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Upload Requirements
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="flex items-center text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="hidden lg:flex items-center space-x-2">
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/register">Register</Link>
-                </Button>
-              </div>
-            )}
-
-            {/* Mobile Menu Button */}
-            <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setMobileMenuOpen(true)}>
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Search Bar */}
-        <div className="md:hidden pb-4">
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+        {/* Search Bar */}
+        <div className="hidden md:flex items-center space-x-4 flex-1 max-w-sm">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              type="text"
+              type="search"
               placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full"
+              className="pl-8"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const query = (e.target as HTMLInputElement).value
+                  if (query.trim()) {
+                    router.push(`/products/search?q=${encodeURIComponent(query)}`)
+                  }
+                }
+              }}
             />
-          </form>
+          </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden">
-          <div className="fixed inset-0 z-[60] bg-black bg-opacity-25" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed inset-y-0 right-0 z-[70] w-full max-w-sm bg-white shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b">
-              <Link href="/" className="flex items-center space-x-2" onClick={() => setMobileMenuOpen(false)}>
-                <FlaskConical className="h-6 w-6 text-blue-600" />
-                <span className="font-bold text-slate-900">ChemCorp</span>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(false)}>
-                <X className="h-6 w-6" />
+        {/* Right Side Actions */}
+        <div className="flex items-center space-x-4">
+          {/* Cart */}
+          <Button variant="ghost" size="icon" asChild className="relative">
+            <Link href="/cart">
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  {totalItems}
+                </Badge>
+              )}
+            </Link>
+          </Button>
+
+          {/* User Menu */}
+          {loading ? (
+            <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 z-[100]">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard" className="flex items-center">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/quote-cart" className="flex items-center">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Quote Cart
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/upload" className="flex items-center">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Quote
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/history" className="flex items-center">
+                    <History className="mr-2 h-4 w-4" />
+                    Order History
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/register">Register</Link>
               </Button>
             </div>
-            <nav className="p-4">
-              <div className="space-y-2">
-                <Link
-                  href="/products"
-                  className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Products
-                </Link>
-                <Link
-                  href="/offers"
-                  className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Offers
-                </Link>
-                <Link
-                  href="/about"
-                  className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  About
-                </Link>
-                <Link
-                  href="/contact"
-                  className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Contact
-                </Link>
+          )}
 
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <LayoutDashboard className="inline w-4 h-4 mr-2" />
-                      Dashboard
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleSignOut()
-                        setMobileMenuOpen(false)
-                      }}
-                      className="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      href="/register"
-                      className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Register
-                    </Link>
-                  </>
-                )}
+          {/* Mobile Menu */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] z-[60]">
+              <div className="flex flex-col space-y-4 mt-4">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search products..."
+                    className="pl-8"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        const query = (e.target as HTMLInputElement).value
+                        if (query.trim()) {
+                          router.push(`/products/search?q=${encodeURIComponent(query)}`)
+                        }
+                      }
+                    }}
+                  />
+                </div>
+
+                <nav className="flex flex-col space-y-2">
+                  <Link href="/" className="text-lg font-medium">
+                    Home
+                  </Link>
+                  <Link href="/products" className="text-lg font-medium">
+                    Products
+                  </Link>
+                  <Link href="/about" className="text-lg font-medium">
+                    About
+                  </Link>
+                  <Link href="/contact" className="text-lg font-medium">
+                    Contact
+                  </Link>
+
+                  {user && (
+                    <>
+                      <div className="border-t pt-4 mt-4">
+                        <Link href="/dashboard" className="text-lg font-medium flex items-center">
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </Link>
+                      </div>
+                      <Link href="/dashboard/quote-cart" className="text-lg font-medium flex items-center">
+                        <FileText className="mr-2 h-4 w-4" />
+                        Quote Cart
+                      </Link>
+                      <Link href="/dashboard/upload" className="text-lg font-medium flex items-center">
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Quote
+                      </Link>
+                      <Link href="/dashboard/history" className="text-lg font-medium flex items-center">
+                        <History className="mr-2 h-4 w-4" />
+                        Order History
+                      </Link>
+                      <Button onClick={handleSignOut} variant="ghost" className="justify-start p-0 text-lg font-medium">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sign Out
+                      </Button>
+                    </>
+                  )}
+
+                  {!user && !loading && (
+                    <div className="border-t pt-4 mt-4 space-y-2">
+                      <Button variant="ghost" size="sm" asChild className="w-full justify-start">
+                        <Link href="/login">Login</Link>
+                      </Button>
+                      <Button size="sm" asChild className="w-full">
+                        <Link href="/register">Register</Link>
+                      </Button>
+                    </div>
+                  )}
+                </nav>
               </div>
-            </nav>
-          </div>
+            </SheetContent>
+          </Sheet>
         </div>
-      )}
+      </div>
     </header>
   )
 }

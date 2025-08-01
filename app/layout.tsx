@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { QuoteProvider } from "@/app/context/quote-context"
 import { AuthProvider } from "@/app/context/auth-context"
 import { CartProvider } from "@/app/context/CartContext"
 import { Toaster } from "@/components/ui/toaster"
@@ -28,13 +29,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <CartProvider>
-            <Header />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
-            <WhatsAppButton />
-            <Toaster />
-          </CartProvider>
+          <QuoteProvider>
+            <CartProvider>
+              <Header />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+              <WhatsAppButton />
+              <Toaster />
+            </CartProvider>
+          </QuoteProvider>
         </AuthProvider>
       </body>
     </html>

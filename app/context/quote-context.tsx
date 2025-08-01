@@ -11,6 +11,7 @@ interface QuoteItem {
   quantity: number
   packSize?: string
   material?: string
+  code: string
 }
 
 interface QuoteContextType {
@@ -41,6 +42,9 @@ export function QuoteProvider({ children }: { children: React.ReactNode }) {
       } finally {
         setIsLoaded(true)
       }
+    } else {
+      // Server-side rendering
+      setIsLoaded(true)
     }
   }, [])
 

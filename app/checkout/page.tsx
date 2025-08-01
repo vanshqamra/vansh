@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -24,6 +23,23 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer")
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && !user) {
+      router.push("/login?redirect=/checkout")
+    }
+  }, [user, router, mounted])
+
+  useEffect(() => {
+    if (mounted && items.length === 0) {
+      router.push("/cart")
+    }
+  }, [items.length, router, mounted])
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,13 +58,24 @@ export default function CheckoutPage() {
     router.push("/order-success")
   }
 
+  if (!mounted) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (!user) {
-    router.push("/login?redirect=/checkout")
     return null
   }
 
   if (items.length === 0) {
-    router.push("/cart")
     return null
   }
 
