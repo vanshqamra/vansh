@@ -129,7 +129,7 @@ export function Header() {
                     <span className="hidden sm:inline">{user.email?.split("@")[0]}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 z-[100]">
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard" className="flex items-center">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -191,8 +191,8 @@ export function Header() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden">
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-25" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-xl">
+          <div className="fixed inset-0 z-[60] bg-black bg-opacity-25" onClick={() => setMobileMenuOpen(false)} />
+          <div className="fixed inset-y-0 right-0 z-[70] w-full max-w-sm bg-white shadow-xl">
             <div className="flex items-center justify-between p-4 border-b">
               <Link href="/" className="flex items-center space-x-2" onClick={() => setMobileMenuOpen(false)}>
                 <FlaskConical className="h-6 w-6 text-blue-600" />

@@ -1,133 +1,181 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef } from "react"
 
 export function ParallaxBackground() {
-  const [scrollY, setScrollY] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
+    const handleScroll = () => {
+      if (!containerRef.current) return
+
+      const scrolled = window.pageYOffset
+      const parallax = scrolled * 0.5
+
+      containerRef.current.style.transform = `translateY(${parallax}px)`
+    }
+
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Base Laboratory Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900" />
-
-      {/* Laboratory Equipment Silhouettes */}
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          transform: `translateY(${scrollY * 0.3}px)`,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fillOpacity='0.1'%3E%3Cpath d='M20 20h10v60h-10z'/%3E%3Ccircle cx='25' cy='15' r='8'/%3E%3Cpath d='M50 30h20v40h-20z'/%3E%3Ccircle cx='60' cy='25' r='6'/%3E%3Cpath d='M80 40h8v30h-8z'/%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: "200px 200px",
-        }}
-      />
-
-      {/* Molecular Structure Overlay */}
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          transform: `translateY(${scrollY * 0.2}px)`,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' strokeWidth='1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3Ccircle cx='60' cy='20' r='4'/%3E%3Ccircle cx='90' cy='30' r='4'/%3E%3Ccircle cx='45' cy='60' r='4'/%3E%3Ccircle cx='75' cy='60' r='4'/%3E%3Cline x1='30' y1='30' x2='60' y2='20'/%3E%3Cline x1='60' y1='20' x2='90' y2='30'/%3E%3Cline x1='30' y1='30' x2='45' y2='60'/%3E%3Cline x1='90' y1='30' x2='75' y2='60'/%3E%3Cline x1='45' y1='60' x2='75' y2='60'/%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: "150px 150px",
-        }}
-      />
-
-      {/* Floating Laboratory Elements */}
-      <div className="absolute inset-0">
-        {/* Beaker */}
-        <div
-          className="absolute top-1/4 left-1/6 w-16 h-20 opacity-20"
-          style={{
-            transform: `translate(${scrollY * 0.1}px, ${Math.sin(scrollY * 0.01) * 10}px)`,
-          }}
-        >
-          <div className="w-full h-full bg-gradient-to-b from-transparent via-blue-300/30 to-blue-400/40 rounded-b-lg border-2 border-white/20">
-            <div className="w-8 h-2 bg-white/20 mx-auto mt-2 rounded"></div>
-          </div>
-        </div>
-
-        {/* Test Tube */}
-        <div
-          className="absolute top-1/3 right-1/4 w-4 h-16 opacity-25"
-          style={{
-            transform: `translate(${-scrollY * 0.15}px, ${Math.cos(scrollY * 0.01) * 15}px)`,
-          }}
-        >
-          <div className="w-full h-full bg-gradient-to-b from-transparent via-green-300/30 to-green-400/40 rounded-b-full border border-white/20">
-            <div className="w-full h-2 bg-white/20 rounded-t"></div>
-          </div>
-        </div>
-
-        {/* Erlenmeyer Flask */}
-        <div
-          className="absolute bottom-1/3 left-1/3 w-12 h-16 opacity-20"
-          style={{
-            transform: `translate(${scrollY * 0.08}px, ${Math.sin(scrollY * 0.008) * 8}px)`,
-          }}
-        >
+      <div ref={containerRef} className="absolute inset-0 w-full h-[120%]">
+        {/* Laboratory Grid Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
           <div
-            className="w-full h-full bg-gradient-to-b from-transparent via-purple-300/30 to-purple-400/40 rounded-b-lg border-2 border-white/20"
-            style={{ clipPath: "polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%)" }}
-          >
-            <div className="w-4 h-3 bg-white/20 mx-auto rounded"></div>
-          </div>
-        </div>
-
-        {/* Microscope */}
-        <div
-          className="absolute top-1/2 right-1/6 w-20 h-24 opacity-15"
-          style={{
-            transform: `translate(${-scrollY * 0.12}px, ${Math.cos(scrollY * 0.009) * 12}px)`,
-          }}
-        >
-          <div className="relative w-full h-full">
-            <div className="absolute bottom-0 w-full h-4 bg-white/20 rounded"></div>
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-2 h-12 bg-white/20 rounded"></div>
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-6 bg-white/20 rounded"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Animated Particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white/30 rounded-full"
+            className="absolute inset-0 opacity-20"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`,
+              backgroundImage: `
+                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: "50px 50px",
             }}
           />
-        ))}
+        </div>
+
+        {/* Floating Laboratory Equipment */}
+        <div className="absolute inset-0">
+          {/* Beaker 1 */}
+          <div className="absolute top-20 left-10 animate-float">
+            <svg width="60" height="80" viewBox="0 0 60 80" className="text-blue-300 opacity-30">
+              <path
+                d="M15 20 L15 50 Q15 65 30 65 Q45 65 45 50 L45 20 Z"
+                fill="currentColor"
+                stroke="rgba(59, 130, 246, 0.5)"
+                strokeWidth="2"
+              />
+              <path d="M15 20 L45 20" stroke="rgba(59, 130, 246, 0.7)" strokeWidth="3" />
+              <circle cx="30" cy="40" r="3" fill="rgba(34, 197, 94, 0.6)" />
+            </svg>
+          </div>
+
+          {/* Test Tube 1 */}
+          <div className="absolute top-32 right-20 animate-float-delayed">
+            <svg width="20" height="100" viewBox="0 0 20 100" className="text-green-300 opacity-40">
+              <rect
+                x="6"
+                y="10"
+                width="8"
+                height="80"
+                rx="4"
+                fill="currentColor"
+                stroke="rgba(34, 197, 94, 0.5)"
+                strokeWidth="1"
+              />
+              <rect x="6" y="70" width="8" height="20" fill="rgba(34, 197, 94, 0.6)" />
+              <circle cx="10" cy="8" r="3" fill="rgba(59, 130, 246, 0.7)" />
+            </svg>
+          </div>
+
+          {/* Microscope */}
+          <div className="absolute bottom-40 left-1/4 animate-float-slow">
+            <svg width="80" height="100" viewBox="0 0 80 100" className="text-indigo-300 opacity-25">
+              <rect x="30" y="80" width="20" height="15" fill="currentColor" />
+              <rect x="35" y="40" width="10" height="40" fill="currentColor" />
+              <circle cx="40" cy="35" r="15" fill="none" stroke="currentColor" strokeWidth="3" />
+              <circle cx="40" cy="35" r="8" fill="rgba(59, 130, 246, 0.3)" />
+              <rect x="20" y="20" width="40" height="8" fill="currentColor" />
+            </svg>
+          </div>
+
+          {/* Molecular Structure 1 */}
+          <div className="absolute top-1/3 left-1/3 animate-spin-slow">
+            <svg width="120" height="120" viewBox="0 0 120 120" className="text-cyan-300 opacity-20">
+              <circle cx="60" cy="30" r="8" fill="currentColor" />
+              <circle cx="30" cy="70" r="8" fill="currentColor" />
+              <circle cx="90" cy="70" r="8" fill="currentColor" />
+              <circle cx="60" cy="90" r="8" fill="currentColor" />
+              <line x1="60" y1="30" x2="30" y2="70" stroke="currentColor" strokeWidth="2" />
+              <line x1="60" y1="30" x2="90" y2="70" stroke="currentColor" strokeWidth="2" />
+              <line x1="30" y1="70" x2="60" y2="90" stroke="currentColor" strokeWidth="2" />
+              <line x1="90" y1="70" x2="60" y2="90" stroke="currentColor" strokeWidth="2" />
+            </svg>
+          </div>
+
+          {/* Erlenmeyer Flask */}
+          <div className="absolute bottom-20 right-1/4 animate-float">
+            <svg width="70" height="90" viewBox="0 0 70 90" className="text-purple-300 opacity-30">
+              <path
+                d="M25 30 L25 10 L45 10 L45 30 L60 70 Q60 80 35 80 Q10 80 10 70 Z"
+                fill="currentColor"
+                stroke="rgba(147, 51, 234, 0.5)"
+                strokeWidth="2"
+              />
+              <path d="M25 10 L45 10" stroke="rgba(147, 51, 234, 0.7)" strokeWidth="3" />
+              <ellipse cx="35" cy="60" rx="15" ry="8" fill="rgba(147, 51, 234, 0.4)" />
+            </svg>
+          </div>
+
+          {/* Floating Particles */}
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-blue-400 rounded-full opacity-30 animate-float-random"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${3 + Math.random() * 4}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Chemical Formula Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="text-6xl font-mono text-blue-200 opacity-10 select-none">H₂SO₄ • NaCl • C₆H₁₂O₆</div>
+        </div>
       </div>
-
-      {/* Grid Pattern */}
-      <div
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
-          transform: `translate(${scrollY * 0.05}px, ${scrollY * 0.05}px)`,
-        }}
-      />
-
-      {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
 
       <style jsx>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(180deg); }
+          50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-15px) rotate(-2deg); }
+        }
+        
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes float-random {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-10px) translateX(5px); }
+          50% { transform: translateY(-5px) translateX(-5px); }
+          75% { transform: translateY(-15px) translateX(3px); }
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-float-delayed {
+          animation: float-delayed 4s ease-in-out infinite;
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 8s ease-in-out infinite;
+        }
+        
+        .animate-spin-slow {
+          animation: spin-slow 20s linear infinite;
+        }
+        
+        .animate-float-random {
+          animation: float-random 7s ease-in-out infinite;
         }
       `}</style>
     </div>
