@@ -1,27 +1,34 @@
 import type React from "react"
-import "./globals.css"
+import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import Header from "@/components/header" // Corrected import to default
 import { Toaster } from "@/components/ui/toaster"
-import { CartProvider } from "./context/CartContext"
-import { AuthProvider } from "./context/auth-context"
+import { AuthProvider } from "@/app/context/auth-context"
+import { CartProvider } from "@/app/context/CartContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Chemical Corporation",
-  description: "Your one-stop shop for laboratory chemicals and supplies.",
+  description: "Your one-stop shop for all chemical needs.",
     generator: 'v0.dev'
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <CartProvider>
-              {children}
+              <Header />
+              <main>{children}</main>
               <Toaster />
             </CartProvider>
           </AuthProvider>

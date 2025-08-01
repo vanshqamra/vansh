@@ -1,246 +1,168 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Search, ShoppingCart } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import { qualigensProducts } from "@/lib/qualigens-products"
+import { Search, ShoppingCart, Package, FlaskConical, Tag } from "lucide-react"
 import Image from "next/image"
+import { getQualigensProducts } from "@/lib/qualigens-products"
 
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+interface Product {
+  id: string
+  code: string
+  cas: string
+  name: string
+  packSize: string
+  material: string
+  price: string | number
+  hsn: string
+  category?: string
+  image?: string
+}
 
-export default function BrandQualigensPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
-  const { addItem } = useCart() // Changed from addToCart to addItem
+export default function BrandPage() {
+  const searchParams = useSearchParams()
+  const brandName = searchParams.get("brandName") || "Qualigens" // Default to Qualigens
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+  const { addItem } = useCart()
   const { toast } = useToast()
 
-  // Sort products alphabetically by name
-  const sortedProducts = useMemo(() => {
-    return [...qualigensProducts].sort((a, b) => a.name.localeCompare(b.name))
-  }, [])
+  const products: Product[] = getQualigensProducts().map((p) => ({
+    id: p.code,
+    code: p.code,
+    cas: p.cas,
+    name: p.name,
+    packSize: p.packSize,
+    material: p.material,
+    price: p.price,
+    hsn: p.hsn,
+    category: p.category,
+    image: p.image,
+  }))
 
-  // Filter products based on search and letter selection
-  const filteredProducts = useMemo(() => {
-    let filtered = sortedProducts
+  useEffect(() => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase()
+    const results = products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+        product.code.toLowerCase().includes(lowerCaseSearchTerm) ||
+        product.cas.toLowerCase().includes(lowerCaseSearchTerm) ||
+        product.packSize.toLowerCase().includes(lowerCaseSearchTerm) ||
+        product.material.toLowerCase().includes(lowerCaseSearchTerm) ||
+        product.category?.toLowerCase().includes(lowerCaseSearchTerm),
+    )
+    setFilteredProducts(results)
+  }, [searchTerm, products])
 
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (product) =>
-          product.name.toLowerCase().includes(query) ||
-          product.code.toLowerCase().includes(query) ||
-          product.cas.toLowerCase().includes(query),
-      )
-    }
-
-    // Filter by selected letter
-    if (selectedLetter) {
-      filtered = filtered.filter((product) => product.name.toUpperCase().startsWith(selectedLetter))
-    }
-
-    return filtered
-  }, [sortedProducts, searchQuery, selectedLetter])
-
-  const handleAddToCart = (product: any) => {
-    try {
-      // Handle POR (Price on Request) items
-      if (product.price === "POR") {
+  const handleAddToCart = (product: Product) => {
+    let numericPrice: number
+    if (typeof product.price === "string") {
+      const cleanedPrice = product.price.replace(/[^0-9.]/g, "")
+      numericPrice = Number.parseFloat(cleanedPrice)
+      if (isNaN(numericPrice)) {
         toast({
-          title: "Price on Request",
-          description: "Please contact us for pricing on this item.",
+          title: "Price Error",
+          description: `"${product.name}" is "Price on Request". Please contact us for pricing.`,
           variant: "destructive",
         })
         return
       }
-
-      // Convert price to number if it's a string
-      let numericPrice = product.price
-      if (typeof product.price === "string") {
-        numericPrice = Number.parseFloat(product.price.replace(/[^0-9.-]+/g, "")) // Remove currency symbols
-      }
-
-      if (isNaN(numericPrice) || numericPrice <= 0) {
-        toast({
-          title: "Error",
-          description: "Invalid price format. Please contact us for this item.",
-          variant: "destructive",
-        })
-        return
-      }
-
-      addItem({
-        // Changed from addToCart to addItem
-        id: product.id || product.code,
-        name: product.name,
-        price: numericPrice,
-        quantity: 1, // Always add 1 when clicking "Add to Cart"
-        brand: "Qualigens",
-        category: product.category || "Laboratory Chemical",
-        packSize: product.packSize,
-        cas: product.cas,
-        image: product.image || "/placeholder.svg", // Ensure an image is provided
-      })
-
-      toast({
-        title: "Added to Cart",
-        description: `${product.name} has been added to your cart.`,
-      })
-    } catch (error) {
-      console.error("Error adding to cart:", error)
-      toast({
-        title: "Error",
-        description: "Failed to add item to cart. Please try again.",
-        variant: "destructive",
-      })
+    } else {
+      numericPrice = product.price
     }
+
+    addItem({
+      id: product.id || product.code,
+      name: product.name,
+      price: numericPrice,
+      brand: brandName,
+      category: product.category || "Laboratory Chemical",
+      packSize: product.packSize,
+      casNumber: product.cas,
+      image: product.image || "/placeholder.svg",
+      quantity: 1, // Always add 1 when clicking "Add to Cart"
+    })
+
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+      variant: "default",
+    })
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Image
-            src="/images/logo-qualigens.png"
-            alt="Qualigens Logo"
-            width={150}
-            height={50}
-            className="mx-auto mb-4"
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 capitalize">{brandName} Products</h1>
+        <Image
+          src={`/images/logo-${brandName.toLowerCase()}.png`}
+          alt={`${brandName} Logo`}
+          width={150}
+          height={50}
+          className="object-contain"
+        />
+      </div>
+
+      <div className="mb-8">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Input
+            type="text"
+            placeholder={`Search ${brandName} products...`}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
           />
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Qualigens Products</h1>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            High-quality laboratory chemicals and reagents from Qualigens. Browse our complete catalog of{" "}
-            {qualigensProducts.length}+ products.
-          </p>
         </div>
+      </div>
 
-        {/* Search Bar */}
-        <div className="max-w-md mx-auto mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <Input
-              placeholder="Search by name, code, or CAS number..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white/80 backdrop-blur-sm"
-            />
-          </div>
+      {filteredProducts.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-600 text-lg">No products found matching your search.</p>
         </div>
+      )}
 
-        {/* Alphabet Filter */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <h3 className="text-lg font-semibold text-slate-700">Filter by first letter:</h3>
-          </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button
-              variant={selectedLetter === null ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedLetter(null)}
-              className="min-w-[40px]"
-            >
-              All
-            </Button>
-            {alphabet.map((letter) => (
-              <Button
-                key={letter}
-                variant={selectedLetter === letter ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedLetter(letter)}
-                className="min-w-[40px]"
-              >
-                {letter}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Results Count */}
-        <div className="text-center mb-6">
-          <p className="text-slate-600">
-            Showing {filteredProducts.length} of {qualigensProducts.length} products
-          </p>
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <Card
-              key={product.id || product.code}
-              className="hover:shadow-lg transition-shadow bg-white/80 backdrop-blur-sm"
-            >
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold leading-tight line-clamp-2">{product.name}</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">Qualigens</Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {product.code}
-                  </Badge>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {filteredProducts.map((product) => (
+          <Card key={product.id} className="flex flex-col">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold line-clamp-2">{product.name}</CardTitle>
+              <p className="text-sm text-gray-500">Code: {product.code}</p>
+            </CardHeader>
+            <CardContent className="flex-grow flex flex-col justify-between p-4 pt-0">
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center text-sm text-gray-600">
+                  <FlaskConical className="h-4 w-4 mr-1 text-gray-400" />
+                  <span>CAS: {product.cas || "N/A"}</span>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-slate-600">CAS:</span>
-                    <span className="text-slate-800">{product.cas || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-slate-600">Pack:</span>
-                    <span className="text-slate-800">{product.packSize}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-slate-600">Material:</span>
-                    <span className="text-slate-800">{product.material}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-slate-600">HSN:</span>
-                    <span className="text-slate-800">{product.hsn}</span>
-                  </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Package className="h-4 w-4 mr-1 text-gray-400" />
+                  <span>Pack Size: {product.packSize}</span>
                 </div>
-
-                <div className="pt-2 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-blue-600">
-                      {product.price === "POR" ? "Price on Request" : `₹${product.price}`}
-                    </span>
-                  </div>
-                  <Button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full mt-3 bg-green-600 hover:bg-green-700"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    {product.price === "POR" ? "Request Quote" : "Add to Cart"}
-                  </Button>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Tag className="h-4 w-4 mr-1 text-gray-400" />
+                  <span>Category: {product.category || "N/A"}</span>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* No Results */}
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <div className="h-24 w-24 bg-slate-200 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <Search className="h-12 w-12 text-slate-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">No products found</h2>
-            <p className="text-slate-600 mb-8">Try adjusting your search terms or filter options.</p>
-            <Button
-              onClick={() => {
-                setSearchQuery("")
-                setSelectedLetter(null)
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-        )}
+              </div>
+              <div className="flex items-center justify-between mt-auto">
+                <p className="text-xl font-bold text-blue-600">
+                  {typeof product.price === "string" && product.price.toLowerCase() === "por"
+                    ? "Price on Request"
+                    : `₹${Number(product.price).toLocaleString()}`}
+                </p>
+                <Button onClick={() => handleAddToCart(product)}>
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Cart
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   )

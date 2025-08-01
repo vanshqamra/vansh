@@ -6,10 +6,9 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/app/context/CartContext"
 import Image from "next/image"
-import { Trash2 } from "lucide-react"
+import { Trash2, MinusCircle, PlusCircle, ShoppingCart } from "lucide-react" // Import ShoppingCart from lucide-react
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
-import ShoppingCart from "@/components/icons/ShoppingCart" // Declaring the ShoppingCart variable
 
 export default function CartPage() {
   const { state, removeItem, updateQuantity, clearCart } = useCart()
@@ -88,7 +87,7 @@ export default function CartPage() {
                     onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                     disabled={item.quantity <= 1}
                   >
-                    -
+                    <MinusCircle className="h-5 w-5" />
                   </Button>
                   <Input
                     type="number"
@@ -102,7 +101,7 @@ export default function CartPage() {
                     size="icon"
                     onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                   >
-                    +
+                    <PlusCircle className="h-5 w-5" />
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)}>
                     <Trash2 className="h-5 w-5 text-red-500" />

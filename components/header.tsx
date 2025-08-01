@@ -6,30 +6,41 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Menu, Search, ShoppingCart, User, ChevronDown, LogOut, LayoutDashboard } from "lucide-react"
-import { useCart } from "@/app/context/CartContext"
+import { Menu, Search, ShoppingCart, User, ChevronDown, LogOut } from "lucide-react"
 import { useAuth } from "@/app/context/auth-context"
+import { useCart } from "@/app/context/CartContext"
 import { useRouter } from "next/navigation"
-import { signOut } from "@/app/(auth)/actions"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export default function Header() {
-  const { state } = useCart()
-  const { user } = useAuth()
+  const [isScrolled, setIsScrolled] = useState(false)
+  const { user, signOut } = useAuth()
+  const { state: cartState } = useCart()
   const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [mounted, setMounted] = useState(false)
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
-    setMounted(true)
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true)
+      } else {
+        setIsScrolled(false)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchTerm.trim()) {
-      router.push(`/products/search?query=${encodeURIComponent(searchTerm.trim())}`)
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const query = formData.get("searchQuery") as string
+    if (query) {
+      router.push(`/products/search?query=${encodeURIComponent(query)}`)
     }
   }
 
@@ -46,86 +57,72 @@ export default function Header() {
     { name: "Rankem", logo: "/images/logo-rankem.png" },
   ]
 
-  if (!mounted) {
-    return (
-      <header className="bg-white shadow-sm py-4">
-        <div className="container mx-auto px-4 flex items-center justify-between animate-pulse">
-          <div className="h-8 w-24 bg-gray-200 rounded"></div>
-          <div className="flex items-center space-x-4">
-            <div className="h-8 w-24 bg-gray-200 rounded hidden md:block"></div>
-            <div className="h-8 w-24 bg-gray-200 rounded hidden md:block"></div>
-            <div className="h-8 w-24 bg-gray-200 rounded hidden md:block"></div>
-            <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-            <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-          </div>
-        </div>
-      </header>
-    )
-  }
-
   return (
-    <header className="bg-white shadow-sm py-4">
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        {/* Logo */}
+    <header
+      className={`sticky top-0 z-50 w-full bg-white transition-all duration-300 ${
+        isScrolled ? "shadow-md py-2" : "py-4"
+      }`}
+    >
+      <div className="container mx-auto flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/placeholder-rzoeb.png" alt="Logo" width={40} height={40} />
-          <span className="text-xl font-bold text-gray-800 hidden md:block">Chemical Corp</span>
+          <Image src="/placeholder.svg?height=40&width=40" alt="Chemical Corp Logo" width={40} height={40} />
+          <span className="text-xl font-bold text-gray-900">Chemical Corp</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link href="/products" className="text-gray-600 hover:text-blue-600 transition-colors">
+        <nav className="hidden lg:flex items-center gap-6">
+          <Link href="/products" className="text-gray-600 hover:text-gray-900 font-medium">
             Products
           </Link>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-gray-600 hover:text-blue-600 transition-colors">
-                Brands <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
+            <DropdownMenuTrigger className="flex items-center text-gray-600 hover:text-gray-900 font-medium">
+              Brands <ChevronDown className="ml-1 h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48">
+            <DropdownMenuContent className="w-56">
               {brands.map((brand) => (
                 <DropdownMenuItem key={brand.name} asChild>
-                  <Link href={`/brand/${brand.name.toLowerCase()}`} className="flex items-center gap-2">
-                    {brand.logo && (
-                      <Image src={brand.logo || "/placeholder.svg"} alt={`${brand.name} Logo`} width={20} height={20} />
-                    )}
+                  <Link href={`/brand/${brand.name.toLowerCase()}`} className="flex items-center">
+                    <Image
+                      src={brand.logo || "/placeholder.svg"}
+                      alt={`${brand.name} Logo`}
+                      width={24}
+                      height={24}
+                      className="mr-2"
+                    />
                     {brand.name}
                   </Link>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link href="/offers" className="text-gray-600 hover:text-blue-600 transition-colors">
+          <Link href="/offers" className="text-gray-600 hover:text-gray-900 font-medium">
             Offers
           </Link>
-          <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors">
+          <Link href="/about" className="text-gray-600 hover:text-gray-900 font-medium">
             About Us
           </Link>
-          <Link href="/contact" className="text-gray-600 hover:text-blue-600 transition-colors">
+          <Link href="/contact" className="text-gray-600 hover:text-gray-900 font-medium">
             Contact
           </Link>
         </nav>
 
-        {/* Search, Cart, and Auth */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           <form onSubmit={handleSearch} className="relative hidden md:block">
             <Input
-              type="text"
+              type="search"
               placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-3 py-2 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-48"
+              className="pl-10 pr-4 py-2 rounded-full border focus:border-blue-500 focus:ring-blue-500"
+              name="searchQuery"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           </form>
 
-          <Link href="/cart" className="relative">
+          <Link href="/cart">
             <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="h-6 w-6 text-gray-600" />
-              {state.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
-                  {state.itemCount}
+              <ShoppingCart className="h-6 w-6" />
+              {cartState.itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartState.itemCount}
                 </span>
               )}
             </Button>
@@ -135,107 +132,94 @@ export default function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
-                  <User className="h-6 w-6 text-gray-600" />
+                  <User className="h-6 w-6" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard" className="flex items-center gap-2">
-                    <LayoutDashboard className="h-4 w-4" /> Dashboard
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Link href="/dashboard" className="flex items-center w-full">
+                    <User className="mr-2 h-4 w-4" /> Dashboard
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2 text-red-600">
-                  <LogOut className="h-4 w-4" /> Sign Out
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" /> Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link href="/login">
-              <Button variant="ghost" className="text-gray-600 hover:text-blue-600">
-                Sign In
+              <Button variant="ghost" size="icon">
+                <User className="h-6 w-6" />
               </Button>
             </Link>
           )}
 
-          {/* Mobile Menu */}
+          {/* Mobile Navigation */}
           <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-6 w-6 text-gray-600" />
+            <SheetTrigger asChild className="lg:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64">
-              <nav className="flex flex-col gap-4 py-6">
-                <form onSubmit={handleSearch} className="relative w-full mb-4">
+            <SheetContent side="right">
+              <div className="flex flex-col gap-4 py-6">
+                <form onSubmit={handleSearch} className="relative w-full">
                   <Input
-                    type="text"
+                    type="search"
                     placeholder="Search products..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 pr-3 py-2 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full"
+                    className="pl-10 pr-4 py-2 rounded-full border focus:border-blue-500 focus:ring-blue-500"
+                    name="searchQuery"
                   />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 </form>
-                <Link href="/products" className="text-gray-700 hover:text-blue-600 transition-colors">
+                <Link href="/products" className="text-gray-700 hover:text-gray-900 font-medium">
                   Products
                 </Link>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="text-gray-700 hover:text-blue-600 transition-colors justify-start pl-0"
-                    >
-                      Brands <ChevronDown className="ml-1 h-4 w-4" />
-                    </Button>
+                  <DropdownMenuTrigger className="flex items-center justify-between text-gray-700 hover:text-gray-900 font-medium w-full">
+                    Brands <ChevronDown className="ml-1 h-4 w-4" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48">
+                  <DropdownMenuContent className="w-full">
                     {brands.map((brand) => (
                       <DropdownMenuItem key={brand.name} asChild>
-                        <Link href={`/brand/${brand.name.toLowerCase()}`} className="flex items-center gap-2">
-                          {brand.logo && (
-                            <Image
-                              src={brand.logo || "/placeholder.svg"}
-                              alt={`${brand.name} Logo`}
-                              width={20}
-                              height={20}
-                            />
-                          )}
+                        <Link href={`/brand/${brand.name.toLowerCase()}`} className="flex items-center">
+                          <Image
+                            src={brand.logo || "/placeholder.svg"}
+                            alt={`${brand.name} Logo`}
+                            width={20}
+                            height={20}
+                            className="mr-2"
+                          />
                           {brand.name}
                         </Link>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Link href="/offers" className="text-gray-700 hover:text-blue-600 transition-colors">
+                <Link href="/offers" className="text-gray-700 hover:text-gray-900 font-medium">
                   Offers
                 </Link>
-                <Link href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">
+                <Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium">
                   About Us
                 </Link>
-                <Link href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
+                <Link href="/contact" className="text-gray-700 hover:text-gray-900 font-medium">
                   Contact
                 </Link>
                 {user ? (
                   <>
-                    <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors">
+                    <Link href="/dashboard" className="text-gray-700 hover:text-gray-900 font-medium">
                       Dashboard
                     </Link>
-                    <Button
-                      onClick={handleSignOut}
-                      variant="ghost"
-                      className="text-red-600 hover:text-red-700 justify-start pl-0"
-                    >
+                    <Button variant="ghost" onClick={handleSignOut} className="justify-start pl-0">
                       Sign Out
                     </Button>
                   </>
                 ) : (
-                  <Link href="/login">
-                    <Button variant="ghost" className="text-gray-700 hover:text-blue-600 justify-start pl-0">
-                      Sign In
-                    </Button>
+                  <Link href="/login" className="text-gray-700 hover:text-gray-900 font-medium">
+                    Login
                   </Link>
                 )}
-              </nav>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
