@@ -135,3 +135,6 @@ export function ProductGrid() {
     </div>
   )
 }
+
+// Default export for compatibility
+export default ProductGrid
