@@ -1,117 +1,108 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/app/context/CartContext"
-import { useToast } from "@/hooks/use-toast"
-import { ShoppingCart, Beaker } from "lucide-react"
+import { Beaker, ShoppingCart } from "lucide-react"
 
-interface Product {
-  id: string
-  name: string
-  price: number
-  category: string
-  brand: string
-  description?: string
-  image?: string
-}
-
-const products: Product[] = [
+const qualigensProducts = [
   {
-    id: "1",
-    name: "Sulfuric Acid (H2SO4)",
-    price: 2500,
-    category: "Acids",
+    id: "ql-001",
+    name: "Sulfuric Acid 98% AR",
     brand: "Qualigens",
-    description: "High purity sulfuric acid for laboratory use",
+    category: "Acids",
+    price: 850,
+    casNumber: "7664-93-9",
+    packSize: "500ml",
   },
   {
-    id: "2",
-    name: "Sodium Hydroxide (NaOH)",
-    price: 1800,
+    id: "ql-002",
+    name: "Sodium Hydroxide Pellets AR",
+    brand: "Qualigens",
     category: "Bases",
-    brand: "Qualigens",
-    description: "Analytical grade sodium hydroxide pellets",
+    price: 420,
+    casNumber: "1310-73-2",
+    packSize: "500g",
   },
   {
-    id: "3",
-    name: "Hydrochloric Acid (HCl)",
-    price: 2200,
+    id: "ql-003",
+    name: "Hydrochloric Acid 37% AR",
+    brand: "Qualigens",
     category: "Acids",
-    brand: "Qualigens",
-    description: "Concentrated hydrochloric acid solution",
+    price: 380,
+    casNumber: "7647-01-0",
+    packSize: "500ml",
   },
   {
-    id: "4",
-    name: "Acetone (C3H6O)",
-    price: 3200,
+    id: "ql-004",
+    name: "Acetone HPLC Grade",
+    brand: "Qualigens",
     category: "Solvents",
-    brand: "Qualigens",
-    description: "HPLC grade acetone for analytical applications",
+    price: 1200,
+    casNumber: "67-64-1",
+    packSize: "1L",
   },
   {
-    id: "5",
-    name: "Methanol (CH3OH)",
-    price: 2800,
+    id: "ql-005",
+    name: "Methanol AR Grade",
+    brand: "Qualigens",
     category: "Solvents",
-    brand: "Qualigens",
-    description: "High purity methanol for laboratory use",
+    price: 950,
+    casNumber: "67-56-1",
+    packSize: "1L",
   },
   {
-    id: "6",
-    name: "Potassium Permanganate (KMnO4)",
-    price: 1500,
+    id: "ql-006",
+    name: "Potassium Permanganate AR",
+    brand: "Qualigens",
     category: "Salts",
-    brand: "Qualigens",
-    description: "Analytical grade potassium permanganate crystals",
+    price: 680,
+    casNumber: "7722-64-7",
+    packSize: "250g",
   },
 ]
 
 export function ProductGrid() {
-  const { addItem } = useCart()
-  const { toast } = useToast()
+  const { addToCart } = useCart()
 
-  const handleAddToCart = (product: Product) => {
-    addItem({
+  const handleAddToCart = (product: (typeof qualigensProducts)[0]) => {
+    addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       brand: product.brand,
       category: product.category,
-      image: product.image,
-    })
-
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart`,
+      casNumber: product.casNumber,
+      packSize: product.packSize,
     })
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {products.map((product) => (
-        <Card key={product.id} className="flex flex-col">
-          <CardHeader>
-            <div className="w-full h-48 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg flex items-center justify-center mb-4">
-              <Beaker className="h-16 w-16 text-blue-600" />
+      {qualigensProducts.map((product) => (
+        <Card key={product.id} className="hover:shadow-lg transition-shadow">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-center h-32 bg-slate-50 rounded-lg mb-3">
+              <Beaker className="h-16 w-16 text-slate-400" />
             </div>
-            <CardTitle className="text-lg">{product.name}</CardTitle>
-            <div className="flex gap-2">
-              <Badge variant="secondary">{product.category}</Badge>
+            <CardTitle className="text-lg leading-tight">{product.name}</CardTitle>
+            <div className="flex items-center gap-2">
               <Badge variant="outline">{product.brand}</Badge>
+              <Badge variant="secondary">{product.category}</Badge>
             </div>
           </CardHeader>
-          <CardContent className="flex-1">
-            <p className="text-sm text-gray-600 mb-4">{product.description}</p>
-            <p className="text-2xl font-bold text-blue-600">₹{product.price.toLocaleString()}</p>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => handleAddToCart(product)} className="w-full">
-              <ShoppingCart className="mr-2 h-4 w-4" />
+          <CardContent className="pt-0">
+            <div className="space-y-2 mb-4">
+              <p className="text-sm text-slate-600">CAS: {product.casNumber}</p>
+              <p className="text-sm text-slate-600">Pack Size: {product.packSize}</p>
+              <p className="text-2xl font-bold text-blue-600">₹{product.price.toLocaleString()}</p>
+            </div>
+            <Button onClick={() => handleAddToCart(product)} className="w-full" size="sm">
+              <ShoppingCart className="h-4 w-4 mr-2" />
               Add to Cart
             </Button>
-          </CardFooter>
+          </CardContent>
         </Card>
       ))}
     </div>
