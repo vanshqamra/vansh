@@ -138,10 +138,10 @@ export default function LoginPage() {
 
             <div className="mt-8 pt-6 border-t border-slate-200">
               <div className="text-center">
-                <p className="text-xs text-slate-500 mb-2">Demo Credentials</p>
+                <p className="text-xs text-slate-500 mb-2">{""}</p>
                 <div className="text-xs text-slate-600 space-y-1">
-                  <p>Email: demo@chemcorp.com</p>
-                  <p>Password: demo123</p>
+                  <p>{""}</p>
+                  <p>{""}</p>
                 </div>
               </div>
             </div>
