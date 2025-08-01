@@ -1,292 +1,366 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
-import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useCart } from "@/app/context/CartContext"
-import { useAuth } from "@/app/context/auth-context"
-import { useRouter } from "next/navigation"
-import { CreditCard, Truck, Shield } from "lucide-react"
 import Link from "next/link"
 
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useCart } from "@/app/context/CartContext"
+import { useAuth } from "@/app/context/auth-context"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { useToast } from "@/hooks/use-toast"
+import { Loader2 } from "lucide-react"
+
 export default function CheckoutPage() {
-  const { items, totalPrice, totalItems, clearCart } = useCart()
+  const { state, clearCart } = useCart()
   const { user } = useAuth()
   const router = useRouter()
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer")
-  const [acceptedTerms, setAcceptedTerms] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const { toast } = useToast()
+
+  const [shippingAddress, setShippingAddress] = useState({
+    fullName: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "India",
+  })
+  const [billingAddress, setBillingAddress] = useState({
+    fullName: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "India",
+  })
+  const [sameAsShipping, setSameAsShipping] = useState(true)
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { items, total: subtotal, itemCount: totalItems } = state
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (mounted && !user) {
-      router.push("/login?redirect=/checkout")
-    }
-  }, [user, router, mounted])
-
-  useEffect(() => {
-    if (mounted && items.length === 0) {
+    if (!items || items.length === 0) {
       router.push("/cart")
+      toast({
+        title: "Cart Empty",
+        description: "Your cart is empty. Please add items before checking out.",
+        variant: "destructive",
+      })
     }
-  }, [items.length, router, mounted])
+  }, [items, router, toast])
 
-  const handleSubmitOrder = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      // Pre-fill user details if available (e.g., from user profile in a real app)
+      // For now, just a placeholder
+      setShippingAddress((prev) => ({ ...prev, fullName: user.email || "" }))
+      setBillingAddress((prev) => ({ ...prev, fullName: user.email || "" }))
+    }
+  }, [user])
+
+  const shippingCost = subtotal < 10000 ? 500 : 0
+  const grandTotal = subtotal + shippingCost
+
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!acceptedTerms) {
-      alert("Please accept the terms and conditions")
+
+    if (!termsAccepted) {
+      toast({
+        title: "Terms and Conditions",
+        description: "Please accept the terms and conditions to proceed.",
+        variant: "destructive",
+      })
       return
     }
 
-    setIsSubmitting(true)
+    if (
+      !shippingAddress.fullName ||
+      !shippingAddress.addressLine1 ||
+      !shippingAddress.city ||
+      !shippingAddress.state ||
+      !shippingAddress.zipCode
+    ) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required shipping address fields.",
+        variant: "destructive",
+      })
+      return
+    }
 
-    // Simulate order processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    if (
+      !sameAsShipping &&
+      (!billingAddress.fullName ||
+        !billingAddress.addressLine1 ||
+        !billingAddress.city ||
+        !billingAddress.state ||
+        !billingAddress.zipCode)
+    ) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required billing address fields.",
+        variant: "destructive",
+      })
+      return
+    }
 
-    // Clear cart and redirect to success page
-    clearCart()
-    router.push("/order-success")
+    setIsLoading(true)
+    try {
+      // Simulate API call to place order
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      // In a real application, you would send order details to your backend
+      console.log("Order placed:", {
+        items,
+        shippingAddress,
+        billingAddress: sameAsShipping ? shippingAddress : billingAddress,
+        total: grandTotal,
+        user: user?.id,
+      })
+
+      clearCart() // Clear cart after successful order
+      toast({
+        title: "Order Placed!",
+        description: "Your order has been successfully placed.",
+        variant: "success",
+      })
+      router.push("/order-success")
+    } catch (error) {
+      console.error("Error placing order:", error)
+      toast({
+        title: "Order Failed",
+        description: "There was an error placing your order. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  if (!mounted) {
+  if (!items || items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-          </div>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-150px)] text-center p-4">
+        <h2 className="text-2xl font-bold mb-4">Your Cart is Empty</h2>
+        <p className="text-gray-600 mb-6">Looks like you haven't added anything to your cart yet.</p>
+        <Button onClick={() => router.push("/products")}>Start Shopping</Button>
       </div>
     )
   }
 
-  if (!user) {
-    return null
-  }
-
-  if (items.length === 0) {
-    return null
-  }
-
-  const taxAmount = Math.round(totalPrice * 0.18)
-  const finalTotal = totalPrice + taxAmount
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <h1 className="text-3xl font-bold text-center mb-8">Checkout</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Checkout Form */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Shipping Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  Shipping Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" required />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" required />
-                  </div>
+      <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Shipping Information */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Shipping Information</CardTitle>
+            <CardDescription>Enter the address where you want your order delivered.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                value={shippingAddress.fullName}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="address1">Address Line 1</Label>
+              <Input
+                id="address1"
+                value={shippingAddress.addressLine1}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="address2">Address Line 2 (Optional)</Label>
+              <Input
+                id="address2"
+                value={shippingAddress.addressLine2}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={shippingAddress.city}
+                  onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="state">State</Label>
+                <Input
+                  id="state"
+                  value={shippingAddress.state}
+                  onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="zipCode">Zip Code</Label>
+                <Input
+                  id="zipCode"
+                  value={shippingAddress.zipCode}
+                  onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="country">Country</Label>
+              <Input id="country" value={shippingAddress.country} disabled />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Billing Information */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Billing Information</CardTitle>
+            <CardDescription>Enter your billing address.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="sameAsShipping"
+                checked={sameAsShipping}
+                onCheckedChange={(checked) => setSameAsShipping(checked as boolean)}
+              />
+              <Label htmlFor="sameAsShipping">Same as shipping address</Label>
+            </div>
+            {!sameAsShipping && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="billingFullName">Full Name</Label>
+                  <Input
+                    id="billingFullName"
+                    value={billingAddress.fullName}
+                    onChange={(e) => setBillingAddress({ ...billingAddress, fullName: e.target.value })}
+                    required={!sameAsShipping}
+                  />
                 </div>
-                <div>
-                  <Label htmlFor="company">Company Name</Label>
-                  <Input id="company" required />
+                <div className="grid gap-2">
+                  <Label htmlFor="billingAddress1">Address Line 1</Label>
+                  <Input
+                    id="billingAddress1"
+                    value={billingAddress.addressLine1}
+                    onChange={(e) => setBillingAddress({ ...billingAddress, addressLine1: e.target.value })}
+                    required={!sameAsShipping}
+                  />
                 </div>
-                <div>
-                  <Label htmlFor="address">Address</Label>
-                  <Textarea id="address" required />
+                <div className="grid gap-2">
+                  <Label htmlFor="billingAddress2">Address Line 2 (Optional)</Label>
+                  <Input
+                    id="billingAddress2"
+                    value={billingAddress.addressLine2}
+                    onChange={(e) => setBillingAddress({ ...billingAddress, addressLine2: e.target.value })}
+                  />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" required />
+                  <div className="grid gap-2">
+                    <Label htmlFor="billingCity">City</Label>
+                    <Input
+                      id="billingCity"
+                      value={billingAddress.city}
+                      onChange={(e) => setBillingAddress({ ...billingAddress, city: e.target.value })}
+                      required={!sameAsShipping}
+                    />
                   </div>
-                  <div>
-                    <Label htmlFor="state">State</Label>
-                    <Input id="state" required />
+                  <div className="grid gap-2">
+                    <Label htmlFor="billingState">State</Label>
+                    <Input
+                      id="billingState"
+                      value={billingAddress.state}
+                      onChange={(e) => setBillingAddress({ ...billingAddress, state: e.target.value })}
+                      required={!sameAsShipping}
+                    />
                   </div>
-                  <div>
-                    <Label htmlFor="pincode">PIN Code</Label>
-                    <Input id="pincode" required />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" required />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Payment Method */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Payment Method
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                    <RadioGroupItem value="bank_transfer" id="bank_transfer" />
-                    <Label htmlFor="bank_transfer" className="flex-1">
-                      <div className="font-medium">Bank Transfer / NEFT</div>
-                      <div className="text-sm text-gray-600">Payment after order confirmation</div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                    <RadioGroupItem value="credit_terms" id="credit_terms" />
-                    <Label htmlFor="credit_terms" className="flex-1">
-                      <div className="font-medium">Credit Terms</div>
-                      <div className="text-sm text-gray-600">Net 30 days payment terms</div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                    <RadioGroupItem value="cheque" id="cheque" />
-                    <Label htmlFor="cheque" className="flex-1">
-                      <div className="font-medium">Cheque Payment</div>
-                      <div className="text-sm text-gray-600">Post-dated cheque on delivery</div>
-                    </Label>
-                  </div>
-                </RadioGroup>
-
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-start gap-2">
-                    <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <div className="text-sm">
-                      <div className="font-medium text-blue-900">Payment Security</div>
-                      <div className="text-blue-700">
-                        Payment will only be processed after we confirm your order and provide final pricing. No charges
-                        will be made at this stage.
-                      </div>
-                    </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="billingZipCode">Zip Code</Label>
+                    <Input
+                      id="billingZipCode"
+                      value={billingAddress.zipCode}
+                      onChange={(e) => setBillingAddress({ ...billingAddress, zipCode: e.target.value })}
+                      required={!sameAsShipping}
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Special Instructions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Special Instructions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="Any special handling requirements, delivery instructions, or additional notes..."
-                  rows={4}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Terms and Conditions */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={acceptedTerms}
-                    onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-                  />
-                  <Label htmlFor="terms" className="text-sm leading-relaxed">
-                    I agree to the{" "}
-                    <Link href="/terms" className="text-blue-600 hover:underline" target="_blank">
-                      Terms and Conditions
-                    </Link>{" "}
-                    and understand that payment will only be processed after order confirmation.
-                  </Label>
+                <div className="grid gap-2">
+                  <Label htmlFor="billingCountry">Country</Label>
+                  <Input id="billingCountry" value={billingAddress.country} disabled />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
 
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <div className="flex-1">
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-gray-600">Qty: {item.quantity}</div>
-                      </div>
-                      <div className="font-medium">{item.price}</div>
-                    </div>
-                  ))}
-                </div>
+        {/* Order Summary */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Order Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal ({totalItems} items)</span>
+                <span>₹{subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>{shippingCost === 0 ? "Free" : `₹${shippingCost.toFixed(2)}`}</span>
+              </div>
+              {subtotal < 10000 && <p className="text-sm text-gray-500">(Free shipping on orders above ₹10,000)</p>}
+              <Separator />
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span>₹{grandTotal.toFixed(2)}</span>
+              </div>
+            </div>
 
-                <Separator />
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+              />
+              <Label htmlFor="terms">
+                I agree to the{" "}
+                <Link href="/terms" className="text-blue-600 hover:underline" target="_blank">
+                  Terms & Conditions
+                </Link>
+              </Label>
+            </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Subtotal ({totalItems} items)</span>
-                    <span>₹{totalPrice.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span className="text-green-600">Free</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax (18%)</span>
-                    <span>₹{taxAmount.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span>₹{finalTotal.toLocaleString()}</span>
-                </div>
-
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p>• Final pricing subject to confirmation</p>
-                  <p>• Payment only after order approval</p>
-                  <p>• Free shipping included</p>
-                </div>
-
-                <Separator />
-
-                <form onSubmit={handleSubmitOrder}>
-                  <Button type="submit" className="w-full" size="lg" disabled={!acceptedTerms || isSubmitting}>
-                    {isSubmitting ? "Processing Order..." : "Place Order"}
-                  </Button>
-                </form>
-
-                <div className="text-center">
-                  <Link href="/cart" className="text-sm text-blue-600 hover:underline">
-                    ← Back to Cart
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+            <Button type="submit" className="w-full" disabled={isLoading || !termsAccepted || items.length === 0}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Placing Order...
+                </>
+              ) : (
+                "Place Order"
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      </form>
     </div>
   )
 }

@@ -1,42 +1,51 @@
 "use client"
 
-import { useState } from "react"
-import { qualigensProducts } from "@/lib/qualigens-products"
-import { labSupplyBrands } from "@/lib/data"
-import { notFound } from "next/navigation"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import { Search, ShoppingCart } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
+import { qualigensProducts } from "@/lib/qualigens-products"
 import Image from "next/image"
 
-type Props = {
-  params: { brandName: string }
-}
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 
-export default function BrandPage({ params }: Props) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const brandKey = params.brandName as keyof typeof labSupplyBrands
-  const brand = labSupplyBrands[brandKey]
-  const { addToCart } = useCart()
+export default function BrandQualigensPage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
+  const { addItem } = useCart() // Changed from addToCart to addItem
   const { toast } = useToast()
 
-  if (!brand) {
-    notFound()
-  }
+  // Sort products alphabetically by name
+  const sortedProducts = useMemo(() => {
+    return [...qualigensProducts].sort((a, b) => a.name.localeCompare(b.name))
+  }, [])
 
-  // Get products based on brand
-  const allProducts = brandKey === "qualigens" ? qualigensProducts : []
+  // Filter products based on search and letter selection
+  const filteredProducts = useMemo(() => {
+    let filtered = sortedProducts
 
-  // Filter products based on search term
-  const filteredProducts = allProducts.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.cas.includes(searchTerm),
-  )
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.code.toLowerCase().includes(query) ||
+          product.cas.toLowerCase().includes(query),
+      )
+    }
+
+    // Filter by selected letter
+    if (selectedLetter) {
+      filtered = filtered.filter((product) => product.name.toUpperCase().startsWith(selectedLetter))
+    }
+
+    return filtered
+  }, [sortedProducts, searchQuery, selectedLetter])
 
   const handleAddToCart = (product: any) => {
     try {
@@ -53,7 +62,7 @@ export default function BrandPage({ params }: Props) {
       // Convert price to number if it's a string
       let numericPrice = product.price
       if (typeof product.price === "string") {
-        numericPrice = Number.parseFloat(product.price.replace(/[^\d.-]/g, ""))
+        numericPrice = Number.parseFloat(product.price.replace(/[^0-9.-]+/g, "")) // Remove currency symbols
       }
 
       if (isNaN(numericPrice) || numericPrice <= 0) {
@@ -65,17 +74,18 @@ export default function BrandPage({ params }: Props) {
         return
       }
 
-      const cartItem = {
+      addItem({
+        // Changed from addToCart to addItem
         id: product.id || product.code,
         name: product.name,
         price: numericPrice,
-        brand: brand.name,
+        quantity: 1, // Always add 1 when clicking "Add to Cart"
+        brand: "Qualigens",
         category: product.category || "Laboratory Chemical",
         packSize: product.packSize,
-        material: product.material,
-      }
-
-      addToCart(cartItem)
+        cas: product.cas,
+        image: product.image || "/placeholder.svg", // Ensure an image is provided
+      })
 
       toast({
         title: "Added to Cart",
@@ -92,91 +102,142 @@ export default function BrandPage({ params }: Props) {
   }
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-12">
-      <div className="text-center mb-12">
-        <div className="flex justify-center mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
           <Image
-            src={`/images/logo-${brandKey}.png`}
-            alt={`${brand.name} logo`}
-            width={120}
-            height={60}
-            className="object-contain"
+            src="/images/logo-qualigens.png"
+            alt="Qualigens Logo"
+            width={150}
+            height={50}
+            className="mx-auto mb-4"
           />
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">Qualigens Products</h1>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            High-quality laboratory chemicals and reagents from Qualigens. Browse our complete catalog of{" "}
+            {qualigensProducts.length}+ products.
+          </p>
         </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">{brand.name}</h1>
-        <p className="mt-3 max-w-2xl mx-auto text-lg text-slate-600">
-          Authorized distributor of {brand.name} products.
-        </p>
-      </div>
 
-      {allProducts.length > 0 && (
-        <div className="mb-8">
-          <div className="relative max-w-md mx-auto">
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
             <Input
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              placeholder="Search by name, code, or CAS number..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white/80 backdrop-blur-sm"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          </div>
-          <div className="text-center mt-4 text-slate-600">
-            Showing {filteredProducts.length} of {allProducts.length} products
           </div>
         </div>
-      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <Card key={product.id || product.code} className="shadow-sm bg-white hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-base font-semibold text-slate-700 line-clamp-2">{product.name}</CardTitle>
-                <p className="text-sm text-slate-500">Code: {product.code}</p>
-                <p className="text-sm text-slate-500">CAS: {product.cas}</p>
+        {/* Alphabet Filter */}
+        <div className="mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <h3 className="text-lg font-semibold text-slate-700">Filter by first letter:</h3>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button
+              variant={selectedLetter === null ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedLetter(null)}
+              className="min-w-[40px]"
+            >
+              All
+            </Button>
+            {alphabet.map((letter) => (
+              <Button
+                key={letter}
+                variant={selectedLetter === letter ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedLetter(letter)}
+                className="min-w-[40px]"
+              >
+                {letter}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="text-center mb-6">
+          <p className="text-slate-600">
+            Showing {filteredProducts.length} of {qualigensProducts.length} products
+          </p>
+        </div>
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredProducts.map((product) => (
+            <Card
+              key={product.id || product.code}
+              className="hover:shadow-lg transition-shadow bg-white/80 backdrop-blur-sm"
+            >
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-semibold leading-tight line-clamp-2">{product.name}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">Qualigens</Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {product.code}
+                  </Badge>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-1 text-sm">
-                  <p>
-                    <span className="font-medium">Pack:</span> {product.packSize} ({product.material})
-                  </p>
-                  {product.purity && (
-                    <p>
-                      <span className="font-medium">Purity:</span> {product.purity}
-                    </p>
-                  )}
-                  <p>
-                    <span className="font-medium">HSN:</span> {product.hsn}
-                  </p>
-                  <p className="text-lg font-bold mt-2 text-blue-600">
-                    {product.price === "POR"
-                      ? "Price on Request"
-                      : `₹${typeof product.price === "number" ? product.price.toLocaleString() : product.price}`}
-                  </p>
+              <CardContent className="space-y-3">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">CAS:</span>
+                    <span className="text-slate-800">{product.cas || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">Pack:</span>
+                    <span className="text-slate-800">{product.packSize}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">Material:</span>
+                    <span className="text-slate-800">{product.material}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">HSN:</span>
+                    <span className="text-slate-800">{product.hsn}</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-blue-600">
+                      {product.price === "POR" ? "Price on Request" : `₹${product.price}`}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full mt-3 bg-green-600 hover:bg-green-700"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    {product.price === "POR" ? "Request Quote" : "Add to Cart"}
+                  </Button>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button
-                  variant="default"
-                  className="w-full bg-green-600 hover:bg-green-700"
-                  onClick={() => handleAddToCart(product)}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {product.price === "POR" ? "Request Quote" : "Add to Cart"}
-                </Button>
-              </CardFooter>
             </Card>
-          ))
-        ) : allProducts.length === 0 ? (
-          <div className="col-span-full text-center py-12">
-            <p className="text-slate-500 text-lg">No products available for this brand yet.</p>
-            <p className="text-slate-400 mt-2">Please check back later or contact us for more information.</p>
-          </div>
-        ) : (
-          <div className="col-span-full text-center py-12">
-            <p className="text-slate-500 text-lg">No products found matching "{searchTerm}"</p>
-            <Button variant="outline" onClick={() => setSearchTerm("")} className="mt-4">
-              Clear Search
+          ))}
+        </div>
+
+        {/* No Results */}
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-12">
+            <div className="h-24 w-24 bg-slate-200 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <Search className="h-12 w-12 text-slate-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">No products found</h2>
+            <p className="text-slate-600 mb-8">Try adjusting your search terms or filter options.</p>
+            <Button
+              onClick={() => {
+                setSearchQuery("")
+                setSelectedLetter(null)
+              }}
+            >
+              Clear Filters
             </Button>
           </div>
         )}
