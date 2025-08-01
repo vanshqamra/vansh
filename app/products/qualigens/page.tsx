@@ -15,7 +15,7 @@ const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 export default function QualigensPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
-  const { addItem } = useCart()
+  const { addToCart } = useCart()
   const { toast } = useToast()
 
   // Sort products alphabetically by name
@@ -47,20 +47,32 @@ export default function QualigensPage() {
   const handleAddToCart = (product: (typeof qualigensProducts)[0]) => {
     const [code, cas, name, packSize, material, price] = product
 
-    addItem({
-      id: code,
-      name: name,
-      price: price === "POR" ? "Price on Request" : price,
-      brand: "Qualigens",
-      category: "Laboratory Chemical",
-      packSize: packSize,
-      material: material,
-    })
+    try {
+      // Convert price to number, handle "POR" case
+      const numericPrice = price === "POR" ? 0 : Number.parseFloat(price.toString())
 
-    toast({
-      title: "Added to Cart",
-      description: `${name} has been added to your cart.`,
-    })
+      addToCart({
+        id: code,
+        name: name,
+        price: numericPrice,
+        brand: "Qualigens",
+        category: "Laboratory Chemical",
+        packSize: packSize,
+        casNumber: cas,
+      })
+
+      toast({
+        title: "Added to Cart",
+        description: `${name} has been added to your cart.`,
+      })
+    } catch (error) {
+      console.error("Error adding to cart:", error)
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (

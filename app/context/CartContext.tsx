@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { createContext, useContext, useReducer, useEffect } from "react"
-import { useToast } from "@/hooks/use-toast"
 
 export interface CartItem {
   id: string
@@ -113,7 +112,6 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState)
-  const { toast } = useToast()
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -139,18 +137,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = (item: Omit<CartItem, "quantity">) => {
     dispatch({ type: "ADD_ITEM", payload: { ...item, quantity: 1 } })
-    toast({
-      title: "Added to cart",
-      description: `${item.name} has been added to your cart`,
-    })
   }
 
   const removeFromCart = (id: string) => {
     dispatch({ type: "REMOVE_ITEM", payload: id })
-    toast({
-      title: "Removed from cart",
-      description: "Item has been removed from your cart",
-    })
   }
 
   const updateQuantity = (id: string, quantity: number) => {

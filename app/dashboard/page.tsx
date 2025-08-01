@@ -1,300 +1,218 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
-import { useRouter } from "next/navigation"
-import { ShoppingCart, Package, Clock, TrendingUp, User, Mail, Phone, Calendar, ArrowRight } from "lucide-react"
+import { ShoppingCart, Package, Clock, TrendingUp, FileText, Upload } from "lucide-react"
 import Link from "next/link"
 
 export default function DashboardPage() {
-  const { user, signOut } = useAuth()
   const { state } = useCart()
-  const router = useRouter()
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (mounted && !user) {
-      router.push("/login")
-    }
-  }, [user, router, mounted])
-
-  if (!mounted || !user) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const cartItems = state?.items || []
-  const cartTotal = state?.total || 0
-  const cartItemCount = state?.itemCount || 0
-
-  // Mock data for demonstration
-  const recentOrders = [
+  const stats = [
     {
-      id: "CC001234",
-      date: "2024-01-15",
-      status: "Delivered",
-      total: 15750,
-      items: 8,
+      title: "Cart Items",
+      value: state.itemCount || 0,
+      icon: ShoppingCart,
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
     },
     {
-      id: "CC001235",
-      date: "2024-01-10",
-      status: "Processing",
-      total: 8900,
-      items: 5,
+      title: "Cart Value",
+      value: `₹${(state.total || 0).toLocaleString()}`,
+      icon: TrendingUp,
+      color: "text-green-600",
+      bgColor: "bg-green-100",
     },
     {
-      id: "CC001236",
-      date: "2024-01-05",
-      status: "Confirmed",
-      total: 12300,
-      items: 6,
+      title: "Pending Orders",
+      value: "2",
+      icon: Clock,
+      color: "text-orange-600",
+      bgColor: "bg-orange-100",
+    },
+    {
+      title: "Total Orders",
+      value: "15",
+      icon: Package,
+      color: "text-purple-600",
+      bgColor: "bg-purple-100",
     },
   ]
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Delivered":
-        return "bg-green-100 text-green-800"
-      case "Processing":
-        return "bg-blue-100 text-blue-800"
-      case "Confirmed":
-        return "bg-yellow-100 text-yellow-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
+  const recentOrders = [
+    {
+      id: "ORD-001",
+      date: "2024-01-15",
+      items: 5,
+      total: 12500,
+      status: "Confirmed",
+    },
+    {
+      id: "ORD-002",
+      date: "2024-01-10",
+      items: 3,
+      total: 8750,
+      status: "Delivered",
+    },
+    {
+      id: "ORD-003",
+      date: "2024-01-05",
+      items: 8,
+      total: 15200,
+      status: "Processing",
+    },
+  ]
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Welcome back, {user.email?.split("@")[0]}!</p>
+            <p className="text-gray-600 mt-2">Welcome back! Here's your account overview.</p>
           </div>
-          <Button variant="outline" onClick={signOut}>
-            Sign Out
-          </Button>
-        </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Cart Items</p>
-                  <p className="text-2xl font-bold text-gray-900">{cartItemCount}</p>
-                </div>
-                <ShoppingCart className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {stats.map((stat) => (
+              <Card key={stat.title}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    </div>
+                    <div className={`p-3 rounded-full ${stat.bgColor}`}>
+                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Cart Value</p>
-                  <p className="text-2xl font-bold text-gray-900">₹{cartTotal.toLocaleString()}</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                  <p className="text-2xl font-bold text-gray-900">{recentOrders.length}</p>
-                </div>
-                <Package className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Orders</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {recentOrders.filter((order) => order.status !== "Delivered").length}
-                  </p>
-                </div>
-                <Clock className="h-8 w-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Current Cart */}
-          <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Current Cart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
+                <CardTitle className="flex items-center">
+                  <ShoppingCart className="h-5 w-5 mr-2" />
                   Current Cart
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {cartItems.length > 0 ? (
+                {state.items && state.items.length > 0 ? (
                   <div className="space-y-4">
-                    {cartItems.slice(0, 3).map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    {state.items.slice(0, 3).map((item) => (
+                      <div key={item.id} className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{item.name}</h4>
-                          <p className="text-sm text-gray-600">
+                          <h4 className="font-medium text-sm">{item.name}</h4>
+                          <p className="text-xs text-gray-600">
                             {item.brand} • Qty: {item.quantity}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-gray-900">
-                            ₹{(item.price * item.quantity).toLocaleString()}
-                          </p>
-                        </div>
+                        <div className="text-sm font-medium">₹{(item.price * item.quantity).toLocaleString()}</div>
                       </div>
                     ))}
-                    {cartItems.length > 3 && (
-                      <p className="text-sm text-gray-500 text-center">... and {cartItems.length - 3} more items</p>
+                    {state.items.length > 3 && (
+                      <p className="text-sm text-gray-600">+{state.items.length - 3} more items</p>
                     )}
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <div className="text-lg font-bold">Total: ₹{cartTotal.toLocaleString()}</div>
-                      <Button asChild>
-                        <Link href="/cart">
-                          View Cart
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
+                    <div className="pt-4 border-t">
+                      <div className="flex justify-between font-bold">
+                        <span>Total</span>
+                        <span>₹{state.total.toLocaleString()}</span>
+                      </div>
+                      <Button asChild className="w-full mt-4">
+                        <Link href="/cart">View Cart</Link>
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <ShoppingCart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">Your cart is empty</p>
+                    <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-4">Your cart is empty</p>
                     <Button asChild>
-                      <Link href="/products/bulk-chemicals">Browse Products</Link>
+                      <Link href="/products">Browse Products</Link>
                     </Button>
                   </div>
                 )}
               </CardContent>
             </Card>
-          </div>
 
-          {/* Account Info */}
-          <div className="space-y-6">
+            {/* Recent Orders */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Account Information
+                <CardTitle className="flex items-center">
+                  <Package className="h-5 w-5 mr-2" />
+                  Recent Orders
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm">{user.email}</span>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentOrders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">{order.id}</h4>
+                        <p className="text-sm text-gray-600">
+                          {order.date} • {order.items} items
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">₹{order.total.toLocaleString()}</p>
+                        <Badge
+                          variant={
+                            order.status === "Delivered"
+                              ? "default"
+                              : order.status === "Confirmed"
+                                ? "secondary"
+                                : "outline"
+                          }
+                          className="text-xs"
+                        >
+                          {order.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  <Button variant="outline" asChild className="w-full bg-transparent">
+                    <Link href="/dashboard/history">View All Orders</Link>
+                  </Button>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm">Member since {new Date(user.created_at || "").toLocaleDateString()}</span>
-                </div>
-                <Button variant="outline" className="w-full bg-transparent">
-                  Edit Profile
-                </Button>
               </CardContent>
             </Card>
+          </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+          {/* Quick Actions */}
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
                   <Link href="/dashboard/upload">
-                    <Package className="mr-2 h-4 w-4" />
+                    <Upload className="h-6 w-6 mb-2" />
                     Upload Quote Request
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                  <Link href="/dashboard/history">
-                    <Clock className="mr-2 h-4 w-4" />
-                    Order History
+                <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
+                  <Link href="/dashboard/quote-cart">
+                    <FileText className="h-6 w-6 mb-2" />
+                    Quote Cart
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                  <Link href="/contact">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Contact Support
+                <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
+                  <Link href="/products/qualigens">
+                    <Package className="h-6 w-6 mb-2" />
+                    Browse Qualigens
                   </Link>
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-
-        {/* Recent Orders */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Recent Orders
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <p className="font-medium text-gray-900">Order #{order.id}</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(order.date).toLocaleDateString()} • {order.items} items
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">₹{order.total.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 text-center">
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/history">
-                  View All Orders
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
