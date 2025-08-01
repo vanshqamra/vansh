@@ -128,7 +128,7 @@ export default function HomePage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-green-100 text-green-800 border-green-200">Product Categories</Badge>
+            <Badge className="mb-4 bg-green-100 text-green-800 border-green-200">FEATURED PRODUCTS </Badge>
             <h2 className="text-4xl font-bold text-slate-900 mb-4">Comprehensive Laboratory Solutions</h2>
           </div>
 
