@@ -24,7 +24,12 @@ export default async function DashboardPage() {
     <div className="container mx-auto py-12">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Welcome, {profile?.full_name || user.email}</h1>
-        <SignOutButton />
+        <div className="flex gap-4">
+          <Button asChild variant="outline">
+            <Link href="/">Back to Home</Link>
+          </Button>
+          <SignOutButton />
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="glow-on-hover">
@@ -34,7 +39,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <Button asChild>
-              <Link href="/products/commercial">Start Browsing</Link>
+              <Link href="/products/bulk-chemicals">Start Browsing</Link>
             </Button>
           </CardContent>
         </Card>
@@ -44,7 +49,9 @@ export default async function DashboardPage() {
             <CardDescription>View the status of your past and current quote requests.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline">View History</Button>
+            <Button asChild variant="outline">
+              <Link href="/dashboard/history">View History</Link>
+            </Button>
           </CardContent>
         </Card>
         <Card className="glow-on-hover">
@@ -53,7 +60,9 @@ export default async function DashboardPage() {
             <CardDescription>Quickly request a quote by uploading a CSV or Excel file.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline">Upload File</Button>
+            <Button asChild variant="outline">
+              <Link href="/dashboard/upload">Upload File</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

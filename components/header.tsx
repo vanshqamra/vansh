@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Menu, X, ShoppingCart, Search, FlaskConical } from "lucide-react"
+import { Menu, X, ShoppingCart, Search, FlaskConical, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useCart } from "@/app/context/CartContext"
@@ -70,8 +70,17 @@ export function Header() {
             </form>
           </div>
 
-          {/* Cart and Mobile Menu */}
+          {/* Cart, Dashboard and Mobile Menu */}
           <div className="flex items-center space-x-4">
+            {/* Dashboard Link */}
+            <Link
+              href="/dashboard"
+              className="hidden lg:flex items-center text-slate-700 hover:text-blue-600 transition-colors"
+            >
+              <User className="h-5 w-5 mr-1" />
+              <span className="text-sm font-medium">Dashboard</span>
+            </Link>
+
             {/* Cart Icon */}
             <Link href="/cart" className="relative p-2 text-slate-700 hover:text-blue-600 transition-colors">
               <ShoppingCart className="h-6 w-6" />
@@ -131,6 +140,13 @@ export function Header() {
                     {item.name}
                   </Link>
                 ))}
+                <Link
+                  href="/dashboard"
+                  className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
               </div>
             </nav>
           </div>

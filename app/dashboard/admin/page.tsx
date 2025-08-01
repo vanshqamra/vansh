@@ -19,55 +19,55 @@ export default async function AdminDashboardPage() {
     redirect("/dashboard")
   }
 
-  const { data: vendors } = await supabase
+  const { data: clients } = await supabase
     .from("profiles")
     .select("id, full_name, email, company_name, gst_no, contact_number, address, approved")
     .order("created_at", { ascending: false })
 
-  async function approveVendor(formData: FormData) {
+  async function approveClient(formData: FormData) {
     "use server"
     const supabase = createClient()
-    const vendorId = formData.get("vendorId") as string
+    const clientId = formData.get("clientId") as string
     const status = formData.get("status") === "true"
 
-    await supabase.from("profiles").update({ approved: status }).eq("id", vendorId)
+    await supabase.from("profiles").update({ approved: status }).eq("id", clientId)
     revalidatePath("/dashboard/admin")
   }
 
   return (
     <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-6">Vendor Approvals</h1>
+      <h1 className="text-3xl font-bold mb-6">Client Approvals</h1>
       <div className="grid gap-6">
-        {vendors?.map((vendor) => (
-          <Card key={vendor.id}>
+        {clients?.map((client) => (
+          <Card key={client.id}>
             <CardHeader>
               <CardTitle>
-                {vendor.company_name} ({vendor.full_name})
+                {client.company_name} ({client.full_name})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p>
-                <strong>Email:</strong> {vendor.email}
+                <strong>Email:</strong> {client.email}
               </p>
               <p>
-                <strong>GST:</strong> {vendor.gst_no}
+                <strong>GST:</strong> {client.gst_no}
               </p>
               <p>
-                <strong>Phone:</strong> {vendor.contact_number}
+                <strong>Phone:</strong> {client.contact_number}
               </p>
               <p>
-                <strong>Address:</strong> {vendor.address}
+                <strong>Address:</strong> {client.address}
               </p>
               <div className="mt-4 flex gap-2">
-                {!vendor.approved ? (
-                  <form action={approveVendor}>
-                    <input type="hidden" name="vendorId" value={vendor.id} />
+                {!client.approved ? (
+                  <form action={approveClient}>
+                    <input type="hidden" name="clientId" value={client.id} />
                     <input type="hidden" name="status" value="true" />
                     <Button type="submit">Approve</Button>
                   </form>
                 ) : (
-                  <form action={approveVendor}>
-                    <input type="hidden" name="vendorId" value={vendor.id} />
+                  <form action={approveClient}>
+                    <input type="hidden" name="clientId" value={client.id} />
                     <input type="hidden" name="status" value="false" />
                     <Button type="submit" variant="destructive">
                       Revoke

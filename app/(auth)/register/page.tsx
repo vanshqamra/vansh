@@ -16,8 +16,8 @@ export default function RegisterPage() {
     <div className="container mx-auto flex items-center justify-center py-16">
       <Card className="w-full max-w-lg bg-white/80 backdrop-blur-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Vendor Registration</CardTitle>
-          <CardDescription>Submit your details for approval to access the vendor portal.</CardDescription>
+          <CardTitle className="text-2xl">Client Registration</CardTitle>
+          <CardDescription>Submit your details for approval to access the client portal.</CardDescription>
         </CardHeader>
         <CardContent>
           {state?.success ? (
@@ -33,7 +33,7 @@ export default function RegisterPage() {
               </div>
               <div className="space-y-1">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" name="email" type="email" placeholder="vendor@company.com" required />
+                <Input id="email" name="email" type="email" placeholder="client@company.com" required />
               </div>
               <div className="space-y-1">
                 <Label htmlFor="password">Password</Label>

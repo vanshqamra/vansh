@@ -16,14 +16,14 @@ export default function LoginPage() {
     <div className="container mx-auto flex items-center justify-center py-16">
       <Card className="w-full max-w-md bg-white/80 backdrop-blur-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Vendor Login</CardTitle>
+          <CardTitle className="text-2xl">Client Login</CardTitle>
           <CardDescription>Access your dashboard to manage quotes and orders.</CardDescription>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="space-y-4">
             <div className="space-y-1">
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" name="email" type="email" placeholder="vendor@company.com" required />
+              <Input id="email" name="email" type="email" placeholder="client@company.com" required />
             </div>
             <div className="space-y-1">
               <Label htmlFor="password">Password</Label>

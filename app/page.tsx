@@ -93,7 +93,15 @@ export default function HomePage() {
               size="lg"
               className="border-white text-white hover:bg-white/10 bg-transparent"
             >
-              <Link href="/register">Become a Vendor</Link>
+              <Link href="/register">Become a Client</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-white text-white hover:bg-white/10 bg-transparent"
+            >
+              <Link href="/login">Client Login</Link>
             </Button>
           </div>
         </div>
@@ -102,7 +110,7 @@ export default function HomePage() {
       {/* Offers Carousel Section */}
       <section className="py-16 bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl font-bold text-center mb-10">Exclusive Vendor Offers</h2>
+          <h2 className="text-3xl font-bold text-center mb-10">Exclusive Client Offers</h2>
           {mounted ? (
             <OffersCarousel />
           ) : (
