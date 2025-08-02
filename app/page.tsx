@@ -56,7 +56,7 @@ export default function HomePage() {
               <div className="text-sm text-blue-300">Clients</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200">25+</div>
+              <div className="text-3xl font-bold text-blue-200">77+</div>
               <div className="text-sm text-blue-300">Years</div>
             </div>
           </div>
