@@ -1,6 +1,6 @@
 export const commercialChemicals = [
   { code: "CC0001", name: "Acetic Acid Glacial", category: "Acids", pack_size: "500ml", price: "₹450" },
-  { code: "CC0002", name: "Acetone", category: "Solvents", pack_size: "1L", price: "₹320" },
+  { code: "CC0002", name: "Acetone", category: "Solvents", pack_size: "1L", price: "���320" },
   { code: "CC0003", name: "Acetonitrile", category: "Solvents", pack_size: "1L", price: "₹850" },
   { code: "CC0004", name: "Alum (Non Ferric /Ferric)", category: "Salts", pack_size: "500g", price: "₹180" },
   { code: "CC0005", name: "Ammonium Bi Sulphite", category: "Salts", pack_size: "500g", price: "₹220" },

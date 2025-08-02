@@ -7,151 +7,134 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
-import { FileText, Download, Trash2, Eye, Search, Filter } from "lucide-react"
+import { Trash2, Eye, Upload, Search, Filter } from "lucide-react"
+import { useAuth } from "@/app/context/auth-context"
+import { createClient } from "@/lib/supabase/client"
 
 interface QuoteUpload {
   id: string
-  fileName: string
-  uploadDate: string
-  status: "pending" | "reviewed" | "quoted" | "completed"
-  customerName: string
-  customerEmail: string
-  fileSize: string
+  user_id: string
+  file_name: string
+  file_url: string
+  status: "pending" | "processing" | "completed" | "rejected"
   notes?: string
+  created_at: string
+  updated_at: string
+  user_email?: string
 }
 
 export default function AdminUploadsPage() {
+  const { user } = useAuth()
   const [uploads, setUploads] = useState<QuoteUpload[]>([])
-  const [filteredUploads, setFilteredUploads] = useState<QuoteUpload[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedUpload, setSelectedUpload] = useState<QuoteUpload | null>(null)
   const [notes, setNotes] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
+  const [updating, setUpdating] = useState(false)
 
-  // Mock data - replace with actual API call
+  const supabase = createClient()
+
   useEffect(() => {
-    const mockUploads: QuoteUpload[] = [
-      {
-        id: "1",
-        fileName: "chemical_requirements_jan2024.pdf",
-        uploadDate: "2024-01-15T10:30:00Z",
-        status: "pending",
-        customerName: "John Smith",
-        customerEmail: "john.smith@example.com",
-        fileSize: "2.4 MB",
-        notes: "Urgent requirement for laboratory setup",
-      },
-      {
-        id: "2",
-        fileName: "bulk_order_request.xlsx",
-        uploadDate: "2024-01-14T14:20:00Z",
-        status: "reviewed",
-        customerName: "Sarah Johnson",
-        customerEmail: "sarah.j@company.com",
-        fileSize: "1.8 MB",
-        notes: "Large quantity order for industrial use",
-      },
-      {
-        id: "3",
-        fileName: "lab_supplies_quote.pdf",
-        uploadDate: "2024-01-13T09:15:00Z",
-        status: "quoted",
-        customerName: "Dr. Michael Brown",
-        customerEmail: "m.brown@university.edu",
-        fileSize: "3.1 MB",
-        notes: "University research project requirements",
-      },
-    ]
-
-    setTimeout(() => {
-      setUploads(mockUploads)
-      setFilteredUploads(mockUploads)
-      setIsLoading(false)
-    }, 1000)
+    fetchUploads()
   }, [])
 
-  // Filter uploads based on search and status
-  useEffect(() => {
-    let filtered = uploads
+  const fetchUploads = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from("quote_uploads")
+        .select(`
+          *,
+          profiles:user_id (
+            email
+          )
+        `)
+        .order("created_at", { ascending: false })
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (upload) =>
-          upload.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          upload.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          upload.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+      if (error) throw error
+
+      const uploadsWithEmail =
+        data?.map((upload) => ({
+          ...upload,
+          user_email: (upload.profiles as any)?.email || "Unknown",
+        })) || []
+
+      setUploads(uploadsWithEmail)
+    } catch (error) {
+      console.error("Error fetching uploads:", error)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((upload) => upload.status === statusFilter)
+  const updateUploadStatus = async (uploadId: string, status: string, adminNotes?: string) => {
+    try {
+      setUpdating(true)
+      const { error } = await supabase
+        .from("quote_uploads")
+        .update({
+          status,
+          notes: adminNotes || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", uploadId)
+
+      if (error) throw error
+
+      await fetchUploads()
+      setSelectedUpload(null)
+      setNotes("")
+    } catch (error) {
+      console.error("Error updating upload:", error)
+    } finally {
+      setUpdating(false)
     }
-
-    setFilteredUploads(filtered)
-  }, [uploads, searchTerm, statusFilter])
-
-  const handleStatusUpdate = (uploadId: string, newStatus: QuoteUpload["status"]) => {
-    setUploads((prev) => prev.map((upload) => (upload.id === uploadId ? { ...upload, status: newStatus } : upload)))
-    toast({
-      title: "Status Updated",
-      description: `Upload status changed to ${newStatus}`,
-    })
   }
 
-  const handleNotesUpdate = (uploadId: string, newNotes: string) => {
-    setUploads((prev) => prev.map((upload) => (upload.id === uploadId ? { ...upload, notes: newNotes } : upload)))
-    toast({
-      title: "Notes Updated",
-      description: "Upload notes have been saved",
-    })
+  const deleteUpload = async (uploadId: string) => {
+    if (!confirm("Are you sure you want to delete this upload?")) return
+
+    try {
+      const { error } = await supabase.from("quote_uploads").delete().eq("id", uploadId)
+
+      if (error) throw error
+
+      await fetchUploads()
+    } catch (error) {
+      console.error("Error deleting upload:", error)
+    }
   }
 
-  const handleDelete = (uploadId: string) => {
-    setUploads((prev) => prev.filter((upload) => upload.id !== uploadId))
-    toast({
-      title: "Upload Deleted",
-      description: "The upload has been removed",
-    })
-  }
+  const filteredUploads = uploads.filter((upload) => {
+    const matchesSearch =
+      upload.file_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      upload.user_email?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === "all" || upload.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
-  const getStatusColor = (status: QuoteUpload["status"]) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800"
-      case "reviewed":
+      case "processing":
         return "bg-blue-100 text-blue-800"
-      case "quoted":
-        return "bg-purple-100 text-purple-800"
       case "completed":
         return "bg-green-100 text-green-800"
+      case "rejected":
+        return "bg-red-100 text-red-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
-
-  if (isLoading) {
+  if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-64"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
+          <p className="text-gray-600 mt-2">You must be logged in to access this page.</p>
         </div>
       </div>
     )
@@ -160,136 +143,198 @@ export default function AdminUploadsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Quote Uploads Management</h1>
-        <p className="text-gray-600">Manage and review customer quote requests</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Quote Upload Management</h1>
+        <p className="text-gray-600">Manage and review customer quote uploads</p>
       </div>
 
       {/* Filters */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Search by filename, customer name, or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search by filename or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="reviewed">Reviewed</SelectItem>
-            <SelectItem value="quoted">Quoted</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="sm:w-48">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger>
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="processing">Processing</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Upload Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredUploads.map((upload) => (
-          <Card key={upload.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5 text-blue-600" />
-                  <CardTitle className="text-lg truncate">{upload.fileName}</CardTitle>
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-yellow-600">
+              {uploads.filter((u) => u.status === "pending").length}
+            </div>
+            <div className="text-sm text-gray-600">Pending</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-blue-600">
+              {uploads.filter((u) => u.status === "processing").length}
+            </div>
+            <div className="text-sm text-gray-600">Processing</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-green-600">
+              {uploads.filter((u) => u.status === "completed").length}
+            </div>
+            <div className="text-sm text-gray-600">Completed</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-red-600">
+              {uploads.filter((u) => u.status === "rejected").length}
+            </div>
+            <div className="text-sm text-gray-600">Rejected</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Uploads List */}
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-gray-600 mt-2">Loading uploads...</p>
+        </div>
+      ) : filteredUploads.length === 0 ? (
+        <div className="text-center py-8">
+          <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No uploads found</h3>
+          <p className="text-gray-600">No quote uploads match your current filters.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredUploads.map((upload) => (
+            <Card key={upload.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-gray-900">{upload.file_name}</h3>
+                      <Badge className={getStatusColor(upload.status)}>
+                        {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <p>Customer: {upload.user_email}</p>
+                      <p>Uploaded: {new Date(upload.created_at).toLocaleDateString()}</p>
+                      {upload.notes && <p>Notes: {upload.notes}</p>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => window.open(upload.file_url, "_blank")}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedUpload(upload)
+                        setNotes(upload.notes || "")
+                      }}
+                    >
+                      Update
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteUpload(upload.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <Badge className={getStatusColor(upload.status)}>{upload.status}</Badge>
-              </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Update Modal */}
+      {selectedUpload && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Update Upload Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="font-medium">Customer:</span> {upload.customerName}
-                </div>
-                <div>
-                  <span className="font-medium">Email:</span> {upload.customerEmail}
-                </div>
-                <div>
-                  <span className="font-medium">Uploaded:</span> {formatDate(upload.uploadDate)}
-                </div>
-                <div>
-                  <span className="font-medium">Size:</span> {upload.fileSize}
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">File</label>
+                <p className="text-sm text-gray-600">{selectedUpload.file_name}</p>
               </div>
-
-              {upload.notes && (
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <span className="font-medium text-sm">Notes:</span>
-                  <p className="text-sm text-gray-600 mt-1">{upload.notes}</p>
-                </div>
-              )}
-
-              <div className="space-y-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <Select
-                  value={upload.status}
-                  onValueChange={(value) => handleStatusUpdate(upload.id, value as QuoteUpload["status"])}
+                  defaultValue={selectedUpload.status}
+                  onValueChange={(value) => {
+                    setSelectedUpload({ ...selectedUpload, status: value as any })
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="reviewed">Reviewed</SelectItem>
-                    <SelectItem value="quoted">Quoted</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
                   </SelectContent>
                 </Select>
-
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <Textarea
-                  placeholder="Add notes..."
-                  value={selectedUpload?.id === upload.id ? notes : upload.notes || ""}
-                  onChange={(e) => {
-                    setNotes(e.target.value)
-                    setSelectedUpload(upload)
-                  }}
-                  onBlur={() => {
-                    if (selectedUpload?.id === upload.id && notes !== upload.notes) {
-                      handleNotesUpdate(upload.id, notes)
-                    }
-                  }}
-                  className="min-h-[80px]"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add notes for the customer..."
+                  rows={3}
                 />
               </div>
-
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={() => updateUploadStatus(selectedUpload.id, selectedUpload.status, notes)}
+                  disabled={updating}
+                  className="flex-1"
+                >
+                  {updating ? "Updating..." : "Update"}
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
-                  onClick={() => handleDelete(upload.id)}
-                  className="text-red-600 hover:text-red-700"
+                  onClick={() => {
+                    setSelectedUpload(null)
+                    setNotes("")
+                  }}
+                  className="flex-1"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  Cancel
                 </Button>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
-
-      {filteredUploads.length === 0 && (
-        <div className="text-center py-12">
-          <FileText className="h-24 w-24 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No uploads found</h3>
-          <p className="text-gray-600">
-            {searchTerm || statusFilter !== "all"
-              ? "No uploads match your current filters."
-              : "No quote uploads have been submitted yet."}
-          </p>
         </div>
       )}
     </div>
