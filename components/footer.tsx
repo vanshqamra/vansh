@@ -18,7 +18,7 @@ export function Footer() {
             Serving laboratories and industries with quality chemicals and supplies since 1948.
           </p>
           <div className="mt-4 text-teal-400 font-bold border border-teal-400/50 rounded-lg px-3 py-1 inline-block">
-            Serving Labs Since 1947 – 77+ Years Strong
+            Serving Labs Since 1948 – 77+ Years Strong
           </div>
         </div>
         <div>
