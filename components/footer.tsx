@@ -15,7 +15,7 @@ export function Footer() {
             <span className="text-xl font-bold text-white">Chemical Corporation</span>
           </Link>
           <p className="text-sm text-slate-400">
-            Serving laboratories and industries with quality chemicals and supplies since 1947.
+            Serving laboratories and industries with quality chemicals and supplies since 1948.
           </p>
           <div className="mt-4 text-teal-400 font-bold border border-teal-400/50 rounded-lg px-3 py-1 inline-block">
             Serving Labs Since 1947 – 77+ Years Strong
