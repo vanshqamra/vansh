@@ -17,13 +17,18 @@ import { CreditCard, Truck, Shield } from "lucide-react"
 import Link from "next/link"
 
 export default function CheckoutPage() {
-  const { items, totalPrice, totalItems, clearCart } = useCart()
+  const { state, clearCart } = useCart()
   const { user } = useAuth()
   const router = useRouter()
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer")
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [mounted, setMounted] = useState(false)
+
+  // Safe access to cart state with defaults
+  const items = state?.items || []
+  const totalPrice = state?.total || 0
+  const totalItems = state?.itemCount || 0
 
   useEffect(() => {
     setMounted(true)
@@ -72,11 +77,31 @@ export default function CheckoutPage() {
   }
 
   if (!user) {
-    return null
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">Please Login</h1>
+          <p className="mb-4">You need to be logged in to access checkout.</p>
+          <Link href="/login?redirect=/checkout">
+            <Button>Login</Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   if (items.length === 0) {
-    return null
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">Your Cart is Empty</h1>
+          <p className="mb-4">Add some products to your cart before checkout.</p>
+          <Link href="/products">
+            <Button>Browse Products</Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const taxAmount = Math.round(totalPrice * 0.18)
@@ -234,7 +259,7 @@ export default function CheckoutPage() {
                         <div className="font-medium">{item.name}</div>
                         <div className="text-gray-600">Qty: {item.quantity}</div>
                       </div>
-                      <div className="font-medium">{item.price}</div>
+                      <div className="font-medium">₹{(item.price * item.quantity).toLocaleString()}</div>
                     </div>
                   ))}
                 </div>
