@@ -137,7 +137,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-lg mb-2">Qualigens Chemicals</h3>
                 <p className="text-gray-600 text-sm mb-4">High-purity laboratory chemicals</p>
                 <Button asChild variant="outline" className="w-full bg-transparent">
-                  <Link href="/brand/qualigens">View Products</Link>
+                  <Link href="/brand/qualigens">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -150,7 +150,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-lg mb-2">Borosil Glassware</h3>
                 <p className="text-gray-600 text-sm mb-4">Premium laboratory glassware</p>
                 <Button asChild variant="outline" className="w-full bg-transparent">
-                  <Link href="/brand/borosil">View Products</Link>
+                  <Link href="/brand/borosil">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -163,7 +163,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-lg mb-2">Scientific Instruments</h3>
                 <p className="text-gray-600 text-sm mb-4">Advanced analytical equipment</p>
                 <Button asChild variant="outline" className="w-full bg-transparent">
-                  <Link href="/products/scientific-instruments">View Products</Link>
+                  <Link href="/products/scientific-instruments">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -176,7 +176,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-lg mb-2">Whatman Filter Paper</h3>
                 <p className="text-gray-600 text-sm mb-4">Laboratory filteration solutions                                                                                                                             </p>
                 <Button asChild variant="outline" className="w-full bg-transparent">
-                  <Link href="/brand/whatman">View Products</Link>
+                  <Link href="/brand/whatman">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
