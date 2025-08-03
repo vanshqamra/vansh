@@ -1,0 +1,3932 @@
+[
+  {
+    "code": "2121",
+    "name": "BURETTES",
+    "description": "2121 - BURETTES With Boroflo stopcock, Class A, with Individual Calibration Certificate \u2022  Complies with IS 1997 / ISO 385, Accuracy as per class A \u2022  Supplied with Boroflo stopcock \u2022  No lubrication required \u2022  Calibrated & certified at 27\u00b0C and supplied with certificate of calibration traceable to National standards \u2022  Generally used in titration process",
+    "image": "product_1.png",
+    "variants": [
+      {
+        "Product\nCode": 2121006,
+        "Capacity\nml": 10,
+        "Graduation\nInterval\nml": 0.05,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 2435.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "2121U06*",
+        "Capacity\nml": 10,
+        "Graduation\nInterval\nml": 0.05,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 2460.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 2121009,
+        "Capacity\nml": 25,
+        "Graduation\nInterval\nml": 0.1,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 2510.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "2121U09*",
+        "Capacity\nml": 25,
+        "Graduation\nInterval\nml": 0.1,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 2615.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 2121012,
+        "Capacity\nml": "SO",
+        "Graduation\nInterval\nml": 0.1,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 2855.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 2121016,
+        "Capacity\nml": 100,
+        "Graduation\nInterval\nml": 0.2,
+        "Tolerance\n+ ml": 40,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 4010.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "* Accuracy as per ASTM E287-2 and calibrated at 20\u00b0C\n30 ml and   00 ml capacities compiles both standards - ISO and ASTM for accuracy",
+        "Capacity\nml": null,
+        "Graduation\nInterval\nml": null,
+        "Tolerance\n+ ml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\nZ": null,
+        "null": null
+      },
+      {
+        "Product\nCode": "2122 - BURETTES\nWith Boroflo stopcock, Class B\n\u2022  Complies with IS 1997 / ISO 385, Accuracy as per class B\n\u2022  Supplied with Boroflo stopcock\n\u2022  No lubrication required\n\u2022  Calibrated at 27\u00b0C\n\u2022  Generally used in titration process",
+        "Capacity\nml": null,
+        "Graduation\nInterval\nml": null,
+        "Tolerance\n+ ml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\nZ": null,
+        "null": null
+      },
+      {
+        "Product\nCode": "Product Code",
+        "Capacity\nml": "Capacity ml",
+        "Graduation\nInterval\nml": "Graduation Interval",
+        "Tolerance\n+ ml": "Tolerance\n+ ml",
+        "Quantity\nPer Case": "Quantity Per Case",
+        "Price /Piece\nZ": "Price /Piece\n\u00a2",
+        "null": null
+      },
+      {
+        "Product\nCode": 2422006,
+        "Capacity\nml": 10,
+        "Graduation\nInterval\nml": 0.05,
+        "Tolerance\n+ ml": 5,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 790.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 2422009,
+        "Capacity\nml": 25,
+        "Graduation\nInterval\nml": 0.1,
+        "Tolerance\n+ ml": 40,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 750.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 2422012,
+        "Capacity\nml": 50,
+        "Graduation\nInterval\nml": 0.1,
+        "Tolerance\n+ ml": 40,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 830.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 2422046,
+        "Capacity\nml": 400,
+        "Graduation\nInterval\nml": 0.2,
+        "Tolerance\n+ ml": 20,
+        "Quantity\nPer Case": 5,
+        "Price /Piece\nZ": 1255.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "48               BOROSIL\u201d-r\nI C       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES  |  For products listed on this page use HSN code 70179010",
+        "Capacity\nml": null,
+        "Graduation\nInterval\nml": null,
+        "Tolerance\n+ ml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\nZ": null,
+        "null": null
+      },
+      {
+        "Product\nCode": "2160 - IMHOFF CONE\nSharp Tip\n\u2022  Complies with IS 7232\n\u2022  Graduated from 0 to 1 ml in 0.1 ml divisions\n\u2022  Graduated from 1 to 10 ml in 0.5 ml divisions\n\u2022  10 to 40 ml in 1 ml divisions also marked at 1000 ml\n\u2022  Facilitates  the  determination  of  the  amount  of  sediment  in  sewape  or industrial waste",
+        "Capacity\nml": null,
+        "Graduation\nInterval\nml": null,
+        "Tolerance\n+ ml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\nZ": null,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "2122",
+    "name": "BURETTES",
+    "description": "2122 - BURETTES With Boroflo stopcock, Class B \u2022  Complies with IS 1997 / ISO 385, Accuracy as per class B \u2022  Supplied with Boroflo stopcock \u2022  No lubrication required \u2022  Calibrated at 27\u00b0C \u2022  Generally used in titration process",
+    "image": "product_10.png",
+    "variants": [
+      {
+        "Product Code": 2422006,
+        "Capacity ml": 10.0,
+        "Graduation Interval": 0.05,
+        "Tolerance\n+ ml": 5.0,
+        "Quantity Per Case": 10.0,
+        "Price /Piece\n\u00a2": 790.0,
+        "null": null
+      },
+      {
+        "Product Code": 2422009,
+        "Capacity ml": 25.0,
+        "Graduation Interval": 0.1,
+        "Tolerance\n+ ml": 40.0,
+        "Quantity Per Case": 10.0,
+        "Price /Piece\n\u00a2": 750.0,
+        "null": null
+      },
+      {
+        "Product Code": 2422012,
+        "Capacity ml": 50.0,
+        "Graduation Interval": 0.1,
+        "Tolerance\n+ ml": 40.0,
+        "Quantity Per Case": 5.0,
+        "Price /Piece\n\u00a2": 830.0,
+        "null": null
+      },
+      {
+        "Product Code": 2422046,
+        "Capacity ml": 400.0,
+        "Graduation Interval": 0.2,
+        "Tolerance\n+ ml": 20.0,
+        "Quantity Per Case": 5.0,
+        "Price /Piece\n\u00a2": 1255.0,
+        "null": null
+      },
+      {
+        "Product Code": "48               BOROSIL\u201d-r\nI C       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES  |  For products listed on this page use HSN code 70179010",
+        "Capacity ml": NaN,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece\n\u00a2": NaN,
+        "null": null
+      },
+      {
+        "Product Code": "2160 - IMHOFF CONE\nSharp Tip\n\u2022  Complies with IS 7232\n\u2022  Graduated from 0 to 1 ml in 0.1 ml divisions\n\u2022  Graduated from 1 to 10 ml in 0.5 ml divisions\n\u2022  10 to 40 ml in 1 ml divisions also marked at 1000 ml\n\u2022  Facilitates  the  determination  of  the  amount  of  sediment  in  sewape  or industrial waste",
+        "Capacity ml": NaN,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece\n\u00a2": NaN,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "2180",
+    "name": "IMHOFF CONE",
+    "description": "2180 - IMHOFF CONE Blunt Tip \u2022   Complies with IS 7232 \u2022   The blunt tip increases its ruggedness  and cleaning ease \u2022  Idea! for use with heavy sediments where the ability to read small volumes is unimportant \u2022   Facilitates  the  determination  of  the  amount  of  sediment  in  sewage  or industrial waste",
+    "image": "product_100.png",
+    "variants": [
+      {
+        "Product Code": 2180093,
+        "Approx Total Height": 439.0,
+        "Approx Top Diameter": null,
+        "Quantity Per Case": null,
+        "Price /Piece T": 7275.0,
+        "null": null
+      },
+      {
+        "Product Code": "8OROSIL\n\u20ac1 F? Ig    I I\u201c I L        an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090                         61",
+        "Approx Total Height": NaN,
+        "Approx Top Diameter": null,
+        "Quantity Per Case": null,
+        "Price /Piece T": NaN,
+        "null": null
+      },
+      {
+        "Product Code": "3021 - CYLINDERS\nClass A, Hexagonal base, Pour out, with Individual Calibration Certificate\n\u2022   Complies with IS 878, ISO 4788 with ISI Mark\n\u2022   Graduated, Single Metric Scale\n\u2022  Each cylinder is engraved with a unique serial number, and comes with a Certificate of Calibration traceable to national standards\n\u2022  Graduations in amber enamel\n\u2022  Sturdy hexapona! base prevents roll-over and ensures greater stability\n\u2022  Calibrated and certified at 27\u00b0C",
+        "Approx Total Height": NaN,
+        "Approx Top Diameter": null,
+        "Quantity Per Case": null,
+        "Price /Piece T": NaN,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "3022",
+    "name": "CYLINDERS",
+    "description": "3022 - CYLINDERS Class B, Hexagonal base, Pour out \u2022   Complies with IS 878, ISO 4788 with ISI Mark \u2022   Graduated, Single Metric Scale \u2022   Certificate of Calibration traceable to national standards \u2022   Graduations in amber enamel \u2022   Sturdy hexagonal base prevents roll -over and ensures greater stability \u2022   Calibrated at 27\u00b0C",
+    "image": "product_101.png",
+    "variants": [
+      {
+        "Product\nCode": 3022005,
+        "Capacity\nml": 5,
+        "Graduation\nInterval\nml": 4.0,
+        "Tolerance\n+ ml": 4.0,
+        "Quantity\nPer Case": 5.0,
+        "Price /Piece\nZ": 325.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022006,
+        "Capacity\nml": 40,
+        "Graduation\nInterval\nml": 0.2,
+        "Tolerance\n+ ml": 0.2,
+        "Quantity\nPer Case": 5.0,
+        "Price /Piece\nZ": 390.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022009,
+        "Capacity\nml": 25,
+        "Graduation\nInterval\nml": 5.0,
+        "Tolerance\n+ ml": 5.0,
+        "Quantity\nPer Case": 30.0,
+        "Price /Piece\nZ": 450.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022012,
+        "Capacity\nml": 50,
+        "Graduation\nInterval\nml": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity\nPer Case": 20.0,
+        "Price /Piece\nZ": 495.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022016,
+        "Capacity\nml": 400,
+        "Graduation\nInterval\nml": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity\nPer Case": 20.0,
+        "Price /Piece\nZ": 555.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022018,
+        "Capacity\nml": "450\u2019",
+        "Graduation\nInterval\nml": 2.0,
+        "Tolerance\n+ ml": 2.0,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\nZ": 825.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022021,
+        "Capacity\nml": 250,
+        "Graduation\nInterval\nml": 2.0,
+        "Tolerance\n+ ml": 2.0,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\nZ": 1035.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022024,
+        "Capacity\nml": 500,
+        "Graduation\nInterval\nml": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity\nPer Case": 5.0,
+        "Price /Piece\nZ": 1345.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022029,
+        "Capacity\nml": 4000,
+        "Graduation\nInterval\nml": 40.0,
+        "Tolerance\n+ ml": 40.0,
+        "Quantity\nPer Case": 4.0,
+        "Price /Piece\nZ": 2040.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 3022030,
+        "Capacity\nml": 2000,
+        "Graduation\nInterval\nml": 20.0,
+        "Tolerance\n+ ml": 20.0,
+        "Quantity\nPer Case": 4.0,
+        "Price /Piece\nZ": 3915.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "*1S0mINoicoeredinaysand\u00e9&",
+        "Capacity\nml": null,
+        "Graduation\nInterval\nml": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\nZ": NaN,
+        "null": null
+      },
+      {
+        "Product\nCode": "8OROSIL\u201d\nI C       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES  |  For products listed on this page use HSN code 70179010",
+        "Capacity\nml": null,
+        "Graduation\nInterval\nml": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\nZ": NaN,
+        "null": null
+      },
+      {
+        "Product\nCode": "BOROSIL  Scientific Drana Desiccators are eauioped witn oodies ano covers that have preat strenptn ana utility  The oody is designed with a streamlined contour tnat facilitates easy cleaning of tne usea desiccant. Any aesiccant such as sulphuric acia, pnospnoric pentoxiae, calcium cnlorioe or silica pel may oe used in Borosil Scientific  orana Desiccators. For your convenience, all Borosil Scientific brand Plain Desiccators  of tne same  size nave intercnanpeable covers  and boaies. When tne pround  surface is cleaner  and greases, Vacuum type Desiccators nold a vacuum of 500 mm of mercury",
+        "Capacity\nml": null,
+        "Graduation\nInterval\nml": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\nZ": NaN,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "3082",
+    "name": "DESICCATOR SET",
+    "description": "3082 - DESICCATOR SET With Cover & Porcelain Plate \u2022 Compies with IS 6128 \u2022   Supplied with cover and porcelain plate, plastic knob \u2022   Simple design for drying under atmospheric  pressure \u2022   Ground glass flanges \u2022   Plates are positioned on an internal ledge within the base \u2022   Generally used for drying of moist products, and for storage of moisture sensitive substances",
+    "image": "product_102.png",
+    "variants": [
+      {
+        "Product Code": 3082041,
+        "Nominal Diameter": 100,
+        "Approx Volume": 120,
+        "Approx Flange OD": 153,
+        "Approx Total Height": 173,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": 10160.0,
+        "null": null
+      },
+      {
+        "Product Code": 3082042,
+        "Nominal Diameter": 150,
+        "Approx Volume": 410,
+        "Approx Flange OD": 213,
+        "Approx Total Height": 205,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": "J1860.00",
+        "null": null
+      },
+      {
+        "Product Code": 3082043,
+        "Nominal Diameter": 200,
+        "Approx Volume": 975,
+        "Approx Flange OD": 272,
+        "Approx Total Height": 272,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": 16525.0,
+        "null": null
+      },
+      {
+        "Product Code": 3082044,
+        "Nominal Diameter": 250,
+        "Approx Volume": 1825,
+        "Approx Flange OD": 333,
+        "Approx Total Height": 323,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": "2JJ15.00",
+        "null": null
+      },
+      {
+        "Product Code": 3082045,
+        "Nominal Diameter": 300,
+        "Approx Volume": 2555,
+        "Approx Flange OD": 395,
+        "Approx Total Height": 344,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": 29700.0,
+        "null": null
+      },
+      {
+        "Product Code": "Spare porcelain plate available on request",
+        "Nominal Diameter": null,
+        "Approx Volume": null,
+        "Approx Flange OD": null,
+        "Approx Total Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null,
+        "null": null
+      },
+      {
+        "Product Code": "3083-VACUUM DESICCATORSET\nWithCover& Porcelan Plate\n\u2022 Compies with IS 6128\n\u2022   Supplied with cover having stopcock with PTFE spindle, porcelain plate and plastic knob\n\u2022   Simple design for drying under atmospheric  pressure\n\u2022   Ground glass flanges\n\u2022   Plates are positioned on an internal hedge within the base\n\u2022   Designed  for use under vacuum\n\u2022   Generally used for drying of moist products,  and for storage of moisture- sensitive substances",
+        "Nominal Diameter": null,
+        "Approx Volume": null,
+        "Approx Flange OD": null,
+        "Approx Total Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null,
+        "null": null
+      },
+      {
+        "Product Code": "Product Code",
+        "Nominal Diameter": "Nominal Diameter",
+        "Approx Volume": "Approx Volume",
+        "Approx Flange OD": "Approx Flange OD",
+        "Approx Total Height": "Total Height mm",
+        "Quantity Per Case": "Quantity Per Case",
+        "Price /Piece Z": "Price /Piece Z",
+        "null": null
+      },
+      {
+        "Product Code": 3083044,
+        "Nominal Diameter": 100,
+        "Approx Volume": 120,
+        "Approx Flange OD": 153,
+        "Approx Total Height": 173,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": 15560.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083042,
+        "Nominal Diameter": 150,
+        "Approx Volume": 410,
+        "Approx Flange OD": 213,
+        "Approx Total Height": 205,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": 23410.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083043,
+        "Nominal Diameter": 200,
+        "Approx Volume": 9,
+        "Approx Flange OD": 272,
+        "Approx Total Height": 22,
+        "Quantity Per Case": null,
+        "Price /Piece Z": 26275.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083044,
+        "Nominal Diameter": 250,
+        "Approx Volume": 4825,
+        "Approx Flange OD": 333,
+        "Approx Total Height": 323,
+        "Quantity Per Case": null,
+        "Price /Piece Z": 36475.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083045,
+        "Nominal Diameter": 300,
+        "Approx Volume": 2555,
+        "Approx Flange OD": 395,
+        "Approx Total Height": 344,
+        "Quantity Per Case": 1,
+        "Price /Piece Z": 45825.0,
+        "null": null
+      },
+      {
+        "Product Code": "Spare porcelain plate and stopcock available on request",
+        "Nominal Diameter": null,
+        "Approx Volume": null,
+        "Approx Flange OD": null,
+        "Approx Total Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null,
+        "null": null
+      },
+      {
+        "Product Code": "BU\u2022R0SIL\n78                   ':  ' \u2022\u201c 11 I  I '\u201d l f.       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090",
+        "Nominal Diameter": null,
+        "Approx Volume": null,
+        "Approx Flange OD": null,
+        "Approx Total Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null,
+        "null": null
+      },
+      {
+        "Product Code": "3140 - CRYSTALLIZING DISHES\n\u2022   Reinforced  and fire-polished  rims reduce chipping\n\u2022   Large labelling field for easy marking\n\u2022   Very high resistance to chemicals  and thermal shocks\n\u2022   \\dea\\  for crystallization and in hot/ice baths",
+        "Nominal Diameter": null,
+        "Approx Volume": null,
+        "Approx Flange OD": null,
+        "Approx Total Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "3083-VACUUM DESICCATORSET",
+    "name": "3083-VACUUM DESICCATORSET",
+    "description": "3083-VACUUM DESICCATORSET WithCover& Porcelan Plate \u2022 Compies with IS 6128 \u2022   Supplied with cover having stopcock with PTFE spindle, porcelain plate and plastic knob \u2022   Simple design for drying under atmospheric  pressure \u2022   Ground glass flanges \u2022   Plates are positioned on an internal hedge within the base \u2022   Designed  for use under vacuum \u2022   Generally used for drying of moist products,  and for storage of moisture- sensitive substances",
+    "image": "product_103.png",
+    "variants": [
+      {
+        "Product Code": 3083044,
+        "Nominal Diameter": 100.0,
+        "Approx Volume": 120.0,
+        "Approx Flange OD": 153.0,
+        "Total Height mm": 173.0,
+        "Quantity Per Case": 1.0,
+        "Price /Piece Z": 15560.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083042,
+        "Nominal Diameter": 150.0,
+        "Approx Volume": 410.0,
+        "Approx Flange OD": 213.0,
+        "Total Height mm": 205.0,
+        "Quantity Per Case": 1.0,
+        "Price /Piece Z": 23410.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083043,
+        "Nominal Diameter": 200.0,
+        "Approx Volume": 9.0,
+        "Approx Flange OD": 272.0,
+        "Total Height mm": 22.0,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": 26275.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083044,
+        "Nominal Diameter": 250.0,
+        "Approx Volume": 4825.0,
+        "Approx Flange OD": 333.0,
+        "Total Height mm": 323.0,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": 36475.0,
+        "null": null
+      },
+      {
+        "Product Code": 3083045,
+        "Nominal Diameter": 300.0,
+        "Approx Volume": 2555.0,
+        "Approx Flange OD": 395.0,
+        "Total Height mm": 344.0,
+        "Quantity Per Case": 1.0,
+        "Price /Piece Z": 45825.0,
+        "null": null
+      },
+      {
+        "Product Code": "Spare porcelain plate and stopcock available on request",
+        "Nominal Diameter": NaN,
+        "Approx Volume": NaN,
+        "Approx Flange OD": NaN,
+        "Total Height mm": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN,
+        "null": null
+      },
+      {
+        "Product Code": "BU\u2022R0SIL\n78                   ':  ' \u2022\u201c 11 I  I '\u201d l f.       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090",
+        "Nominal Diameter": NaN,
+        "Approx Volume": NaN,
+        "Approx Flange OD": NaN,
+        "Total Height mm": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN,
+        "null": null
+      },
+      {
+        "Product Code": "3140 - CRYSTALLIZING DISHES\n\u2022   Reinforced  and fire-polished  rims reduce chipping\n\u2022   Large labelling field for easy marking\n\u2022   Very high resistance to chemicals  and thermal shocks\n\u2022   \\dea\\  for crystallization and in hot/ice baths",
+        "Nominal Diameter": NaN,
+        "Approx Volume": NaN,
+        "Approx Flange OD": NaN,
+        "Total Height mm": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "3160",
+    "name": "PETRI DISHES (3.3 Borosilicate)",
+    "description": "3160 - PETRI DISHES (3.3 Borosilicate) \u2022   Made of 3.3 low expansion borosilicate glass \u2022   Complies with IS 2626 \u2022   These dishes  are clear  and  withstand  repeated  sterilisation  cycles  (wet or dry) \u2022   Beaded edges impart greater mechanical  strength \u2022   Specially  formed  to  ensure  even  wall  thickness  and  consistent  optical performance \u2022   \\dea\\ culture vessel for microbiology and plant tissue culture applications # Not covered in standard 3165 - S LINE PETRI DISHES \u2022   Made of sodalime glass \u2022  S-Line petri dishes with durable white enamel printing - with lid and bottom mentioned on it \u2022   Helps in quick identification of the lid and the bottom while sorting and pairing the petri dishes during use \u2022   Optimally clear and bubble free for making critical observations \u2022   Flat inner surface for uniform distribution of media \u2022   Ideal culture vessel for microbiology and plant tissue culture applications",
+    "image": "product_104.png",
+    "variants": [
+      {
+        "Product Code": 3160065,
+        "null": null,
+        "Size mm": "50 x 17",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "53 x 15",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "50 x 17",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 250.0
+      },
+      {
+        "Product Code": 3160072,
+        "null": null,
+        "Size mm": "80 x 17",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "83 x 15",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "80 x 17",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 320.0
+      },
+      {
+        "Product Code": 3160077,
+        "null": null,
+        "Size mm": "100 x 17#",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "103 x 15",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "100 x 17#",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 375.0
+      },
+      {
+        "Product Code": 3160081,
+        "null": null,
+        "Size mm": "150 x 20",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "153 x 17",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "150 x 20",
+        "Quantity Per Case": 40,
+        "Price /Piece 7": 920.0
+      },
+      {
+        "Product Code": 3160087,
+        "null": null,
+        "Size mm": "200 x 20",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "203 x 20",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "200 x 20",
+        "Quantity Per Case": 10,
+        "Price /Piece 7": 1980.0
+      },
+      {
+        "Product Code": "BOROSIL too X  s no",
+        "null": null,
+        "Size mm": null,
+        "LID\nApprox I.D. (D1) x Height (H1) mm": null,
+        "Bottom Approx O.D. (D2) x Height (H2) mm": null,
+        "Quantity Per Case": null,
+        "Price /Piece 7": null
+      },
+      {
+        "Product Code": "D4",
+        "null": null,
+        "Size mm": null,
+        "LID\nApprox I.D. (D1) x Height (H1) mm": null,
+        "Bottom Approx O.D. (D2) x Height (H2) mm": null,
+        "Quantity Per Case": null,
+        "Price /Piece 7": null
+      },
+      {
+        "Product Code": "BOROSIL 100   15   O  T                     H/ \u2019t",
+        "null": null,
+        "Size mm": null,
+        "LID\nApprox I.D. (D1) x Height (H1) mm": null,
+        "Bottom Approx O.D. (D2) x Height (H2) mm": null,
+        "Quantity Per Case": null,
+        "Price /Piece 7": null
+      },
+      {
+        "Product Code": "Product Code",
+        "null": null,
+        "Size mm": "Size mm",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "LID\nApprox I.D. (D1) x Height (H1) mm",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "Bottom Approx O.D. (D2) x Height (H2) mm",
+        "Quantity Per Case": "Quantity Per Case",
+        "Price /Piece 7": "Price /Piece T"
+      },
+      {
+        "Product Code": 3165065,
+        "null": null,
+        "Size mm": "50x12",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "46x8",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "44x12",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 115.0
+      },
+      {
+        "Product Code": 3165072,
+        "null": null,
+        "Size mm": "80x15",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "76x12",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "74x15",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 130.0
+      },
+      {
+        "Product Code": "3165A75",
+        "null": null,
+        "Size mm": "90x15",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "86x12",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "84x15",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 130.0
+      },
+      {
+        "Product Code": 3165077,
+        "null": null,
+        "Size mm": "100x15",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "96x12",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "94x15",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 130.0
+      },
+      {
+        "Product Code": "3165A77",
+        "null": null,
+        "Size mm": "100x20",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "96x15",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "94x20",
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 205.0
+      },
+      {
+        "Product Code": 3165081,
+        "null": null,
+        "Size mm": "150 x25",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "143 x18",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "141x25",
+        "Quantity Per Case": 40,
+        "Price /Piece 7": 315.0
+      },
+      {
+        "Product Code": 3165087,
+        "null": null,
+        "Size mm": "200x 30",
+        "LID\nApprox I.D. (D1) x Height (H1) mm": "195 x24",
+        "Bottom Approx O.D. (D2) x Height (H2) mm": "192 x 30",
+        "Quantity Per Case": 10,
+        "Price /Piece 7": 660.0
+      },
+      {
+        "Product Code": "BOROSIL  too X  5 LTD",
+        "null": null,
+        "Size mm": null,
+        "LID\nApprox I.D. (D1) x Height (H1) mm": null,
+        "Bottom Approx O.D. (D2) x Height (H2) mm": null,
+        "Quantity Per Case": null,
+        "Price /Piece 7": null
+      },
+      {
+        "Product Code": "BOROSIL       x     o  T",
+        "null": null,
+        "Size mm": null,
+        "LID\nApprox I.D. (D1) x Height (H1) mm": null,
+        "Bottom Approx O.D. (D2) x Height (H2) mm": null,
+        "Quantity Per Case": null,
+        "Price /Piece 7": null
+      }
+    ]
+  },
+  {
+    "code": "* Not covered in standards",
+    "name": "* Not covered in standards",
+    "description": "* Not covered in standards # Suitable for use in Polenske Apparatus 4100 - FLAT BOTTOM FLASK Narrow Mouth, Short Neck With I/C Joint \u2022  Uniform wa!! thickness distribution makes these Flasks ideal for heating \u2022  All sizes have a durable matt-finished enamelled area for marking \u2022  Equipped with interchangeable joint \u2022  The flat base ensures that the Flask can be placed down even without the supporting rinp * These are specific flasks with long neck 34/35  ount used in  eweIIery manufacturers 8OROSIL \u20ac1  F? Ig    I I\u201c I L       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES     For products listed on this page use HSN code 70179090",
+    "image": "product_105.png",
+    "variants": [
+      {
+        "Product Code": 4100018,
+        "Capacity ml": 150,
+        "Interchangeable Joint": "24/29",
+        "null": null,
+        "Approx Height": 115,
+        "Quantity Per Case": 5,
+        "Price / Piece": 290.0
+      },
+      {
+        "Product Code": 4100021,
+        "Capacity ml": 250,
+        "Interchangeable Joint": "24/29",
+        "null": null,
+        "Approx Height": 130,
+        "Quantity Per Case": 5,
+        "Price / Piece": 310.0
+      },
+      {
+        "Product Code": 4100024,
+        "Capacity ml": 500,
+        "Interchangeable Joint": "24/29",
+        "null": null,
+        "Approx Height": 160,
+        "Quantity Per Case": 5,
+        "Price / Piece": 465.0
+      },
+      {
+        "Product Code": 4100029,
+        "Capacity ml": "1000*",
+        "Interchangeable Joint": "34 / 35",
+        "null": null,
+        "Approx Height": 288,
+        "Quantity Per Case": 2,
+        "Price / Piece": 590.0
+      },
+      {
+        "Product Code": 4100030,
+        "Capacity ml": "2000*",
+        "Interchangeable Joint": "34 / 35",
+        "null": null,
+        "Approx Height": 321,
+        "Quantity Per Case": 2,
+        "Price / Piece": 1050.0
+      },
+      {
+        "Product Code": 4100031,
+        "Capacity ml": "3000\u2019",
+        "Interchangeable Joint": "34 / 35",
+        "null": null,
+        "Approx Height": 345,
+        "Quantity Per Case": 2,
+        "Price / Piece": 2865.0
+      },
+      {
+        "Product Code": 4100033,
+        "Capacity ml": "5000\u2019",
+        "Interchangeable Joint": "34 / 35",
+        "null": null,
+        "Approx Height": 81,
+        "Quantity Per Case": 2,
+        "Price / Piece": 4655.0
+      }
+    ]
+  },
+  {
+    "code": "4260",
+    "name": "ROUND BOTTOM FLASK",
+    "description": "4260 - ROUND BOTTOM FLASK Narrow Mouth \u2022  Complies with IS 1381 (P art I), ISO 1773  with ISI Mark \u2022  Uniform wall thickness distribution makes these Flasks ideal for heating \u2022  All sizes have a durable matt-finished enamelled area for marking",
+    "image": "product_106.jpeg",
+    "variants": [
+      {
+        "Product Code": 4260009,
+        "Capacity ml": "25*",
+        "null": null,
+        "Approx\nO.D. x Height": "42 x 90",
+        "Approx Neck O.D.": 22.0,
+        "Quantity Per Case": 50.0,
+        "Price /Piece Z": 125.0
+      },
+      {
+        "Product Code": 4260012,
+        "Capacity ml": 50,
+        "null": null,
+        "Approx\nO.D. x Height": "51 x 95",
+        "Approx Neck O.D.": 26.0,
+        "Quantity Per Case": 70.0,
+        "Price /Piece Z": 140.0
+      },
+      {
+        "Product Code": 4260016,
+        "Capacity ml": 100,
+        "null": null,
+        "Approx\nO.D. x Height": "64 x 110",
+        "Approx Neck O.D.": 26.0,
+        "Quantity Per Case": 50.0,
+        "Price /Piece Z": 155.0
+      },
+      {
+        "Product Code": 4260018,
+        "Capacity ml": "15 0*",
+        "null": null,
+        "Approx\nO.D. x Height": "75 x 137",
+        "Approx Neck O.D.": 28.0,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 175.0
+      },
+      {
+        "Product Code": 4260021,
+        "Capacity ml": 250,
+        "null": null,
+        "Approx\nO.D. x Height": "85 x 143",
+        "Approx Neck O.D.": 34.0,
+        "Quantity Per Case": 80.0,
+        "Price /Piece Z": 175.0
+      },
+      {
+        "Product Code": 4260024,
+        "Capacity ml": 500,
+        "null": null,
+        "Approx\nO.D. x Height": "105 x 168",
+        "Approx Neck O.D.": 34.0,
+        "Quantity Per Case": 40.0,
+        "Price /Piece Z": 305.0
+      },
+      {
+        "Product Code": 4260029,
+        "Capacity ml": 1000,
+        "null": null,
+        "Approx\nO.D. x Height": "131 x 200",
+        "Approx Neck O.D.": 42.0,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 415.0
+      },
+      {
+        "Product Code": 4260030,
+        "Capacity ml": 2000,
+        "null": null,
+        "Approx\nO.D. x Height": "166 x 240",
+        "Approx Neck O.D.": NaN,
+        "Quantity Per Case": 2.0,
+        "Price /Piece Z": 920.0
+      },
+      {
+        "Product Code": 4260031,
+        "Capacity ml": "3000*",
+        "null": null,
+        "Approx\nO.D. x Height": "187 x 305",
+        "Approx Neck O.D.": 50.0,
+        "Quantity Per Case": 2.0,
+        "Price /Piece Z": 2530.0
+      },
+      {
+        "Product Code": 4260033,
+        "Capacity ml": "5000*",
+        "null": null,
+        "Approx\nO.D. x Height": "224 x 350",
+        "Approx Neck O.D.": 58.0,
+        "Quantity Per Case": 2.0,
+        "Price /Piece Z": 3745.0
+      },
+      {
+        "Product Code": 4260034,
+        "Capacity ml": 6000,
+        "null": null,
+        "Approx\nO.D. x Height": "236 x 330",
+        "Approx Neck O.D.": 65.0,
+        "Quantity Per Case": 1.0,
+        "Price /Piece Z": 4890.0
+      },
+      {
+        "Product Code": 4260038,
+        "Capacity ml": 10000,
+        "null": null,
+        "Approx\nO.D. x Height": "279 x 380",
+        "Approx Neck O.D.": 65.0,
+        "Quantity Per Case": 1.0,
+        "Price /Piece Z": 7820.0
+      },
+      {
+        "Product Code": 4260040,
+        "Capacity ml": "20000*",
+        "null": null,
+        "Approx\nO.D. x Height": "350 x 505",
+        "Approx Neck O.D.": 78.0,
+        "Quantity Per Case": 1.0,
+        "Price /Piece Z": 14650.0
+      },
+      {
+        "Product Code": "* Not covered !n standa cds\nFor more details please refer pape no. 301",
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "LA B    U EST\nB'BOROSIL\nSUIT and Stirred\nBaths\nThe  oil  bath  is  Constructed  entirely  of  stainless  steel,  the Precision Oi! Bath provides controlled heating uo to 240\u00b0C. It is designed for still and stirred apolications, offering a temoerature accuracy  of  +1\u00b0C.  The  bath  is  insulated  for  user  safety  and equipped  with overshoot  control.  Additionally,  it can be used with water\n\u2022   Made from stainless steel\n\u2022   Perforated base olate and supolied with lid\n\u2022   Temoerature control of either internal or externa! with a PT\n100 probe\n\u2022   Cylindrical interior tank\n\u2022   Small footprint\n\u2022   Microprocessor PID control\n\u2022   Available with an inbuilt stirred ootion for uniform heat\ntransfer\nIll ci  Wr *r rc c:s\nEmail id: lab.support@borosiI.com Toll Free Number:  1800 224 551",
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": 104,
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      }
+    ]
+  },
+  {
+    "code": "4620",
+    "name": "DISTILLING FLASK",
+    "description": "4620 - DISTILLING FLASK With Side Arm \u2022  Complies with IS 2620 \u2022  Uniform  wall  thickness  distribution  makes  these  Flasks  ideal  for heating \u2022  Suitable for distillation process",
+    "image": "product_107.png",
+    "variants": [
+      {
+        "Product Code": 4620016,
+        "null": null,
+        "Capacity ml": 100,
+        "Approx\nO.D. x Height": "65x210",
+        "Approx Neck O.D.": 22,
+        "Quantity Per Case": 4,
+        "Price /Piece Z": 390.0
+      },
+      {
+        "Product Code": 4620017,
+        "null": null,
+        "Capacity ml": "*125",
+        "Approx\nO.D. x Height": "69x215",
+        "Approx Neck O.D.": 22,
+        "Quantity Per Case": 4,
+        "Price /Piece Z": 385.0
+      },
+      {
+        "Product Code": 4620021,
+        "null": null,
+        "Capacity ml": 250,
+        "Approx\nO.D. x Height": "87x230",
+        "Approx Neck O.D.": 25,
+        "Quantity Per Case": 4,
+        "Price /Piece Z": 640.0
+      },
+      {
+        "Product Code": 4620024,
+        "null": null,
+        "Capacity ml": 500,
+        "Approx\nO.D. x Height": "110x250",
+        "Approx Neck O.D.": 28,
+        "Quantity Per Case": 4,
+        "Price /Piece Z": 755.0
+      },
+      {
+        "Product Code": 4620029,
+        "null": null,
+        "Capacity ml": 1000,
+        "Approx\nO.D. x Height": "138x305",
+        "Approx Neck O.D.": 34,
+        "Quantity Per Case": 4,
+        "Price /Piece Z": 910.0
+      },
+      {
+        "Product Code": "* Specification as per the Institute of Petroleum Standard No. IP 123/64",
+        "null": null,
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null
+      },
+      {
+        "Product Code": "4621 - DISTILLING FLASK\nWith I/C Joint\n\u2022  Distilling with I/C joint 19/26 as per ASTM D86",
+        "null": null,
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null
+      },
+      {
+        "Product Code": "Product Code",
+        "null": null,
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null
+      },
+      {
+        "Product Code": 4621017,
+        "null": null,
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null
+      },
+      {
+        "Product Code": "4980 - ERLENMEYER (CONICAL) FLASK\nNarrow Mouth, With Rim\n\u2022  Complies with IS 1381(P art I), DIN / ISO 1773  with ISI Mark\n\u2022  Uniform wall thickness distribution makes these flasks ideal for heating\n\u2022  The conical form makes them suitable for mixinp liquids\n\u2022  The easy-to-read scale and larpe labelling field facilitate easy marking\n\u2022  Graduated from 25 ml to 5000 m!",
+        "null": null,
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null
+      },
+      {
+        "Product Code": "Product Code",
+        "null": null,
+        "Capacity ml": "Capacity ml",
+        "Approx\nO.D. x Height": "Approx\nO.D. x Height",
+        "Approx Neck O.D.": "Approx Neck O.D.",
+        "Quantity Per Case": "Quantity Per Case",
+        "Price /Piece Z": "Price /Piece 7"
+      },
+      {
+        "Product Code": 4980006,
+        "null": null,
+        "Capacity ml": "10\u2019",
+        "Approx\nO.D. x Height": "37x60",
+        "Approx Neck O.D.": 15,
+        "Quantity Per Case": 30,
+        "Price /Piece Z": 115.0
+      },
+      {
+        "Product Code": 4980009,
+        "null": null,
+        "Capacity ml": 25,
+        "Approx\nO.D. x Height": "2x75",
+        "Approx Neck O.D.": 22,
+        "Quantity Per Case": 40,
+        "Price /Piece Z": 120.0
+      },
+      {
+        "Product Code": 4980012,
+        "null": null,
+        "Capacity ml": 0,
+        "Approx\nO.D. x Height": "Yx90",
+        "Approx Neck O.D.": 22,
+        "Quantity Per Case": 100,
+        "Price /Piece Z": 120.0
+      },
+      {
+        "Product Code": 498006,
+        "null": null,
+        "Capacity ml": 0,
+        "Approx\nO.D. x Height": "64x05",
+        "Approx Neck O.D.": 22,
+        "Quantity Per Case": 100,
+        "Price /Piece Z": 125.0
+      },
+      {
+        "Product Code": 4980017,
+        "null": null,
+        "Capacity ml": "125\u2019",
+        "Approx\nO.D. x Height": "66x110",
+        "Approx Neck O.D.": 28,
+        "Quantity Per Case": 100,
+        "Price /Piece Z": 145.0
+      },
+      {
+        "Product Code": 4980018,
+        "null": null,
+        "Capacity ml": "50\u2019",
+        "Approx\nO.D. x Height": "2i24",
+        "Approx Neck O.D.": 28,
+        "Quantity Per Case": 100,
+        "Price /Piece Z": 150.0
+      },
+      {
+        "Product Code": 4980021,
+        "null": null,
+        "Capacity ml": 20,
+        "Approx\nO.D. x Height": "85x145",
+        "Approx Neck O.D.": 34,
+        "Quantity Per Case": 40,
+        "Price /Piece Z": 185.0
+      },
+      {
+        "Product Code": 4980024,
+        "null": null,
+        "Capacity ml": "TOO",
+        "Approx\nO.D. x Height": "105 x 180",
+        "Approx Neck O.D.": 34,
+        "Quantity Per Case": 40,
+        "Price /Piece Z": 265.0
+      }
+    ]
+  },
+  {
+    "code": "4980",
+    "name": "ERLENMEYER (CONICAL) FLASK",
+    "description": "4980 - ERLENMEYER (CONICAL) FLASK Narrow Mouth, With Rim \u2022  Complies with IS 1381(P art I), DIN / ISO 1773  with ISI Mark \u2022  Uniform wall thickness distribution makes these flasks ideal for heating \u2022  The conical form makes them suitable for mixinp liquids \u2022  The easy-to-read scale and larpe labelling field facilitate easy marking \u2022  Graduated from 25 ml to 5000 m!",
+    "image": "product_108.jpeg",
+    "variants": [
+      {
+        "Product Code": 4980006,
+        "null": null,
+        "Capacity ml": "10\u2019",
+        "Approx\nO.D. x Height": "37x60",
+        "Approx Neck O.D.": 15.0,
+        "Quantity Per Case": 30,
+        "Price /Piece 7": 115.0
+      },
+      {
+        "Product Code": 4980009,
+        "null": null,
+        "Capacity ml": 25,
+        "Approx\nO.D. x Height": "2x75",
+        "Approx Neck O.D.": 22.0,
+        "Quantity Per Case": 40,
+        "Price /Piece 7": 120.0
+      },
+      {
+        "Product Code": 4980012,
+        "null": null,
+        "Capacity ml": 0,
+        "Approx\nO.D. x Height": "Yx90",
+        "Approx Neck O.D.": 22.0,
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 120.0
+      },
+      {
+        "Product Code": 498006,
+        "null": null,
+        "Capacity ml": 0,
+        "Approx\nO.D. x Height": "64x05",
+        "Approx Neck O.D.": 22.0,
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 125.0
+      },
+      {
+        "Product Code": 4980017,
+        "null": null,
+        "Capacity ml": "125\u2019",
+        "Approx\nO.D. x Height": "66x110",
+        "Approx Neck O.D.": 28.0,
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 145.0
+      },
+      {
+        "Product Code": 4980018,
+        "null": null,
+        "Capacity ml": "50\u2019",
+        "Approx\nO.D. x Height": "2i24",
+        "Approx Neck O.D.": 28.0,
+        "Quantity Per Case": 100,
+        "Price /Piece 7": 150.0
+      },
+      {
+        "Product Code": 4980021,
+        "null": null,
+        "Capacity ml": 20,
+        "Approx\nO.D. x Height": "85x145",
+        "Approx Neck O.D.": 34.0,
+        "Quantity Per Case": 40,
+        "Price /Piece 7": 185.0
+      },
+      {
+        "Product Code": 4980024,
+        "null": null,
+        "Capacity ml": "TOO",
+        "Approx\nO.D. x Height": "105 x 180",
+        "Approx Neck O.D.": 34.0,
+        "Quantity Per Case": 40,
+        "Price /Piece 7": 265.0
+      },
+      {
+        "Product Code": 4980029,
+        "null": null,
+        "Capacity ml": 1000,
+        "Approx\nO.D. x Height": "131x 220",
+        "Approx Neck O.D.": 42.0,
+        "Quantity Per Case": 20,
+        "Price /Piece 7": 450.0
+      },
+      {
+        "Product Code": 4980030,
+        "null": null,
+        "Capacity ml": 2000,
+        "Approx\nO.D. x Height": "166x280",
+        "Approx Neck O.D.": 52.0,
+        "Quantity Per Case": 20,
+        "Price /Piece 7": 790.0
+      },
+      {
+        "Product Code": 4980031,
+        "null": null,
+        "Capacity ml": 3000,
+        "Approx\nO.D. x Height": "187x 310",
+        "Approx Neck O.D.": 0.0,
+        "Quantity Per Case": "d",
+        "Price /Piece 7": 2260.0
+      },
+      {
+        "Product Code": 4980033,
+        "null": null,
+        "Capacity ml": 5000,
+        "Approx\nO.D. x Height": "220x365",
+        "Approx Neck O.D.": 50.0,
+        "Quantity Per Case": 2,
+        "Price /Piece 7": 3495.0
+      },
+      {
+        "Product Code": "114              8OROSIL\u201d",
+        "null": null,
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": NaN,
+        "Quantity Per Case": null,
+        "Price /Piece 7": NaN
+      },
+      {
+        "Product Code": "I C        an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES   |  For products listed on this page use HSN code 70179090",
+        "null": null,
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Approx Neck O.D.": NaN,
+        "Quantity Per Case": null,
+        "Price /Piece 7": NaN
+      }
+    ]
+  },
+  {
+    "code": "5640",
+    "name": "VOLUMETRIC FLASKS",
+    "description": "5640 - VOLUMETRIC FLASKS Class A, Narrow Mouth, Clear, with Individual Calibration Certificate \u2022  Complies with IS 815 / DIN   ISO 1042, Accuracy as per class A with ISI Mark 25m5000.   5.\u201c20.    \u2022  Supplied with Interchangeable Solid Glass Stopper \u2022  Each  flask is marked  with individua!  serial number  and supplied  with certificate of calibration traceable to National standards \u2022   Amber enamel inscriptions \u2022  Calibrated & certified at 27\u00b0C -1 ml to 20 ml supplied with trapezoida!  shape for better stability Stopper size as per Boros!! Sc!entif!c Design 1 ml & 2 ml without QR code 5641 - VOLUMETRIC FLASKS Class B, Narrow Mouth, Clear \u2022  Complies with IS 815 / DIN   ISO 1042, Accuracy as per class B with ISI Mark \u2022  Supplied with interchangeable plass stopper ,    2t\\    \u2022   Amber enamel inscriptions \u2022   Calibrated at 27\u00b0C -1  ml to 20 ml supplied with traoezoida!  shape for better stability - Certified and Calibrated at 27\u2022C - # Stooper size as per Boros!t  Sc!entif!c Design",
+    "image": "product_109.png",
+    "variants": [
+      {
+        "Product Code": 5640001,
+        "Capacity ml": "1*",
+        "null": null,
+        "Tolerance\n+ ml": 0.025,
+        "Stopper Size": "7/16",
+        "Quantity Per Case": 5.0,
+        "Price /Piece Z": 1210.0
+      },
+      {
+        "Product Code": 5640002,
+        "Capacity ml": "2*",
+        "null": null,
+        "Tolerance\n+ ml": 0.025,
+        "Stopper Size": "7/16",
+        "Quantity Per Case": 5.0,
+        "Price /Piece Z": 1210.0
+      },
+      {
+        "Product Code": 5640005,
+        "Capacity ml": 5,
+        "null": null,
+        "Tolerance\n+ ml": 0.025,
+        "Stopper Size": "10/19#",
+        "Quantity Per Case": 5.0,
+        "Price /Piece Z": 1090.0
+      },
+      {
+        "Product Code": 5640006,
+        "Capacity ml": 10,
+        "null": null,
+        "Tolerance\n+ ml": 0.025,
+        "Stopper Size": "10/19#",
+        "Quantity Per Case": 5.0,
+        "Price /Piece Z": 945.0
+      },
+      {
+        "Product Code": 5640008,
+        "Capacity ml": 20,
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Stopper Size": "10/19",
+        "Quantity Per Case": 5.0,
+        "Price /Piece Z": 945.0
+      },
+      {
+        "Product Code": 5640009,
+        "Capacity ml": 25,
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Stopper Size": "10/19",
+        "Quantity Per Case": 5.0,
+        "Price /Piece Z": 875.0
+      },
+      {
+        "Product Code": 5640012,
+        "Capacity ml": 50,
+        "null": null,
+        "Tolerance\n+ ml": 0.06,
+        "Stopper Size": "12/21",
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 825.0
+      },
+      {
+        "Product Code": 5640016,
+        "Capacity ml": 100,
+        "null": null,
+        "Tolerance\n+ ml": 0.1,
+        "Stopper Size": "14/23",
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 805.0
+      },
+      {
+        "Product Code": 5640020,
+        "Capacity ml": 200,
+        "null": null,
+        "Tolerance\n+ ml": 0.15,
+        "Stopper Size": "14/23",
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 1140.0
+      },
+      {
+        "Product Code": 5640021,
+        "Capacity ml": 250,
+        "null": null,
+        "Tolerance\n+ ml": 0.15,
+        "Stopper Size": "14/23",
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 1140.0
+      },
+      {
+        "Product Code": 5640024,
+        "Capacity ml": 500,
+        "null": null,
+        "Tolerance\n+ ml": 0.25,
+        "Stopper Size": "19/26",
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 1490.0
+      },
+      {
+        "Product Code": 5640029,
+        "Capacity ml": 1000,
+        "null": null,
+        "Tolerance\n+ ml": 0.4,
+        "Stopper Size": "24/29",
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 2185.0
+      },
+      {
+        "Product Code": 5640030,
+        "Capacity ml": 2000,
+        "null": null,
+        "Tolerance\n+ ml": 0.6,
+        "Stopper Size": "29/32",
+        "Quantity Per Case": 2.0,
+        "Price /Piece Z": 3545.0
+      },
+      {
+        "Product Code": 5640033,
+        "Capacity ml": 5000,
+        "null": null,
+        "Tolerance\n+ ml": 1.2,
+        "Stopper Size": "34/35",
+        "Quantity Per Case": 1.0,
+        "Price /Piece Z": 15180.0
+      },
+      {
+        "Product Code": "Product Code",
+        "Capacity ml": "Capacity ml",
+        "null": null,
+        "Tolerance\n+ ml": NaN,
+        "Stopper Size": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": "Price /Piece Z"
+      },
+      {
+        "Product Code": 5641001,
+        "Capacity ml": 1,
+        "null": null,
+        "Tolerance\n+ ml": NaN,
+        "Stopper Size": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": 405.0
+      },
+      {
+        "Product Code": 5641002,
+        "Capacity ml": 2,
+        "null": null,
+        "Tolerance\n+ ml": NaN,
+        "Stopper Size": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": 360.0
+      },
+      {
+        "Product Code": 5641005,
+        "Capacity ml": 5,
+        "null": null,
+        "Tolerance\n+ ml": NaN,
+        "Stopper Size": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": 335.0
+      }
+    ]
+  },
+  {
+    "code": "- * Not covered in standard",
+    "name": "- * Not covered in standard",
+    "description": "- * Not covered in standard 6150 - FUNNEL TEST TUBES \u2022  Specially designed for soil testing laboratory",
+    "image": "product_11.jpeg",
+    "variants": [
+      {
+        "Product\nCode": 6450007,
+        "null": NaN,
+        "Capacity\nml": null,
+        "Quantity\nPer Case": 40,
+        "Price /Piece\n": 245.0
+      },
+      {
+        "Product\nCode": 6450040,
+        "null": NaN,
+        "Capacity\nml": 30,
+        "Quantity\nPer Case": 40,
+        "Price /Piece\n": 305.0
+      },
+      {
+        "Product\nCode": "6220 - POWDER FUNNEL\nWith Stem\n\u2022  Designed with a short wide stem to facilitate smooth flow\n\u2022  Idea! for transferring powders",
+        "null": NaN,
+        "Capacity\nml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": null
+      },
+      {
+        "Product\nCode": "Poduct Code",
+        "null": NaN,
+        "Capacity\nml": "Capacity\nml",
+        "Quantity\nPer Case": "Quantity\nPer Case",
+        "Price /Piece\n": "Price /Piece\n"
+      },
+      {
+        "Product\nCode": 6220080,
+        "null": NaN,
+        "Capacity\nml": 425,
+        "Quantity\nPer Case": 30,
+        "Price /Piece\n": 545.0
+      },
+      {
+        "Product\nCode": 6220084,
+        "null": NaN,
+        "Capacity\nml": 450,
+        "Quantity\nPer Case": 20,
+        "Price /Piece\n": 580.0
+      },
+      {
+        "Product\nCode": 6220087,
+        "null": NaN,
+        "Capacity\nml": 200,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 1640.0
+      },
+      {
+        "Product\nCode": 6220089,
+        "null": NaN,
+        "Capacity\nml": 250,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 2245.0
+      },
+      {
+        "Product\nCode": "6230 - POWDER FUNNEL\nStem With Cone\n\u2022   Supplied with ground glass cone for easy fitting on flask\n\u2022   Interchangeable joint size 24/29\n\u2022   Designed with a short wide stem to facilitate smooth flow\n\u2022   Ideal for transferring powders",
+        "null": NaN,
+        "Capacity\nml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": null
+      },
+      {
+        "Product\nCode": "Product Code",
+        "null": NaN,
+        "Capacity\nml": "Capacity ml",
+        "Quantity\nPer Case": "Quantity\nPer Case",
+        "Price /Piece\n": "Price /Piece\n"
+      },
+      {
+        "Product\nCode": 6230080,
+        "null": NaN,
+        "Capacity\nml": 425,
+        "Quantity\nPer Case": 20,
+        "Price /Piece\n": 815.0
+      },
+      {
+        "Product\nCode": 6230084,
+        "null": NaN,
+        "Capacity\nml": 450,
+        "Quantity\nPer Case": 20,
+        "Price /Piece\n": 940.0
+      },
+      {
+        "Product\nCode": 6230087,
+        "null": NaN,
+        "Capacity\nml": 200,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 1810.0
+      },
+      {
+        "Product\nCode": 6230089,
+        "null": NaN,
+        "Capacity\nml": 250,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 2725.0
+      },
+      {
+        "Product\nCode": "8OROSIL\n\u20ac1 F? Ig    I I\u201c I L       an ISO 9001: 2015 certified company     PRICES EXCLUSIVE OF TAXES     For products listed on this page use HSN code 70179090",
+        "null": 157.0,
+        "Capacity\nml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": null
+      }
+    ]
+  },
+  {
+    "code": "6220",
+    "name": "POWDER FUNNEL",
+    "description": "6220 - POWDER FUNNEL With Stem \u2022  Designed with a short wide stem to facilitate smooth flow \u2022  Idea! for transferring powders",
+    "image": "product_110.png",
+    "variants": [
+      {
+        "Poduct Code": 6220080,
+        "null": NaN,
+        "Capacity\nml": 425,
+        "Quantity\nPer Case": 30,
+        "Price /Piece\n": 545.0
+      },
+      {
+        "Poduct Code": 6220084,
+        "null": NaN,
+        "Capacity\nml": 450,
+        "Quantity\nPer Case": 20,
+        "Price /Piece\n": 580.0
+      },
+      {
+        "Poduct Code": 6220087,
+        "null": NaN,
+        "Capacity\nml": 200,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 1640.0
+      },
+      {
+        "Poduct Code": 6220089,
+        "null": NaN,
+        "Capacity\nml": 250,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 2245.0
+      },
+      {
+        "Poduct Code": "6230 - POWDER FUNNEL\nStem With Cone\n\u2022   Supplied with ground glass cone for easy fitting on flask\n\u2022   Interchangeable joint size 24/29\n\u2022   Designed with a short wide stem to facilitate smooth flow\n\u2022   Ideal for transferring powders",
+        "null": NaN,
+        "Capacity\nml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": null
+      },
+      {
+        "Poduct Code": "Product Code",
+        "null": NaN,
+        "Capacity\nml": "Capacity ml",
+        "Quantity\nPer Case": "Quantity\nPer Case",
+        "Price /Piece\n": "Price /Piece\n"
+      },
+      {
+        "Poduct Code": 6230080,
+        "null": NaN,
+        "Capacity\nml": 425,
+        "Quantity\nPer Case": 20,
+        "Price /Piece\n": 815.0
+      },
+      {
+        "Poduct Code": 6230084,
+        "null": NaN,
+        "Capacity\nml": 450,
+        "Quantity\nPer Case": 20,
+        "Price /Piece\n": 940.0
+      },
+      {
+        "Poduct Code": 6230087,
+        "null": NaN,
+        "Capacity\nml": 200,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 1810.0
+      },
+      {
+        "Poduct Code": 6230089,
+        "null": NaN,
+        "Capacity\nml": 250,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": 2725.0
+      },
+      {
+        "Poduct Code": "8OROSIL\n\u20ac1 F? Ig    I I\u201c I L       an ISO 9001: 2015 certified company     PRICES EXCLUSIVE OF TAXES     For products listed on this page use HSN code 70179090",
+        "null": 157.0,
+        "Capacity\nml": null,
+        "Quantity\nPer Case": null,
+        "Price /Piece\n": null
+      }
+    ]
+  },
+  {
+    "code": "6230",
+    "name": "POWDER FUNNEL",
+    "description": "6230 - POWDER FUNNEL Stem With Cone \u2022   Supplied with ground glass cone for easy fitting on flask \u2022   Interchangeable joint size 24/29 \u2022   Designed with a short wide stem to facilitate smooth flow \u2022   Ideal for transferring powders",
+    "image": "product_111.png",
+    "variants": [
+      {
+        "Product Code": 6230080,
+        "null": NaN,
+        "Capacity ml": 425.0,
+        "Quantity\nPer Case": 20.0,
+        "Price /Piece\n": 815.0
+      },
+      {
+        "Product Code": 6230084,
+        "null": NaN,
+        "Capacity ml": 450.0,
+        "Quantity\nPer Case": 20.0,
+        "Price /Piece\n": 940.0
+      },
+      {
+        "Product Code": 6230087,
+        "null": NaN,
+        "Capacity ml": 200.0,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": 1810.0
+      },
+      {
+        "Product Code": 6230089,
+        "null": NaN,
+        "Capacity ml": 250.0,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": 2725.0
+      },
+      {
+        "Product Code": "8OROSIL\n\u20ac1 F? Ig    I I\u201c I L       an ISO 9001: 2015 certified company     PRICES EXCLUSIVE OF TAXES     For products listed on this page use HSN code 70179090",
+        "null": 157.0,
+        "Capacity ml": NaN,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": NaN
+      }
+    ]
+  },
+  {
+    "code": "7062",
+    "name": "MOHR PIPETTES",
+    "description": "7062 - MOHR PIPETTES Class B, White Marking \u2022   Complies with ISO 835 \u2022   Graduated for delivery from zero mark to the last graduation mark \u2022   Graduation in white enamel for increased visibility against dark solutions \u2022   Calibrated at 27\u00b0C",
+    "image": "product_112.png",
+    "variants": [
+      {
+        "Product Code": "062P41",
+        "Capacity ml": 4,
+        "Graduation Interval\nml": 0.04,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 225.0,
+        "null": null
+      },
+      {
+        "Product Code": "7062P42",
+        "Capacity ml": 0.2,
+        "Graduation Interval\nml": 0.04,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 215.0,
+        "null": null
+      },
+      {
+        "Product Code": "7062P01",
+        "Capacity ml": null,
+        "Graduation Interval\nml": 0.04,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 215.0,
+        "null": null
+      },
+      {
+        "Product Code": "062P11",
+        "Capacity ml": 1,
+        "Graduation Interval\nml": 40,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 200.0,
+        "null": null
+      },
+      {
+        "Product Code": "062P02",
+        "Capacity ml": 2,
+        "Graduation Interval\nml": 0.02,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 225.0,
+        "null": null
+      },
+      {
+        "Product Code": "7062P22",
+        "Capacity ml": 2,
+        "Graduation Interval\nml": 40,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 215.0,
+        "null": null
+      },
+      {
+        "Product Code": "7062P05",
+        "Capacity ml": 5,
+        "Graduation Interval\nml": 0.05,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 240.0,
+        "null": null
+      },
+      {
+        "Product Code": "7062P55",
+        "Capacity ml": null,
+        "Graduation Interval\nml": 40,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 225.0,
+        "null": null
+      },
+      {
+        "Product Code": "7062P06",
+        "Capacity ml": 10,
+        "Graduation Interval\nml": 40,
+        "Tolerance\n+ ml": 40,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 265.0,
+        "null": null
+      },
+      {
+        "Product Code": "062P09",
+        "Capacity ml": 25,
+        "Graduation Interval\nml": 0.2,
+        "Tolerance\n+ ml": 0.2,
+        "Quantity Per Case": 20,
+        "Price /Piece Z": 410.0,
+        "null": null
+      },
+      {
+        "Product Code": "7079 - SEROLOGICAL PIPETTES\nClass A, With Individual Calibration Certificate\n\u2022  Complies with IS, ISO 835, Type III total delivery\n\u2022  These Pipettes are graduated to the tip\n\u2022  Two rinps at the top indicate that the Pipette is calibrated to deliver from any graduation line down to tip\n\u2022  Supplied  with  individual  calibration  certificate  showing  actual  volume  dispensed  and providing traceability to national standards\n\u2022  Markings are made in permanent amber stain diffused into the surface of the plass for better visibility and durability\n\u2022  Calibrated and certified at 27\u00b0C",
+        "Capacity ml": null,
+        "Graduation Interval\nml": null,
+        "Tolerance\n+ ml": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": null,
+        "null": null
+      },
+      {
+        "Product Code": "Product Code",
+        "Capacity ml": "Capacity ml",
+        "Graduation Interval\nml": "Graduation Interval",
+        "Tolerance\n+ ml": "Tolerance\n+ ml",
+        "Quantity Per Case": "Quantity Per Case",
+        "Price /Piece Z": "Price /Piece Z",
+        "null": null
+      },
+      {
+        "Product Code": "7079P41",
+        "Capacity ml": 4,
+        "Graduation Interval\nml": 0.04,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity Per Case": 10,
+        "Price /Piece Z": 675.0,
+        "null": null
+      },
+      {
+        "Product Code": "7079P42",
+        "Capacity ml": 0.2,
+        "Graduation Interval\nml": 0.04,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity Per Case": 10,
+        "Price /Piece Z": 675.0,
+        "null": null
+      },
+      {
+        "Product Code": "7079P01",
+        "Capacity ml": null,
+        "Graduation Interval\nml": 0.01,
+        "Tolerance\n+ ml": 0.007,
+        "Quantity Per Case": 10,
+        "Price /Piece Z": 635.0,
+        "null": null
+      },
+      {
+        "Product Code": "7079P11",
+        "Capacity ml": null,
+        "Graduation Interval\nml": 40,
+        "Tolerance\n+ ml": 0.007,
+        "Quantity Per Case": 10,
+        "Price /Piece Z": 560.0,
+        "null": null
+      },
+      {
+        "Product Code": "7079P02",
+        "Capacity ml": 2,
+        "Graduation Interval\nml": 2,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 10,
+        "Price /Piece Z": 625.0,
+        "null": null
+      },
+      {
+        "Product Code": "7079P22",
+        "Capacity ml": 2,
+        "Graduation Interval\nml": 40,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 10,
+        "Price /Piece Z": 580.0,
+        "null": null
+      },
+      {
+        "Product Code": "7079P05",
+        "Capacity ml": null,
+        "Graduation Interval\nml": 5,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity Per Case": 10,
+        "Price /Piece Z": 725.0,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "7079",
+    "name": "SEROLOGICAL PIPETTES",
+    "description": "7079 - SEROLOGICAL PIPETTES Class A, With Individual Calibration Certificate \u2022  Complies with IS, ISO 835, Type III total delivery \u2022  These Pipettes are graduated to the tip \u2022  Two rinps at the top indicate that the Pipette is calibrated to deliver from any graduation line down to tip \u2022  Supplied  with  individual  calibration  certificate  showing  actual  volume  dispensed  and providing traceability to national standards \u2022  Markings are made in permanent amber stain diffused into the surface of the plass for better visibility and durability \u2022  Calibrated and certified at 27\u00b0C",
+    "image": "product_113.png",
+    "variants": [
+      {
+        "Product Code": "7079P41",
+        "Capacity ml": 4.0,
+        "Graduation Interval": 0.04,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 675.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P42",
+        "Capacity ml": 0.2,
+        "Graduation Interval": 0.04,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 675.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P01",
+        "Capacity ml": NaN,
+        "Graduation Interval": 0.01,
+        "Tolerance\n+ ml": 0.007,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 635.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P11",
+        "Capacity ml": NaN,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 0.007,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 560.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P02",
+        "Capacity ml": 2.0,
+        "Graduation Interval": 2.0,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 625.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P22",
+        "Capacity ml": 2.0,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 580.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P05",
+        "Capacity ml": NaN,
+        "Graduation Interval": 5.0,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 725.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P55",
+        "Capacity ml": NaN,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 675.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P06",
+        "Capacity ml": 40.0,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 775.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "7079P09",
+        "Capacity ml": 25.0,
+        "Graduation Interval": 20.0,
+        "Tolerance\n+ ml": 40.0,
+        "Quantity Per Case": 10.0,
+        "Price /Piece Z": 915.0,
+        "null": NaN
+      },
+      {
+        "Product Code": "8OROSIL\n\u20ac1  F? Ig    I I\u201c I L       an ISO 9001: 2015 certified company     PRICES EXCLUSIVE OF TAXES     For products listed on this page use HSN code 70179010",
+        "Capacity ml": NaN,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN,
+        "null": 169.0
+      }
+    ]
+  },
+  {
+    "code": "7082",
+    "name": "SEROLOGICAL PIPETTES",
+    "description": "7082 - SEROLOGICAL PIPETTES Class B, White marking \u2022  Complies with IS, ISO 835 \u2022  These Pipettes are graduated to the tip \u2022   Two rings at the top indicate that the Pipette is calibrated to deliver from any graduation line down to tip \u2022  Graduation in white enamel for increased visibility against dark solutions \u2022  Calibrated at 27\u00b0C",
+    "image": "product_114.jpeg",
+    "variants": [
+      {
+        "Product Code": "7082P41",
+        "Capacity ml": 4.0,
+        "null": null,
+        "Graduation Interval": 0.04,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 225.0
+      },
+      {
+        "Product Code": "7082P42",
+        "Capacity ml": 0.2,
+        "null": null,
+        "Graduation Interval": 0.04,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 215.0
+      },
+      {
+        "Product Code": "7082P01",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": 0.04,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 215.0
+      },
+      {
+        "Product Code": "7082P11",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 200.0
+      },
+      {
+        "Product Code": "7082P02",
+        "Capacity ml": 2.0,
+        "null": null,
+        "Graduation Interval": 0.02,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 225.0
+      },
+      {
+        "Product Code": "7082P22",
+        "Capacity ml": 2.0,
+        "null": null,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 215.0
+      },
+      {
+        "Product Code": "7082P05",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": 0.05,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 240.0
+      },
+      {
+        "Product Code": "7082P55",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 225.0
+      },
+      {
+        "Product Code": "7082P06",
+        "Capacity ml": 40.0,
+        "null": null,
+        "Graduation Interval": 40.0,
+        "Tolerance\n+ ml": 40.0,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 265.0
+      },
+      {
+        "Product Code": "7082P09",
+        "Capacity ml": 25.0,
+        "null": null,
+        "Graduation Interval": 0.2,
+        "Tolerance\n+ ml": 0.2,
+        "Quantity Per Case": 20.0,
+        "Price /Piece Z": 410.0
+      },
+      {
+        "Product Code": "7100 - VOLUMETRIC PIPETTES\nClass A, with Individual Calibration Certificate\n\u2022   Complies with IS 1117 /  ISO 648 with ISI Mark\n\u2022   Calibrated  for delivery (TD, Ex)\n\u2022  Each pipette coded with unique identification number (UID) and supplied with calibration certificate with traceability to national standards\n\u2022   Generally used for accurate measurement and decanting of liquid\n\u2022   Calibrated and certified at 27\u00b0C",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "Product Code",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "7400004",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "7400002",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "7400005",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "700006",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "700008",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "7400009",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "70002",
+        "Capacity ml": NaN,
+        "null": null,
+        "Graduation Interval": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      }
+    ]
+  },
+  {
+    "code": "7100",
+    "name": "VOLUMETRIC PIPETTES",
+    "description": "7100 - VOLUMETRIC PIPETTES Class A, with Individual Calibration Certificate \u2022   Complies with IS 1117 /  ISO 648 with ISI Mark \u2022   Calibrated  for delivery (TD, Ex) \u2022  Each pipette coded with unique identification number (UID) and supplied with calibration certificate with traceability to national standards \u2022   Generally used for accurate measurement and decanting of liquid \u2022   Calibrated and certified at 27\u00b0C",
+    "image": "product_115.jpeg",
+    "variants": [
+      {
+        "Product Code": "7400004",
+        "null": NaN,
+        "Capacity ml": NaN,
+        "Tolerance 1 ml": 0.008,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 425.0
+      },
+      {
+        "Product Code": "7400002",
+        "null": NaN,
+        "Capacity ml": 2.0,
+        "Tolerance 1 ml": 0.04,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 430.0
+      },
+      {
+        "Product Code": "7400005",
+        "null": NaN,
+        "Capacity ml": NaN,
+        "Tolerance 1 ml": 0.045,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 485.0
+      },
+      {
+        "Product Code": "700006",
+        "null": NaN,
+        "Capacity ml": 40.0,
+        "Tolerance 1 ml": 0.02,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 580.0
+      },
+      {
+        "Product Code": "700008",
+        "null": NaN,
+        "Capacity ml": 20.0,
+        "Tolerance 1 ml": 0.03,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 760.0
+      },
+      {
+        "Product Code": "7400009",
+        "null": NaN,
+        "Capacity ml": 25.0,
+        "Tolerance 1 ml": 0.03,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 805.0
+      },
+      {
+        "Product Code": "70002",
+        "null": NaN,
+        "Capacity ml": 50.0,
+        "Tolerance 1 ml": 0.05,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 915.0
+      },
+      {
+        "Product Code": "70006",
+        "null": NaN,
+        "Capacity ml": 400.0,
+        "Tolerance 1 ml": 0.08,
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n\u00a2": 1385.0
+      },
+      {
+        "Product Code": "8OROSIL\n\u20ac1 F? Ig    I I\u201c I L        an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179010",
+        "null": 171.0,
+        "Capacity ml": NaN,
+        "Tolerance 1 ml": NaN,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n\u00a2": NaN
+      }
+    ]
+  },
+  {
+    "code": "7101",
+    "name": "VOLUMETRIC PIPETTES",
+    "description": "7101 - VOLUMETRIC PIPETTES Class A, ASTM with Individual Calibration Certificate \u2022  Complies with ASTM E-969-02 \u2022  Calibrated for delivery (TD, Ex) \u2022  Each pipette coded with unique identification number (UID) and supplied with calibration certificate with traceability to national standards \u2022  Generally used for accurate measurement and decanting of liquid \u2022  Calibrated and certified at 20\u00b0C",
+    "image": "product_116.png",
+    "variants": [
+      {
+        "Product Code": 7404004,
+        "Capacity ml": null,
+        "null": null,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 445.0
+      },
+      {
+        "Product Code": 7404405,
+        "Capacity ml": "4S\u2019",
+        "null": null,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 500.0
+      },
+      {
+        "Product Code": 7404002,
+        "Capacity ml": 2,
+        "null": null,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 500.0
+      },
+      {
+        "Product Code": 70205,
+        "Capacity ml": "25\u2019",
+        "null": null,
+        "Tolerance\n+ ml": 0.006,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 560.0
+      },
+      {
+        "Product Code": 70003,
+        "Capacity ml": 3,
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 525.0
+      },
+      {
+        "Product Code": 70004,
+        "Capacity ml": 4,
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 525.0
+      },
+      {
+        "Product Code": 7404005,
+        "Capacity ml": 5,
+        "null": null,
+        "Tolerance\n+ ml": 0.01,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 530.0
+      },
+      {
+        "Product Code": 70706,
+        "Capacity ml": 6,
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 580.0
+      },
+      {
+        "Product Code": 70707,
+        "Capacity ml": 7,
+        "null": null,
+        "Tolerance\n+ ml": 0.01,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 580.0
+      },
+      {
+        "Product Code": 70708,
+        "Capacity ml": 8,
+        "null": null,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 580.0
+      },
+      {
+        "Product Code": 7404709,
+        "Capacity ml": 9,
+        "null": null,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 580.0
+      },
+      {
+        "Product Code": 70006,
+        "Capacity ml": 0,
+        "null": null,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 605.0
+      },
+      {
+        "Product Code": 70007,
+        "Capacity ml": 45,
+        "null": null,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 680.0
+      },
+      {
+        "Product Code": 7404008,
+        "Capacity ml": 20,
+        "null": null,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 790.0
+      },
+      {
+        "Product Code": 70009,
+        "Capacity ml": 25,
+        "null": null,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 830.0
+      },
+      {
+        "Product Code": 7404010,
+        "Capacity ml": 30,
+        "null": null,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 830.0
+      },
+      {
+        "Product Code": 70011,
+        "Capacity ml": 40,
+        "null": null,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 885.0
+      },
+      {
+        "Product Code": 7002,
+        "Capacity ml": 0,
+        "null": null,
+        "Tolerance\n+ ml": 0.05,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 960.0
+      },
+      {
+        "Product Code": 7404016,
+        "Capacity ml": 400,
+        "null": null,
+        "Tolerance\n+ ml": 0.08,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 1445.0
+      }
+    ]
+  },
+  {
+    "code": "* As per Borosil Scientific standard",
+    "name": "* As per Borosil Scientific standard",
+    "description": "* As per Borosil Scientific standard 7102 - VOLUMETRIC  PIPETTES Class B \u2022  Complies with IS 1117 / ISO 648 with ISI Mark \u2022  Calibrated for delivery (TD, Ex) \u2022  Generally used for accurate measurement and decanting of liquid \u2022  Calibrated at 27\u00b0C",
+    "image": "product_117.jpeg",
+    "variants": [
+      {
+        "Product Code": 7102001,
+        "Capacity\nml": 1,
+        "null": null,
+        "Tolerance\n+ ml": 0.045,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 245.0
+      },
+      {
+        "Product Code": 7102002,
+        "Capacity\nml": 2,
+        "null": null,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 225.0
+      },
+      {
+        "Product Code": 7102003,
+        "Capacity\nml": "3*",
+        "null": null,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 225.0
+      },
+      {
+        "Product Code": 7102004,
+        "Capacity\nml": "4*",
+        "null": null,
+        "Tolerance\n+ ml": 0.02,
+        "Quantity\nPer Case": "TO",
+        "Price /Piece\nZ": 225.0
+      },
+      {
+        "Product Code": 7102005,
+        "Capacity\nml": 5,
+        "null": null,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 240.0
+      },
+      {
+        "Product Code": 7102706,
+        "Capacity\nml": "6*",
+        "null": null,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 255.0
+      },
+      {
+        "Product Code": 7102707,
+        "Capacity\nml": "7*",
+        "null": null,
+        "Tolerance\n+ ml": 0.03,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 255.0
+      },
+      {
+        "Product Code": 7102708,
+        "Capacity\nml": "8\u2019",
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity\nPer Case": "TO",
+        "Price /Piece\nZ": 255.0
+      },
+      {
+        "Product Code": 7102709,
+        "Capacity\nml": "9*",
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity\nPer Case": "TO",
+        "Price /Piece\nZ": 255.0
+      },
+      {
+        "Product Code": 7102006,
+        "Capacity\nml": 10,
+        "null": null,
+        "Tolerance\n+ ml": 0.04,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 280.0
+      },
+      {
+        "Product Code": 7102007,
+        "Capacity\nml": "15*",
+        "null": null,
+        "Tolerance\n+ ml": 0.06,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 315.0
+      },
+      {
+        "Product Code": 7102008,
+        "Capacity\nml": 20,
+        "null": null,
+        "Tolerance\n+ ml": 0.06,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 320.0
+      },
+      {
+        "Product Code": 7102009,
+        "Capacity\nml": 25,
+        "null": null,
+        "Tolerance\n+ ml": 0.06,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 335.0
+      },
+      {
+        "Product Code": 7102010,
+        "Capacity\nml": "30*",
+        "null": null,
+        "Tolerance\n+ ml": 0.06,
+        "Quantity\nPer Case": "\\0",
+        "Price /Piece\nZ": 325.0
+      },
+      {
+        "Product Code": 7102011,
+        "Capacity\nml": "40*",
+        "null": null,
+        "Tolerance\n+ ml": 4.0,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 355.0
+      },
+      {
+        "Product Code": 7102012,
+        "Capacity\nml": 50,
+        "null": null,
+        "Tolerance\n+ ml": 0.1,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 395.0
+      },
+      {
+        "Product Code": 7102016,
+        "Capacity\nml": 100,
+        "null": null,
+        "Tolerance\n+ ml": 0.15,
+        "Quantity\nPer Case": 10,
+        "Price /Piece\nZ": 560.0
+      },
+      {
+        "Product Code": 172,
+        "Capacity\nml": null,
+        "null": null,
+        "Tolerance\n+ ml": NaN,
+        "Quantity\nPer Case": null,
+        "Price /Piece\nZ": NaN
+      }
+    ]
+  },
+  {
+    "code": "Tu",
+    "name": "Tu",
+    "description": "Tu 9800 - TEST TUBES With Rim \u2022   Complies with IS 2618, DIN / ISO 4142 \u2022   Designed with a round bottom and a rim \u2022   Made thick-walled, mechanically very resistant \u2022   High thermal shock resistance",
+    "image": "product_118.png",
+    "variants": [
+      {
+        "Poduct Code": "9800U01",
+        "Capacity ml": 3,
+        "null": null,
+        "Approx\nO.D. x Length": "10 x 75",
+        "Quantity Per Case": 800.0,
+        "Price /Piece Z": 11.0
+      },
+      {
+        "Poduct Code": "9800U02",
+        "Capacity ml": 5,
+        "null": null,
+        "Approx\nO.D. x Length": "12 x 75",
+        "Quantity Per Case": 800.0,
+        "Price /Piece Z": 11.0
+      },
+      {
+        "Poduct Code": "9800U03",
+        "Capacity ml": 7,
+        "null": null,
+        "Approx\nO.D. x Length": "12 x 100",
+        "Quantity Per Case": 800.0,
+        "Price /Piece Z": 16.0
+      },
+      {
+        "Poduct Code": "9800U15",
+        "Capacity ml": 4,
+        "null": null,
+        "Approx\nO.D. x Length": "13 x SP*",
+        "Quantity Per Case": 800.0,
+        "Price /Piece Z": 18.0
+      },
+      {
+        "Poduct Code": "9800U04",
+        "Capacity ml": 13,
+        "null": null,
+        "Approx\nO.D. x Length": "15 x 125",
+        "Quantity Per Case": 800.0,
+        "Price /Piece Z": 20.0
+      },
+      {
+        "Poduct Code": "9800U05",
+        "Capacity ml": 15,
+        "null": null,
+        "Approx\nO.D. x Length": "15 x 150",
+        "Quantity Per Case": 400.0,
+        "Price /Piece Z": 23.0
+      },
+      {
+        "Poduct Code": "9800U06",
+        "Capacity ml": 27,
+        "null": null,
+        "Approx\nO.D. x Length": "18 x 150",
+        "Quantity Per Case": 400.0,
+        "Price /Piece Z": 24.0
+      },
+      {
+        "Poduct Code": "9800U07",
+        "Capacity ml": 38,
+        "null": null,
+        "Approx\nO.D. x Length": "25 x 100#",
+        "Quantity Per Case": 200.0,
+        "Price /Piece Z": 30.0
+      },
+      {
+        "Poduct Code": "9800U08",
+        "Capacity ml": "US",
+        "null": null,
+        "Approx\nO.D. x Length": "25 x 150",
+        "Quantity Per Case": 200.0,
+        "Price /Piece Z": 36.0
+      },
+      {
+        "Poduct Code": "9800U09",
+        "Capacity ml": 70,
+        "null": null,
+        "Approx\nO.D. x Length": "25 x 200",
+        "Quantity Per Case": 400.0,
+        "Price /Piece Z": 48.0
+      },
+      {
+        "Poduct Code": "9800U10",
+        "Capacity ml": 100,
+        "null": null,
+        "Approx\nO.D. x Length": "32 x 200",
+        "Quantity Per Case": 50.0,
+        "Price /Piece Z": 72.0
+      },
+      {
+        "Poduct Code": "9800UL",
+        "Capacity ml": 170,
+        "null": null,
+        "Approx\nO.D. x Length": "38 x 200",
+        "Quantity Per Case": 50.0,
+        "Price /Piece Z": 86.0
+      },
+      {
+        "Poduct Code": "* IS . 3740 for tube widal\n# Not covered in the standard",
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Poduct Code": "9801 - TUBE FOR CULTURE COLLECTION\n\u2022  Designed with a round bottom\n\u2022  Thick walled and hiph mechanical resistance\n\u2022  Hiph thermal shock resistance\n\u2022  Used for blood and microbial culturing",
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Poduct Code": "Product\nCode",
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Poduct Code": "9801U01",
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Poduct Code": 192,
+        "Capacity ml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece Z": NaN
+      }
+    ]
+  },
+  {
+    "code": "9801",
+    "name": "TUBE FOR CULTURE COLLECTION",
+    "description": "9801 - TUBE FOR CULTURE COLLECTION \u2022  Designed with a round bottom \u2022  Thick walled and hiph mechanical resistance \u2022  Hiph thermal shock resistance \u2022  Used for blood and microbial culturing",
+    "image": "product_12.png",
+    "variants": [
+      {
+        "Product\nCode": "9801U01",
+        "null": null,
+        "Approx\nO.D. x Length": "7 x 127",
+        "Quantity\nPer Case": 200.0,
+        "Price /Piece\n": 32.0
+      },
+      {
+        "Product\nCode": 192,
+        "null": null,
+        "Approx\nO.D. x Length": "BOROSIL\u201d\nI C        an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090",
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": NaN
+      }
+    ]
+  },
+  {
+    "code": "9820",
+    "name": "TEST TUBES",
+    "description": "9820 - TEST TUBES Without Rim \u2022  Complies with IS 2618, DIN / ISO 4142 \u2022  Designed with a round bottom and without rim \u2022  Made thick-walled, mechanically very resistant \u2022  Hiph thermal shock resistance",
+    "image": "product_121.png",
+    "variants": [
+      {
+        "Product Code": "9820U16",
+        "Capacity\nml": 1,
+        "null": null,
+        "Approx\nO.D. x Length": "7 x 60*",
+        "Quantity Per Case": 800,
+        "Price /Piece Z": 10.0
+      },
+      {
+        "Product Code": "9820U01",
+        "Capacity\nml": 3,
+        "null": null,
+        "Approx\nO.D. x Length": "10 x 75***",
+        "Quantity Per Case": 800,
+        "Price /Piece Z": 10.0
+      },
+      {
+        "Product Code": "9820U02",
+        "Capacity\nml": 5,
+        "null": null,
+        "Approx\nO.D. x Length": "12 x 75**/***",
+        "Quantity Per Case": 800,
+        "Price /Piece Z": 10.0
+      },
+      {
+        "Product Code": "9820U03",
+        "Capacity\nml": 7,
+        "null": null,
+        "Approx\nO.D. x Length": "12 x 100***",
+        "Quantity Per Case": 800,
+        "Price /Piece Z": 16.0
+      },
+      {
+        "Product Code": "9820U17",
+        "Capacity\nml": 8,
+        "null": null,
+        "Approx\nO.D. x Length": "12 x 125***",
+        "Quantity Per Case": 800,
+        "Price /Piece Z": 17.0
+      },
+      {
+        "Product Code": "9820U04",
+        "Capacity\nml": 13,
+        "null": null,
+        "Approx\nO.D. x Length": "15 x 125",
+        "Quantity Per Case": 800,
+        "Price /Piece Z": 20.0
+      },
+      {
+        "Product Code": "9820U05",
+        "Capacity\nml": 15,
+        "null": null,
+        "Approx\nO.D. x Length": "15 x 150",
+        "Quantity Per Case": "TOO",
+        "Price /Piece Z": 23.0
+      },
+      {
+        "Product Code": "9820U12",
+        "Capacity\nml": 12,
+        "null": null,
+        "Approx\nO.D. x Length": "16 x 100***",
+        "Quantity Per Case": 800,
+        "Price /Piece Z": 22.0
+      },
+      {
+        "Product Code": "9820U18",
+        "Capacity\nml": 20,
+        "null": null,
+        "Approx\nO.D. x Length": "16 x 150***",
+        "Quantity Per Case": "TOO",
+        "Price /Piece Z": 27.0
+      },
+      {
+        "Product Code": "9820U06",
+        "Capacity\nml": 27,
+        "null": null,
+        "Approx\nO.D. x Length": "18 x 150",
+        "Quantity Per Case": "TOO",
+        "Price /Piece Z": 24.0
+      },
+      {
+        "Product Code": "9820U19",
+        "Capacity\nml": 25,
+        "null": null,
+        "Approx\nO.D. x Length": "19 x 125***",
+        "Quantity Per Case": "TOO",
+        "Price /Piece Z": 27.0
+      },
+      {
+        "Product Code": "9820U07",
+        "Capacity\nml": 38,
+        "null": null,
+        "Approx\nO.D. x Length": "25 x 100#",
+        "Quantity Per Case": 200,
+        "Price /Piece Z": 30.0
+      },
+      {
+        "Product Code": "9820U08",
+        "Capacity\nml": "US",
+        "null": null,
+        "Approx\nO.D. x Length": "25 x 150***",
+        "Quantity Per Case": 200,
+        "Price /Piece Z": 36.0
+      },
+      {
+        "Product Code": "9820U09",
+        "Capacity\nml": 70,
+        "null": null,
+        "Approx\nO.D. x Length": "25 x 200",
+        "Quantity Per Case": 400,
+        "Price /Piece Z": 48.0
+      },
+      {
+        "Product Code": "9820U10",
+        "Capacity\nml": 100,
+        "null": null,
+        "Approx\nO.D. x Length": "32 x 200",
+        "Quantity Per Case": 50,
+        "Price /Piece Z": 72.0
+      },
+      {
+        "Product Code": "9820U11",
+        "Capacity\nml": 170,
+        "null": null,
+        "Approx\nO.D. x Length": "38 x 200",
+        "Quantity Per Case": 50,
+        "Price /Piece Z": 86.0
+      },
+      {
+        "Product Code": "* IS:3740 \u20141966 for DURHAM FERMENTATION\n** IS:3740 - 1966 for KAHN & WASSERMAN  TEST\n*** IS:3740 - 1966 for BACTERIOLOGI CAL TEST\n# Not covered in the standard",
+        "Capacity\nml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "9821 - DISSOLUTION TUBE\nWithout Rim\n\u2022  Designed with flat bottom and without rim\n\u2022  Hiph thermal shock resistance\n\u2022  Used for pathological tests and disintegration apparatus",
+        "Capacity\nml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": NaN
+      },
+      {
+        "Product Code": "Poduct\nCode",
+        "Capacity\nml": null,
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity Per Case": null,
+        "Price /Piece Z": NaN
+      }
+    ]
+  },
+  {
+    "code": "9821",
+    "name": "DISSOLUTION TUBE",
+    "description": "9821 - DISSOLUTION TUBE Without Rim \u2022  Designed with flat bottom and without rim \u2022  Hiph thermal shock resistance \u2022  Used for pathological tests and disintegration apparatus",
+    "image": "product_122.jpeg",
+    "variants": [
+      {
+        "Poduct\nCode": "9821U42",
+        "null": null,
+        "Approx\nO.D. x Length": "12 x 75",
+        "Quantity\nPer Case": 800.0,
+        "Price /Piece\n": 27.0
+      },
+      {
+        "Poduct\nCode": "9821U61",
+        "null": null,
+        "Approx\nO.D. x Length": "18 x 100",
+        "Quantity\nPer Case": 400.0,
+        "Price /Piece\n": 53.0
+      },
+      {
+        "Poduct\nCode": "8OROSIL\n\u20ac1 F? Ig    I I\u201c I L        an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090                        193",
+        "null": null,
+        "Approx\nO.D. x Length": null,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": NaN
+      }
+    ]
+  },
+  {
+    "code": "9986",
+    "name": "WATCH GLASSES",
+    "description": "9986 - WATCH GLASSES S - Line \u2022  Made of sodalime glass \u2022  A special process is used that results in an absolutely flat curved surface \u2022  Hiph clarity free of bubbles \u2022  All  of them  are  moulded  to the  same  radius  of  curvature  for convenient stacking",
+    "image": "product_123.jpeg",
+    "variants": [
+      {
+        "Poduct\nCode": 9986072,
+        "Size\nmm": 80.0,
+        "Quantity\nPer Case": 50.0,
+        "Price /Piece\n": 120.0,
+        "null": NaN
+      },
+      {
+        "Poduct\nCode": 9986077,
+        "Size\nmm": 100.0,
+        "Quantity\nPer Case": 50.0,
+        "Price /Piece\n": 135.0,
+        "null": NaN
+      },
+      {
+        "Poduct\nCode": 9986079,
+        "Size\nmm": 120.0,
+        "Quantity\nPer Case": 20.0,
+        "Price /Piece\n": 145.0,
+        "null": NaN
+      },
+      {
+        "Poduct\nCode": 9986084,
+        "Size\nmm": 150.0,
+        "Quantity\nPer Case": 20.0,
+        "Price /Piece\n": 195.0,
+        "null": NaN
+      },
+      {
+        "Poduct\nCode": "BOROSIL\n':  ' *\u201c I I I |     l L.       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090",
+        "Size\nmm": NaN,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": NaN,
+        "null": 199.0
+      }
+    ]
+  },
+  {
+    "code": "36060",
+    "name": "BUCHNER FUNNEL",
+    "description": "36060 - BUCHNER FUNNEL With Sintered Disc \u2022  Made of 3 3 borosilicate plass \u2022  Especially useful where the filter paper may be attacked by filtered material \u2022  Generally used in qualitative inorganic analysis and preparative chemistry \u2022  Resistant to corrosion and heat",
+    "image": "product_124.jpeg",
+    "variants": [
+      {
+        "Product Code": 3606058,
+        "Capacity ml": 35,
+        "Porosity Grade": null,
+        "Dia of Disc": 30,
+        "Approx Height": 430,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 740.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606658,
+        "Capacity ml": 35,
+        "Porosity Grade": 2,
+        "Dia of Disc": 30,
+        "Approx Height": 430,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 705.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606758,
+        "Capacity ml": "3S",
+        "Porosity Grade": 3,
+        "Dia of Disc": 30,
+        "Approx Height": 430,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 740.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606858,
+        "Capacity ml": "3S",
+        "Porosity Grade": "A",
+        "Dia of Disc": 30,
+        "Approx Height": 430,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 705.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606958,
+        "Capacity ml": "3S",
+        "Porosity Grade": 5,
+        "Dia of Disc": 30,
+        "Approx Height": 430,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 885.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606072,
+        "Capacity ml": 80,
+        "Porosity Grade": 1,
+        "Dia of Disc": 35,
+        "Approx Height": 142,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 1370.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606672,
+        "Capacity ml": 80,
+        "Porosity Grade": 2,
+        "Dia of Disc": 35,
+        "Approx Height": 142,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 1370.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606772,
+        "Capacity ml": 80,
+        "Porosity Grade": 3,
+        "Dia of Disc": 35,
+        "Approx Height": 142,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 1370.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606872,
+        "Capacity ml": 80,
+        "Porosity Grade": 4,
+        "Dia of Disc": 35,
+        "Approx Height": 142,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 1370.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606972,
+        "Capacity ml": 80,
+        "Porosity Grade": 5,
+        "Dia of Disc": 35,
+        "Approx Height": 142,
+        "Stem Dia mm": 8,
+        "Quantity Per Case": 5,
+        "Price / Piece": 1660.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606020,
+        "Capacity ml": 200,
+        "Porosity Grade": 1,
+        "Dia of Disc": 68,
+        "Approx Height": 215,
+        "Stem Dia mm": 13,
+        "Quantity Per Case": 5,
+        "Price / Piece": 2130.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606620,
+        "Capacity ml": 200,
+        "Porosity Grade": 2,
+        "Dia of Disc": 68,
+        "Approx Height": 215,
+        "Stem Dia mm": 13,
+        "Quantity Per Case": 5,
+        "Price / Piece": 2130.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606720,
+        "Capacity ml": 200,
+        "Porosity Grade": 3,
+        "Dia of Disc": 68,
+        "Approx Height": 215,
+        "Stem Dia mm": 13,
+        "Quantity Per Case": 5,
+        "Price / Piece": 2130.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606820,
+        "Capacity ml": 200,
+        "Porosity Grade": 4,
+        "Dia of Disc": 68,
+        "Approx Height": 215,
+        "Stem Dia mm": 13,
+        "Quantity Per Case": 5,
+        "Price / Piece": 2130.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606920,
+        "Capacity ml": 200,
+        "Porosity Grade": 5,
+        "Dia of Disc": 68,
+        "Approx Height": 215,
+        "Stem Dia mm": 13,
+        "Quantity Per Case": 5,
+        "Price / Piece": 2475.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606024,
+        "Capacity ml": 0,
+        "Porosity Grade": 1,
+        "Dia of Disc": 92,
+        "Approx Height": 258,
+        "Stem Dia mm": 17,
+        "Quantity Per Case": 2,
+        "Price / Piece": 5030.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606624,
+        "Capacity ml": 500,
+        "Porosity Grade": 2,
+        "Dia of Disc": 92,
+        "Approx Height": 258,
+        "Stem Dia mm": 17,
+        "Quantity Per Case": 2,
+        "Price / Piece": 5030.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606724,
+        "Capacity ml": 500,
+        "Porosity Grade": 3,
+        "Dia of Disc": 92,
+        "Approx Height": 258,
+        "Stem Dia mm": 17,
+        "Quantity Per Case": 2,
+        "Price / Piece": 5030.0,
+        "null": null
+      },
+      {
+        "Product Code": 3606824,
+        "Capacity ml": 0,
+        "Porosity Grade": 4,
+        "Dia of Disc": 92,
+        "Approx Height": 258,
+        "Stem Dia mm": 17,
+        "Quantity Per Case": 2,
+        "Price / Piece": 5030.0,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "32061",
+    "name": "TUBE FOR GOOCH CRUCIBLE",
+    "description": "32061 - TUBE FOR GOOCH CRUCIBLE \u2022  Made of 3 3 borosilicate plass \u2022  Suitable for use with Borosil s Scientific Gooch Crucible with sintered disc",
+    "image": "product_126.jpeg",
+    "variants": [
+      {
+        "Poduct\nCode": 3206127,
+        "null": NaN,
+        "Approx\nO.D. x Length": "27x150",
+        "Quantity\nPer Case": 5.0,
+        "Price /Piece\n": 225.0
+      },
+      {
+        "Poduct\nCode": 3206136,
+        "null": NaN,
+        "Approx\nO.D. x Length": "36x160",
+        "Quantity\nPer Case": 5.0,
+        "Price /Piece\n": 320.0
+      },
+      {
+        "Poduct\nCode": 3206156,
+        "null": NaN,
+        "Approx\nO.D. x Length": "56x170",
+        "Quantity\nPer Case": 10.0,
+        "Price /Piece\n": 475.0
+      },
+      {
+        "Poduct\nCode": "These are suitable for use with our filtering crucibles Gooch Tyoe with sinte\u2039ed disc, No. 32060 lower part 8 mm O D. x 75 mm length !n all sizes.",
+        "null": NaN,
+        "Approx\nO.D. x Length": null,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": NaN
+      },
+      {
+        "Poduct\nCode": "8OROSIL\n\u20ac1 F? Ig    I I\u201c I L       an ISO 9001: 2015 certified company     PRICES EXCLUSIVE OF TAXES     For products listed on this page use HSN code 70179090",
+        "null": 203.0,
+        "Approx\nO.D. x Length": null,
+        "Quantity\nPer Case": NaN,
+        "Price /Piece\n": NaN
+      }
+    ]
+  },
+  {
+    "code": "1000",
+    "name": "LOW FORM BEAKER",
+    "description": "1000 - LOW FORM BEAKER With Spout \u2022   Complies with IS 2619 /ISO 3819 and DIN 12331    with ISI Mark \u2022   The spout design enables clean and precise pouring \u2022   Graduated  to indicate the approximate content \u2022   Uniform   wall   thickness   distribution   improves   mechanical   &   thermal properties  & makes it ideal  for heating liquids \u2022   The easy-to-read  scale and large labelling field makes marking easier \u2022   High resistance to chemical attack",
+    "image": "product_129.png",
+    "variants": [
+      {
+        "Poduct Code": "1000005",
+        "Capacity ml": "5*",
+        "Approx\nO.D. x Height": "22 x 30",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 155.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000006",
+        "Capacity ml": "10 *",
+        "Approx\nO.D. x Height": "26 x 35",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 155.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000009",
+        "Capacity ml": 25,
+        "Approx\nO.D. x Height": "34 x 50",
+        "Quantity Per Case": 60,
+        "Price /Piece T": 155.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D12",
+        "Capacity ml": 50,
+        "Approx\nO.D. x Height": "42 x 60",
+        "Quantity Per Case": 60,
+        "Price /Piece T": 110.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D16",
+        "Capacity ml": 100,
+        "Approx\nO.D. x Height": "50 x 70",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 110.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D18",
+        "Capacity ml": 150,
+        "Approx\nO.D. x Height": "60 x 80",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 110.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D21",
+        "Capacity ml": 250,
+        "Approx\nO.D. x Height": "70 x 95",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 120.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D23",
+        "Capacity ml": 400,
+        "Approx\nO.D. x Height": "80 x 110",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 190.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D24",
+        "Capacity ml": 500,
+        "Approx\nO.D. x Height": "83 x 115",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 185.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D25",
+        "Capacity ml": 600,
+        "Approx\nO.D. x Height": "90 x 125",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 260.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D28",
+        "Capacity ml": 800,
+        "Approx\nO.D. x Height": "100 x 135",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 375.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D29",
+        "Capacity ml": 1000,
+        "Approx\nO.D. x Height": "105 x 145",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 375.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D30",
+        "Capacity ml": 2000,
+        "Approx\nO.D. x Height": "130 x 185",
+        "Quantity Per Case": 6,
+        "Price /Piece T": 765.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D31",
+        "Capacity ml": 3000,
+        "Approx\nO.D. x Height": "150 x 210",
+        "Quantity Per Case": null,
+        "Price /Piece T": 2065.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D33",
+        "Capacity ml": 5000,
+        "Approx\nO.D. x Height": "170 x 270",
+        "Quantity Per Case": null,
+        "Price /Piece T": 3030.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1000D38",
+        "Capacity ml": 10000,
+        "Approx\nO.D. x Height": "220 x 350",
+        "Quantity Per Case": null,
+        "Price /Piece T": 9730.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "* 3 m  and 10 ml Beakers are not g aduated",
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece T": null,
+        "null": null
+      },
+      {
+        "Poduct Code": "1040 - TALL FORM BEAKER\nWithout Spout\n\u2022   Complies with IS 2619 / ISO 3819 and DIN 12331\n\u2022   Graduated  to indicate the approximate coc\\en\\\n\u2022   Uniform   wall   thickness   distribution   improves   mechanical   &  thermal properties & makes it ideal  for heating liquids\n\u2022   The easy-to-read scale and large labelling field makes marking easier\n\u2022   High resistance to chemical attack\n\u2022   \\dea\\ for titrations",
+        "Capacity ml": null,
+        "Approx\nO.D. x Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece T": null,
+        "null": null
+      },
+      {
+        "Poduct Code": "Poduct Code",
+        "Capacity ml": "Capacity ml",
+        "Approx\nO.D. x Height": "Approx\nO.D. x Height",
+        "Quantity Per Case": "Quantity Per Case",
+        "Price /Piece T": "Price /Piece T",
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "1040",
+    "name": "TALL FORM BEAKER",
+    "description": "1040 - TALL FORM BEAKER Without Spout \u2022   Complies with IS 2619 / ISO 3819 and DIN 12331 \u2022   Graduated  to indicate the approximate coc\\en\\ \u2022   Uniform   wall   thickness   distribution   improves   mechanical   &  thermal properties & makes it ideal  for heating liquids \u2022   The easy-to-read scale and large labelling field makes marking easier \u2022   High resistance to chemical attack \u2022   \\dea\\ for titrations",
+    "image": "product_13.png",
+    "variants": [
+      {
+        "Poduct Code": "4040042",
+        "Capacity ml": 50.0,
+        "Approx\nO.D. x Height": "38x70",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 160.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "404006",
+        "Capacity ml": 400.0,
+        "Approx\nO.D. x Height": "S0x80",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 165.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1040018",
+        "Capacity ml": 450.0,
+        "Approx\nO.D. x Height": null,
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 170.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "4040024",
+        "Capacity ml": 250.0,
+        "Approx\nO.D. x Height": "60x120",
+        "Quantity Per Case": "A0",
+        "Price /Piece T": 180.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1040024",
+        "Capacity ml": 500.0,
+        "Approx\nO.D. x Height": "80x440",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 260.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "4040025",
+        "Capacity ml": 600.0,
+        "Approx\nO.D. x Height": "80x150",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 335.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1040028",
+        "Capacity ml": 800.0,
+        "Approx\nO.D. x Height": "90 x475",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 410.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "1040029",
+        "Capacity ml": 4000.0,
+        "Approx\nO.D. x Height": "9Sx480",
+        "Quantity Per Case": 20,
+        "Price /Piece T": 500.0,
+        "null": null
+      },
+      {
+        "Poduct Code": "BOROSIL\n':  ' *\u201c I I I |     l L.       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090                         27",
+        "Capacity ml": NaN,
+        "Approx\nO.D. x Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece T": NaN,
+        "null": null
+      },
+      {
+        "Poduct Code": "1500 - REAGENT BOTTLES\nNarrow Mouth With I/C Glass Stopper\n\u2022   Complies with IS 1388 (P art II)  ISO 4796    2\n\u2022   Supplied with solid glass stopper\n\u2022   Printed with graduations using a durable white enamel\n\u2022   Boyles are mechanically strong and chemical resistant with a sturdy ground neck",
+        "Capacity ml": NaN,
+        "Approx\nO.D. x Height": null,
+        "Quantity Per Case": null,
+        "Price /Piece T": NaN,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "1501",
+    "name": "REAGENT BOTTLES",
+    "description": "1501 - REAGENT BOTTLES Narrow Mouth With Screw Cap \u2022   Compies with  S 1388 (P at   )ISO 4796   1 \u2022   Supplied  with  screw  caps  and  pouring  ring  made  of  polypropylene, autoclavable at 121\u00b0C \u2022   Printed with graduations  and retrace code using a durable white enamel \u2022   100 ml to 20000 ml Bottles have unifor m GL 45 thread \u2022   Mechanically  strong and chemical resistant \u2022   Ideal for storage of chemicals, reagents, media",
+    "image": "product_131.jpeg",
+    "variants": [
+      {
+        "Product Code": 1501006,
+        "Capacity ml": "10**#",
+        "Approx O.D. x Height*": "36x50",
+        "Thread Specification": "GL25",
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 585.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501009,
+        "Capacity ml": "25#",
+        "Approx O.D. x Height*": "36x70",
+        "Thread Specification": "GL25",
+        "Quantity Per Case": 20.0,
+        "Price /Piece T": 390.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501012,
+        "Capacity ml": 50,
+        "Approx O.D. x Height*": "46x87",
+        "Thread Specification": "GL32",
+        "Quantity Per Case": 20.0,
+        "Price /Piece T": 480.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501016,
+        "Capacity ml": 100,
+        "Approx O.D. x Height*": "56x100",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 425.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501018,
+        "Capacity ml": "150**",
+        "Approx O.D. x Height*": "60x120",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 505.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501021,
+        "Capacity ml": 250,
+        "Approx O.D. x Height*": "70x138",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 435.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501024,
+        "Capacity ml": 500,
+        "Approx O.D. x Height*": "86x177",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 480.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501029,
+        "Capacity ml": 1000,
+        "Approx O.D. x Height*": "101x225",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 735.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501030,
+        "Capacity ml": 2000,
+        "Approx O.D. x Height*": "136x260",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 1315.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501031,
+        "Capacity ml": "3000**",
+        "Approx O.D. x Height*": "158x295",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 2.0,
+        "Price /Piece T": 6800.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501033,
+        "Capacity ml": "5000***",
+        "Approx O.D. x Height*": "181x316",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 1.0,
+        "Price /Piece T": 7675.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501038,
+        "Capacity ml": "10000***",
+        "Approx O.D. x Height*": "235x410",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 1.0,
+        "Price /Piece T": 12665.0,
+        "null": null
+      },
+      {
+        "Product Code": 1501040,
+        "Capacity ml": "20000***",
+        "Approx O.D. x Height*": "296x505",
+        "Thread Specification": "GL45",
+        "Quantity Per Case": 1.0,
+        "Price /Piece T": 23680.0,
+        "null": null
+      },
+      {
+        "Product Code": "- *He!g ht Andhated is of Bottle on y\n- #Without Pouring Ring\n- **Not covered in any standard\n- ***/\\s Der Borosil Scientific  Dimension",
+        "Capacity ml": null,
+        "Approx O.D. x Height*": null,
+        "Thread Specification": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece T": NaN,
+        "null": null
+      },
+      {
+        "Product Code": "BOROSIL\n':  ' *\u201c  I I I  |      lL.        an ISO 9001: 2015 certified company       PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090                           33",
+        "Capacity ml": null,
+        "Approx O.D. x Height*": null,
+        "Thread Specification": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece T": NaN,
+        "null": null
+      },
+      {
+        "Product Code": "1509 - REAGENT BOTTLES\nNarrow Mouth With I/C Glass Stopper, Amber\n\u2022   Complies with IS 1388 (P art II), ISO 4796    2\n\u2022   Supplied with solid glass stopper\n\u2022   Printed with graduations using a durable white enamel\n\u2022   Bottles     are    mechanically     strong     and    chemical     resistant     with a sturdy ground neck\n\u2022   Uniform   amber   colour   protects   media   from   light   radiation   with   a wave-length between 300 nm and 500 nm\n\u2022   Ideal  for use  with  light-sensitive media  and  for the long-term  storage  of\nsubstances",
+        "Capacity ml": null,
+        "Approx O.D. x Height*": null,
+        "Thread Specification": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece T": NaN,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "*Height indicated !s of Bottle only",
+    "name": "*Height indicated !s of Bottle only",
+    "description": "*Height indicated !s of Bottle only **60 & 125 ml is not covered in standards 1519 - REAGENT BOTTLES Narrow Mouth With Screw Cap, Amber \u2022   Complies with IS 1388 (P art I)  ISO 4796   1 \u2022   Supplied  with  screw  caps  and  pouring  ring  made  of  polypropylene, autoclavable  at   23\u00b0C \u2022   Printed with graduations  and retrace code using a durable white enamel \u2022   100 ml to 20000 ml Bottles have unifor m GL 45 thread \u2022   Mechanically  strong and chemical resistant \u2022   Uniform   amber   colour   protects   media   from   light   radiation   with   a wave-length between 300 nm and 500 nm \u2022   Ideal  for use  with  light sensitive  media  and  for the long  term storage  of substances - *He!g ht Andhated is of Bottle on y #Without Pouring rings **Not covered !n any standard ***As pe  BOROS L Scientific d!mens!ons",
+    "image": "product_132.jpeg",
+    "variants": [
+      {
+        "Product Code": 1519006,
+        "Capacity ml": "10**#",
+        "Approx O.D. x Height*": "36x50",
+        "Thread Specification": "GL25",
+        "null": null,
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 740.0
+      },
+      {
+        "Product Code": 1519009,
+        "Capacity ml": "25#",
+        "Approx O.D. x Height*": "36x70",
+        "Thread Specification": "GL25",
+        "null": null,
+        "Quantity Per Case": 20.0,
+        "Price /Piece T": 625.0
+      },
+      {
+        "Product Code": 1519012,
+        "Capacity ml": "50#",
+        "Approx O.D. x Height*": "46x87",
+        "Thread Specification": "GL32",
+        "null": null,
+        "Quantity Per Case": 20.0,
+        "Price /Piece T": 725.0
+      },
+      {
+        "Product Code": 1519016,
+        "Capacity ml": 100,
+        "Approx O.D. x Height*": "56x100",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 750.0
+      },
+      {
+        "Product Code": 1519021,
+        "Capacity ml": 250,
+        "Approx O.D. x Height*": "70x138",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 790.0
+      },
+      {
+        "Product Code": 1519024,
+        "Capacity ml": 500,
+        "Approx O.D. x Height*": "86x177",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 945.0
+      },
+      {
+        "Product Code": 1519029,
+        "Capacity ml": 1000,
+        "Approx O.D. x Height*": "101x225",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 1235.0
+      },
+      {
+        "Product Code": 1519030,
+        "Capacity ml": 2000,
+        "Approx O.D. x Height*": "136x260",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 10.0,
+        "Price /Piece T": 2315.0
+      },
+      {
+        "Product Code": 1519031,
+        "Capacity ml": "3000**",
+        "Approx O.D. x Height*": "158x295",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 2.0,
+        "Price /Piece T": 12360.0
+      },
+      {
+        "Product Code": 1519033,
+        "Capacity ml": "5000***",
+        "Approx O.D. x Height*": "183 x316",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 1.0,
+        "Price /Piece T": 12760.0
+      },
+      {
+        "Product Code": 1519038,
+        "Capacity ml": "10000***",
+        "Approx O.D. x Height*": "235x410",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 1.0,
+        "Price /Piece T": 18570.0
+      },
+      {
+        "Product Code": 1519040,
+        "Capacity ml": "20000***",
+        "Approx O.D. x Height*": "296x 500",
+        "Thread Specification": "GL45",
+        "null": null,
+        "Quantity Per Case": 1.0,
+        "Price /Piece T": 33575.0
+      },
+      {
+        "Product Code": "':  ' \u2022\u201c 11 I  I '\u201d l f.       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES      For products listed on this page use HSN code 70179090",
+        "Capacity ml": null,
+        "Approx O.D. x Height*": null,
+        "Thread Specification": null,
+        "null": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece T": NaN
+      },
+      {
+        "Product Code": "1624 - RELATIVE DENSITY BOTTLES\n(Pyknometer) With I/C PTFE Stoppper With Class A Certificate\n\u2022  Supplied with I/C PTFE (Teflon) stopper\n\u2022  These bottles are mechanically stronp and chemical resistant\n\u2022  All sizes have a durable matt-finished enamelled area for marking\n\u2022  Provided with certificate",
+        "Capacity ml": null,
+        "Approx O.D. x Height*": null,
+        "Thread Specification": null,
+        "null": null,
+        "Quantity Per Case": NaN,
+        "Price /Piece T": NaN
+      }
+    ]
+  },
+  {
+    "code": "1625",
+    "name": "RELATIVE DENSITY BOTTLES",
+    "description": "1625 - RELATIVE DENSITY BOTTLES (Pyknometer) With I/C PTFE Stoppper \u2022  Supplied with I/C PTFE (Teflon) stopper \u2022  Complies with IS 5717, DIN / ISO 3507 \u2022  These bottles are mechanically stronp and chemical resistant \u2022  All sizes have a durable matt-finished enamelled area for marking",
+    "image": "product_135.jpeg",
+    "variants": [
+      {
+        "Product\nCode": 1625006,
+        "Capacity ml": 40,
+        "Capacity Tolerance\n+ ml": 1,
+        "Max. Body Dia x Height": "29xd8",
+        "Size of Inter- Changeable Stopper": "10/4S",
+        "Quantity Per Case": 10,
+        "Price / Piece Z": 655.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 1625009,
+        "Capacity ml": 25,
+        "Capacity Tolerance\n+ ml": 2,
+        "Max. Body Dia x Height": "40x5S",
+        "Size of Inter- Changeable Stopper": "40/4S",
+        "Quantity Per Case": 10,
+        "Price / Piece Z": 725.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 1625012,
+        "Capacity ml": 50,
+        "Capacity Tolerance\n+ ml": 3,
+        "Max. Body Dia x Height": "S0x65",
+        "Size of Inter- Changeable Stopper": "10/15",
+        "Quantity Per Case": 5,
+        "Price / Piece Z": 775.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "1627 -  SPECIFIC GRAVITY BOTTLES (PYKNOMETER)\nWith Thermometer And Capillary Side Tube\n\u2022  Complies with IS 5717, DIN / ISO 3507\n\u2022  These bottles are mechanically  stronp and chemical resistant\n\u2022  All sizes have a durable matt-finished enamelled area for marking\n\u2022  Supplied with thermometer alongwith certificate for thermometer",
+        "Capacity ml": null,
+        "Capacity Tolerance\n+ ml": null,
+        "Max. Body Dia x Height": null,
+        "Size of Inter- Changeable Stopper": null,
+        "Quantity Per Case": null,
+        "Price / Piece Z": null,
+        "null": null
+      },
+      {
+        "Product\nCode": "Product\nCode",
+        "Capacity ml": "Capacity\nml",
+        "Capacity Tolerance\n+ ml": "Tolerance\n+ ml",
+        "Max. Body Dia x Height": "Max. Body Dia x Height",
+        "Size of Inter- Changeable Stopper": "Size of\nI/C Stopper",
+        "Quantity Per Case": "Quantity\nPer Case",
+        "Price / Piece Z": "Price /\nPiece\n\u00a2",
+        "null": null
+      },
+      {
+        "Product\nCode": 1627006,
+        "Capacity ml": 10,
+        "Capacity Tolerance\n+ ml": 1,
+        "Max. Body Dia x Height": "29 x 48",
+        "Size of Inter- Changeable Stopper": "10 /19",
+        "Quantity Per Case": 5,
+        "Price / Piece Z": 1865.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 1627009,
+        "Capacity ml": 25,
+        "Capacity Tolerance\n+ ml": 2,
+        "Max. Body Dia x Height": "40 x SP",
+        "Size of Inter- Changeable Stopper": "10 / 19",
+        "Quantity Per Case": 5,
+        "Price / Piece Z": 2185.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "16 2701 2",
+        "Capacity ml": 50,
+        "Capacity Tolerance\n+ ml": 3,
+        "Max. Body Dia x Height": "50 x 65",
+        "Size of Inter- Changeable Stopper": "10 / 19",
+        "Quantity Per Case": 5,
+        "Price / Piece Z": 2370.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "40              BOROSIL\u201d-r\nI C       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES  |  For products listed on this page use HSN code 70179090",
+        "Capacity ml": null,
+        "Capacity Tolerance\n+ ml": null,
+        "Max. Body Dia x Height": null,
+        "Size of Inter- Changeable Stopper": null,
+        "Quantity Per Case": null,
+        "Price / Piece Z": null,
+        "null": null
+      }
+    ]
+  },
+  {
+    "code": "1627",
+    "name": "SPECIFIC GRAVITY BOTTLES (PYKNOMETER)",
+    "description": "1627 -  SPECIFIC GRAVITY BOTTLES (PYKNOMETER) With Thermometer And Capillary Side Tube \u2022  Complies with IS 5717, DIN / ISO 3507 \u2022  These bottles are mechanically  stronp and chemical resistant \u2022  All sizes have a durable matt-finished enamelled area for marking \u2022  Supplied with thermometer alongwith certificate for thermometer",
+    "image": "product_136.jpeg",
+    "variants": [
+      {
+        "Product\nCode": 1627006,
+        "Capacity\nml": 10.0,
+        "Tolerance\n+ ml": 1.0,
+        "Max. Body Dia x Height": "29 x 48",
+        "Size of\nI/C Stopper": "10 /19",
+        "Quantity\nPer Case": 5.0,
+        "Price /\nPiece\n\u00a2": 1865.0,
+        "null": null
+      },
+      {
+        "Product\nCode": 1627009,
+        "Capacity\nml": 25.0,
+        "Tolerance\n+ ml": 2.0,
+        "Max. Body Dia x Height": "40 x SP",
+        "Size of\nI/C Stopper": "10 / 19",
+        "Quantity\nPer Case": 5.0,
+        "Price /\nPiece\n\u00a2": 2185.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "16 2701 2",
+        "Capacity\nml": 50.0,
+        "Tolerance\n+ ml": 3.0,
+        "Max. Body Dia x Height": "50 x 65",
+        "Size of\nI/C Stopper": "10 / 19",
+        "Quantity\nPer Case": 5.0,
+        "Price /\nPiece\n\u00a2": 2370.0,
+        "null": null
+      },
+      {
+        "Product\nCode": "40              BOROSIL\u201d-r\nI C       an ISO 9001: 2015 certified company      PRICES EXCLUSIVE OF TAXES  |  For products listed on this page use HSN code 70179090",
+        "Capacity\nml": NaN,
+        "Tolerance\n+ ml": NaN,
+        "Max. Body Dia x Height": null,
+        "Size of\nI/C Stopper": null,
+        "Quantity\nPer Case": NaN,
+        "Price /\nPiece\n\u00a2": NaN,
+        "null": null
+      }
+    ]
+  }
+]
