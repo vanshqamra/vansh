@@ -7,8 +7,14 @@ import { useToast } from "@/hooks/use-toast"
 import { labSupplyBrands } from "@/lib/data"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import qualigensProducts from "@/lib/qualigens-products"
+import rankemProducts from "@/lib/rankem_products.json"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+
+// Modify Rankem brand title to Avantor
+if (labSupplyBrands.rankem) {
+  labSupplyBrands.rankem.name = "Avantor"
+}
 
 // Types
 
@@ -35,7 +41,7 @@ export default function BrandPage({ params }: Props) {
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const productsPerPage = 12
+  const productsPerPage = 50
 
   let grouped: GroupedProduct[] = []
 
@@ -63,44 +69,40 @@ export default function BrandPage({ params }: Props) {
     "Dia of Disc mm": ["dia_of_disc_mm", "dia_disc"],
     "Neck Stopper Size": ["neck_stopper_size"],
     "Approx Height Neck Stopper Size": ["approx_height_neck_stopper_size"],
-    "Capacity Tolerance + ml Max. Body Dia x Height": ["capacity_tolerance_max_body_dia_height"]
+    "Capacity Tolerance + ml Max. Body Dia x Height": ["capacity_tolerance_max_body_dia_height"],
+    "Cat No": ["catno", "cat_no"],
+    "List Price 2025(INR)": ["listprice", "price"]
   }
 
-  if (brandKey === "borosil") {
-    grouped = borosilProducts.map((group, idx) => {
+  const parseGroups = (source: any[]) => {
+    return source.map((group: any, idx: number) => {
       const specs = group.specs_headers || []
-
       const variants = (group.variants || []).map((variant: Variant) => {
         const mapped: Variant = {}
         Object.entries(variant).forEach(([k, v]) => {
           mapped[k] = String(v)
           mapped[normalizeKey(k)] = String(v)
         })
-        return mapped
-      })
-
-      const displayVariants = variants.map((v: Variant) => {
         const row: Variant = {}
         specs.forEach(header => {
           const norm = normalizeKey(header)
           const matchKeys = headerKeyMap[header] || [norm]
-          row[header] = matchKeys.map(k => v[k]).find(val => val) || ""
+          row[header] = matchKeys.map(k => mapped[k]).find(val => val) || ""
         })
         return row
       })
-
-      const title = group.product?.trim() || group.title?.trim() || ""
-      const category = group.category?.trim() || ""
-      const fallbackTitle = title || category || `Product Group ${idx + 1}`
-
       return {
-        category,
-        title: fallbackTitle,
-        description: group.description?.trim() || "",
+        category: group.category?.trim() || `Group ${idx + 1}`,
+        title: group.title?.trim() || `Group ${idx + 1}`,
+        description: group.description || "",
         specs_headers: specs,
-        variants: displayVariants,
+        variants: variants
       }
-    }).filter((g) => g.variants.length > 0)
+    }).filter(g => g.variants.length > 0)
+  }
+
+  if (brandKey === "borosil") {
+    grouped = parseGroups(borosilProducts)
   } else if (brandKey === "qualigens") {
     grouped = [
       {
@@ -111,13 +113,41 @@ export default function BrandPage({ params }: Props) {
         variants: qualigensProducts.map((p: any) => ({
           "Product Code": p.code || "",
           "Pack Size": p.packSize || "",
-          "Price": p.price || "",
-        })),
-      },
+          "Price": p.price || ""
+        }))
+      }
     ]
+  } else if (brandKey === "rankem") {
+    const allVariants = rankemProducts[0]?.variants || []
+    const specs = rankemProducts[0]?.specs_headers || []
+    const paginatedVariants = allVariants.slice(
+      (currentPage - 1) * productsPerPage,
+      currentPage * productsPerPage
+    ).map((variant: Variant) => {
+      const mapped: Variant = {}
+      Object.entries(variant).forEach(([k, v]) => {
+        mapped[k] = String(v)
+        mapped[normalizeKey(k)] = String(v)
+      })
+      const row: Variant = {}
+      specs.forEach(header => {
+        const norm = normalizeKey(header)
+        const matchKeys = headerKeyMap[header] || [norm]
+        row[header] = matchKeys.map(k => mapped[k]).find(val => val) || ""
+      })
+      return row
+    })
+
+    grouped = [{
+      category: "Avantor",
+      title: "Avantor Products",
+      description: "",
+      specs_headers: specs,
+      variants: paginatedVariants
+    }]
   }
 
-  const filtered = grouped.filter((group) => {
+  const filtered = grouped.filter(group => {
     const term = searchTerm.toLowerCase()
     return (
       group.title?.toLowerCase().includes(term) ||
@@ -127,11 +157,9 @@ export default function BrandPage({ params }: Props) {
     )
   })
 
-  const totalPages = Math.ceil(filtered.length / productsPerPage)
-  const paginatedGroups = filtered.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  )
+  const totalPages = brandKey === "rankem"
+    ? Math.ceil((rankemProducts[0]?.variants?.length || 0) / productsPerPage)
+    : Math.ceil(filtered.length / productsPerPage)
 
   const handleAdd = (variant: Variant, group: GroupedProduct) => {
     if (!isLoaded) {
@@ -148,17 +176,22 @@ export default function BrandPage({ params }: Props) {
       return
     }
 
+    const nameParts = [
+      `Cat No: ${variant["Cat No"] || variant["Product Code"] || variant["code"] || ""}`,
+      ...group.specs_headers.map(h => `${h}: ${variant[h] || "—"}`)
+    ]
+
     try {
       addItem({
-        id: variant["Product Code"] || variant["code"] || "",
-        name: `${group.title}\n${group.description || ""}\n${group.specs_headers.map(h => `${h}: ${variant[h] || "—"}`).join(" | ")}`,
+        id: variant["Product Code"] || variant["code"] || variant["Cat No"] || "",
+        name: nameParts.join("\n"),
         price: numericPrice,
         brand: brand.name,
         category: group.category,
         packSize: variant["Pack Size"] || variant["capacity_ml"] || "",
-        material: "",
+        material: ""
       })
-      toast({ title: "Added to Cart", description: `${group.title} added successfully.` })
+      toast({ title: "Added to Cart", description: `${variant["Description"] || group.title} added successfully.` })
     } catch (err) {
       console.error(err)
       toast({ title: "Error", description: "Failed to add item.", variant: "destructive" })
@@ -176,7 +209,7 @@ export default function BrandPage({ params }: Props) {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {paginatedGroups.map((group, index) => (
+      {filtered.map((group, index) => (
         <div key={`${group.title}-${index}`} className="mb-12">
           <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">{group.category}</h3>
           <h2 className="text-xl font-bold text-blue-700 mb-2">{group.title}</h2>
@@ -218,16 +251,22 @@ export default function BrandPage({ params }: Props) {
       ))}
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <Button
-              key={index}
-              variant={currentPage === index + 1 ? "default" : "outline"}
-              onClick={() => setCurrentPage(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
+        <div className="flex justify-center gap-2 mt-8 overflow-x-auto max-w-full">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </Button>
+          <span className="px-4 py-2 text-sm">Page {currentPage} of {totalPages}</span>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
         </div>
       )}
 
