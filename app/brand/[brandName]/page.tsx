@@ -1,75 +1,144 @@
-// app/brand/[brandName]/page.tsx
 "use client"
 
 import { useState } from "react"
 import { notFound } from "next/navigation"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import qualigensProducts from "@/lib/qualigens-products"
 import { labSupplyBrands } from "@/lib/data"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import borosilProducts from "@/lib/borosil_products_absolute_final.json"
+import qualigensProducts from "@/lib/qualigens-products"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+// Types
+
 type Props = { params: { brandName: string } }
+
+type Variant = {
+  [key: string]: string
+}
+
+type GroupedProduct = {
+  category: string
+  title: string
+  description?: string
+  specs_headers: string[]
+  variants: Variant[]
+}
 
 export default function BrandPage({ params }: Props) {
   const brandKey = params.brandName as keyof typeof labSupplyBrands
   const brand = labSupplyBrands[brandKey]
   if (!brand) notFound()
 
-  // Normalize qualigensProducts into an array when brandKey === "qualigens"
-  const rawData = brandKey === "qualigens" ? (qualigensProducts as any) : {}
-  const productsArray: any[] = Array.isArray(rawData)
-    ? rawData
-    : Array.isArray(Object.values(rawData))
-    ? Object.values(rawData)
-    : []
-
-  const [searchTerm, setSearchTerm] = useState("")
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
+  const [searchTerm, setSearchTerm] = useState("")
 
-  // Filter by code, CAS, or name (adjust destructuring if needed)
-  const filtered = productsArray.filter((prod) => {
-    // prod may be an array [code, cas, name, ...] or an object
-    let code: string, cas: string, name: string
-    if (Array.isArray(prod)) {
-      ;[code, cas, name] = prod
-    } else {
-      code = (prod as any).code
-      cas = (prod as any).cas
-      name = (prod as any).name
-    }
+  const normalizeKey = (key: string) =>
+    key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
+
+  const headerKeyMap: Record<string, string[]> = {
+    "Product Code": ["code", "product_code"],
+    "Diameter mm": ["diameter_mm"],
+    "Quantity Per Case": ["quantity_per_case"],
+    "Price /Piece": ["price"],
+    "Capacity ml": ["capacity_ml", "capacity"],
+    "Graduation Interval ml": ["interval_ml", "graduation_interval_ml"],
+    "Graduation Interval": ["interval_ml", "graduation_interval_ml"],
+    "Tolerance": ["tolerance_ml", "tolerance"],
+    "Tolerance ± ml": ["tolerance_ml", "tolerance"],
+    "Tolerance + ml": ["tolerance_ml", "tolerance"],
+    "Porosity Grade": ["porosity_grade"],
+    "Approx Height": ["approx_height", "height"],
+    "Stopper Size": ["stopper_size"],
+    "Neck Stopper Size": ["neck_stopper_size"],
+    "Thread Specification": ["thread_specification"],
+    "Max. Body Dia x Height": ["max_dia_height"],
+    "Size of I/C Stopper": ["ic_stopper_size"],
+    "Capacity Tolerance + ml": ["capacity_tolerance_ml"],
+    "Approx O.D. x Length": ["od_x_length"],
+    "Approx O.D. x Height": ["od_x_height"],
+    "Dia of Disc mm": ["dia_of_disc_mm", "dia_disc"],
+    "Approx Height Neck Stopper Size": ["approx_height_neck_stopper_size"],
+    "Stem Dia mm": ["stem_dia_mm"],
+    "Approx O.D.": ["od"],
+    "Approx I.D.": ["id"],
+  }
+
+  let grouped: GroupedProduct[] = []
+
+  if (brandKey === "borosil") {
+    grouped = borosilProducts.map((group, idx) => {
+      const specs = group.specs_headers || []
+
+      const variants = (group.variants || []).map((variant: Variant) => {
+        const mapped: Variant = {}
+        Object.entries(variant).forEach(([k, v]) => {
+          mapped[k] = v
+          mapped[normalizeKey(k)] = v
+        })
+        return mapped
+      })
+
+      const displayVariants = variants.map((v: Variant) => {
+        const row: Variant = {}
+        specs.forEach(header => {
+          const norm = normalizeKey(header)
+          const matchKeys = headerKeyMap[header] || [norm]
+          row[header] = matchKeys.map(k => v[k]).find(val => val) || ""
+        })
+        return row
+      })
+
+      const title = group.product?.trim() || group.title?.trim() || ""
+      const category = group.category?.trim() || ""
+      const fallbackTitle = title || category || `Product Group ${idx + 1}`
+
+      return {
+        category,
+        title: fallbackTitle,
+        description: group.description?.trim() || "",
+        specs_headers: specs,
+        variants: displayVariants,
+      }
+    }).filter((g) => g.variants.length > 0)
+  } else if (brandKey === "qualigens") {
+    grouped = [
+      {
+        category: "Qualigens",
+        title: "Qualigens Products",
+        description: "",
+        specs_headers: ["Product Code", "Pack Size", "Price"],
+        variants: qualigensProducts.map((p: any) => ({
+          "Product Code": p.code || "",
+          "Pack Size": p.packSize || "",
+          "Price": p.price || "",
+        })),
+      },
+    ]
+  }
+
+  const filtered = grouped.filter((group) => {
     const term = searchTerm.toLowerCase()
     return (
-      name.toLowerCase().includes(term) ||
-      code.toLowerCase().includes(term) ||
-      cas.includes(searchTerm)
+      group.title?.toLowerCase().includes(term) ||
+      group.variants.some((v) =>
+        Object.values(v).some(val => val?.toLowerCase().includes(term))
+      )
     )
   })
 
-  const handleAdd = (prod: any) => {
+  const handleAdd = (variant: Variant, group: GroupedProduct) => {
     if (!isLoaded) {
       toast({ title: "Loading...", description: "Please wait", variant: "destructive" })
       return
     }
 
-    // Destructure fields whether prod is array or object
-    let code: string, cas: string, name: string, packSize: string, material: string, price: any
-    if (Array.isArray(prod)) {
-      ;[code, cas, name, packSize, material, price] = prod
-    } else {
-      ;({ code, cas, name, packSize, material, price } = prod)
-    }
+    const priceKey = group.specs_headers.find(h => h.toLowerCase().includes("price")) || ""
+    const priceString = variant[priceKey] || ""
+    const numericPrice = parseFloat(priceString.replace(/[^\d.]/g, ""))
 
-    if (price === "POR") {
-      toast({ title: "Price on Request", description: "Contact us for pricing.", variant: "destructive" })
-      return
-    }
-
-    const numericPrice =
-      typeof price === "string" ? parseFloat(price.replace(/[^\d.]/g, "")) : price
     if (isNaN(numericPrice) || numericPrice <= 0) {
       toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" })
       return
@@ -77,15 +146,15 @@ export default function BrandPage({ params }: Props) {
 
     try {
       addItem({
-        id: code,
-        name,
+        id: variant["Product Code"] || variant["code"] || "",
+        name: `${group.title} (${variant["Pack Size"] || variant["capacity_ml"] || "Variant"})`,
         price: numericPrice,
         brand: brand.name,
-        category: "Lab Chemical",
-        packSize,
-        material,
+        category: group.category,
+        packSize: variant["Pack Size"] || variant["capacity_ml"] || "",
+        material: "",
       })
-      toast({ title: "Added to Cart", description: `${name} added successfully.` })
+      toast({ title: "Added to Cart", description: `${group.title} added successfully.` })
     } catch (err) {
       console.error(err)
       toast({ title: "Error", description: "Failed to add item.", variant: "destructive" })
@@ -103,37 +172,46 @@ export default function BrandPage({ params }: Props) {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((prod) => {
-          let code: string, name: string, cas: string, packSize: string, material: string, price: any, hsn: string
-          if (Array.isArray(prod)) {
-            ;[code, cas, name, packSize, material, price, hsn] = prod
-          } else {
-            ;({ code, cas, name, packSize, material, price, hsn } = prod as any)
-          }
-          return (
-            <Card key={code}>
-              <CardHeader>
-                <CardTitle className="text-lg">{name}</CardTitle>
-                <p className="text-sm text-gray-600">CAS: {cas}</p>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">Pack: {packSize}</p>
-                <p className="text-sm">Material: {material}</p>
-                <p className="text-sm">HSN: {hsn}</p>
-                <p className="font-bold text-lg mt-2">
-                  {price === "POR" ? "Price on Request" : `₹${price}`}
-                </p>
-              </CardContent>
-              <CardFooter>
-                <Button onClick={() => handleAdd(prod)} className="w-full" disabled={!isLoaded || price === "POR"}>
-                  {!isLoaded ? "Loading..." : price === "POR" ? "Contact for Price" : "Add to Cart"}
-                </Button>
-              </CardFooter>
-            </Card>
-          )
-        })}
-      </div>
+      {filtered.map((group, index) => (
+        <div key={`${group.title}-${index}`} className="mb-12">
+          <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">{group.category}</h3>
+          <h2 className="text-xl font-bold text-blue-700 mb-2">{group.title}</h2>
+          {group.description && (
+            <p className="text-sm text-gray-600 whitespace-pre-line mb-4">{group.description}</p>
+          )}
+
+          <div className="overflow-auto border rounded mb-4">
+            <table className="min-w-full text-sm text-left text-gray-700">
+              <thead className="bg-gray-100 text-xs uppercase font-semibold">
+                <tr>
+                  {group.specs_headers.map((header, i) => (
+                    <th key={i} className="px-3 py-2 whitespace-nowrap">{header}</th>
+                  ))}
+                  <th className="px-3 py-2 whitespace-nowrap"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.variants.map((variant, i) => (
+                  <tr key={i} className="border-t">
+                    {group.specs_headers.map((key, j) => (
+                      <td key={j} className="px-3 py-2 whitespace-nowrap">{variant[key] || "—"}</td>
+                    ))}
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <Button
+                        onClick={() => handleAdd(variant, group)}
+                        disabled={!isLoaded}
+                        className="text-xs"
+                      >
+                        Add to Cart
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
 
       {filtered.length === 0 && (
         <div className="text-center py-12">

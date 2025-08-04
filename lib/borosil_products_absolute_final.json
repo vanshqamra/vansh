@@ -1,0 +1,3314 @@
+[
+  {
+    "product": "BURETTES WITH BOROFLO STOPCOCK, CLASS A",
+    "description": "Complies with IS 1997 / ISO 385, Accuracy as per class A. Supplied with Boroflo stopcock. No lubrication required. Calibrated & certified at 27\u00b0C and supplied with certificate of calibration traceable to National standards. Generally used in titration process.",
+    "variants": [
+      {
+        "code": "2121006",
+        "capacity_ml": 10,
+        "graduation_interval_ml": 0.05,
+        "tolerance_ml": 0.03,
+        "quantity_per_case": 5,
+        "price": 2435.0
+      },
+      {
+        "code": "2121U06*",
+        "capacity_ml": 10,
+        "graduation_interval_ml": 0.05,
+        "tolerance_ml": 0.02,
+        "quantity_per_case": 5,
+        "price": 2460.0
+      },
+      {
+        "code": "2121009",
+        "capacity_ml": 25,
+        "graduation_interval_ml": 0.1,
+        "tolerance_ml": 0.05,
+        "quantity_per_case": 5,
+        "price": 2510.0
+      },
+      {
+        "code": "2121U09*",
+        "capacity_ml": 25,
+        "graduation_interval_ml": 0.1,
+        "tolerance_ml": 0.03,
+        "quantity_per_case": 5,
+        "price": 2615.0
+      },
+      {
+        "code": "2121012",
+        "capacity_ml": 50,
+        "graduation_interval_ml": 0.1,
+        "tolerance_ml": 0.05,
+        "quantity_per_case": 5,
+        "price": 2855.0
+      },
+      {
+        "code": "2121016",
+        "capacity_ml": 100,
+        "graduation_interval_ml": 0.2,
+        "tolerance_ml": 0.4,
+        "quantity_per_case": 5,
+        "price": 4010.0
+      }
+    ],
+    "notes": "Accuracy as per ASTM E287-2 and calibrated at 20\u00b0C. 30 ml and 00 ml capacities comply with ISO and ASTM standards.",
+    "title": "Untitled Group 1",
+    "specs_headers": [
+      "code",
+      "capacity_ml",
+      "graduation_interval_ml",
+      "tolerance_ml",
+      "quantity_per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "BURETTES WITH BOROFLO STOPCOCK, CLASS B",
+    "description": "Complies with IS 1997 / ISO 385, Accuracy as per class B. Supplied with Boroflo stopcock. No lubrication required. Calibrated at 27\u00b0C. Generally used in titration process.",
+    "variants": [
+      {
+        "code": "2422006",
+        "capacity_ml": 10,
+        "graduation_interval_ml": 0.05,
+        "tolerance_ml": 0.05,
+        "quantity_per_case": 10,
+        "price": 790.0
+      },
+      {
+        "code": "2422009",
+        "capacity_ml": 25,
+        "graduation_interval_ml": 0.1,
+        "tolerance_ml": 0.4,
+        "quantity_per_case": 10,
+        "price": 750.0
+      },
+      {
+        "code": "2422012",
+        "capacity_ml": 50,
+        "graduation_interval_ml": 0.1,
+        "tolerance_ml": 0.4,
+        "quantity_per_case": 5,
+        "price": 830.0
+      },
+      {
+        "code": "2422046",
+        "capacity_ml": 400,
+        "graduation_interval_ml": 0.2,
+        "tolerance_ml": 0.2,
+        "quantity_per_case": 5,
+        "price": 1255.0
+      }
+    ],
+    "title": "Untitled Group 2",
+    "specs_headers": [
+      "code",
+      "capacity_ml",
+      "graduation_interval_ml",
+      "tolerance_ml",
+      "quantity_per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "IMHOFF CONE - Sharp Tip",
+    "description": "\u2022 Complies with IS 7232\n\u2022 Graduated from 0 to 1 ml in 0.1 ml divisions\n\u2022 Graduated from 1 to 10 ml in 0.5 ml divisions\n\u2022 10 to 40 ml in 1 ml divisions also marked at 1000 ml\n\u2022 Facilitates the determination of the amount of sediment in sewage or industrial waste",
+    "variants": [
+      {
+        "code": "2160094",
+        "height": "",
+        "diameter": "",
+        "caseQty": "",
+        "price": "7130.00"
+      }
+    ],
+    "title": "Untitled Group 3",
+    "specs_headers": [
+      "code",
+      "height",
+      "diameter",
+      "caseQty",
+      "price"
+    ]
+  },
+  {
+    "product": "IMHOFF CONE - Blunt Tip",
+    "description": "\u2022 Complies with IS 7232\n\u2022 The blunt tip increases its ruggedness and cleaning ease\n\u2022 Ideal for use with heavy sediments where the ability to read small volumes is unimportant\n\u2022 Facilitates the determination of the amount of sediment in sewage or industrial waste",
+    "variants": [
+      {
+        "code": "2180093",
+        "height": "439",
+        "diameter": "",
+        "caseQty": "",
+        "price": "7275.00"
+      }
+    ],
+    "title": "Untitled Group 4",
+    "specs_headers": [
+      "code",
+      "height",
+      "diameter",
+      "caseQty",
+      "price"
+    ]
+  },
+  {
+    "product": "CYLINDERS, Class A, Hexagonal base, Pour out",
+    "description": "\u2022 Complies with IS 878, ISO 4788 with ISI Mark\n\u2022 Graduated, Single Metric Scale\n\u2022 Each cylinder is engraved with a unique serial number, and calibration traceable to national standards\n\u2022 Graduations in amber enamel\n\u2022 Sturdy hexagonal base prevents roll-over and ensures greater stability\n\u2022 Calibrated and certified at 27\u00b0C",
+    "variants": [
+      {
+        "code": "3024005",
+        "capacity": "5",
+        "interval": "0.04",
+        "tolerance": "0.05",
+        "caseQty": "5",
+        "price": "580.00"
+      },
+      {
+        "code": "3024006",
+        "capacity": "40",
+        "interval": "0.2",
+        "tolerance": "0.4",
+        "caseQty": "5",
+        "price": "670.00"
+      },
+      {
+        "code": "3024008",
+        "capacity": "20",
+        "interval": "0.4",
+        "tolerance": "0.25",
+        "caseQty": "10",
+        "price": "850.00"
+      },
+      {
+        "code": "3021009",
+        "capacity": "25",
+        "interval": "0.5",
+        "tolerance": "0.25",
+        "caseQty": "10",
+        "price": "765.00"
+      },
+      {
+        "code": "3021012",
+        "capacity": "50",
+        "interval": "",
+        "tolerance": "0.5",
+        "caseQty": "10",
+        "price": "930.00"
+      },
+      {
+        "code": "3021016",
+        "capacity": "100",
+        "interval": "",
+        "tolerance": "0.5",
+        "caseQty": "10",
+        "price": "1055.00"
+      },
+      {
+        "code": "3021018",
+        "capacity": "150",
+        "interval": "2",
+        "tolerance": "",
+        "caseQty": "5",
+        "price": "1400.00"
+      },
+      {
+        "code": "3021021",
+        "capacity": "250",
+        "interval": "2",
+        "tolerance": "",
+        "caseQty": "10",
+        "price": "1555.00"
+      },
+      {
+        "code": "3020400",
+        "capacity": "400",
+        "interval": "",
+        "tolerance": "25",
+        "caseQty": "5",
+        "price": "2170.00"
+      },
+      {
+        "code": "3021029",
+        "capacity": "1000",
+        "interval": "40",
+        "tolerance": "",
+        "caseQty": "4",
+        "price": "2645.00"
+      },
+      {
+        "code": "3021030",
+        "capacity": "2000",
+        "interval": "20",
+        "tolerance": "10",
+        "caseQty": "4",
+        "price": "5150.00"
+      }
+    ],
+    "title": "Untitled Group 5",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "interval",
+      "tolerance",
+      "caseQty",
+      "price"
+    ]
+  },
+  {
+    "product": "CYLINDERS, Class B, Hexagonal base, Pour out",
+    "description": "\u2022 Complies with IS 878, ISO 4788 with ISI Mark\n\u2022 Graduated, Single Metric Scale\n\u2022 Certificate of Calibration traceable to national standards\n\u2022 Graduations in amber enamel\n\u2022 Sturdy hexagonal base prevents roll-over and ensures greater stability\n\u2022 Calibrated at 27\u00b0C",
+    "variants": [
+      {
+        "code": "3022005",
+        "capacity": "5",
+        "interval": "0.04",
+        "tolerance": "0.04",
+        "caseQty": "5",
+        "price": "325.00"
+      },
+      {
+        "code": "3022006",
+        "capacity": "40",
+        "interval": "0.2",
+        "tolerance": "0.2",
+        "caseQty": "5",
+        "price": "390.00"
+      },
+      {
+        "code": "3022009",
+        "capacity": "25",
+        "interval": "0.5",
+        "tolerance": "0.5",
+        "caseQty": "30",
+        "price": "450.00"
+      },
+      {
+        "code": "3022012",
+        "capacity": "50",
+        "interval": "",
+        "tolerance": "",
+        "caseQty": "20",
+        "price": "495.00"
+      },
+      {
+        "code": "3022016",
+        "capacity": "400",
+        "interval": "",
+        "tolerance": "",
+        "caseQty": "20",
+        "price": "555.00"
+      },
+      {
+        "code": "3022018",
+        "capacity": "450",
+        "interval": "2",
+        "tolerance": "2",
+        "caseQty": "",
+        "price": "825.00"
+      },
+      {
+        "code": "3022021",
+        "capacity": "250",
+        "interval": "2",
+        "tolerance": "2",
+        "caseQty": "10",
+        "price": "1035.00"
+      },
+      {
+        "code": "3022024",
+        "capacity": "500",
+        "interval": "",
+        "tolerance": "",
+        "caseQty": "5",
+        "price": "1345.00"
+      },
+      {
+        "code": "3022029",
+        "capacity": "4000",
+        "interval": "40",
+        "tolerance": "40",
+        "caseQty": "4",
+        "price": "2040.00"
+      },
+      {
+        "code": "3022030",
+        "capacity": "2000",
+        "interval": "20",
+        "tolerance": "20",
+        "caseQty": "4",
+        "price": "3915.00"
+      }
+    ],
+    "title": "Untitled Group 6",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "interval",
+      "tolerance",
+      "caseQty",
+      "price"
+    ]
+  },
+  {
+    "product": "DESICCATOR SET With Cover & Porcelain Plate",
+    "description": "\u2022 Complies with IS 6128\n\u2022 Supplied with cover and porcelain plate, plastic knob\n\u2022 Simple design for drying under atmospheric pressure\n\u2022 Ground glass flanges\n\u2022 Plates are positioned on an internal ledge within the base\n\u2022 Generally used for drying of moist products, and for storage of moisture sensitive substances",
+    "variants": [
+      {
+        "code": "3082041",
+        "diameter": "100",
+        "volume": "120",
+        "flange_od": "153",
+        "height": "173",
+        "case_qty": "1",
+        "price": "10160.00"
+      },
+      {
+        "code": "3082042",
+        "diameter": "150",
+        "volume": "410",
+        "flange_od": "213",
+        "height": "205",
+        "case_qty": "1",
+        "price": "11860.00"
+      },
+      {
+        "code": "3082043",
+        "diameter": "200",
+        "volume": "975",
+        "flange_od": "272",
+        "height": "272",
+        "case_qty": "1",
+        "price": "16525.00"
+      },
+      {
+        "code": "3082044",
+        "diameter": "250",
+        "volume": "1825",
+        "flange_od": "333",
+        "height": "323",
+        "case_qty": "1",
+        "price": "2115.00"
+      },
+      {
+        "code": "3082045",
+        "diameter": "300",
+        "volume": "2555",
+        "flange_od": "395",
+        "height": "344",
+        "case_qty": "1",
+        "price": "29700.00"
+      }
+    ],
+    "title": "Untitled Group 7",
+    "specs_headers": [
+      "code",
+      "diameter",
+      "volume",
+      "flange_od",
+      "height",
+      "case_qty",
+      "price"
+    ]
+  },
+  {
+    "product": "VACUUM DESICCATOR SET With Cover & Porcelain Plate",
+    "description": "\u2022 Complies with IS 6128\n\u2022 Supplied with cover having stopcock with PTFE spindle, porcelain plate\n\u2022 Simple design for drying under atmospheric pressure\n\u2022 Ground glass flanges\n\u2022 Plates are positioned on an internal hedge within the base\n\u2022 Designed for use under vacuum\n\u2022 Generally used for drying of moist products, and for storage of substances",
+    "variants": [
+      {
+        "code": "3083044-1",
+        "diameter": "100",
+        "volume": "120",
+        "flange_od": "153",
+        "height": "173",
+        "case_qty": "1",
+        "price": "15560.00"
+      },
+      {
+        "code": "3083042",
+        "diameter": "150",
+        "volume": "410",
+        "flange_od": "213",
+        "height": "205",
+        "case_qty": "1",
+        "price": "23410.00"
+      },
+      {
+        "code": "3083043",
+        "diameter": "200",
+        "volume": "9",
+        "flange_od": "272",
+        "height": "22",
+        "price": "26275.00"
+      },
+      {
+        "code": "3083044-2",
+        "diameter": "250",
+        "volume": "4825",
+        "flange_od": "333",
+        "height": "323",
+        "price": "36475.00"
+      },
+      {
+        "code": "3083045",
+        "diameter": "300",
+        "volume": "2555",
+        "flange_od": "395",
+        "height": "344",
+        "case_qty": "1",
+        "price": "45825.00"
+      }
+    ],
+    "title": "Untitled Group 8",
+    "specs_headers": [
+      "code",
+      "diameter",
+      "volume",
+      "flange_od",
+      "height",
+      "case_qty",
+      "price"
+    ]
+  },
+  {
+    "product": "CRYSTALLIZING DISHES",
+    "description": "\u2022 Reinforced and fire-polished rims reduce chipping\n\u2022 Large labelling field for easy marking\n\u2022 Very high resistance to chemicals and thermal shocks\n\u2022 Ideal for crystallization and in hot/ice baths",
+    "variants": [
+      {
+        "code": "3440077",
+        "capacity": "100 x 50",
+        "price": "630.00"
+      },
+      {
+        "code": "3440084",
+        "capacity": "150 x 75",
+        "price": "1100.00"
+      },
+      {
+        "code": "3440086",
+        "capacity": "190 x 100",
+        "price": "1830.00"
+      }
+    ],
+    "title": "Untitled Group 9",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "price"
+    ]
+  },
+  {
+    "product": "PETRI DISHES (3.3 Borosilicate)",
+    "description": "\u2022 Made of 3.3 low expansion borosilicate glass\n\u2022 Complies with IS 2626\n\u2022 These dishes are clear and withstand repeated sterilisation cycles\n\u2022 Beaded edges impart greater mechanical strength\n\u2022 Specially formed to ensure even wall thickness and consistent optical performance\n\u2022 Ideal culture vessel for microbiology and plant tissue culture applications",
+    "variants": [
+      {
+        "code": "3160065",
+        "capacity": "50 x 17",
+        "price": "250.00"
+      },
+      {
+        "code": "3160072",
+        "capacity": "80 x 17",
+        "price": "320.00"
+      },
+      {
+        "code": "3160077",
+        "capacity": "100 x 17#",
+        "price": "375.00"
+      },
+      {
+        "code": "3160081",
+        "capacity": "150 x 20",
+        "price": "920.00"
+      },
+      {
+        "code": "3160087",
+        "capacity": "200 x 20",
+        "price": "1980.00"
+      }
+    ],
+    "title": "Untitled Group 10",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "price"
+    ]
+  },
+  {
+    "product": "S LINE PETRI DISHES",
+    "description": "\u2022 Made of sodalime glass\n\u2022 S-Line petri dishes with durable white enamel printing\n\u2022 Helps in quick identification of the lid and the bottom\n\u2022 Optimally clear and bubble free for making critical observations\n\u2022 Flat inner surface for uniform distribution of media\n\u2022 Ideal culture vessel for microbiology and plant tissue culture applications",
+    "variants": [
+      {
+        "code": "3165065",
+        "capacity": "50 x 12",
+        "price": "115.00"
+      },
+      {
+        "code": "3165072",
+        "capacity": "80 x 15",
+        "price": "130.00"
+      },
+      {
+        "code": "3165A75",
+        "capacity": "90 x 15",
+        "price": "130.00"
+      },
+      {
+        "code": "3165077",
+        "capacity": "100 x 15",
+        "price": "130.00"
+      },
+      {
+        "code": "3165A77",
+        "capacity": "100 x 20",
+        "price": "205.00"
+      },
+      {
+        "code": "3165081",
+        "capacity": "150 x 25",
+        "price": "315.00"
+      },
+      {
+        "code": "3165087",
+        "capacity": "200 x 30",
+        "price": "660.00"
+      }
+    ],
+    "title": "Untitled Group 11",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "price"
+    ]
+  },
+  {
+    "product": "FLAT BOTTOM FLASK (Narrow Mouth)",
+    "description": "\u2022 Complies with IS 1381 (Part - I), ISO 1773 with ISI Mark\n\u2022 Uniform wall thickness distribution makes these flasks ideal for heating\n\u2022 All sizes have a durable matt-finished enamelled area for marking",
+    "variants": [
+      {
+        "code": "4060009",
+        "capacity": "25",
+        "dimensions": "42x90",
+        "neck_od": "20",
+        "per_case": "50",
+        "price": "125.00"
+      },
+      {
+        "code": "4060012",
+        "capacity": "50",
+        "dimensions": "51x90",
+        "neck_od": "26",
+        "per_case": "50",
+        "price": "145.00"
+      },
+      {
+        "code": "406006",
+        "capacity": "100",
+        "dimensions": "64x105",
+        "neck_od": "26",
+        "per_case": "80",
+        "price": "155.00"
+      },
+      {
+        "code": "4060018",
+        "capacity": "150",
+        "dimensions": "Mx3",
+        "neck_od": "28",
+        "per_case": "10",
+        "price": "175.00"
+      },
+      {
+        "code": "4060021",
+        "capacity": "250",
+        "dimensions": "85x140",
+        "neck_od": "34",
+        "per_case": "80",
+        "price": "185.00"
+      },
+      {
+        "code": "4060022",
+        "capacity": "300",
+        "dimensions": "88x160",
+        "neck_od": "24",
+        "per_case": "20",
+        "price": "275.00"
+      },
+      {
+        "code": "4060024",
+        "capacity": "500",
+        "dimensions": "105x165",
+        "neck_od": "34",
+        "per_case": "40",
+        "price": "305.00"
+      },
+      {
+        "code": "4060029",
+        "capacity": "1000",
+        "dimensions": "131x190",
+        "neck_od": "42",
+        "per_case": "20",
+        "price": "480.00"
+      },
+      {
+        "code": "4060030",
+        "capacity": "2000",
+        "dimensions": "166x20",
+        "neck_od": "50",
+        "per_case": "2",
+        "price": "910.00"
+      },
+      {
+        "code": "4060031",
+        "capacity": "3000",
+        "dimensions": "186x300",
+        "neck_od": "50",
+        "per_case": "4",
+        "price": "2580.00"
+      },
+      {
+        "code": "4060033",
+        "capacity": "5000",
+        "dimensions": "224x320",
+        "neck_od": "58",
+        "per_case": "2",
+        "price": "3785.00"
+      },
+      {
+        "code": "4060034",
+        "capacity": "6000",
+        "dimensions": "236x31",
+        "neck_od": "65",
+        "per_case": "1",
+        "price": "5470.00"
+      },
+      {
+        "code": "4060038",
+        "capacity": "10000",
+        "dimensions": "279x360",
+        "neck_od": "65",
+        "per_case": "1",
+        "price": "8835.00"
+      },
+      {
+        "code": "4060A38",
+        "capacity": "10000",
+        "dimensions": "279x390",
+        "neck_od": "65",
+        "per_case": "1",
+        "price": "8835.00"
+      },
+      {
+        "code": "4060040",
+        "capacity": "20000",
+        "dimensions": "350x495",
+        "neck_od": "78",
+        "per_case": "1",
+        "price": "14710.00"
+      }
+    ],
+    "title": "Untitled Group 12",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "dimensions",
+      "neck_od",
+      "per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "FLAT BOTTOM FLASK (Short Neck With I/C Joint)",
+    "description": "\u2022 Uniform wall thickness distribution makes these Flasks ideal for heating\n\u2022 All sizes have a durable matt-finished enamelled area for marking\n\u2022 Equipped with interchangeable joint\n\u2022 The flat base ensures placement without a support ring\n* These are specific flasks with long neck 34/35 mount used in jewellery manufacturers",
+    "variants": [
+      {
+        "code": "4100018",
+        "capacity": "150",
+        "joint": "24/29",
+        "height": "115",
+        "per_case": "5",
+        "price": "290.00"
+      },
+      {
+        "code": "4100021",
+        "capacity": "250",
+        "joint": "24/29",
+        "height": "130",
+        "per_case": "5",
+        "price": "310.00"
+      },
+      {
+        "code": "4100024",
+        "capacity": "500",
+        "joint": "24/29",
+        "height": "160",
+        "per_case": "5",
+        "price": "465.00"
+      },
+      {
+        "code": "4100029",
+        "capacity": "1000",
+        "joint": "34/35",
+        "height": "288",
+        "per_case": "2",
+        "price": "590.00"
+      },
+      {
+        "code": "4100030",
+        "capacity": "2000",
+        "joint": "34/35",
+        "height": "321",
+        "per_case": "2",
+        "price": "1050.00"
+      },
+      {
+        "code": "4100031",
+        "capacity": "3000",
+        "joint": "34/35",
+        "height": "345",
+        "per_case": "2",
+        "price": "2865.00"
+      },
+      {
+        "code": "4100033",
+        "capacity": "5000",
+        "joint": "34/35",
+        "height": "81",
+        "per_case": "2",
+        "price": "4655.00"
+      }
+    ],
+    "title": "Untitled Group 13",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "joint",
+      "height",
+      "per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "ROUND BOTTOM FLASK (Narrow Mouth)",
+    "description": "\u2022 Complies with IS 1381 (Part I), ISO 1773 with ISI Mark\n\u2022 Uniform wall thickness distribution\n\u2022 All sizes have a durable matt-finished enamelled area for marking",
+    "variants": [
+      {
+        "code": "4260009",
+        "capacity": "25",
+        "dimensions": "42x90",
+        "neck_od": "22",
+        "per_case": "50",
+        "price": "125.00"
+      },
+      {
+        "code": "4260012",
+        "capacity": "50",
+        "dimensions": "51x95",
+        "neck_od": "26",
+        "per_case": "70",
+        "price": "140.00"
+      },
+      {
+        "code": "4260016",
+        "capacity": "100",
+        "dimensions": "64x110",
+        "neck_od": "26",
+        "per_case": "50",
+        "price": "155.00"
+      },
+      {
+        "code": "4260018",
+        "capacity": "150",
+        "dimensions": "75x137",
+        "neck_od": "28",
+        "per_case": "10",
+        "price": "175.00"
+      },
+      {
+        "code": "4260021",
+        "capacity": "250",
+        "dimensions": "85x143",
+        "neck_od": "34",
+        "per_case": "80",
+        "price": "175.00"
+      },
+      {
+        "code": "4260024",
+        "capacity": "500",
+        "dimensions": "105x168",
+        "neck_od": "34",
+        "per_case": "40",
+        "price": "305.00"
+      },
+      {
+        "code": "4260029",
+        "capacity": "1000",
+        "dimensions": "131x200",
+        "neck_od": "42",
+        "per_case": "20",
+        "price": "415.00"
+      },
+      {
+        "code": "4260030",
+        "capacity": "2000",
+        "dimensions": "166x240",
+        "per_case": "2",
+        "price": "920.00"
+      },
+      {
+        "code": "4260031",
+        "capacity": "3000",
+        "dimensions": "187x305",
+        "neck_od": "50",
+        "per_case": "2",
+        "price": "2530.00"
+      },
+      {
+        "code": "4260033",
+        "capacity": "5000",
+        "dimensions": "224x350",
+        "neck_od": "58",
+        "per_case": "2",
+        "price": "3745.00"
+      },
+      {
+        "code": "4260034",
+        "capacity": "6000",
+        "dimensions": "236x330",
+        "neck_od": "65",
+        "per_case": "1",
+        "price": "4890.00"
+      },
+      {
+        "code": "4260038",
+        "capacity": "10000",
+        "dimensions": "279x380",
+        "neck_od": "65",
+        "per_case": "1",
+        "price": "7820.00"
+      },
+      {
+        "code": "4260040",
+        "capacity": "20000",
+        "dimensions": "350x505",
+        "neck_od": "78",
+        "per_case": "1",
+        "price": "14650.00"
+      }
+    ],
+    "title": "Untitled Group 14",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "dimensions",
+      "neck_od",
+      "per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "DISTILLING FLASK",
+    "description": "With Side Arm \u2022 Complies with IS 2620 \u2022 Uniform wall thickness distribution makes these suitable for heating \u2022 Suitable for distillation process \u2022 Specification as per the Institute of Petroleum Standard No. IP 123/64",
+    "variants": [
+      {
+        "code": "4620016",
+        "capacity": "100",
+        "dimensions": "65x210",
+        "neck_od": "22",
+        "qty_per_case": "4",
+        "price": "390.00"
+      },
+      {
+        "code": "4620017",
+        "capacity": "*125",
+        "dimensions": "69x215",
+        "neck_od": "22",
+        "qty_per_case": "4",
+        "price": "385.00"
+      },
+      {
+        "code": "4620021",
+        "capacity": "250",
+        "dimensions": "87x230",
+        "neck_od": "25",
+        "qty_per_case": "4",
+        "price": "640.00"
+      },
+      {
+        "code": "4620024",
+        "capacity": "500",
+        "dimensions": "110x250",
+        "neck_od": "28",
+        "qty_per_case": "4",
+        "price": "755.00"
+      },
+      {
+        "code": "4620029",
+        "capacity": "1000",
+        "dimensions": "138x305",
+        "neck_od": "34",
+        "qty_per_case": "4",
+        "price": "910.00"
+      }
+    ],
+    "title": "Untitled Group 15",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "dimensions",
+      "neck_od",
+      "qty_per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "DISTILLING FLASK (With I/C Joint)",
+    "description": "Distilling flask with I/C joint 19/26 as per ASTM D86",
+    "variants": [
+      {
+        "code": "4621017",
+        "capacity": "125",
+        "dimensions": "69 x 218",
+        "neck_id": "19",
+        "joint": "19/26",
+        "qty_per_case": "20",
+        "price": "605.00"
+      }
+    ],
+    "title": "Untitled Group 16",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "dimensions",
+      "neck_id",
+      "joint",
+      "qty_per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "ERLENMEYER (CONICAL) FLASK",
+    "description": "Narrow Mouth, With Rim \u2022 Complies with IS 1381(P art I), DIN / ISO 1773 with ISI \u2022 Uniform wall thickness distribution makes these flasks ideal \u2022 The conical form makes them suitable for mixing liquids \u2022 The easy-to-read scale and large labelling field facilitate \u2022 Graduated from 25 ml to 5000 ml",
+    "variants": [
+      {
+        "code": "4980006",
+        "capacity": "10\u2019",
+        "dimensions": "37x60",
+        "neck_od": "15",
+        "qty_per_case": "30",
+        "price": "115.00"
+      },
+      {
+        "code": "4980009",
+        "capacity": "25",
+        "dimensions": "2x75",
+        "neck_od": "22",
+        "qty_per_case": "40",
+        "price": "120.00"
+      },
+      {
+        "code": "4980012",
+        "capacity": "0",
+        "dimensions": "Yx90",
+        "neck_od": "22",
+        "qty_per_case": "100",
+        "price": "120.00"
+      },
+      {
+        "code": "498006",
+        "capacity": "00",
+        "dimensions": "64x05",
+        "neck_od": "22",
+        "qty_per_case": "100",
+        "price": "125.00"
+      },
+      {
+        "code": "4980017",
+        "capacity": "125\u2019",
+        "dimensions": "66x110",
+        "neck_od": "28",
+        "qty_per_case": "100",
+        "price": "145.00"
+      },
+      {
+        "code": "4980018",
+        "capacity": "50\u2019",
+        "dimensions": "2i24",
+        "neck_od": "28",
+        "qty_per_case": "100",
+        "price": "150.00"
+      },
+      {
+        "code": "4980021",
+        "capacity": "20",
+        "dimensions": "85x145",
+        "neck_od": "34",
+        "qty_per_case": "40",
+        "price": "185.00"
+      },
+      {
+        "code": "4980024",
+        "capacity": "TOO",
+        "dimensions": "105 x 180",
+        "neck_od": "34",
+        "qty_per_case": "40",
+        "price": "265.00"
+      },
+      {
+        "code": "4980029",
+        "capacity": "1000",
+        "dimensions": "131x 220",
+        "neck_od": "42",
+        "qty_per_case": "20",
+        "price": "450.00"
+      },
+      {
+        "code": "4980030",
+        "capacity": "2000",
+        "dimensions": "166x280",
+        "neck_od": "52",
+        "qty_per_case": "20",
+        "price": "790.00"
+      },
+      {
+        "code": "4980031",
+        "capacity": "3000",
+        "dimensions": "187x 310",
+        "neck_od": "0",
+        "qty_per_case": "d",
+        "price": "2260.00"
+      },
+      {
+        "code": "4980033",
+        "capacity": "5000",
+        "dimensions": "220x365",
+        "neck_od": "50",
+        "qty_per_case": "2",
+        "price": "3495.00"
+      }
+    ],
+    "title": "Untitled Group 17",
+    "specs_headers": [
+      "code",
+      "capacity",
+      "dimensions",
+      "neck_od",
+      "qty_per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "5640 - VOLUMETRIC FLASKS",
+    "description": "Class A, Narrow Mouth, Clear, with Individual Calibration Certificate\n\u2022 Complies with IS 815 / DIN ISO 1042, Accuracy as per class A with IS\n\u2022 Supplied with Interchangeable Solid Glass Stopper\n\u2022 Each flask is marked with individual serial number and supplied with certificate of calibration traceable to National standards\n\u2022 Amber enamel inscriptions\n\u2022 Calibrated & certified at 27\u00b0C\n- 1 ml to 20 ml supplied with trapezoidal shape for better stability\nStopper size as per Boros\n1 ml & 2 ml without QR code",
+    "variants": [
+      {
+        "code": "5640001",
+        "capacity_ml": "1*",
+        "tolerance_ml": "0.025",
+        "stopper_size": "7/16",
+        "qty_per_case": "5",
+        "price": "1210.00"
+      },
+      {
+        "code": "5640002",
+        "capacity_ml": "2*",
+        "tolerance_ml": "0.025",
+        "stopper_size": "7/16",
+        "qty_per_case": "5",
+        "price": "1210.00"
+      },
+      {
+        "code": "5640005",
+        "capacity_ml": "5",
+        "tolerance_ml": "0.025",
+        "stopper_size": "10/19#",
+        "qty_per_case": "5",
+        "price": "1090.00"
+      },
+      {
+        "code": "5640006",
+        "capacity_ml": "10",
+        "tolerance_ml": "0.025",
+        "stopper_size": "10/19#",
+        "qty_per_case": "5",
+        "price": "945.00"
+      },
+      {
+        "code": "5640008",
+        "capacity_ml": "20",
+        "tolerance_ml": "0.04",
+        "stopper_size": "10/19",
+        "qty_per_case": "5",
+        "price": "945.00"
+      },
+      {
+        "code": "5640009",
+        "capacity_ml": "25",
+        "tolerance_ml": "0.04",
+        "stopper_size": "10/19",
+        "qty_per_case": "5",
+        "price": "875.00"
+      },
+      {
+        "code": "5640012",
+        "capacity_ml": "50",
+        "tolerance_ml": "0.06",
+        "stopper_size": "12/21",
+        "qty_per_case": "10",
+        "price": "825.00"
+      },
+      {
+        "code": "5640016",
+        "capacity_ml": "100",
+        "tolerance_ml": "0.10",
+        "stopper_size": "14/23",
+        "qty_per_case": "10",
+        "price": "805.00"
+      },
+      {
+        "code": "5640020",
+        "capacity_ml": "200",
+        "tolerance_ml": "0.15",
+        "stopper_size": "14/23",
+        "qty_per_case": "10",
+        "price": "1140.00"
+      },
+      {
+        "code": "5640021",
+        "capacity_ml": "250",
+        "tolerance_ml": "0.15",
+        "stopper_size": "14/23",
+        "qty_per_case": "10",
+        "price": "1140.00"
+      },
+      {
+        "code": "5640024",
+        "capacity_ml": "500",
+        "tolerance_ml": "0.25",
+        "stopper_size": "19/26",
+        "qty_per_case": "10",
+        "price": "1490.00"
+      },
+      {
+        "code": "5640029",
+        "capacity_ml": "1000",
+        "tolerance_ml": "0.40",
+        "stopper_size": "24/29",
+        "qty_per_case": "10",
+        "price": "2185.00"
+      },
+      {
+        "code": "5640030",
+        "capacity_ml": "2000",
+        "tolerance_ml": "0.60",
+        "stopper_size": "29/32",
+        "qty_per_case": "2",
+        "price": "3545.00"
+      },
+      {
+        "code": "5640033",
+        "capacity_ml": "5000",
+        "tolerance_ml": "1.20",
+        "stopper_size": "34/35",
+        "qty_per_case": "1",
+        "price": "15180.00"
+      }
+    ],
+    "title": "Untitled Group 18",
+    "specs_headers": [
+      "code",
+      "capacity_ml",
+      "tolerance_ml",
+      "stopper_size",
+      "qty_per_case",
+      "price"
+    ]
+  },
+  {
+    "product": "5641 - VOLUMETRIC FLASKS",
+    "description": "Class B, Narrow Mouth, Clear\n\u2022 Complies with IS 815 / DIN ISO 1042, Accuracy as per class B with IS\n\u2022 Supplied with interchangeable glass stopper\n\u2022 1 ml to 20 ml supplied with trapezoidal shape for better stability\n\u2022 Certified and Calibrated at 27\u00b0C\n# Stopper size as per Borosil Scientific Design",
+    "variants": [
+      {
+        "code": "5641001",
+        "capacity_ml": "1",
+        "tolerance_ml": "0.05",
+        "stopper_size": "7/16",
+        "qty_per_case": "10",
+        "price": "405.00"
+      },
+      {
+        "code": "5641002",
+        "capacity_ml": "2",
+        "tolerance_ml": "0.05",
+        "stopper_size": "7/16",
+        "qty_per_case": "10",
+        "price": "360.00"
+      },
+      {
+        "code": "5641005",
+        "capacity_ml": "5",
+        "tolerance_ml": "0.05",
+        "stopper_size": "10/19#",
+        "qty_per_case": "10",
+        "price": "335.00"
+      },
+      {
+        "code": "5641006",
+        "capacity_ml": "10",
+        "tolerance_ml": "0.05",
+        "stopper_size": "10/19#",
+        "qty_per_case": "10",
+        "price": "315.00"
+      },
+      {
+        "code": "5641008",
+        "capacity_ml": "20",
+        "tolerance_ml": "0.08",
+        "stopper_size": "10/19",
+        "qty_per_case": "10",
+        "price": "315.00"
+      },
+      {
+        "code": "5641009",
+        "capacity_ml": "25",
+        "tolerance_ml": "0.08",
+        "stopper_size": "10/19",
+        "qty_per_case": "10",
+        "price": "310.00"
+      },
+      {
+        "code": "5641012",
+        "capacity_ml": "50",
+        "tolerance_ml": "0.12",
+        "stopper_size": "12/21",
+        "qty_per_case": "10",
+        "price": "335.00"
+      },
+      {
+        "code": "5641016",
+        "capacity_ml": "100",
+        "tolerance_ml": "0.20",
+        "stopper_size": "14/23",
+        "qty_per_case": "10",
+        "price": "370.00"
+      },
+      {
+        "code": "5641020",
+        "capacity_ml": "200",
+        "tolerance_ml": "0.30",
+        "stopper_size": "14/23",
+        "qty_per_case": "10",
+        "price": "435.00"
+      },
+      {
+        "code": "5641021",
+        "capacity_ml": "250",
+        "tolerance_ml": "0.30",
+        "stopper_size": "14/23",
+        "qty_per_case": "10",
+        "price": "450.00"
+      },
+      {
+        "code": "5641024",
+        "capacity_ml": "500",
+        "tolerance_ml": "0.50",
+        "stopper_size": "19/26",
+        "qty_per_case": "10",
+        "price": "630.00"
+      },
+      {
+        "code": "5641029",
+        "capacity_ml": "1000",
+        "tolerance_ml": "0.80",
+        "stopper_size": "24/29",
+        "qty_per_case": "10",
+        "price": "1035.00"
+      },
+      {
+        "code": "5641030",
+        "capacity_ml": "2000",
+        "tolerance_ml": "120",
+        "stopper_size": "29/32",
+        "qty_per_case": "2",
+        "price": "2155.00"
+      },
+      {
+        "code": "5641033",
+        "capacity_ml": "5000",
+        "tolerance_ml": "2.40",
+        "stopper_size": "34/35",
+        "qty_per_case": "1",
+        "price": "7710.00"
+      }
+    ],
+    "title": "Untitled Group 19",
+    "specs_headers": [
+      "code",
+      "capacity_ml",
+      "tolerance_ml",
+      "stopper_size",
+      "qty_per_case",
+      "price"
+    ]
+  },
+  {
+    "category": "GLASS FILTER FUNNEL",
+    "title": "Short Stem",
+    "description": "Complies with IS 1591 DIN / ISO 4798. Designed with a 60\u00b0 bowl angle to ensure precise fitting of the filter paper. High thermal shock resistance and chemical resistance. Generally used for filtering and decanting liquids of varied densities.",
+    "specs_headers": [
+      "Product Code",
+      "Diameter mm",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "644007",
+        "diameter_mm": "25",
+        "quantity_per_case": "30",
+        "price": "120.00"
+      },
+      {
+        "code": "6440058",
+        "diameter_mm": "35",
+        "quantity_per_case": "30",
+        "price": "150.00"
+      },
+      {
+        "code": "6440065",
+        "diameter_mm": "50",
+        "quantity_per_case": "20",
+        "price": "160.00"
+      },
+      {
+        "code": "6440069",
+        "diameter_mm": "65",
+        "quantity_per_case": "20",
+        "price": "195.00"
+      },
+      {
+        "code": "6440074",
+        "diameter_mm": "75",
+        "quantity_per_case": "20",
+        "price": "185.00"
+      },
+      {
+        "code": "6440077",
+        "diameter_mm": "100",
+        "quantity_per_case": "40",
+        "price": "245.00"
+      }
+    ]
+  },
+  {
+    "category": "POWDER FUNNEL",
+    "title": "With Stem",
+    "description": "Designed with a short wide stem to facilitate smooth flow. Ideal for transferring powders.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "6220080",
+        "capacity_ml": "425",
+        "quantity_per_case": "30",
+        "price": "545.00"
+      },
+      {
+        "code": "6220084",
+        "capacity_ml": "450",
+        "quantity_per_case": "20",
+        "price": "580.00"
+      },
+      {
+        "code": "6220087",
+        "capacity_ml": "200",
+        "quantity_per_case": "",
+        "price": "1640.00"
+      },
+      {
+        "code": "6220089",
+        "capacity_ml": "250",
+        "quantity_per_case": "",
+        "price": "2245.00"
+      }
+    ]
+  },
+  {
+    "category": "POWDER FUNNEL",
+    "title": "Stem With Cone",
+    "description": "Supplied with ground glass cone for easy fitting on flask. Interchangeable joint size 24/29. Designed with a short wide stem to facilitate smooth flow. Ideal for transferring powders.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "6230080",
+        "capacity_ml": "425",
+        "quantity_per_case": "20",
+        "price": "815.00"
+      },
+      {
+        "code": "6230084",
+        "capacity_ml": "450",
+        "quantity_per_case": "20",
+        "price": "940.00"
+      },
+      {
+        "code": "6230087",
+        "capacity_ml": "200",
+        "quantity_per_case": "",
+        "price": "1810.00"
+      },
+      {
+        "code": "6230089",
+        "capacity_ml": "250",
+        "quantity_per_case": "",
+        "price": "2725.00"
+      }
+    ]
+  },
+  {
+    "category": "MOHR PIPETTES",
+    "title": "Class B, White Marking",
+    "description": "Complies with ISO 835. Graduated for delivery from zero mark to the last graduation mark. Graduation in white enamel for increased visibility against dark solutions. Calibrated at 27\u00b0C.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Graduation Interval ml",
+      "Tolerance + ml",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "062P41",
+        "capacity_ml": "0.4",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "225.00"
+      },
+      {
+        "code": "7062P42",
+        "capacity_ml": "0.2",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "215.00"
+      },
+      {
+        "code": "7062P01",
+        "capacity_ml": "",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "215.00"
+      },
+      {
+        "code": "062P11",
+        "capacity_ml": "1",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "200.00"
+      },
+      {
+        "code": "062P02",
+        "capacity_ml": "2",
+        "interval_ml": "0.02",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "20",
+        "price": "225.00"
+      },
+      {
+        "code": "7062P22",
+        "capacity_ml": "2",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "20",
+        "price": "215.00"
+      },
+      {
+        "code": "7062P05",
+        "capacity_ml": "5",
+        "interval_ml": "0.05",
+        "tolerance_ml": "0.05",
+        "quantity_per_case": "20",
+        "price": "240.00"
+      },
+      {
+        "code": "7062P55",
+        "capacity_ml": "",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.05",
+        "quantity_per_case": "20",
+        "price": "225.00"
+      },
+      {
+        "code": "7062P06",
+        "capacity_ml": "10",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.40",
+        "quantity_per_case": "20",
+        "price": "265.00"
+      },
+      {
+        "code": "062P09",
+        "capacity_ml": "25",
+        "interval_ml": "0.20",
+        "tolerance_ml": "0.20",
+        "quantity_per_case": "20",
+        "price": "410.00"
+      }
+    ]
+  },
+  {
+    "category": "SEROLOGICAL PIPETTES",
+    "title": "Class A, With Individual Calibration Certificate",
+    "description": "Complies with IS, ISO 835, Type III total delivery. These Pipettes are graduated to the tip. Two rings at the top indicate that the Pipette is calibrated to deliver from any graduation line down to tip. Supplied with individual calibration certificate showing actual volume dispensed and providing traceable standards. Markings are made in permanent amber stain diffused into the surface of the glass for better visibility. Calibrated and certified at 27\u00b0C.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Graduation Interval",
+      "Tolerance + ml",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "7079P41",
+        "capacity_ml": "0.4",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.006",
+        "quantity_per_case": "10",
+        "price": "675.00"
+      },
+      {
+        "code": "7079P42",
+        "capacity_ml": "0.2",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.006",
+        "quantity_per_case": "10",
+        "price": "675.00"
+      },
+      {
+        "code": "7079P01",
+        "capacity_ml": "",
+        "interval_ml": "0.01",
+        "tolerance_ml": "0.007",
+        "quantity_per_case": "10",
+        "price": "635.00"
+      },
+      {
+        "code": "7079P11",
+        "capacity_ml": "",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.007",
+        "quantity_per_case": "10",
+        "price": "560.00"
+      },
+      {
+        "code": "7079P02",
+        "capacity_ml": "2",
+        "interval_ml": "0.02",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "10",
+        "price": "625.00"
+      },
+      {
+        "code": "7079P22",
+        "capacity_ml": "2",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "10",
+        "price": "580.00"
+      },
+      {
+        "code": "7079P05",
+        "capacity_ml": "",
+        "interval_ml": "0.05",
+        "tolerance_ml": "0.03",
+        "quantity_per_case": "10",
+        "price": "725.00"
+      },
+      {
+        "code": "7079P55",
+        "capacity_ml": "",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.03",
+        "quantity_per_case": "10",
+        "price": "675.00"
+      },
+      {
+        "code": "7079P06",
+        "capacity_ml": "40",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.05",
+        "quantity_per_case": "10",
+        "price": "775.00"
+      },
+      {
+        "code": "7079P09",
+        "capacity_ml": "25",
+        "interval_ml": "0.20",
+        "tolerance_ml": "0.40",
+        "quantity_per_case": "10",
+        "price": "915.00"
+      }
+    ]
+  },
+  {
+    "category": "SEROLOGICAL PIPETTES",
+    "title": "Class B, White Marking",
+    "description": "Complies with IS, ISO 835. These Pipettes are graduated to the tip. Two rings at the top indicate that the Pipette is calibrated to deliver from any graduation line down to tip. Graduation in white enamel for increased visibility against dark solutions. Calibrated at 27\u00b0C.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Graduation Interval",
+      "Tolerance + ml",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "7082P41",
+        "capacity_ml": "0.4",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "225.00"
+      },
+      {
+        "code": "7082P42",
+        "capacity_ml": "0.2",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "215.00"
+      },
+      {
+        "code": "7082P01",
+        "capacity_ml": "",
+        "interval_ml": "0.04",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "215.00"
+      },
+      {
+        "code": "7082P11",
+        "capacity_ml": "",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "20",
+        "price": "200.00"
+      },
+      {
+        "code": "7082P02",
+        "capacity_ml": "2",
+        "interval_ml": "0.02",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "20",
+        "price": "225.00"
+      },
+      {
+        "code": "7082P22",
+        "capacity_ml": "2",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "20",
+        "price": "215.00"
+      },
+      {
+        "code": "7082P05",
+        "capacity_ml": "",
+        "interval_ml": "0.05",
+        "tolerance_ml": "0.05",
+        "quantity_per_case": "20",
+        "price": "240.00"
+      },
+      {
+        "code": "7082P55",
+        "capacity_ml": "",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.05",
+        "quantity_per_case": "20",
+        "price": "225.00"
+      },
+      {
+        "code": "7082P06",
+        "capacity_ml": "40",
+        "interval_ml": "0.40",
+        "tolerance_ml": "0.40",
+        "quantity_per_case": "20",
+        "price": "265.00"
+      },
+      {
+        "code": "7082P09",
+        "capacity_ml": "25",
+        "interval_ml": "0.20",
+        "tolerance_ml": "0.20",
+        "quantity_per_case": "20",
+        "price": "410.00"
+      }
+    ]
+  },
+  {
+    "category": "VOLUMETRIC PIPETTES",
+    "title": "Class A, with Individual Calibration Certificate",
+    "description": "Complies with IS 1117 / ISO 648 with ISI Mark. Calibrated for delivery (TD, Ex). Each pipette coded with unique identification number (UID) and supplied with calibration certificate with traceable standards. Generally used for accurate measurement and decanting of liquid. Calibrated and certified at 27\u00b0C.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Tolerance \u00b1 ml",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "7400004",
+        "capacity_ml": "",
+        "tolerance_ml": "0.008",
+        "quantity_per_case": "10",
+        "price": "425.00"
+      },
+      {
+        "code": "7400002",
+        "capacity_ml": "2",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "10",
+        "price": "430.00"
+      },
+      {
+        "code": "7400005",
+        "capacity_ml": "",
+        "tolerance_ml": "0.045",
+        "quantity_per_case": "10",
+        "price": "485.00"
+      },
+      {
+        "code": "700006",
+        "capacity_ml": "40",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "10",
+        "price": "580.00"
+      },
+      {
+        "code": "700008",
+        "capacity_ml": "20",
+        "tolerance_ml": "0.03",
+        "quantity_per_case": "10",
+        "price": "760.00"
+      },
+      {
+        "code": "7400009",
+        "capacity_ml": "25",
+        "tolerance_ml": "0.03",
+        "quantity_per_case": "10",
+        "price": "805.00"
+      },
+      {
+        "code": "70002",
+        "capacity_ml": "50",
+        "tolerance_ml": "0.05",
+        "quantity_per_case": "10",
+        "price": "915.00"
+      },
+      {
+        "code": "70006",
+        "capacity_ml": "400",
+        "tolerance_ml": "0.08",
+        "quantity_per_case": "10",
+        "price": "1385.00"
+      }
+    ]
+  },
+  {
+    "category": "VOLUMETRIC PIPETTES",
+    "title": "Class B",
+    "description": "Complies with IS 1117 / ISO 648 with ISI Mark. Calibrated for delivery (TD, Ex). Generally used for accurate measurement and decanting of liquid. Calibrated at 27\u00b0C.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Tolerance \u00b1 ml",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "7102001",
+        "capacity_ml": "1",
+        "tolerance_ml": "0.045",
+        "quantity_per_case": "10",
+        "price": "245.00"
+      },
+      {
+        "code": "7102002",
+        "capacity_ml": "2",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "10",
+        "price": "225.00"
+      },
+      {
+        "code": "7102003",
+        "capacity_ml": "3",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "10",
+        "price": "225.00"
+      },
+      {
+        "code": "7102004",
+        "capacity_ml": "4",
+        "tolerance_ml": "0.02",
+        "quantity_per_case": "10",
+        "price": "225.00"
+      },
+      {
+        "code": "7102005",
+        "capacity_ml": "5",
+        "tolerance_ml": "0.03",
+        "quantity_per_case": "10",
+        "price": "240.00"
+      },
+      {
+        "code": "7102706",
+        "capacity_ml": "6",
+        "tolerance_ml": "0.03",
+        "quantity_per_case": "10",
+        "price": "255.00"
+      },
+      {
+        "code": "7102707",
+        "capacity_ml": "7",
+        "tolerance_ml": "0.03",
+        "quantity_per_case": "10",
+        "price": "255.00"
+      },
+      {
+        "code": "7102708",
+        "capacity_ml": "8",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "10",
+        "price": "255.00"
+      },
+      {
+        "code": "7102709",
+        "capacity_ml": "9",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "10",
+        "price": "255.00"
+      },
+      {
+        "code": "7102006",
+        "capacity_ml": "10",
+        "tolerance_ml": "0.04",
+        "quantity_per_case": "10",
+        "price": "280.00"
+      },
+      {
+        "code": "7102007",
+        "capacity_ml": "15",
+        "tolerance_ml": "0.06",
+        "quantity_per_case": "10",
+        "price": "315.00"
+      },
+      {
+        "code": "7102008",
+        "capacity_ml": "20",
+        "tolerance_ml": "0.06",
+        "quantity_per_case": "10",
+        "price": "320.00"
+      },
+      {
+        "code": "7102009",
+        "capacity_ml": "25",
+        "tolerance_ml": "0.06",
+        "quantity_per_case": "10",
+        "price": "335.00"
+      },
+      {
+        "code": "7102010",
+        "capacity_ml": "30",
+        "tolerance_ml": "0.06",
+        "quantity_per_case": "10",
+        "price": "325.00"
+      },
+      {
+        "code": "7102011",
+        "capacity_ml": "40",
+        "tolerance_ml": "0.4",
+        "quantity_per_case": "10",
+        "price": "355.00"
+      },
+      {
+        "code": "7102012",
+        "capacity_ml": "50",
+        "tolerance_ml": "0.1",
+        "quantity_per_case": "10",
+        "price": "395.00"
+      },
+      {
+        "code": "7102016",
+        "capacity_ml": "100",
+        "tolerance_ml": "0.15",
+        "quantity_per_case": "10",
+        "price": "560.00"
+      }
+    ]
+  },
+  {
+    "category": "TEST TUBES",
+    "title": "With Rim",
+    "description": "Complies with IS 2618, DIN / ISO 4142. Designed with a round bottom and a rim. Made thick-walled, mechanically very resistant. High thermal shock resistance.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Length",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "9800U01",
+        "capacity_ml": "3",
+        "od_x_length": "10 x 75",
+        "quantity_per_case": "800",
+        "price": "11.00"
+      },
+      {
+        "code": "9800U02",
+        "capacity_ml": "5",
+        "od_x_length": "12 x 75",
+        "quantity_per_case": "800",
+        "price": "11.00"
+      },
+      {
+        "code": "9800U03",
+        "capacity_ml": "7",
+        "od_x_length": "12 x 100",
+        "quantity_per_case": "800",
+        "price": "16.00"
+      },
+      {
+        "code": "9800U15",
+        "capacity_ml": "4",
+        "od_x_length": "13 x SP*",
+        "quantity_per_case": "800",
+        "price": "18.00"
+      },
+      {
+        "code": "9800U04",
+        "capacity_ml": "13",
+        "od_x_length": "15 x 125",
+        "quantity_per_case": "800",
+        "price": "20.00"
+      },
+      {
+        "code": "9800U05",
+        "capacity_ml": "15",
+        "od_x_length": "15 x 150",
+        "quantity_per_case": "400",
+        "price": "23.00"
+      },
+      {
+        "code": "9800U06",
+        "capacity_ml": "27",
+        "od_x_length": "18 x 150",
+        "quantity_per_case": "400",
+        "price": "24.00"
+      },
+      {
+        "code": "9800U07",
+        "capacity_ml": "38",
+        "od_x_length": "25 x 100",
+        "quantity_per_case": "200",
+        "price": "30.00"
+      },
+      {
+        "code": "9800U08",
+        "capacity_ml": "US",
+        "od_x_length": "25 x 150",
+        "quantity_per_case": "200",
+        "price": "36.00"
+      },
+      {
+        "code": "9800U09",
+        "capacity_ml": "70",
+        "od_x_length": "25 x 200",
+        "quantity_per_case": "400",
+        "price": "48.00"
+      },
+      {
+        "code": "9800U10",
+        "capacity_ml": "100",
+        "od_x_length": "32 x 200",
+        "quantity_per_case": "50",
+        "price": "72.00"
+      },
+      {
+        "code": "9800UL",
+        "capacity_ml": "170",
+        "od_x_length": "38 x 200",
+        "quantity_per_case": "50",
+        "price": "86.00"
+      }
+    ]
+  },
+  {
+    "category": "TUBE FOR CULTURE COLLECTION",
+    "title": "Untitled Group 29",
+    "description": "Designed with a round bottom. Thick walled and high mechanical resistance. High thermal shock resistance. Used for blood and microbial culturing.",
+    "specs_headers": [
+      "Product Code",
+      "Approx O.D. x Length",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "9801U01",
+        "od_x_length": "7 x 127",
+        "quantity_per_case": "200",
+        "price": "32.00"
+      }
+    ]
+  },
+  {
+    "category": "TEST TUBES",
+    "title": "Without Rim",
+    "description": "Complies with IS 2618, DIN / ISO 4142. Designed with a round bottom and without rim. Made thick-walled, mechanically very resistant. High thermal shock resistance.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Length",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "9820U16",
+        "capacity_ml": "1",
+        "od_x_length": "7 x 60*",
+        "quantity_per_case": "800",
+        "price": "10.00"
+      },
+      {
+        "code": "9820U01",
+        "capacity_ml": "3",
+        "od_x_length": "10 x 75***",
+        "quantity_per_case": "800",
+        "price": "10.00"
+      },
+      {
+        "code": "9820U02",
+        "capacity_ml": "5",
+        "od_x_length": "12 x 75**/***",
+        "quantity_per_case": "800",
+        "price": "10.00"
+      },
+      {
+        "code": "9820U03",
+        "capacity_ml": "7",
+        "od_x_length": "12 x 100***",
+        "quantity_per_case": "800",
+        "price": "16.00"
+      },
+      {
+        "code": "9820U17",
+        "capacity_ml": "8",
+        "od_x_length": "12 x 125***",
+        "quantity_per_case": "800",
+        "price": "17.00"
+      },
+      {
+        "code": "9820U04",
+        "capacity_ml": "13",
+        "od_x_length": "15 x 125",
+        "quantity_per_case": "800",
+        "price": "20.00"
+      },
+      {
+        "code": "9820U05",
+        "capacity_ml": "15",
+        "od_x_length": "15 x 150",
+        "quantity_per_case": "TOO",
+        "price": "23.00"
+      },
+      {
+        "code": "9820U12",
+        "capacity_ml": "12",
+        "od_x_length": "16 x 100***",
+        "quantity_per_case": "800",
+        "price": "22.00"
+      },
+      {
+        "code": "9820U18",
+        "capacity_ml": "20",
+        "od_x_length": "16 x 150***",
+        "quantity_per_case": "TOO",
+        "price": "27.00"
+      },
+      {
+        "code": "9820U06",
+        "capacity_ml": "27",
+        "od_x_length": "18 x 150",
+        "quantity_per_case": "TOO",
+        "price": "24.00"
+      },
+      {
+        "code": "9820U19",
+        "capacity_ml": "25",
+        "od_x_length": "19 x 125***",
+        "quantity_per_case": "TOO",
+        "price": "27.00"
+      },
+      {
+        "code": "9820U07",
+        "capacity_ml": "38",
+        "od_x_length": "25 x 100#",
+        "quantity_per_case": "200",
+        "price": "30.00"
+      },
+      {
+        "code": "9820U08",
+        "capacity_ml": "US",
+        "od_x_length": "25 x 150***",
+        "quantity_per_case": "200",
+        "price": "36.00"
+      },
+      {
+        "code": "9820U09",
+        "capacity_ml": "70",
+        "od_x_length": "25 x 200",
+        "quantity_per_case": "400",
+        "price": "48.00"
+      },
+      {
+        "code": "9820U10",
+        "capacity_ml": "100",
+        "od_x_length": "32 x 200",
+        "quantity_per_case": "50",
+        "price": "72.00"
+      },
+      {
+        "code": "9820U11",
+        "capacity_ml": "170",
+        "od_x_length": "38 x 200",
+        "quantity_per_case": "50",
+        "price": "86.00"
+      }
+    ]
+  },
+  {
+    "category": "TUBE FOR CULTURE COLLECTION",
+    "title": "Untitled Group 31",
+    "description": "Designed with a round bottom. Thick walled and high mechanical resistance. High thermal shock resistance. Used for blood and microbial culturing.",
+    "specs_headers": [
+      "Product Code",
+      "Approx O.D. x Length",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "9801U01",
+        "od_x_length": "7 x 127",
+        "quantity_per_case": "200",
+        "price": "32.00"
+      }
+    ]
+  },
+  {
+    "category": "TEST TUBES",
+    "title": "Without Rim",
+    "description": "Complies with IS 2618, DIN / ISO 4142. Designed with a round bottom and without rim. Made thick-walled, mechanically very resistant. High thermal shock resistance.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Length",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "9820U16",
+        "capacity_ml": "1",
+        "od_x_length": "7 x 60*",
+        "quantity_per_case": "800",
+        "price": "10.00"
+      },
+      {
+        "code": "9820U01",
+        "capacity_ml": "3",
+        "od_x_length": "10 x 75***",
+        "quantity_per_case": "800",
+        "price": "10.00"
+      },
+      {
+        "code": "9820U02",
+        "capacity_ml": "5",
+        "od_x_length": "12 x 75**/***",
+        "quantity_per_case": "800",
+        "price": "10.00"
+      },
+      {
+        "code": "9820U03",
+        "capacity_ml": "7",
+        "od_x_length": "12 x 100***",
+        "quantity_per_case": "800",
+        "price": "16.00"
+      },
+      {
+        "code": "9820U17",
+        "capacity_ml": "8",
+        "od_x_length": "12 x 125***",
+        "quantity_per_case": "800",
+        "price": "17.00"
+      },
+      {
+        "code": "9820U04",
+        "capacity_ml": "13",
+        "od_x_length": "15 x 125",
+        "quantity_per_case": "800",
+        "price": "20.00"
+      },
+      {
+        "code": "9820U05",
+        "capacity_ml": "15",
+        "od_x_length": "15 x 150",
+        "quantity_per_case": "TOO",
+        "price": "23.00"
+      },
+      {
+        "code": "9820U12",
+        "capacity_ml": "12",
+        "od_x_length": "16 x 100***",
+        "quantity_per_case": "800",
+        "price": "22.00"
+      },
+      {
+        "code": "9820U18",
+        "capacity_ml": "20",
+        "od_x_length": "16 x 150***",
+        "quantity_per_case": "TOO",
+        "price": "27.00"
+      },
+      {
+        "code": "9820U06",
+        "capacity_ml": "27",
+        "od_x_length": "18 x 150",
+        "quantity_per_case": "TOO",
+        "price": "24.00"
+      },
+      {
+        "code": "9820U19",
+        "capacity_ml": "25",
+        "od_x_length": "19 x 125***",
+        "quantity_per_case": "TOO",
+        "price": "27.00"
+      },
+      {
+        "code": "9820U07",
+        "capacity_ml": "38",
+        "od_x_length": "25 x 100#",
+        "quantity_per_case": "200",
+        "price": "30.00"
+      },
+      {
+        "code": "9820U08",
+        "capacity_ml": "US",
+        "od_x_length": "25 x 150***",
+        "quantity_per_case": "200",
+        "price": "36.00"
+      },
+      {
+        "code": "9820U09",
+        "capacity_ml": "70",
+        "od_x_length": "25 x 200",
+        "quantity_per_case": "400",
+        "price": "48.00"
+      },
+      {
+        "code": "9820U10",
+        "capacity_ml": "100",
+        "od_x_length": "32 x 200",
+        "quantity_per_case": "50",
+        "price": "72.00"
+      },
+      {
+        "code": "9820U11",
+        "capacity_ml": "170",
+        "od_x_length": "38 x 200",
+        "quantity_per_case": "50",
+        "price": "86.00"
+      }
+    ]
+  },
+  {
+    "category": "DISSOLUTION TUBE",
+    "title": "Without Rim",
+    "description": "Designed with flat bottom and without rim. High thermal shock resistance. Used for pathological tests and disintegration apparatus.",
+    "specs_headers": [
+      "Product Code",
+      "Approx O.D. x Length",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "9821U42",
+        "od_x_length": "12 x 75",
+        "quantity_per_case": "800",
+        "price": "27.00"
+      },
+      {
+        "code": "9821U61",
+        "od_x_length": "18 x 100",
+        "quantity_per_case": "400",
+        "price": "53.00"
+      }
+    ]
+  },
+  {
+    "category": "WATCH GLASSES",
+    "title": "S-Line",
+    "description": "Made of soda lime glass. Absolutely flat curved surface. High clarity, bubble-free. All glasses molded to the same radius for stacking.",
+    "specs_headers": [
+      "Product Code",
+      "Size mm",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "9986072",
+        "size_mm": "80",
+        "quantity_per_case": "50",
+        "price": "120.00"
+      },
+      {
+        "code": "9986077",
+        "size_mm": "100",
+        "quantity_per_case": "50",
+        "price": "135.00"
+      },
+      {
+        "code": "9986079",
+        "size_mm": "120",
+        "quantity_per_case": "20",
+        "price": "145.00"
+      },
+      {
+        "code": "9986084",
+        "size_mm": "150",
+        "quantity_per_case": "20",
+        "price": "195.00"
+      }
+    ]
+  },
+  {
+    "category": "BUCHNER FUNNEL",
+    "title": "With Sintered Disc",
+    "description": "Made of 3.3 borosilicate glass. Especially useful where filter paper may be attacked. Used in qualitative inorganic analysis and preparation. Resistant to corrosion and heat.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Porosity Grade",
+      "Dia of Disc",
+      "Approx Height",
+      "Stem Dia mm",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "3606058",
+        "capacity_ml": "35",
+        "porosity_grade": "",
+        "dia_disc": "30",
+        "height": "430",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "740.00"
+      },
+      {
+        "code": "3606658",
+        "capacity_ml": "35",
+        "porosity_grade": "2",
+        "dia_disc": "30",
+        "height": "430",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "705.00"
+      },
+      {
+        "code": "3606758",
+        "capacity_ml": "35",
+        "porosity_grade": "3",
+        "dia_disc": "30",
+        "height": "430",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "740.00"
+      },
+      {
+        "code": "3606858",
+        "capacity_ml": "35",
+        "porosity_grade": "4",
+        "dia_disc": "30",
+        "height": "430",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "705.00"
+      },
+      {
+        "code": "3606958",
+        "capacity_ml": "35",
+        "porosity_grade": "5",
+        "dia_disc": "30",
+        "height": "430",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "885.00"
+      },
+      {
+        "code": "3606072",
+        "capacity_ml": "80",
+        "porosity_grade": "1",
+        "dia_disc": "35",
+        "height": "142",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "1370.00"
+      },
+      {
+        "code": "3606672",
+        "capacity_ml": "80",
+        "porosity_grade": "2",
+        "dia_disc": "35",
+        "height": "142",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "1370.00"
+      },
+      {
+        "code": "3606772",
+        "capacity_ml": "80",
+        "porosity_grade": "3",
+        "dia_disc": "35",
+        "height": "142",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "1370.00"
+      },
+      {
+        "code": "3606872",
+        "capacity_ml": "80",
+        "porosity_grade": "4",
+        "dia_disc": "35",
+        "height": "142",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "1370.00"
+      },
+      {
+        "code": "3606972",
+        "capacity_ml": "80",
+        "porosity_grade": "5",
+        "dia_disc": "35",
+        "height": "142",
+        "stem_dia_mm": "8",
+        "quantity_per_case": "5",
+        "price": "1660.00"
+      },
+      {
+        "code": "3606020",
+        "capacity_ml": "200",
+        "porosity_grade": "1",
+        "dia_disc": "68",
+        "height": "215",
+        "stem_dia_mm": "13",
+        "quantity_per_case": "5",
+        "price": "2130.00"
+      },
+      {
+        "code": "3606920",
+        "capacity_ml": "200",
+        "porosity_grade": "5",
+        "dia_disc": "68",
+        "height": "215",
+        "stem_dia_mm": "13",
+        "quantity_per_case": "5",
+        "price": "2475.00"
+      },
+      {
+        "code": "3606024",
+        "capacity_ml": "500",
+        "porosity_grade": "1",
+        "dia_disc": "92",
+        "height": "258",
+        "stem_dia_mm": "17",
+        "quantity_per_case": "2",
+        "price": "5030.00"
+      },
+      {
+        "code": "3606924",
+        "capacity_ml": "500",
+        "porosity_grade": "5",
+        "dia_disc": "92",
+        "height": "258",
+        "stem_dia_mm": "17",
+        "quantity_per_case": "2",
+        "price": "6585.00"
+      },
+      {
+        "code": "3606029",
+        "capacity_ml": "4000",
+        "porosity_grade": "1",
+        "dia_disc": "124",
+        "height": "276",
+        "stem_dia_mm": "19",
+        "quantity_per_case": "2",
+        "price": "9725.00"
+      },
+      {
+        "code": "3606929",
+        "capacity_ml": "4000",
+        "porosity_grade": "5",
+        "dia_disc": "124",
+        "height": "276",
+        "stem_dia_mm": "19",
+        "quantity_per_case": "2",
+        "price": "12430.00"
+      }
+    ]
+  },
+  {
+    "category": "GOOCH CRUCIBLE",
+    "title": "Low Form, With Sintered Disc",
+    "description": "Made of 3.3 borosilicate glass. Adapted for analytical work where precipitates are dried to constant weight at 110\u00b0C. Should not be subjected to sudden temperature changes. Remove from furnace only after cooling to 250\u00b0C.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Porosity Grade",
+      "Dia of Disc mm",
+      "Approx Height",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "3206007",
+        "capacity_ml": "45",
+        "porosity_grade": "1",
+        "dia_disc_mm": "20",
+        "height": "50",
+        "quantity_per_case": "10",
+        "price": "510.00"
+      },
+      {
+        "code": "3206607",
+        "capacity_ml": "45",
+        "porosity_grade": "2",
+        "dia_disc_mm": "20",
+        "height": "50",
+        "quantity_per_case": "10",
+        "price": "510.00"
+      },
+      {
+        "code": "3206707",
+        "capacity_ml": "45",
+        "porosity_grade": "3",
+        "dia_disc_mm": "20",
+        "height": "50",
+        "quantity_per_case": "10",
+        "price": "510.00"
+      },
+      {
+        "code": "3206807",
+        "capacity_ml": "45",
+        "porosity_grade": "4",
+        "dia_disc_mm": "20",
+        "height": "50",
+        "quantity_per_case": "10",
+        "price": "510.00"
+      },
+      {
+        "code": "3206907",
+        "capacity_ml": "45",
+        "porosity_grade": "5",
+        "dia_disc_mm": "20",
+        "height": "50",
+        "quantity_per_case": "10",
+        "price": "625.00"
+      },
+      {
+        "code": "3206010",
+        "capacity_ml": "30",
+        "porosity_grade": "1",
+        "dia_disc_mm": "30",
+        "height": "60",
+        "quantity_per_case": "10",
+        "price": "675.00"
+      },
+      {
+        "code": "3206910",
+        "capacity_ml": "30",
+        "porosity_grade": "5",
+        "dia_disc_mm": "30",
+        "height": "60",
+        "quantity_per_case": "10",
+        "price": "835.00"
+      },
+      {
+        "code": "3206012",
+        "capacity_ml": "50",
+        "porosity_grade": "1",
+        "dia_disc_mm": "40",
+        "height": "65",
+        "quantity_per_case": "10",
+        "price": "780.00"
+      },
+      {
+        "code": "3206912",
+        "capacity_ml": "50",
+        "porosity_grade": "5",
+        "dia_disc_mm": "40",
+        "height": "65",
+        "quantity_per_case": "10",
+        "price": "975.00"
+      }
+    ]
+  },
+  {
+    "category": "TUBE FOR GOOCH CRUCIBLE",
+    "title": "Untitled Group 37",
+    "description": "Made of 3.3 borosilicate glass. Suitable for use with Borosil\u2019s Scientific Gooch Crucible with sintered disc.",
+    "specs_headers": [
+      "Product Code",
+      "Approx O.D. x Length",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "3206127",
+        "od_x_length": "27x150",
+        "quantity_per_case": "5",
+        "price": "225.00"
+      },
+      {
+        "code": "3206136",
+        "od_x_length": "36x160",
+        "quantity_per_case": "5",
+        "price": "320.00"
+      },
+      {
+        "code": "3206156",
+        "od_x_length": "56x170",
+        "quantity_per_case": "10",
+        "price": "475.00"
+      }
+    ]
+  },
+  {
+    "category": "TALL FORM BEAKER",
+    "title": "Without Spout",
+    "description": "Complies with IS 2619 / ISO 3819 and DIN 12331. Graduated to indicate the approximate content. Uniform wall thickness distribution improves mechanical & thermal properties & makes it ideal for heating liquids. The easy-to-read scale and large labelling field makes marking easier. High resistance to chemical attack. Ideal for titrations.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Height",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "1000005",
+        "capacity_ml": "5*",
+        "od_x_height": "22 x 30",
+        "quantity_per_case": "20",
+        "price": "155.00"
+      },
+      {
+        "code": "1000006",
+        "capacity_ml": "10*",
+        "od_x_height": "26 x 35",
+        "quantity_per_case": "20",
+        "price": "155.00"
+      },
+      {
+        "code": "1000009",
+        "capacity_ml": "25",
+        "od_x_height": "34 x 50",
+        "quantity_per_case": "60",
+        "price": "155.00"
+      },
+      {
+        "code": "1000D12",
+        "capacity_ml": "50",
+        "od_x_height": "42 x 60",
+        "quantity_per_case": "60",
+        "price": "110.00"
+      },
+      {
+        "code": "1000D16",
+        "capacity_ml": "100",
+        "od_x_height": "50 x 70",
+        "quantity_per_case": "A0",
+        "price": "110.00"
+      },
+      {
+        "code": "1000D18",
+        "capacity_ml": "150",
+        "od_x_height": "60 x 80",
+        "quantity_per_case": "A0",
+        "price": "110.00"
+      },
+      {
+        "code": "1000D21",
+        "capacity_ml": "250",
+        "od_x_height": "70 x 95",
+        "quantity_per_case": "A0",
+        "price": "120.00"
+      },
+      {
+        "code": "1000D23",
+        "capacity_ml": "400",
+        "od_x_height": "80 x 110",
+        "quantity_per_case": "A0",
+        "price": "190.00"
+      },
+      {
+        "code": "1000D24",
+        "capacity_ml": "500",
+        "od_x_height": "83 x 115",
+        "quantity_per_case": "A0",
+        "price": "185.00"
+      },
+      {
+        "code": "1000D25",
+        "capacity_ml": "600",
+        "od_x_height": "90 x 125",
+        "quantity_per_case": "A0",
+        "price": "260.00"
+      },
+      {
+        "code": "1000D28",
+        "capacity_ml": "800",
+        "od_x_height": "100 x 135",
+        "quantity_per_case": "20",
+        "price": "375.00"
+      },
+      {
+        "code": "1000D29",
+        "capacity_ml": "1000",
+        "od_x_height": "105 x 145",
+        "quantity_per_case": "20",
+        "price": "375.00"
+      },
+      {
+        "code": "1000D30",
+        "capacity_ml": "2000",
+        "od_x_height": "130 x 185",
+        "quantity_per_case": "6",
+        "price": "765.00"
+      },
+      {
+        "code": "1000D31",
+        "capacity_ml": "3000",
+        "od_x_height": "150 x 210",
+        "quantity_per_case": "",
+        "price": "2065.00"
+      },
+      {
+        "code": "1000D33",
+        "capacity_ml": "5000",
+        "od_x_height": "170 x 270",
+        "quantity_per_case": "",
+        "price": "3030.00"
+      },
+      {
+        "code": "1000D38",
+        "capacity_ml": "10000",
+        "od_x_height": "220 x 350",
+        "quantity_per_case": "",
+        "price": "9730.00"
+      },
+      {
+        "code": "4040042",
+        "capacity_ml": "50",
+        "od_x_height": "38 x 70",
+        "quantity_per_case": "A0",
+        "price": "160.00"
+      },
+      {
+        "code": "404006",
+        "capacity_ml": "400",
+        "od_x_height": "S0 x 80",
+        "quantity_per_case": "A0",
+        "price": "165.00"
+      },
+      {
+        "code": "1040018",
+        "capacity_ml": "450",
+        "od_x_height": "",
+        "quantity_per_case": "A0",
+        "price": "170.00"
+      },
+      {
+        "code": "4040024",
+        "capacity_ml": "250",
+        "od_x_height": "60 x 120",
+        "quantity_per_case": "A0",
+        "price": "180.00"
+      },
+      {
+        "code": "1040024",
+        "capacity_ml": "500",
+        "od_x_height": "80 x 440",
+        "quantity_per_case": "20",
+        "price": "260.00"
+      },
+      {
+        "code": "4040025",
+        "capacity_ml": "600",
+        "od_x_height": "80 x 150",
+        "quantity_per_case": "20",
+        "price": "335.00"
+      },
+      {
+        "code": "1040028",
+        "capacity_ml": "800",
+        "od_x_height": "90 x 475",
+        "quantity_per_case": "20",
+        "price": "410.00"
+      },
+      {
+        "code": "1040029",
+        "capacity_ml": "4000",
+        "od_x_height": "95 x 480",
+        "quantity_per_case": "20",
+        "price": "500.00"
+      }
+    ]
+  },
+  {
+    "category": "REAGENT BOTTLES",
+    "title": "Narrow Mouth With I/C Glass Stopper",
+    "description": "Complies with IS 1388 (Part II) ISO 4796-2. Supplied with solid glass stopper. Printed with graduations using durable white enamel. Bottles are mechanically strong, chemical resistant, with a sturdy ground neck.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Height",
+      "Neck Stopper Size",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "1500013",
+        "capacity_ml": "60**",
+        "od_x_height": "45x90",
+        "stopper_size": "14/23",
+        "quantity_per_case": "20",
+        "price": "470.00"
+      },
+      {
+        "code": "1500016",
+        "capacity_ml": "100",
+        "od_x_height": "56x100",
+        "stopper_size": "19/26",
+        "quantity_per_case": "10",
+        "price": "515.00"
+      },
+      {
+        "code": "1500017",
+        "capacity_ml": "125**",
+        "od_x_height": "56x120",
+        "stopper_size": "19/26",
+        "quantity_per_case": "20",
+        "price": "465.00"
+      },
+      {
+        "code": "1500021",
+        "capacity_ml": "250",
+        "od_x_height": "70x138",
+        "stopper_size": "19/26",
+        "quantity_per_case": "10",
+        "price": "510.00"
+      },
+      {
+        "code": "1500024",
+        "capacity_ml": "500",
+        "od_x_height": "86x177",
+        "stopper_size": "24/29",
+        "quantity_per_case": "10",
+        "price": "515.00"
+      },
+      {
+        "code": "1500029",
+        "capacity_ml": "1000",
+        "od_x_height": "101 x 225",
+        "stopper_size": "29/32",
+        "quantity_per_case": "5",
+        "price": "900.00"
+      },
+      {
+        "code": "1500030",
+        "capacity_ml": "2000",
+        "od_x_height": "136 x 260",
+        "stopper_size": "34/35",
+        "quantity_per_case": "5",
+        "price": "1520.00"
+      }
+    ]
+  },
+  {
+    "category": "REAGENT BOTTLES",
+    "title": "Narrow Mouth With Screw Cap",
+    "description": "Complies with IS 1388 (Part I) ISO 4796-1. Supplied with screw caps and pouring ring made of polypropylene, autoclavable at 121\u00b0C. Printed with graduations and retrace code using durable white enamel. GL 45 thread from 100 ml to 20000 ml. Mechanically strong and chemical resistant. Ideal for storage of chemicals, reagents, and media.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Height",
+      "Thread Specification",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "1501006",
+        "capacity_ml": "10**#",
+        "od_x_height": "36x50",
+        "thread": "GL25",
+        "quantity_per_case": "10",
+        "price": "585.00"
+      },
+      {
+        "code": "1501009",
+        "capacity_ml": "25#",
+        "od_x_height": "36x70",
+        "thread": "GL25",
+        "quantity_per_case": "20",
+        "price": "390.00"
+      },
+      {
+        "code": "1501012",
+        "capacity_ml": "50",
+        "od_x_height": "46x87",
+        "thread": "GL32",
+        "quantity_per_case": "20",
+        "price": "480.00"
+      },
+      {
+        "code": "1501016",
+        "capacity_ml": "100",
+        "od_x_height": "56x100",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "425.00"
+      },
+      {
+        "code": "1501018",
+        "capacity_ml": "150**",
+        "od_x_height": "60x120",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "505.00"
+      },
+      {
+        "code": "1501021",
+        "capacity_ml": "250",
+        "od_x_height": "70x138",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "435.00"
+      },
+      {
+        "code": "1501024",
+        "capacity_ml": "500",
+        "od_x_height": "86x177",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "480.00"
+      },
+      {
+        "code": "1501029",
+        "capacity_ml": "1000",
+        "od_x_height": "101x225",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "735.00"
+      },
+      {
+        "code": "1501030",
+        "capacity_ml": "2000",
+        "od_x_height": "136x260",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "1315.00"
+      }
+    ]
+  },
+  {
+    "category": "REAGENT BOTTLES",
+    "title": "Narrow Mouth With I/C Glass Stopper, Amber",
+    "description": "Complies with IS 1388 (Part II), ISO 4796-2. Supplied with solid glass stopper. Printed with graduations using durable white enamel. Mechanically strong and chemical resistant. Uniform amber color protects media from light radiation between 300\u2013500 nm. Ideal for light-sensitive media and long-term storage.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Height",
+      "Neck Stopper Size",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "4S09043",
+        "capacity_ml": "60",
+        "od_x_height": "45x400",
+        "stopper_size": "4A/23",
+        "quantity_per_case": "20",
+        "price": "670.00"
+      },
+      {
+        "code": "4S09046",
+        "capacity_ml": "500",
+        "od_x_height": "56x400",
+        "stopper_size": "44/23",
+        "quantity_per_case": "0",
+        "price": "745.00"
+      },
+      {
+        "code": "4S09047",
+        "capacity_ml": "425",
+        "od_x_height": "56x120",
+        "stopper_size": "19/26",
+        "quantity_per_case": "20",
+        "price": "700.00"
+      },
+      {
+        "code": "4S09024",
+        "capacity_ml": "2000",
+        "od_x_height": "136x260",
+        "stopper_size": "34/35",
+        "quantity_per_case": "",
+        "price": "2445.00"
+      }
+    ]
+  },
+  {
+    "category": "REAGENT BOTTLES",
+    "title": "Narrow Mouth With Screw Cap, Amber",
+    "description": "Complies with IS 1388 (Part I), ISO 4796-1. Supplied with screw caps and pouring ring made of polypropylene, autoclavable at 121\u00b0C. Printed with graduations and retrace code using durable white enamel. GL 45 thread from 100 ml to 20000 ml. Mechanically strong and chemical resistant. Amber color protects against light (300\u2013500 nm). Ideal for light-sensitive media and long-term storage.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Approx O.D. x Height",
+      "Thread Specification",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "1519006",
+        "capacity_ml": "10",
+        "od_x_height": "36x50",
+        "thread": "GL25",
+        "quantity_per_case": "10",
+        "price": "740.00"
+      },
+      {
+        "code": "1519009",
+        "capacity_ml": "25",
+        "od_x_height": "36x70",
+        "thread": "GL25",
+        "quantity_per_case": "20",
+        "price": "625.00"
+      },
+      {
+        "code": "1519012",
+        "capacity_ml": "50",
+        "od_x_height": "46x87",
+        "thread": "GL32",
+        "quantity_per_case": "20",
+        "price": "725.00"
+      },
+      {
+        "code": "1519016",
+        "capacity_ml": "100",
+        "od_x_height": "56x100",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "750.00"
+      },
+      {
+        "code": "1519021",
+        "capacity_ml": "250",
+        "od_x_height": "70x138",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "790.00"
+      },
+      {
+        "code": "1519024",
+        "capacity_ml": "500",
+        "od_x_height": "86x177",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "945.00"
+      },
+      {
+        "code": "1519029",
+        "capacity_ml": "1000",
+        "od_x_height": "101x225",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "1235.00"
+      },
+      {
+        "code": "1519030",
+        "capacity_ml": "2000",
+        "od_x_height": "136x260",
+        "thread": "GL45",
+        "quantity_per_case": "10",
+        "price": "2315.00"
+      }
+    ]
+  },
+  {
+    "category": "RELATIVE DENSITY BOTTLES",
+    "title": "With I/C PTFE Stopper With Class A Certificate",
+    "description": "Supplied with interchangeable PTFE (Teflon) stopper. Mechanically strong and chemical resistant. All sizes have a durable matt-finished enamelled area for marking. Supplied with certificate.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Capacity Tolerance + ml",
+      "Max. Body Dia x Height",
+      "Size of I/C Stopper",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "4624006",
+        "capacity_ml": "40",
+        "tolerance_ml": "0.3",
+        "body_dims": "29x48",
+        "stopper_size": "10/15",
+        "quantity_per_case": "5",
+        "price": "1380.00"
+      },
+      {
+        "code": "4624009",
+        "capacity_ml": "25",
+        "tolerance_ml": "0.8",
+        "body_dims": "40 x SP",
+        "stopper_size": "10/15",
+        "quantity_per_case": "5",
+        "price": "1630.00"
+      },
+      {
+        "code": "4624012",
+        "capacity_ml": "50",
+        "tolerance_ml": "1",
+        "body_dims": "50 x 65",
+        "stopper_size": "10/15",
+        "quantity_per_case": "5",
+        "price": "1715.00"
+      }
+    ]
+  },
+  {
+    "category": "RELATIVE DENSITY BOTTLES",
+    "title": "With I/C PTFE Stopper",
+    "description": "Supplied with I/C PTFE (Teflon) stopper. Complies with IS 5717, DIN / ISO 3507. Mechanically strong and chemical resistant. Durable matt-finished enamelled marking area.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Capacity Tolerance + ml",
+      "Max. Body Dia x Height",
+      "Size of I/C Stopper",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "1625006",
+        "capacity_ml": "40",
+        "tolerance_ml": "1",
+        "body_dims": "29x48",
+        "stopper_size": "10/45",
+        "quantity_per_case": "10",
+        "price": "655.00"
+      },
+      {
+        "code": "1625009",
+        "capacity_ml": "25",
+        "tolerance_ml": "2",
+        "body_dims": "40x55",
+        "stopper_size": "40/45",
+        "quantity_per_case": "10",
+        "price": "725.00"
+      },
+      {
+        "code": "1625012",
+        "capacity_ml": "50",
+        "tolerance_ml": "3",
+        "body_dims": "50x65",
+        "stopper_size": "10/15",
+        "quantity_per_case": "5",
+        "price": "775.00"
+      }
+    ]
+  },
+  {
+    "category": "SPECIFIC GRAVITY BOTTLES",
+    "title": "With Thermometer And Capillary Side Tube",
+    "description": "Complies with IS 5717, DIN / ISO 3507. Mechanically strong and chemical resistant. Matt-finished enamelled area for marking. Supplied with thermometer and side tube.",
+    "specs_headers": [
+      "Product Code",
+      "Capacity ml",
+      "Tolerance +ml",
+      "Max. Body Dia x Height",
+      "Size of I/C Stopper",
+      "Quantity Per Case",
+      "Price /Piece"
+    ],
+    "variants": [
+      {
+        "code": "1627006",
+        "capacity_ml": "10",
+        "tolerance_ml": "1",
+        "body_dims": "29 x 48",
+        "stopper_size": "10/19",
+        "quantity_per_case": "5",
+        "price": "1865.00"
+      },
+      {
+        "code": "1627009",
+        "capacity_ml": "25",
+        "tolerance_ml": "2",
+        "body_dims": "40 x SP",
+        "stopper_size": "10/19",
+        "quantity_per_case": "5",
+        "price": "2185.00"
+      },
+      {
+        "code": "1627012",
+        "capacity_ml": "50",
+        "tolerance_ml": "3",
+        "body_dims": "50 x 65",
+        "stopper_size": "10/19",
+        "quantity_per_case": "5",
+        "price": "2370.00"
+      }
+    ]
+  }
+]
