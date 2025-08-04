@@ -28,9 +28,12 @@ export default function BrandPage({ params }) {
 
   let grouped = []
 
-  const qualigensProducts = Array.isArray(qualigensProductsRaw)
+  // ✅ FIXED: Safe fallback for Qualigens JSON structure
+  const qualigensProducts = Array.isArray(qualigensProductsRaw?.data)
+    ? qualigensProductsRaw.data
+    : Array.isArray(qualigensProductsRaw)
     ? qualigensProductsRaw
-    : qualigensProductsRaw.data || []
+    : []
 
   if (brandKey === "borosil") {
     const flat = []
@@ -50,7 +53,6 @@ export default function BrandPage({ params }) {
       const resolvedCategory =
         group.category?.trim() || group.product?.trim() || resolvedTitle
 
-      // ✅ Force override Untitled fallback only if necessary
       const baseMeta = {
         ...group,
         title: group.title?.toLowerCase().startsWith("untitled group")
@@ -195,7 +197,6 @@ export default function BrandPage({ params }) {
         variant: "destructive"
       })
 
-    // ✅ Smart fallback for product name in cart
     const productName =
       variant["Product Name"] ||
       variant["Description"] ||
