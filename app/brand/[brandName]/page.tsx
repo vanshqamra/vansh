@@ -13,7 +13,11 @@ import { Input } from "@/components/ui/input"
 
 if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor"
 
-const normalizeKey = (key) => key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
+const normalizeKey = (key) =>
+  key
+    ?.toLowerCase()
+    .replace(/[^a-z0-9]/gi, "")
+    .trim()
 
 export default function BrandPage({ params }) {
   const brandKey = params.brandName
@@ -28,20 +32,30 @@ export default function BrandPage({ params }) {
 
   let grouped = []
 
-  // ✅ FIXED: Safe fallback for Qualigens JSON structure
-  const qualigensProducts = Array.isArray(qualigensProductsRaw?.data)
-    ? qualigensProductsRaw.data
-    : Array.isArray(qualigensProductsRaw)
-    ? qualigensProductsRaw
-    : []
+  // ✅ FIXED: Safe fallback for Qualigens JSON structure with proper validation
+  const qualigensProducts = (() => {
+    try {
+      if (Array.isArray(qualigensProductsRaw?.data)) {
+        return qualigensProductsRaw.data
+      } else if (Array.isArray(qualigensProductsRaw)) {
+        return qualigensProductsRaw
+      } else {
+        return []
+      }
+    } catch (error) {
+      console.error("Error processing Qualigens products:", error)
+      return []
+    }
+  })()
 
   if (brandKey === "borosil") {
     const flat = []
     borosilProducts.forEach((group, idx) => {
       const variants = group.variants || []
-      const specs = Array.isArray(group.specs_headers) && group.specs_headers.length > 0
-        ? group.specs_headers
-        : Object.keys(variants[0] || {})
+      const specs =
+        Array.isArray(group.specs_headers) && group.specs_headers.length > 0
+          ? group.specs_headers
+          : Object.keys(variants[0] || {})
 
       const resolvedTitle =
         group.product?.trim() ||
@@ -50,19 +64,16 @@ export default function BrandPage({ params }) {
         group.description?.split("\n")[0]?.trim() ||
         `Group ${idx + 1}`
 
-      const resolvedCategory =
-        group.category?.trim() || group.product?.trim() || resolvedTitle
+      const resolvedCategory = group.category?.trim() || group.product?.trim() || resolvedTitle
 
       const baseMeta = {
         ...group,
-        title: group.title?.toLowerCase().startsWith("untitled group")
-          ? resolvedTitle
-          : group.title || resolvedTitle,
+        title: group.title?.toLowerCase().startsWith("untitled group") ? resolvedTitle : group.title || resolvedTitle,
         category: group.category?.toLowerCase().startsWith("untitled group")
           ? resolvedCategory
           : group.category || resolvedCategory,
         specs_headers: specs,
-        description: group.description || ""
+        description: group.description || "",
       }
 
       variants.forEach((v) => flat.push({ variant: v, groupMeta: baseMeta }))
@@ -70,7 +81,7 @@ export default function BrandPage({ params }) {
 
     const filtered = flat.filter(({ variant, groupMeta }) => {
       const variantMatch = Object.values(variant).some((val) =>
-        String(val).toLowerCase().includes(searchTerm.toLowerCase())
+        String(val).toLowerCase().includes(searchTerm.toLowerCase()),
       )
       const metaMatch =
         groupMeta.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -79,18 +90,14 @@ export default function BrandPage({ params }) {
       return variantMatch || metaMatch
     })
 
-    const paginated = filtered.slice(
-      (currentPage - 1) * productsPerPage,
-      currentPage * productsPerPage
-    )
+    const paginated = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
 
     const groupedMap = {}
     paginated.forEach(({ variant, groupMeta }) => {
       if (!groupMeta.specs_headers?.length) return
 
       const key = `${groupMeta.category}-${groupMeta.title}`
-      if (!groupedMap[key])
-        groupedMap[key] = { ...groupMeta, variants: [] }
+      if (!groupedMap[key]) groupedMap[key] = { ...groupMeta, variants: [] }
 
       const row = {}
       groupMeta.specs_headers.forEach((header) => {
@@ -101,7 +108,7 @@ export default function BrandPage({ params }) {
       groupedMap[key].variants.push(row)
     })
 
-    grouped = Object.values(groupedMap).filter(g => g.variants.length > 0)
+    grouped = Object.values(groupedMap).filter((g) => g.variants.length > 0)
   } else if (brandKey === "rankem") {
     const flat = []
     rankemProducts.forEach((group, idx) => {
@@ -112,26 +119,20 @@ export default function BrandPage({ params }) {
         title: cleanTitle,
         category: group.category || cleanTitle,
         description: group.description || "",
-        specs_headers: group.specs_headers || []
+        specs_headers: group.specs_headers || [],
       }
-      ;(group.variants || []).forEach(variant =>
-        flat.push({ variant, groupMeta })
-      )
+      ;(group.variants || []).forEach((variant) => flat.push({ variant, groupMeta }))
     })
 
-    const paginated = flat.slice(
-      (currentPage - 1) * productsPerPage,
-      currentPage * productsPerPage
-    )
+    const paginated = flat.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
 
     const groupedMap = {}
     paginated.forEach(({ variant, groupMeta }) => {
       const key = `${groupMeta.category}-${groupMeta.title}`
-      if (!groupedMap[key])
-        groupedMap[key] = { ...groupMeta, variants: [] }
+      if (!groupedMap[key]) groupedMap[key] = { ...groupMeta, variants: [] }
 
       const row = {}
-      groupMeta.specs_headers.forEach(header => {
+      groupMeta.specs_headers.forEach((header) => {
         const normKey = header.toLowerCase()
         row[header] = variant[header] || variant[normKey] || ""
       })
@@ -140,36 +141,25 @@ export default function BrandPage({ params }) {
 
     grouped = Object.values(groupedMap)
   } else if (brandKey === "qualigens") {
-    const paginated = qualigensProducts.slice(
-      (currentPage - 1) * productsPerPage,
-      currentPage * productsPerPage
-    )
+    const paginated = qualigensProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
 
     grouped = [
       {
         category: "Qualigens",
         title: "Qualigens Products",
         description: "",
-        specs_headers: [
-          "Product Code",
-          "CAS No",
-          "Product Name",
-          "Pack Size",
-          "Packing",
-          "Price",
-          "HSN Code"
-        ],
+        specs_headers: ["Product Code", "CAS No", "Product Name", "Pack Size", "Packing", "Price", "HSN Code"],
         variants: paginated.map((p, i) => ({
           "Product Code": p["Product Code"] || "",
           "CAS No": p["CAS No"] || "",
           "Product Name": p["Product Name"] || "",
           "Pack Size": p["Pack Size"] || "",
-          "Packing": p["Packing"] || "",
-          "Price": p["Price"] || "",
+          Packing: p["Packing"] || "",
+          Price: p["Price"] || "",
           "HSN Code": p["HSN Code"] || "",
-          __key: `qualigens-${p["Product Code"] || i}`
-        }))
-      }
+          __key: `qualigens-${p["Product Code"] || i}`,
+        })),
+      },
     ]
   }
 
@@ -178,23 +168,18 @@ export default function BrandPage({ params }) {
       return toast({
         title: "Loading...",
         description: "Please wait",
-        variant: "destructive"
+        variant: "destructive",
       })
 
-    const priceKey = group.specs_headers.find(h =>
-      h.toLowerCase().includes("price")
-    ) || ""
+    const priceKey = group.specs_headers.find((h) => h.toLowerCase().includes("price")) || ""
     const rawPrice = variant[priceKey] || ""
-    const price =
-      typeof rawPrice === "number"
-        ? rawPrice
-        : parseFloat(rawPrice.replace(/[^\d.]/g, ""))
+    const price = typeof rawPrice === "number" ? rawPrice : Number.parseFloat(rawPrice.replace(/[^\d.]/g, ""))
 
     if (isNaN(price) || price <= 0)
       return toast({
         title: "Invalid Price",
         description: "Cannot add invalid price.",
-        variant: "destructive"
+        variant: "destructive",
       })
 
     const productName =
@@ -223,13 +208,13 @@ export default function BrandPage({ params }) {
       quantity: 1,
       brand: brand.name,
       category: group.category,
-      image: null
+      image: null,
     })
 
     toast({
       title: "Added to Cart",
       description: `${productName} added successfully.`,
-      variant: "default"
+      variant: "default",
     })
   }
 
@@ -237,10 +222,10 @@ export default function BrandPage({ params }) {
     brandKey === "rankem"
       ? Math.ceil(rankemProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0) / productsPerPage)
       : brandKey === "borosil"
-      ? Math.ceil(borosilProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0) / productsPerPage)
-      : brandKey === "qualigens"
-      ? Math.ceil(qualigensProducts.length / productsPerPage)
-      : 1
+        ? Math.ceil(borosilProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0) / productsPerPage)
+        : brandKey === "qualigens"
+          ? Math.ceil(qualigensProducts.length / productsPerPage)
+          : 1
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -261,18 +246,16 @@ export default function BrandPage({ params }) {
           <h2 className="text-xl font-bold text-blue-700 mb-2">
             {group.title || group.product || `Group ${index + 1}`}
           </h2>
-          {group.description && (
-            <p className="text-sm text-gray-600 whitespace-pre-line mb-4">
-              {group.description}
-            </p>
-          )}
+          {group.description && <p className="text-sm text-gray-600 whitespace-pre-line mb-4">{group.description}</p>}
           {group.specs_headers.length > 0 && (
             <div className="overflow-auto border rounded mb-4">
               <table className="min-w-full text-sm text-left text-gray-700">
                 <thead className="bg-gray-100 text-xs uppercase font-semibold">
                   <tr>
                     {group.specs_headers.map((header, i) => (
-                      <th key={i} className="px-3 py-2 whitespace-nowrap">{header}</th>
+                      <th key={i} className="px-3 py-2 whitespace-nowrap">
+                        {header}
+                      </th>
                     ))}
                     <th className="px-3 py-2 whitespace-nowrap"></th>
                   </tr>
@@ -304,9 +287,23 @@ export default function BrandPage({ params }) {
 
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-8 overflow-x-auto max-w-full">
-          <Button variant="outline" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>Prev</Button>
-          <span className="px-4 py-2 text-sm">Page {currentPage} of {totalPages}</span>
-          <Button variant="outline" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>Next</Button>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </Button>
+          <span className="px-4 py-2 text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
         </div>
       )}
 
