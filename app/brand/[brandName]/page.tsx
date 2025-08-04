@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast"
 import { labSupplyBrands } from "@/lib/data"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import qualigensProducts from "@/lib/qualigens-products"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -35,8 +36,9 @@ export default function BrandPage({ params }: Props) {
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
 
-  const normalizeKey = (key: string) =>
-    key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
+  let grouped: GroupedProduct[] = []
+
+  const normalizeKey = (key: string) => key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
 
   const headerKeyMap: Record<string, string[]> = {
     "Product Code": ["code", "product_code"],
@@ -45,28 +47,23 @@ export default function BrandPage({ params }: Props) {
     "Price /Piece": ["price"],
     "Capacity ml": ["capacity_ml", "capacity"],
     "Graduation Interval ml": ["interval_ml", "graduation_interval_ml"],
+    "Tolerance + ml": ["tolerance_ml", "tolerance"],
+    "Approx O.D. x Length": ["od_x_length"],
+    "Tolerance ± ml": ["tolerance_ml", "tolerance"],
     "Graduation Interval": ["interval_ml", "graduation_interval_ml"],
     "Tolerance": ["tolerance_ml", "tolerance"],
-    "Tolerance ± ml": ["tolerance_ml", "tolerance"],
-    "Tolerance + ml": ["tolerance_ml", "tolerance"],
-    "Porosity Grade": ["porosity_grade"],
     "Approx Height": ["approx_height", "height"],
     "Stopper Size": ["stopper_size"],
-    "Neck Stopper Size": ["neck_stopper_size"],
     "Thread Specification": ["thread_specification"],
     "Max. Body Dia x Height": ["max_dia_height"],
     "Size of I/C Stopper": ["ic_stopper_size"],
     "Capacity Tolerance + ml": ["capacity_tolerance_ml"],
-    "Approx O.D. x Length": ["od_x_length"],
     "Approx O.D. x Height": ["od_x_height"],
     "Dia of Disc mm": ["dia_of_disc_mm", "dia_disc"],
+    "Neck Stopper Size": ["neck_stopper_size"],
     "Approx Height Neck Stopper Size": ["approx_height_neck_stopper_size"],
-    "Stem Dia mm": ["stem_dia_mm"],
-    "Approx O.D.": ["od"],
-    "Approx I.D.": ["id"],
+    "Capacity Tolerance + ml Max. Body Dia x Height": ["capacity_tolerance_max_body_dia_height"]
   }
-
-  let grouped: GroupedProduct[] = []
 
   if (brandKey === "borosil") {
     grouped = borosilProducts.map((group, idx) => {
@@ -75,8 +72,8 @@ export default function BrandPage({ params }: Props) {
       const variants = (group.variants || []).map((variant: Variant) => {
         const mapped: Variant = {}
         Object.entries(variant).forEach(([k, v]) => {
-          mapped[k] = v
-          mapped[normalizeKey(k)] = v
+          mapped[k] = String(v)
+          mapped[normalizeKey(k)] = String(v)
         })
         return mapped
       })
@@ -124,7 +121,7 @@ export default function BrandPage({ params }: Props) {
     return (
       group.title?.toLowerCase().includes(term) ||
       group.variants.some((v) =>
-        Object.values(v).some(val => val?.toLowerCase().includes(term))
+        Object.values(v).some(val => String(val || "").toLowerCase().includes(term))
       )
     )
   })
@@ -136,7 +133,7 @@ export default function BrandPage({ params }: Props) {
     }
 
     const priceKey = group.specs_headers.find(h => h.toLowerCase().includes("price")) || ""
-    const priceString = variant[priceKey] || ""
+    const priceString = String(variant[priceKey] || "")
     const numericPrice = parseFloat(priceString.replace(/[^\d.]/g, ""))
 
     if (isNaN(numericPrice) || numericPrice <= 0) {
@@ -147,7 +144,7 @@ export default function BrandPage({ params }: Props) {
     try {
       addItem({
         id: variant["Product Code"] || variant["code"] || "",
-        name: `${group.title} (${variant["Pack Size"] || variant["capacity_ml"] || "Variant"})`,
+        name: `${group.title}\n${group.description || ""}\n${group.specs_headers.map(h => `${h}: ${variant[h] || "—"}`).join(" | ")}`,
         price: numericPrice,
         brand: brand.name,
         category: group.category,
