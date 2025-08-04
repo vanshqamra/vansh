@@ -31,19 +31,4 @@ export const qualigensProducts: QualigensProduct[] = Array.isArray(qualigensData
     }))
   : []
 
-  ([code, cas, name, packSize, material, price, hsn]) => ({
-    code,
-    cas: cas || "",
-    name,
-    packSize,
-    material,
-    price,
-    hsn,
-    category: "Laboratory Chemical",
-    purity: "SQ",
-    brand: "Qualigens",
-    id: code,
-  }),
-)
-
 export default qualigensProducts
