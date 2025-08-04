@@ -6,17 +6,14 @@ import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
 import { labSupplyBrands } from "@/lib/data"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
-import qualigensProducts from "@/lib/qualigens-products"
+import qualigensProductsRaw from "@/lib/qualigens-products.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-if (labSupplyBrands.rankem) {
-  labSupplyBrands.rankem.name = "Avantor"
-}
+if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor"
 
-const normalizeKey = (key) =>
-  key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
+const normalizeKey = (key) => key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
 
 export default function BrandPage({ params }) {
   const brandKey = params.brandName
@@ -29,52 +26,50 @@ export default function BrandPage({ params }) {
   const [currentPage, setCurrentPage] = useState(1)
   const productsPerPage = 50
 
-  const headerKeyMap = {
-    "Product Code": ["code", "product_code"],
-    "Diameter mm": ["diameter_mm"],
-    "Quantity Per Case": ["quantity_per_case"],
-    "Price /Piece": ["price"],
-    "Capacity ml": ["capacity_ml", "capacity"],
-    "Graduation Interval ml": ["interval_ml", "graduation_interval_ml"],
-    "Tolerance + ml": ["tolerance_ml", "tolerance"],
-    "Approx O.D. x Length": ["od_x_length"],
-    "Tolerance ± ml": ["tolerance_ml", "tolerance"],
-    "Graduation Interval": ["interval_ml", "graduation_interval_ml"],
-    "Tolerance": ["tolerance_ml", "tolerance"],
-    "Approx Height": ["approx_height", "height"],
-    "Stopper Size": ["stopper_size"],
-    "Thread Specification": ["thread_specification"],
-    "Max. Body Dia x Height": ["max_dia_height"],
-    "Size of I/C Stopper": ["ic_stopper_size"],
-    "Capacity Tolerance + ml": ["capacity_tolerance_ml"],
-    "Approx O.D. x Height": ["od_x_height"],
-    "Dia of Disc mm": ["dia_of_disc_mm", "dia_disc"],
-    "Neck Stopper Size": ["neck_stopper_size"],
-    "Approx Height Neck Stopper Size": ["approx_height_neck_stopper_size"],
-    "Capacity Tolerance + ml Max. Body Dia x Height": ["capacity_tolerance_max_body_dia_height"],
-    "Cat No": ["catno", "cat_no"],
-    "List Price 2025(INR)": ["listprice", "price"]
-  }
-
   let grouped = []
+
+  const qualigensProducts = Array.isArray(qualigensProductsRaw)
+    ? qualigensProductsRaw
+    : qualigensProductsRaw.data || []
 
   if (brandKey === "borosil") {
     const flat = []
     borosilProducts.forEach((group, idx) => {
-      const specs = group.specs_headers || []
-      const resolvedTitle = group.product?.trim() || group.title?.trim() || `Unnamed Borosil Product Group ${idx + 1}`;
-      const resolvedCategory = group.product?.trim() || group.category?.trim() || resolvedTitle;
+      const variants = group.variants || []
+      const specs = Array.isArray(group.specs_headers) && group.specs_headers.length > 0
+        ? group.specs_headers
+        : Object.keys(variants[0] || {})
+
+      const resolvedTitle =
+        group.product?.trim() ||
+        group.title?.trim() ||
+        group.category?.trim() ||
+        group.description?.split("\n")[0]?.trim() ||
+        `Group ${idx + 1}`
+
+      const resolvedCategory =
+        group.category?.trim() || group.product?.trim() || resolvedTitle
+
+      // ✅ Force override Untitled fallback only if necessary
       const baseMeta = {
-        title: resolvedTitle,
-        category: resolvedCategory,
+        ...group,
+        title: group.title?.toLowerCase().startsWith("untitled group")
+          ? resolvedTitle
+          : group.title || resolvedTitle,
+        category: group.category?.toLowerCase().startsWith("untitled group")
+          ? resolvedCategory
+          : group.category || resolvedCategory,
         specs_headers: specs,
         description: group.description || ""
       }
-      ;(group.variants || []).forEach(v => flat.push({ variant: v, groupMeta: baseMeta }))
+
+      variants.forEach((v) => flat.push({ variant: v, groupMeta: baseMeta }))
     })
 
     const filtered = flat.filter(({ variant, groupMeta }) => {
-      const variantMatch = Object.values(variant).some(val => val.toLowerCase().includes(searchTerm.toLowerCase()))
+      const variantMatch = Object.values(variant).some((val) =>
+        String(val).toLowerCase().includes(searchTerm.toLowerCase())
+      )
       const metaMatch =
         groupMeta.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         groupMeta.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,99 +77,169 @@ export default function BrandPage({ params }) {
       return variantMatch || metaMatch
     })
 
-    const paginated = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
+    const paginated = filtered.slice(
+      (currentPage - 1) * productsPerPage,
+      currentPage * productsPerPage
+    )
+
     const groupedMap = {}
-    paginated.forEach(({ variant, groupMeta }, idx) => {
+    paginated.forEach(({ variant, groupMeta }) => {
+      if (!groupMeta.specs_headers?.length) return
+
       const key = `${groupMeta.category}-${groupMeta.title}`
-      if (!groupedMap[key]) {
+      if (!groupedMap[key])
         groupedMap[key] = { ...groupMeta, variants: [] }
-      }
-      const mapped = {}
-      Object.entries(variant).forEach(([k, v]) => {
-        mapped[k] = String(v)
-        mapped[normalizeKey(k)] = String(v)
-      })
+
       const row = {}
-      groupMeta.specs_headers.forEach(header => {
-        const keys = headerKeyMap[header] || [normalizeKey(header)]
-        row[header] = keys.map(k => mapped[k]).find(val => val) || ""
+      groupMeta.specs_headers.forEach((header) => {
+        const normKey = header.toLowerCase()
+        row[header] = variant[header] || variant[normKey] || ""
       })
+
       groupedMap[key].variants.push(row)
     })
-    grouped = Object.values(groupedMap)
+
+    grouped = Object.values(groupedMap).filter(g => g.variants.length > 0)
   } else if (brandKey === "rankem") {
     const flat = []
-    rankemProducts.forEach(group => {
-      (group.variants || []).forEach(variant => flat.push({ variant, groupMeta: group }))
-    })
-    const paginated = flat.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
-    const groupedMap = {}
-    paginated.forEach(({ variant, groupMeta }, idx) => {
-      const key = groupMeta.title || groupMeta.category || `Group-${idx}`
-      if (!groupedMap[key]) {
-        groupedMap[key] = {
-          category: groupMeta.category || key,
-          title: groupMeta.title || key,
-          description: groupMeta.description || "",
-          specs_headers: groupMeta.specs_headers || [],
-          variants: []
-        }
+    rankemProducts.forEach((group, idx) => {
+      const cleanTitle = group.title?.startsWith("Table")
+        ? group.category || `Group-${idx}`
+        : group.title || group.category || `Group-${idx}`
+      const groupMeta = {
+        title: cleanTitle,
+        category: group.category || cleanTitle,
+        description: group.description || "",
+        specs_headers: group.specs_headers || []
       }
-      const mapped = {}
-      Object.entries(variant).forEach(([k, v]) => {
-        mapped[k] = String(v)
-        mapped[normalizeKey(k)] = String(v)
-      })
+      ;(group.variants || []).forEach(variant =>
+        flat.push({ variant, groupMeta })
+      )
+    })
+
+    const paginated = flat.slice(
+      (currentPage - 1) * productsPerPage,
+      currentPage * productsPerPage
+    )
+
+    const groupedMap = {}
+    paginated.forEach(({ variant, groupMeta }) => {
+      const key = `${groupMeta.category}-${groupMeta.title}`
+      if (!groupedMap[key])
+        groupedMap[key] = { ...groupMeta, variants: [] }
+
       const row = {}
-      groupedMap[key].specs_headers.forEach(header => {
-        const keys = headerKeyMap[header] || [normalizeKey(header)]
-        row[header] = keys.map(k => mapped[k]).find(val => val) || ""
+      groupMeta.specs_headers.forEach(header => {
+        const normKey = header.toLowerCase()
+        row[header] = variant[header] || variant[normKey] || ""
       })
       groupedMap[key].variants.push(row)
     })
+
     grouped = Object.values(groupedMap)
   } else if (brandKey === "qualigens") {
+    const paginated = qualigensProducts.slice(
+      (currentPage - 1) * productsPerPage,
+      currentPage * productsPerPage
+    )
+
     grouped = [
       {
         category: "Qualigens",
         title: "Qualigens Products",
         description: "",
-        specs_headers: ["Product Code", "Pack Size", "Price"],
-        variants: qualigensProducts.map((p, i) => ({
-          "Product Code": p.code || "",
-          "Pack Size": p.packSize || "",
-          "Price": p.price || "",
-          __key: `qualigens-${p.code || i}`
+        specs_headers: [
+          "Product Code",
+          "CAS No",
+          "Product Name",
+          "Pack Size",
+          "Packing",
+          "Price",
+          "HSN Code"
+        ],
+        variants: paginated.map((p, i) => ({
+          "Product Code": p["Product Code"] || "",
+          "CAS No": p["CAS No"] || "",
+          "Product Name": p["Product Name"] || "",
+          "Pack Size": p["Pack Size"] || "",
+          "Packing": p["Packing"] || "",
+          "Price": p["Price"] || "",
+          "HSN Code": p["HSN Code"] || "",
+          __key: `qualigens-${p["Product Code"] || i}`
         }))
       }
     ]
   }
 
-  const totalPages = brandKey === "rankem"
-    ? Math.ceil(rankemProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0) / productsPerPage)
-    : brandKey === "borosil"
-      ? Math.ceil(borosilProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0) / productsPerPage)
-      : 1
-
   const handleAdd = (variant, group) => {
-    if (!isLoaded) return toast({ title: "Loading...", description: "Please wait", variant: "destructive" })
-    const priceKey = group.specs_headers.find(h => h.toLowerCase().includes("price")) || ""
-    const price = parseFloat((variant[priceKey] || "").replace(/[^\d.]/g, ""))
-    if (isNaN(price) || price <= 0) return toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" })
-    const name = [`Cat No: ${variant["Cat No"] || variant["Product Code"] || variant["code"] || ""}`,
-      ...group.specs_headers.map(h => `${h}: ${variant[h] || "—"}`)
-    ].join("\n")
+    if (!isLoaded)
+      return toast({
+        title: "Loading...",
+        description: "Please wait",
+        variant: "destructive"
+      })
+
+    const priceKey = group.specs_headers.find(h =>
+      h.toLowerCase().includes("price")
+    ) || ""
+    const rawPrice = variant[priceKey] || ""
+    const price =
+      typeof rawPrice === "number"
+        ? rawPrice
+        : parseFloat(rawPrice.replace(/[^\d.]/g, ""))
+
+    if (isNaN(price) || price <= 0)
+      return toast({
+        title: "Invalid Price",
+        description: "Cannot add invalid price.",
+        variant: "destructive"
+      })
+
+    // ✅ Smart fallback for product name in cart
+    const productName =
+      variant["Product Name"] ||
+      variant["Description"] ||
+      variant["Unnamed: 1"] ||
+      group.title ||
+      group.product ||
+      group.description?.split("\n")[0]?.trim() ||
+      "Unnamed Product"
+
+    const catNo = variant["Cat No"] || variant["Product Code"] || variant["code"] || ""
+
     addItem({
-      id: variant["Product Code"] || variant["code"] || variant["Cat No"] || "",
-      name,
+      id: catNo,
+      name: productName,
+      productName,
+      catNo,
+      productCode: variant["Product Code"] || "",
+      casNo: variant["CAS No"] || "",
+      grade: variant["Grade"] || variant["grade"] || "",
+      packSize: variant["Pack Size"] || variant["capacity_ml"] || "",
+      packing: variant["Packing"] || "",
+      hsn: variant["HSN Code"] || "",
       price,
+      quantity: 1,
       brand: brand.name,
       category: group.category,
-      packSize: variant["Pack Size"] || variant["capacity_ml"] || "",
-      material: ""
+      image: null
     })
-    toast({ title: "Added to Cart", description: `${variant["Description"] || group.title} added successfully.` })
+
+    toast({
+      title: "Added to Cart",
+      description: `${productName} added successfully.`,
+      variant: "default"
+    })
   }
+
+  const totalPages =
+    brandKey === "rankem"
+      ? Math.ceil(rankemProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0) / productsPerPage)
+      : brandKey === "borosil"
+      ? Math.ceil(borosilProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0) / productsPerPage)
+      : brandKey === "qualigens"
+      ? Math.ceil(qualigensProducts.length / productsPerPage)
+      : 1
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -184,50 +249,58 @@ export default function BrandPage({ params }) {
         placeholder="Search products..."
         className="mb-8 max-w-md"
         value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
+
       {grouped.map((group, index) => (
         <div key={`group-${index}-${group.title || "untitled"}`} className="mb-12">
-          <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">{group.category}</h3>
-          <h2 className="text-xl font-bold text-blue-700 mb-2">{group.title}</h2>
+          <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">
+            {group.category || `Group ${index + 1}`}
+          </h3>
+          <h2 className="text-xl font-bold text-blue-700 mb-2">
+            {group.title || group.product || `Group ${index + 1}`}
+          </h2>
           {group.description && (
             <p className="text-sm text-gray-600 whitespace-pre-line mb-4">
               {group.description}
             </p>
           )}
-          <div className="overflow-auto border rounded mb-4">
-            <table className="min-w-full text-sm text-left text-gray-700">
-              <thead className="bg-gray-100 text-xs uppercase font-semibold">
-                <tr>
-                  {group.specs_headers.map((header, i) => (
-                    <th key={i} className="px-3 py-2 whitespace-nowrap">{header}</th>
-                  ))}
-                  <th className="px-3 py-2 whitespace-nowrap"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {group.variants.map((variant, i) => {
-                  const rowKey = `${brandKey}-${variant["Product Code"] || variant["Cat No"] || i}-${i}`
-                  return (
-                    <tr key={rowKey} className="border-t">
-                      {group.specs_headers.map((key, j) => (
-                        <td key={j} className="px-3 py-2 whitespace-nowrap">
-                          {variant[key] || "—"}
+          {group.specs_headers.length > 0 && (
+            <div className="overflow-auto border rounded mb-4">
+              <table className="min-w-full text-sm text-left text-gray-700">
+                <thead className="bg-gray-100 text-xs uppercase font-semibold">
+                  <tr>
+                    {group.specs_headers.map((header, i) => (
+                      <th key={i} className="px-3 py-2 whitespace-nowrap">{header}</th>
+                    ))}
+                    <th className="px-3 py-2 whitespace-nowrap"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.variants.map((variant, i) => {
+                    const rowKey = `${brandKey}-${variant["Product Code"] || variant["Cat No"] || i}-${i}`
+                    return (
+                      <tr key={rowKey} className="border-t">
+                        {group.specs_headers.map((key, j) => (
+                          <td key={j} className="px-3 py-2 whitespace-nowrap">
+                            {variant[key] || "—"}
+                          </td>
+                        ))}
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <Button onClick={() => handleAdd(variant, group)} disabled={!isLoaded} className="text-xs">
+                            Add to Cart
+                          </Button>
                         </td>
-                      ))}
-                      <td className="px-3 py-2 whitespace-nowrap">
-                        <Button onClick={() => handleAdd(variant, group)} disabled={!isLoaded} className="text-xs">
-                          Add to Cart
-                        </Button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       ))}
+
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-8 overflow-x-auto max-w-full">
           <Button variant="outline" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>Prev</Button>
@@ -235,6 +308,7 @@ export default function BrandPage({ params }) {
           <Button variant="outline" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages}>Next</Button>
         </div>
       )}
+
       {grouped.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">No products found matching your search.</p>

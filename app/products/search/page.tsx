@@ -1,9 +1,8 @@
-// SearchPage.tsx — Updated to show entire product group for Borosil matches
 "use client"
 
 import type React from "react"
 import { useState, useEffect, Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -12,16 +11,14 @@ import { Search, Plus } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
 
-import { qualigensProducts } from "@/lib/qualigens-products"
+import qualigensProducts from "@/lib/qualigens-products.json"  // ✅ DEFAULT import
 import { commercialChemicals } from "@/lib/data"
 import rankemProducts from "@/lib/rankem_products.json"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 
 function SearchResults() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
-  const [hasSyncedFromParams, setHasSyncedFromParams] = useState(false)
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [mounted, setMounted] = useState(false)
   const { addItem, isLoaded } = useCart()
@@ -32,12 +29,9 @@ function SearchResults() {
   }, [])
 
   useEffect(() => {
-    if (!hasSyncedFromParams) {
-      const query = searchParams.get("q") || ""
-      setSearchQuery(query)
-      setHasSyncedFromParams(true)
-    }
-  }, [searchParams, hasSyncedFromParams])
+    const query = searchParams.get("q") || ""
+    setSearchQuery(query)
+  }, [searchParams])
 
   const matchesSearchQuery = (product: any, query: string): boolean => {
     const q = query.trim().toLowerCase()
@@ -67,9 +61,15 @@ function SearchResults() {
       return
     }
 
-    const qualigensResults = qualigensProducts
+    const qualigensResults = (Array.isArray(qualigensProducts) ? qualigensProducts : qualigensProducts.data || [])
       .filter((product) => matchesSearchQuery(product, searchQuery))
-      .map((product) => ({ ...product, source: "qualigens" }))
+      .map((product) => ({
+        ...product,
+        source: "qualigens",
+        name: product["Product Name"],
+        code: product["Product Code"],
+        price: product["Price"]
+      }))
 
     const commercialResults = commercialChemicals
       .filter((product) => matchesSearchQuery(product, searchQuery))
@@ -165,7 +165,10 @@ function SearchResults() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/products/search?q=${encodeURIComponent(searchQuery)}`)
+      const params = new URLSearchParams(window.location.search)
+      params.set("q", searchQuery)
+      window.history.pushState({}, "", `?${params.toString()}`)
+      window.dispatchEvent(new PopStateEvent("popstate"))
     }
   }
 
