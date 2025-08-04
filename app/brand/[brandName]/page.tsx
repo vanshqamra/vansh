@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast"
 import { labSupplyBrands } from "@/lib/data"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import qualigensProducts from "@/lib/qualigens-products"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -35,6 +34,8 @@ export default function BrandPage({ params }: Props) {
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const productsPerPage = 12
 
   let grouped: GroupedProduct[] = []
 
@@ -126,6 +127,12 @@ export default function BrandPage({ params }: Props) {
     )
   })
 
+  const totalPages = Math.ceil(filtered.length / productsPerPage)
+  const paginatedGroups = filtered.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
+  )
+
   const handleAdd = (variant: Variant, group: GroupedProduct) => {
     if (!isLoaded) {
       toast({ title: "Loading...", description: "Please wait", variant: "destructive" })
@@ -169,7 +176,7 @@ export default function BrandPage({ params }: Props) {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {filtered.map((group, index) => (
+      {paginatedGroups.map((group, index) => (
         <div key={`${group.title}-${index}`} className="mb-12">
           <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">{group.category}</h3>
           <h2 className="text-xl font-bold text-blue-700 mb-2">{group.title}</h2>
@@ -209,6 +216,20 @@ export default function BrandPage({ params }: Props) {
           </div>
         </div>
       ))}
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-8">
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <Button
+              key={index}
+              variant={currentPage === index + 1 ? "default" : "outline"}
+              onClick={() => setCurrentPage(index + 1)}
+            >
+              {index + 1}
+            </Button>
+          ))}
+        </div>
+      )}
 
       {filtered.length === 0 && (
         <div className="text-center py-12">

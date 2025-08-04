@@ -13,7 +13,6 @@ export default function CartPage() {
   const { state, removeItem, updateQuantity, clearCart } = useCart()
   const [mounted, setMounted] = useState(false)
 
-  // Safe access to cart state with defaults
   const items = state?.items || []
   const totalPrice = state?.total || 0
   const totalItems = state?.itemCount || 0
@@ -65,7 +64,7 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Shopping Cart</h1>
           <Button variant="outline" onClick={clearCart} className="text-red-600 hover:text-red-700 bg-transparent">
@@ -74,13 +73,13 @@ export default function CartPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="space-y-4 overflow-x-auto">
             {items.map((item) => (
               <Card key={item.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
+                <CardContent className="p-6 overflow-x-auto">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-4 space-y-4 lg:space-y-0">
                     <div className="relative h-20 w-20 flex-shrink-0">
                       <Image
                         src={item.image || "/placeholder.svg?height=80&width=80"}
@@ -90,11 +89,20 @@ export default function CartPage() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg truncate">{item.name}</h3>
-                      {item.brand && <p className="text-sm text-gray-600">{item.brand}</p>}
-                      {item.category && <p className="text-sm text-gray-500">{item.category}</p>}
-                      <p className="text-lg font-bold text-blue-600">₹{item.price.toLocaleString()}</p>
+                      <div className="space-y-1">
+                        {item.name.includes("|") ? (
+                          item.name.split("|").map((part, i) => (
+                            <p key={i} className="text-sm text-gray-800 break-words whitespace-normal">{part.trim()}</p>
+                          ))
+                        ) : (
+                          <h3 className="font-semibold text-base break-words whitespace-normal">{item.name}</h3>
+                        )}
+                        {item.brand && <p className="text-sm text-gray-600">{item.brand}</p>}
+                        {item.category && <p className="text-sm text-gray-500">{item.category}</p>}
+                      </div>
+                      <p className="text-lg font-bold text-blue-600 mt-1">₹{item.price.toLocaleString()}</p>
                     </div>
+
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
@@ -119,7 +127,8 @@ export default function CartPage() {
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="text-right">
+
+                    <div className="text-right min-w-[100px]">
                       <p className="font-bold text-lg">₹{(item.price * item.quantity).toLocaleString()}</p>
                       <Button
                         variant="ghost"
@@ -138,7 +147,7 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
+          <div>
             <Card className="sticky top-4">
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
