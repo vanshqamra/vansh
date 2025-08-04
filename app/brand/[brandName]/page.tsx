@@ -14,7 +14,10 @@ import { Input } from "@/components/ui/input"
 if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor"
 
 const normalizeKey = (key) =>
-  key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
+  key
+    ?.toLowerCase()
+    .replace(/[^a-z0-9]/gi, "")
+    .trim()
 
 export default function BrandPage({ params }) {
   const brandKey = params.brandName
@@ -31,13 +34,14 @@ export default function BrandPage({ params }) {
 
   const qualigensProducts = (() => {
     try {
-      if (Array.isArray(qualigensProductsRaw?.data)) {
-        return qualigensProductsRaw.data
-      } else if (Array.isArray(qualigensProductsRaw)) {
-        return qualigensProductsRaw
-      } else {
-        return []
-      }
+      // ✅ FIXED: Handle JSON module import correctly for build environments
+      const rawQualigensData = qualigensProductsRaw.default || qualigensProductsRaw
+      const qualigensProducts = Array.isArray(rawQualigensData?.data)
+        ? rawQualigensData.data
+        : Array.isArray(rawQualigensData)
+          ? rawQualigensData
+          : []
+      return qualigensProducts
     } catch (error) {
       console.error("Error processing Qualigens products:", error)
       return []
@@ -77,7 +81,7 @@ export default function BrandPage({ params }) {
 
     const filtered = flat.filter(({ variant, groupMeta }) => {
       const variantMatch = Object.values(variant).some((val) =>
-        String(val).toLowerCase().includes(searchTerm.toLowerCase())
+        String(val).toLowerCase().includes(searchTerm.toLowerCase()),
       )
       const metaMatch =
         groupMeta.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
