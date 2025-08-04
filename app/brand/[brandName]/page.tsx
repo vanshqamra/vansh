@@ -14,10 +14,7 @@ import { Input } from "@/components/ui/input"
 if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor"
 
 const normalizeKey = (key) =>
-  key
-    ?.toLowerCase()
-    .replace(/[^a-z0-9]/gi, "")
-    .trim()
+  key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
 
 export default function BrandPage({ params }) {
   const brandKey = params.brandName
@@ -32,7 +29,6 @@ export default function BrandPage({ params }) {
 
   let grouped = []
 
-  // ✅ FIXED: Safe fallback for Qualigens JSON structure with proper validation
   const qualigensProducts = (() => {
     try {
       if (Array.isArray(qualigensProductsRaw?.data)) {
@@ -81,7 +77,7 @@ export default function BrandPage({ params }) {
 
     const filtered = flat.filter(({ variant, groupMeta }) => {
       const variantMatch = Object.values(variant).some((val) =>
-        String(val).toLowerCase().includes(searchTerm.toLowerCase()),
+        String(val).toLowerCase().includes(searchTerm.toLowerCase())
       )
       const metaMatch =
         groupMeta.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -141,6 +137,11 @@ export default function BrandPage({ params }) {
 
     grouped = Object.values(groupedMap)
   } else if (brandKey === "qualigens") {
+    if (!Array.isArray(qualigensProducts)) {
+      console.error("Qualigens data is not iterable")
+      notFound()
+    }
+
     const paginated = qualigensProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
 
     grouped = [
