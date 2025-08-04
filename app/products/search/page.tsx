@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -11,13 +10,17 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Plus } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
+
 import { qualigensProducts } from "@/lib/qualigens-products"
 import { commercialChemicals } from "@/lib/data"
+import rankemProducts from "@/lib/rankem_products.json"
+import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 
 function SearchResults() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
+  const [hasSyncedFromParams, setHasSyncedFromParams] = useState(false)
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [mounted, setMounted] = useState(false)
   const { addItem, isLoaded } = useCart()
@@ -25,9 +28,39 @@ function SearchResults() {
 
   useEffect(() => {
     setMounted(true)
-    const query = searchParams.get("q") || ""
-    setSearchQuery(query)
-  }, [searchParams])
+  }, [])
+
+  useEffect(() => {
+    if (!hasSyncedFromParams) {
+      const query = searchParams.get("q") || ""
+      setSearchQuery(query)
+      setHasSyncedFromParams(true)
+    }
+  }, [searchParams, hasSyncedFromParams])
+
+  const matchesSearchQuery = (product: any, query: string): boolean => {
+    const q = query.trim().toLowerCase()
+    if (!q) return false
+
+    const fields = [
+      product.name,
+      product.code,
+      product.cas,
+      product.category,
+      product.title,
+      product.description
+    ]
+
+    const specsString = Array.isArray(product.specs)
+      ? product.specs.flat().join(" ").toLowerCase()
+      : ""
+
+    return (
+      fields.some(
+        (field) => typeof field === "string" && field.toLowerCase().includes(q)
+      ) || specsString.includes(q)
+    )
+  }
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -35,30 +68,66 @@ function SearchResults() {
       return
     }
 
-    const searchLower = searchQuery.toLowerCase()
-
-    // Search in Qualigens products
     const qualigensResults = qualigensProducts
-      .filter(
-        (product) =>
-          (product.name && product.name.toLowerCase().includes(searchLower)) ||
-          (product.code && product.code.toLowerCase().includes(searchLower)) ||
-          (product.cas && product.cas.toLowerCase().includes(searchLower)) ||
-          (product.category && product.category.toLowerCase().includes(searchLower)),
-      )
+      .filter((product) => matchesSearchQuery(product, searchQuery))
       .map((product) => ({ ...product, source: "qualigens" }))
 
-    // Search in commercial chemicals
     const commercialResults = commercialChemicals
-      .filter(
-        (product) =>
-          (product.name && product.name.toLowerCase().includes(searchLower)) ||
-          (product.code && product.code.toLowerCase().includes(searchLower)) ||
-          (product.category && product.category.toLowerCase().includes(searchLower)),
-      )
+      .filter((product) => matchesSearchQuery(product, searchQuery))
       .map((product) => ({ ...product, source: "commercial" }))
 
-    setSearchResults([...qualigensResults, ...commercialResults])
+    const rankemResults = rankemProducts
+      .flatMap((group: any) =>
+        group.variants
+          .filter((variant: any) => {
+            const enriched = {
+              ...variant,
+              specs: group.specs_headers?.map((header: string) => variant[header] || "") || [],
+              category: group.category,
+              title: group.title,
+              description: group.description,
+              specs_headers: group.specs_headers,
+              source: "rankem",
+              name: variant.name || variant["Product Name"] || group.title || "",
+              code: variant.code || variant["Product Code"] || variant["Cat No"] || "",
+              price: variant.price || variant["Price"] || variant["List Price 2025(INR)"] || ""
+            }
+            return matchesSearchQuery(enriched, searchQuery)
+          })
+          .map((variant: any) => ({
+            ...variant,
+            specs: group.specs_headers?.map((header: string) => variant[header] || "") || [],
+            category: group.category,
+            title: group.title,
+            description: group.description,
+            specs_headers: group.specs_headers,
+            source: "rankem",
+            name: variant.name || variant["Product Name"] || group.title || "",
+            code: variant.code || variant["Product Code"] || variant["Cat No"] || "",
+            price: variant.price || variant["Price"] || variant["List Price 2025(INR)"] || ""
+          }))
+      )
+
+    const borosilResults = borosilProducts
+      .flatMap((group: any) =>
+        group.variants.map((variant: any) => ({
+          ...variant,
+          category: group.category,
+          title: group.title,
+          description: group.description,
+          specs_headers: group.specs_headers,
+          specs: variant.specs,
+          source: "borosil",
+        }))
+      )
+      .filter((product) => matchesSearchQuery(product, searchQuery))
+
+    setSearchResults([
+      ...qualigensResults,
+      ...commercialResults,
+      ...rankemResults,
+      ...borosilResults,
+    ])
   }, [searchQuery])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -80,7 +149,9 @@ function SearchResults() {
 
     try {
       const price =
-        typeof product.price === "number" ? product.price : Number.parseFloat(product.price.replace(/[^\d.]/g, ""))
+        typeof product.price === "number"
+          ? product.price
+          : Number.parseFloat(product.price?.replace(/[^\d.]/g, ""))
 
       if (isNaN(price) || price <= 0) {
         toast({
@@ -93,15 +164,15 @@ function SearchResults() {
 
       addItem({
         id: product.id || product.code,
-        name: product.name,
+        name: product.name || product.title,
         price: price,
-        brand: product.source === "qualigens" ? "Qualigens" : "Commercial",
+        brand: product.source,
         category: product.category,
       })
 
       toast({
         title: "Added to Cart",
-        description: `${product.name} has been added to your cart`,
+        description: `${product.name || product.title} has been added to your cart`,
       })
     } catch (error) {
       console.error("Error adding to cart:", error)
@@ -114,20 +185,7 @@ function SearchResults() {
   }
 
   if (!mounted) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-slate-200 rounded w-64 mb-8"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-96 bg-slate-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <div className="container mx-auto px-4 py-8">Loading...</div>
   }
 
   return (
@@ -136,7 +194,6 @@ function SearchResults() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Search Results</h1>
 
-          {/* Search Bar */}
           <form onSubmit={handleSearch} className="flex gap-4 max-w-md mb-6">
             <Input
               placeholder="Search products..."
@@ -160,27 +217,31 @@ function SearchResults() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {searchResults.map((product) => (
               <Card
-                key={`${product.source}-${product.id || product.code}`}
+                key={`${product.source}-${product.id || product.code || Math.random().toString(36).substring(2, 10)}`}
                 className="hover:shadow-lg transition-shadow"
               >
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">{product.name}</CardTitle>
+                  <CardTitle className="text-lg">{product.name || product.title}</CardTitle>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{product.source === "qualigens" ? "Qualigens" : "Commercial"}</Badge>
+                    <Badge variant="secondary">{product.source}</Badge>
                     <Badge variant="outline">{product.category}</Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 mb-4">
-                    <p className="text-sm text-slate-600">Code: {product.code}</p>
+                    {product.code && <p className="text-sm text-slate-600">Code: {product.code}</p>}
                     {product.cas && <p className="text-sm text-slate-600">CAS: {product.cas}</p>}
                     {product.purity && <p className="text-sm text-slate-600">Purity: {product.purity}</p>}
-                    <p className="text-sm text-slate-600">Pack Size: {product.packSize || product.pack_size}</p>
+                    <p className="text-sm text-slate-600">
+                      Pack Size: {product.packSize || product.pack_size || "—"}
+                    </p>
                     {product.material && <p className="text-sm text-slate-600">Material: {product.material}</p>}
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-blue-600">
-                      {typeof product.price === "number" ? `₹${product.price.toLocaleString()}` : product.price}
+                      {typeof product.price === "number"
+                        ? `₹${product.price.toLocaleString()}`
+                        : product.price || "₹—"}
                     </span>
                     <Button
                       onClick={() => handleAddToCart(product)}
@@ -197,11 +258,9 @@ function SearchResults() {
           </div>
         ) : searchQuery ? (
           <div className="text-center py-12">
-            <div className="h-24 w-24 bg-slate-200 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <Search className="h-12 w-12 text-slate-400" />
-            </div>
+            <Search className="h-24 w-24 text-slate-400 mx-auto mb-6" />
             <h2 className="text-2xl font-bold text-slate-900 mb-4">No products found</h2>
-            <p className="text-slate-600 mb-8">Try different search terms or browse our categories.</p>
+            <p className="text-slate-600">Try different search terms or browse our categories.</p>
           </div>
         ) : (
           <div className="text-center py-12">
@@ -217,20 +276,7 @@ function SearchResults() {
 
 export default function SearchPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-slate-200 rounded w-64 mb-8"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-96 bg-slate-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading...</div>}>
       <SearchResults />
     </Suspense>
   )

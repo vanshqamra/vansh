@@ -11,12 +11,9 @@ import rankemProducts from "@/lib/rankem_products.json"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-// Modify Rankem brand title to Avantor
 if (labSupplyBrands.rankem) {
   labSupplyBrands.rankem.name = "Avantor"
 }
-
-// Types
 
 type Props = { params: { brandName: string } }
 
@@ -42,8 +39,6 @@ export default function BrandPage({ params }: Props) {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const productsPerPage = 50
-
-  let grouped: GroupedProduct[] = []
 
   const normalizeKey = (key: string) => key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
 
@@ -73,6 +68,8 @@ export default function BrandPage({ params }: Props) {
     "Cat No": ["catno", "cat_no"],
     "List Price 2025(INR)": ["listprice", "price"]
   }
+
+  let grouped: GroupedProduct[] = []
 
   const parseGroups = (source: any[]) => {
     return source.map((group: any, idx: number) => {
@@ -147,15 +144,23 @@ export default function BrandPage({ params }: Props) {
     }]
   }
 
-  const filtered = grouped.filter(group => {
-    const term = searchTerm.toLowerCase()
-    return (
-      group.title?.toLowerCase().includes(term) ||
-      group.variants.some((v) =>
-        Object.values(v).some(val => String(val || "").toLowerCase().includes(term))
+  // ✅ FIXED SEARCH LOGIC
+  const filtered = grouped.map(group => {
+    const filteredVariants = group.variants.filter(variant =>
+      Object.values(variant).some(val =>
+        String(val || "").toLowerCase().includes(searchTerm.toLowerCase())
       )
     )
-  })
+
+    return {
+      ...group,
+      variants: filteredVariants
+    }
+  }).filter(group =>
+    group.variants.length > 0 ||
+    group.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    group.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const totalPages = brandKey === "rankem"
     ? Math.ceil((rankemProducts[0]?.variants?.length || 0) / productsPerPage)
