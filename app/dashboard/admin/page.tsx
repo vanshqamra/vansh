@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { revalidatePath } from "next/cache"
 
 export default async function AdminDashboardPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -26,7 +26,7 @@ export default async function AdminDashboardPage() {
 
   async function approveClient(formData: FormData) {
     "use server"
-    const supabase = createClient()
+    const supabase = await createClient()
     const clientId = formData.get("clientId") as string
     const status = formData.get("status") === "true"
 
