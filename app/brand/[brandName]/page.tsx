@@ -1,4 +1,3 @@
-// Final corrected BrandPage.tsx
 "use client"
 
 import { useState } from "react"
@@ -16,7 +15,8 @@ if (labSupplyBrands.rankem) {
   labSupplyBrands.rankem.name = "Avantor"
 }
 
-const normalizeKey = (key) => key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
+const normalizeKey = (key) =>
+  key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
 
 export default function BrandPage({ params }) {
   const brandKey = params.brandName
@@ -62,8 +62,6 @@ export default function BrandPage({ params }) {
     const flat = []
     borosilProducts.forEach((group, idx) => {
       const specs = group.specs_headers || []
-      
-      
       const resolvedTitle = group.product?.trim() || group.title?.trim() || `Unnamed Borosil Product Group ${idx + 1}`;
       const resolvedCategory = group.product?.trim() || group.category?.trim() || resolvedTitle;
       const baseMeta = {
@@ -74,22 +72,22 @@ export default function BrandPage({ params }) {
       }
       ;(group.variants || []).forEach(v => flat.push({ variant: v, groupMeta: baseMeta }))
     })
+
     const filtered = flat.filter(({ variant, groupMeta }) => {
       const variantMatch = Object.values(variant).some(val => val.toLowerCase().includes(searchTerm.toLowerCase()))
-      const metaMatch = groupMeta.title?.toLowerCase().includes(searchTerm.toLowerCase()) || groupMeta.category?.toLowerCase().includes(searchTerm.toLowerCase()) || groupMeta.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      const metaMatch =
+        groupMeta.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        groupMeta.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        groupMeta.description?.toLowerCase().includes(searchTerm.toLowerCase())
       return variantMatch || metaMatch
-    }))
-    )
+    })
+
     const paginated = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
     const groupedMap = {}
-    paginated.forEach(({ variant, groupMeta }) => {
-      
-      
-      const key = `${groupMeta.category}-${groupMeta.title}`;
+    paginated.forEach(({ variant, groupMeta }, idx) => {
+      const key = `${groupMeta.category}-${groupMeta.title}`
       if (!groupedMap[key]) {
-        groupedMap[key] = {
-          ...groupMeta,
-          variants: [] }
+        groupedMap[key] = { ...groupMeta, variants: [] }
       }
       const mapped = {}
       Object.entries(variant).forEach(([k, v]) => {
@@ -142,10 +140,11 @@ export default function BrandPage({ params }) {
         title: "Qualigens Products",
         description: "",
         specs_headers: ["Product Code", "Pack Size", "Price"],
-        variants: qualigensProducts.map(p => ({
+        variants: qualigensProducts.map((p, i) => ({
           "Product Code": p.code || "",
           "Pack Size": p.packSize || "",
-          "Price": p.price || ""
+          "Price": p.price || "",
+          __key: `qualigens-${p.code || i}`
         }))
       }
     ]
@@ -180,12 +179,22 @@ export default function BrandPage({ params }) {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-6">{brand.name} Products</h1>
-      <Input type="text" placeholder="Search products..." className="mb-8 max-w-md" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+      <Input
+        type="text"
+        placeholder="Search products..."
+        className="mb-8 max-w-md"
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+      />
       {grouped.map((group, index) => (
-        <div key={`${group.category}-${group.title}-${index}`} className="mb-12">
+        <div key={`group-${index}-${group.title || "untitled"}`} className="mb-12">
           <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">{group.category}</h3>
           <h2 className="text-xl font-bold text-blue-700 mb-2">{group.title}</h2>
-          {group.description && <p className="text-sm text-gray-600 whitespace-pre-line mb-4">{group.description}</p>}
+          {group.description && (
+            <p className="text-sm text-gray-600 whitespace-pre-line mb-4">
+              {group.description}
+            </p>
+          )}
           <div className="overflow-auto border rounded mb-4">
             <table className="min-w-full text-sm text-left text-gray-700">
               <thead className="bg-gray-100 text-xs uppercase font-semibold">
@@ -197,16 +206,23 @@ export default function BrandPage({ params }) {
                 </tr>
               </thead>
               <tbody>
-                {group.variants.map((variant, i) => (
-                  <tr key={i} className="border-t">
-                    {group.specs_headers.map((key, j) => (
-                      <td key={j} className="px-3 py-2 whitespace-nowrap">{variant[key] || "—"}</td>
-                    ))}
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      <Button onClick={() => handleAdd(variant, group)} disabled={!isLoaded} className="text-xs">Add to Cart</Button>
-                    </td>
-                  </tr>
-                ))}
+                {group.variants.map((variant, i) => {
+                  const rowKey = `${brandKey}-${variant["Product Code"] || variant["Cat No"] || i}-${i}`
+                  return (
+                    <tr key={rowKey} className="border-t">
+                      {group.specs_headers.map((key, j) => (
+                        <td key={j} className="px-3 py-2 whitespace-nowrap">
+                          {variant[key] || "—"}
+                        </td>
+                      ))}
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <Button onClick={() => handleAdd(variant, group)} disabled={!isLoaded} className="text-xs">
+                          Add to Cart
+                        </Button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
