@@ -1,3 +1,4 @@
+// SearchPage.tsx — Updated to show entire product group for Borosil matches
 "use client"
 
 import type React from "react"
@@ -42,24 +43,22 @@ function SearchResults() {
     const q = query.trim().toLowerCase()
     if (!q) return false
 
-    const fields = [
-      product.name,
-      product.code,
-      product.cas,
-      product.category,
-      product.title,
-      product.description
-    ]
+    const searchFields: string[] = []
 
-    const specsString = Array.isArray(product.specs)
-      ? product.specs.flat().join(" ").toLowerCase()
-      : ""
+    const collectFields = (obj: any) => {
+      if (typeof obj === "string") {
+        searchFields.push(obj.toLowerCase())
+      } else if (typeof obj === "number") {
+        searchFields.push(obj.toString())
+      } else if (Array.isArray(obj)) {
+        obj.forEach(collectFields)
+      } else if (typeof obj === "object" && obj !== null) {
+        Object.values(obj).forEach(collectFields)
+      }
+    }
 
-    return (
-      fields.some(
-        (field) => typeof field === "string" && field.toLowerCase().includes(q)
-      ) || specsString.includes(q)
-    )
+    collectFields(product)
+    return searchFields.some((field) => field.includes(q))
   }
 
   useEffect(() => {
@@ -76,11 +75,14 @@ function SearchResults() {
       .filter((product) => matchesSearchQuery(product, searchQuery))
       .map((product) => ({ ...product, source: "commercial" }))
 
-    const rankemResults = rankemProducts
-      .flatMap((group: any) =>
-        group.variants
-          .filter((variant: any) => {
-            const enriched = {
+    const rankemResults = rankemProducts.flatMap((group: any) =>
+      group.variants
+        .map((variant: any) => {
+          const isStandardFormat = variant["Cat No"] && variant["Description"]
+          const isAlternateFormat = variant["Unnamed: 1"] && variant["Unnamed: 5"]
+
+          if (isStandardFormat) {
+            return {
               ...variant,
               specs: group.specs_headers?.map((header: string) => variant[header] || "") || [],
               category: group.category,
@@ -88,39 +90,69 @@ function SearchResults() {
               description: group.description,
               specs_headers: group.specs_headers,
               source: "rankem",
-              name: variant.name || variant["Product Name"] || group.title || "",
-              code: variant.code || variant["Product Code"] || variant["Cat No"] || "",
-              price: variant.price || variant["Price"] || variant["List Price 2025(INR)"] || ""
+              name: variant["Description"] || group.title || "—",
+              code: variant["Cat No"] || "—",
+              price: variant["List Price\n2025(INR)"] || variant["Price"] || "—",
+              packSize: variant["Pack\nSize"] || variant["Packing"] || "—"
             }
-            return matchesSearchQuery(enriched, searchQuery)
-          })
-          .map((variant: any) => ({
-            ...variant,
-            specs: group.specs_headers?.map((header: string) => variant[header] || "") || [],
-            category: group.category,
-            title: group.title,
-            description: group.description,
-            specs_headers: group.specs_headers,
-            source: "rankem",
-            name: variant.name || variant["Product Name"] || group.title || "",
-            code: variant.code || variant["Product Code"] || variant["Cat No"] || "",
-            price: variant.price || variant["Price"] || variant["List Price 2025(INR)"] || ""
-          }))
+          } else if (isAlternateFormat) {
+            const code = variant["Baker Analyzed ACS\nReagent\n(PVC"]?.trim()
+            const name = variant["Unnamed: 1"]?.trim()
+            const packSize = variant["Unnamed: 3"]?.trim()
+            const price = variant["Unnamed: 5"]
+
+            if (!name || !code) return null
+
+            return {
+              ...variant,
+              specs: [],
+              category: group.category,
+              title: group.title,
+              description: group.description,
+              specs_headers: group.specs_headers,
+              source: "rankem",
+              name,
+              code,
+              packSize: packSize || "—",
+              price: price || "—"
+            }
+          }
+
+          return null
+        })
+        .filter((product: any) => product && matchesSearchQuery(product, searchQuery))
+    )
+
+    const borosilResults = borosilProducts.flatMap((group: any) => {
+      const groupMatch = (
+        group.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        group.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        group.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        group.description?.toLowerCase().includes(searchQuery.toLowerCase())
       )
 
-    const borosilResults = borosilProducts
-      .flatMap((group: any) =>
-        group.variants.map((variant: any) => ({
-          ...variant,
-          category: group.category,
-          title: group.title,
-          description: group.description,
-          specs_headers: group.specs_headers,
-          specs: variant.specs,
-          source: "borosil",
-        }))
-      )
-      .filter((product) => matchesSearchQuery(product, searchQuery))
+      const matchedVariants = (group.variants || []).filter((variant: any) => matchesSearchQuery(variant, searchQuery))
+
+      if (groupMatch || matchedVariants.length > 0) {
+        const variantsToUse = groupMatch && matchedVariants.length === 0 ? group.variants : matchedVariants
+
+        return variantsToUse.map((variant: any) => {
+          const specs = group.specs_headers?.map((header: string) => `${header}: ${variant[header] || "—"}`) || []
+
+          return {
+            ...variant,
+            category: "Borosil",
+            title: group.title,
+            description: group.description,
+            product: group.product,
+            specs_headers: group.specs_headers,
+            specs,
+            source: "borosil",
+          }
+        })
+      }
+      return []
+    })
 
     setSearchResults([
       ...qualigensResults,
@@ -139,61 +171,42 @@ function SearchResults() {
 
   const handleAddToCart = (product: any) => {
     if (!mounted || !isLoaded) {
-      toast({
-        title: "Loading...",
-        description: "Please wait while the cart loads",
-        variant: "destructive",
-      })
+      toast({ title: "Loading...", description: "Please wait while the cart loads", variant: "destructive" })
       return
     }
 
     try {
-      const price =
-        typeof product.price === "number"
-          ? product.price
-          : Number.parseFloat(product.price?.replace(/[^\d.]/g, ""))
+      const price = typeof product.price === "number"
+        ? product.price
+        : Number.parseFloat(product.price?.toString().replace(/[^\d.]/g, ""))
 
       if (isNaN(price) || price <= 0) {
-        toast({
-          title: "Invalid Price",
-          description: "Unable to add item with invalid price.",
-          variant: "destructive",
-        })
+        toast({ title: "Invalid Price", description: "Unable to add item with invalid price.", variant: "destructive" })
         return
       }
 
       addItem({
         id: product.id || product.code,
-        name: product.name || product.title,
-        price: price,
+        name: product.name || product.product || product.title,
+        price,
         brand: product.source,
         category: product.category,
       })
 
-      toast({
-        title: "Added to Cart",
-        description: `${product.name || product.title} has been added to your cart`,
-      })
+      toast({ title: "Added to Cart", description: `${product.name || product.title} has been added to your cart` })
     } catch (error) {
       console.error("Error adding to cart:", error)
-      toast({
-        title: "Error",
-        description: "Failed to add item to cart. Please try again.",
-        variant: "destructive",
-      })
+      toast({ title: "Error", description: "Failed to add item to cart. Please try again.", variant: "destructive" })
     }
   }
 
-  if (!mounted) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>
-  }
+  if (!mounted) return <div className="container mx-auto px-4 py-8">Loading...</div>
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Search Results</h1>
-
           <form onSubmit={handleSearch} className="flex gap-4 max-w-md mb-6">
             <Input
               placeholder="Search products..."
@@ -205,7 +218,6 @@ function SearchResults() {
               <Search className="h-4 w-4" />
             </Button>
           </form>
-
           {searchQuery && (
             <p className="text-slate-600 mb-6">
               Showing {searchResults.length} results for "{searchQuery}"
@@ -221,7 +233,7 @@ function SearchResults() {
                 className="hover:shadow-lg transition-shadow"
               >
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">{product.name || product.title}</CardTitle>
+                  <CardTitle className="text-lg">{product.name || product.product || product.title}</CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">{product.source}</Badge>
                     <Badge variant="outline">{product.category}</Badge>
@@ -230,24 +242,16 @@ function SearchResults() {
                 <CardContent>
                   <div className="space-y-2 mb-4">
                     {product.code && <p className="text-sm text-slate-600">Code: {product.code}</p>}
-                    {product.cas && <p className="text-sm text-slate-600">CAS: {product.cas}</p>}
-                    {product.purity && <p className="text-sm text-slate-600">Purity: {product.purity}</p>}
-                    <p className="text-sm text-slate-600">
-                      Pack Size: {product.packSize || product.pack_size || "—"}
-                    </p>
-                    {product.material && <p className="text-sm text-slate-600">Material: {product.material}</p>}
+                    {product.description && <p className="text-sm text-slate-600">{product.description}</p>}
+                    {product.specs?.map((spec: string, idx: number) => (
+                      <p key={idx} className="text-sm text-slate-600">{spec}</p>
+                    ))}
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-blue-600">
-                      {typeof product.price === "number"
-                        ? `₹${product.price.toLocaleString()}`
-                        : product.price || "₹—"}
+                      {typeof product.price === "number" ? `₹${product.price.toLocaleString()}` : product.price || "₹—"}
                     </span>
-                    <Button
-                      onClick={() => handleAddToCart(product)}
-                      disabled={!isLoaded}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
+                    <Button onClick={() => handleAddToCart(product)} disabled={!isLoaded} className="bg-green-600 hover:bg-green-700">
                       <Plus className="h-4 w-4 mr-2" />
                       {isLoaded ? "Add to Cart" : "Loading..."}
                     </Button>
