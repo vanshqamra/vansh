@@ -4,7 +4,7 @@ export interface QualigensProduct {
   name: string
   packSize: string
   material: string
-  price: string
+  price: number
   hsn: string
   category?: string
   purity?: string
@@ -17,13 +17,21 @@ import qualigensDataRaw from "./qualigens-products.json"
 const raw = Array.isArray(qualigensDataRaw?.data)
   ? qualigensDataRaw.data
   : Array.isArray(qualigensDataRaw)
-  ? qualigensDataRaw
-  : []
+    ? qualigensDataRaw
+    : []
 
-export const qualigensProducts: QualigensProduct[] = raw.map(
-  ([code, cas, name, packSize, material, price, hsn]) => ({
+export const qualigensProducts: QualigensProduct[] = raw.map((item) => {
+  const code = item["Product Code"] || ""
+  const cas = item["CAS No"] || ""
+  const name = item["Product Name"] || ""
+  const packSize = item["Pack Size"] || ""
+  const material = item["Packing"] || ""
+  const price = Number(item["Price"] || 0)
+  const hsn = item["HSN Code"] || ""
+
+  return {
     code,
-    cas: cas || "",
+    cas,
     name,
     packSize,
     material,
@@ -33,7 +41,7 @@ export const qualigensProducts: QualigensProduct[] = raw.map(
     purity: "SQ",
     brand: "Qualigens",
     id: code,
-  })
-)
+  }
+})
 
 export default qualigensProducts
