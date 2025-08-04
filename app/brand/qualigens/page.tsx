@@ -1,5 +1,3 @@
-// app/brand/qualigens/page.tsx
-
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import qualigensProducts from "@/lib/qualigens-products"
@@ -12,16 +10,14 @@ export const metadata: Metadata = {
 }
 
 export default function QualigensPage() {
-  // Normalize the import to an array
   const raw = qualigensProducts as any
-  const products: any[] = Array.isArray(raw)
+  const products: any[] = Array.isArray(raw?.data)
+    ? raw.data
+    : Array.isArray(raw)
     ? raw
-    : Array.isArray(Object.values(raw))
-    ? Object.values(raw)
     : []
 
-  // If no products, show 404
-  if (products.length === 0) {
+  if (!Array.isArray(products) || products.length === 0) {
     notFound()
   }
 
@@ -37,7 +33,6 @@ export default function QualigensPage() {
         </p>
       </div>
 
-      {/* Now passing a guaranteed array */}
       <QualiProductGrid products={products} />
     </div>
   )
