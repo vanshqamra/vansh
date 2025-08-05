@@ -4,13 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import {
-  Minus,
-  Plus,
-  Trash2,
-  ShoppingBag,
-  ArrowLeft
-} from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 
 export default function CartPage() {
@@ -24,10 +18,7 @@ export default function CartPage() {
   }, [state.items])
 
   // ✅ Calculate subtotal manually
-  const subtotal = state.items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  )
+  const subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   const applyPromoCode = () => {
     const code = promoCode.toLowerCase()
@@ -61,9 +52,10 @@ export default function CartPage() {
         <div className="space-y-6">
           {state.items.map((item, index) => {
             const rawName = item.name?.trim() || ""
-            const name = rawName.toLowerCase().startsWith("table") || rawName === ""
-              ? item.product || item.title || "Unnamed Product"
-              : rawName
+            const name =
+              rawName.toLowerCase().startsWith("table") || rawName === ""
+                ? item.product || item.title || "Unnamed Product"
+                : rawName
 
             return (
               <div
@@ -88,11 +80,17 @@ export default function CartPage() {
                     {item.brand && <p className="text-sm text-gray-500">Brand: {item.brand}</p>}
                     {item.category && <p className="text-sm text-gray-500">Category: {item.category}</p>}
                     {item.packSize && <p className="text-sm text-gray-500">Pack Size: {item.packSize}</p>}
-                    {item.price > 0 && <p className="text-sm text-gray-500">Unit Price: ₹{item.price.toLocaleString()}</p>}
+                    {item.price > 0 && (
+                      <p className="text-sm text-gray-500">Unit Price: ₹{item.price.toLocaleString()}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 pt-4 lg:pt-0">
-                  <Button variant="outline" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>
+                  <Button
+                    variant="outline"
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    disabled={item.quantity <= 1}
+                  >
                     <Minus className="h-4 w-4" />
                   </Button>
                   <span className="text-lg font-semibold px-2">{item.quantity}</span>
@@ -114,7 +112,7 @@ export default function CartPage() {
                   type="text"
                   placeholder="Promo code"
                   value={promoCode}
-                  onChange={e => setPromoCode(e.target.value)}
+                  onChange={(e) => setPromoCode(e.target.value)}
                   className="border px-4 py-2 rounded w-48"
                 />
                 <Button variant="outline" onClick={applyPromoCode}>
@@ -124,7 +122,9 @@ export default function CartPage() {
               <div className="text-right space-y-1">
                 <p className="text-sm text-gray-600">Subtotal: ₹{subtotal.toLocaleString()}</p>
                 {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
-                <p className="text-sm text-gray-600">Shipping: <span className="text-green-700">Free</span></p>
+                <p className="text-sm text-gray-600">
+                  Shipping: <span className="text-green-700">Free</span>
+                </p>
                 <p className="text-sm text-gray-600">GST (18%): ₹{taxAmount.toLocaleString()}</p>
                 <p className="text-lg font-bold mt-1">Total: ₹{finalTotal.toLocaleString()}</p>
               </div>
@@ -135,9 +135,7 @@ export default function CartPage() {
                 Clear Cart
               </Button>
               <Link href="/checkout">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Checkout
-                </Button>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Checkout</Button>
               </Link>
             </div>
           </div>

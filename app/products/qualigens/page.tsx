@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Search, ShoppingCart } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import qualigensProducts from "@/lib/qualigens-products.json"
+import qualigensProducts, { QualigensProduct } from "@/lib/qualigens-products"
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 
@@ -20,8 +20,10 @@ export default function QualigensPage() {
 
   // Sort products alphabetically by name
   const sortedProducts = useMemo(() => {
-    return [...qualigensProducts].sort((a, b) => a[2].localeCompare(b[2]))
-  }, [])
+    return [...qualigensProducts].sort((a, b) =>
+      (a.name || "").localeCompare(b.name || "")
+    )
+  }, [qualigensProducts])
 
   // Filter products based on search and letter selection
   const filteredProducts = useMemo(() => {
@@ -31,30 +33,34 @@ export default function QualigensPage() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
-        ([code, cas, name]) =>
-          name.toLowerCase().includes(query) || code.toLowerCase().includes(query) || cas.toLowerCase().includes(query),
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.code.toLowerCase().includes(query) ||
+          product.cas.toLowerCase().includes(query),
       )
     }
 
     // Filter by selected letter
     if (selectedLetter) {
-      filtered = filtered.filter(([, , name]) => name.toUpperCase().startsWith(selectedLetter))
+      filtered = filtered.filter((product) =>
+        product.name.toUpperCase().startsWith(selectedLetter),
+      )
     }
 
     return filtered
   }, [sortedProducts, searchQuery, selectedLetter])
 
-  const handleAddToCart = (product: (typeof qualigensProducts)[0]) => {
-    const [code, cas, name, packSize, material, price] = product
+  const handleAddToCart = (product: QualigensProduct) => {
+    const { code, name, packSize, material, price } = product
 
     addItem({
       id: code,
-      name: name,
-      price: price === "POR" ? "Price on Request" : price,
+      name,
+      price: Number.isNaN(price) ? "Price on Request" : price,
       brand: "Qualigens",
       category: "Laboratory Chemical",
-      packSize: packSize,
-      material: material,
+      packSize,
+      material,
     })
 
     toast({
@@ -126,7 +132,7 @@ export default function QualigensPage() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => {
-            const [code, cas, name, packSize, material, price, hsn] = product
+            const { code, cas, name, packSize, material, price, hsn } = product
             return (
               <Card key={code} className="hover:shadow-lg transition-shadow bg-white/80 backdrop-blur-sm">
                 <CardHeader className="pb-4">
@@ -161,7 +167,7 @@ export default function QualigensPage() {
                   <div className="pt-2 border-t">
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-blue-600">
-                        {price === "POR" ? "Price on Request" : `₹${price}`}
+                        {Number.isNaN(price) ? "Price on Request" : `₹${price}`}
                       </span>
                     </div>
                     <Button
