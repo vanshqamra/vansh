@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Beaker, Microscope, TestTube, FlaskConical, Thermometer } from "lucide-react"
+import { Beaker, Microscope, TestTube, FlaskConical, Thermometer, Biohazard } from "lucide-react"
 import Link from "next/link"
 
 const laboratoryBrands = [
@@ -44,6 +44,14 @@ const laboratoryBrands = [
     productCount: "400+",
     specialties: ["Chromatography", "Spectroscopy", "Mass Spectrometry", "Genomics"],
     href: "/brand/avarice",
+  },
+  {
+    name: "HiMedia",
+    description: "Trusted for microbiology, culture media, and diagnostics",
+    icon: Biohazard,
+    productCount: "5000+",
+    specialties: ["Culture Media", "Prepared Plates", "Microbiological Tools", "Cell Biology"],
+    href: "/brand/HiMedia",
   },
 ]
 

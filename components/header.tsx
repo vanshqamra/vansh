@@ -136,6 +136,12 @@ export function Header() {
                     Rankem
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/brand/HiMedia" className="flex items-center">
+                    <Image src="/images/logo-himedia.png" alt="HiMedia" width={20} height={20} className="mr-2" />
+                    HiMedia
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/products/laboratory-supplies" className="text-blue-600 font-medium">
