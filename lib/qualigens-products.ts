@@ -12,12 +12,13 @@ export interface QualigensProduct {
   id?: string
 }
 
-import qualigensDataRaw from "./qualigens-products.json"
+import * as qualigensDataRaw from "./qualigens-products.json"
 
-const raw = Array.isArray(qualigensDataRaw?.data)
-  ? qualigensDataRaw.data
-  : Array.isArray(qualigensDataRaw)
-    ? qualigensDataRaw
+const rawQualigensData = (qualigensDataRaw as any).default || qualigensDataRaw
+const raw = Array.isArray(rawQualigensData?.data)
+  ? rawQualigensData.data
+  : Array.isArray(rawQualigensData)
+    ? rawQualigensData
     : []
 
 export const qualigensProducts: QualigensProduct[] = raw.map((item) => {
