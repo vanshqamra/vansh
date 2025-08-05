@@ -26,7 +26,13 @@ export const qualigensProducts: QualigensProduct[] = raw.map((item) => {
   const name = item["Product Name"] || ""
   const packSize = item["Pack Size"] || ""
   const material = item["Packing"] || ""
-  const price = Number(item["Price"] || 0)
+  const priceValue = item["Price"]
+  const price =
+    typeof priceValue === "number"
+      ? priceValue
+      : typeof priceValue === "string" && /^\d/.test(priceValue)
+        ? Number(priceValue)
+        : 0
   const hsn = item["HSN Code"] || ""
 
   return {
