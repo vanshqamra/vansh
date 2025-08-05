@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Beaker, Microscope, TestTube, FlaskConical, Thermometer, Biohazard } from "lucide-react"
 import Link from "next/link"
+import brandDiscounts from "@/lib/brandDiscounts"
 
 const laboratoryBrands = [
   {
@@ -72,6 +73,7 @@ export default function LaboratorySuppliesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {laboratoryBrands.map((brand) => {
             const IconComponent = brand.icon
+            const discount = brandDiscounts[brand.name] || 0
             return (
               <Card
                 key={brand.name}
@@ -80,9 +82,16 @@ export default function LaboratorySuppliesPage() {
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-2">
                     <IconComponent className="h-8 w-8 text-blue-600" />
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      {brand.productCount} Products
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1">
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        {brand.productCount} Products
+                      </Badge>
+                      {discount > 0 && (
+                        <Badge className="bg-green-100 text-green-800 text-xs font-medium">
+                          {discount}% OFF
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <CardTitle className="text-xl font-bold text-slate-900">{brand.name}</CardTitle>
                   <CardDescription className="text-slate-600">{brand.description}</CardDescription>

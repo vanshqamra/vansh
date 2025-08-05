@@ -6,19 +6,26 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
+import brandDiscounts from "@/lib/brandDiscounts"
 
 export default function CartPage() {
   const { state, updateQuantity, removeItem, clearCart, isLoaded } = useCart()
   const [promoCode, setPromoCode] = useState("")
   const [discount, setDiscount] = useState(0)
 
-  // ✅ Recalculate discount on any cart change
+  const getDiscountedPrice = (item) => {
+    const discount = brandDiscounts[item.brand] || 0
+    return item.price ? item.price * (1 - discount / 100) : null
+  }
+
+  const subtotal = state.items.reduce((sum, item) => {
+    const discounted = getDiscountedPrice(item)
+    return sum + (discounted ?? 0) * item.quantity
+  }, 0)
+
   useEffect(() => {
     setDiscount(0)
   }, [state.items])
-
-  // ✅ Calculate subtotal manually
-  const subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   const applyPromoCode = () => {
     const code = promoCode.toLowerCase()
@@ -57,6 +64,9 @@ export default function CartPage() {
                 ? item.product || item.title || "Unnamed Product"
                 : rawName
 
+            const unitPrice = getDiscountedPrice(item)
+            const discountPercent = brandDiscounts[item.brand] || 0
+
             return (
               <div
                 key={item.id || index}
@@ -81,7 +91,11 @@ export default function CartPage() {
                     {item.category && <p className="text-sm text-gray-500">Category: {item.category}</p>}
                     {item.packSize && <p className="text-sm text-gray-500">Pack Size: {item.packSize}</p>}
                     {item.price > 0 && (
-                      <p className="text-sm text-gray-500">Unit Price: ₹{item.price.toLocaleString()}</p>
+                      <div className="text-sm text-gray-500">
+                        <span className="line-through text-red-400">₹{item.price.toLocaleString()}</span>{" "}
+                        <span className="font-semibold text-green-600">₹{unitPrice.toFixed(2)}</span>{" "}
+                        <span className="text-xs text-green-700">({discountPercent}% off)</span>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -121,7 +135,7 @@ export default function CartPage() {
               </div>
               <div className="text-right space-y-1">
                 <p className="text-sm text-gray-600">Subtotal: ₹{subtotal.toLocaleString()}</p>
-                {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
+                {discount > 0 && <p className="text-sm text-green-600">Extra Promo: -₹{discount.toLocaleString()}</p>}
                 <p className="text-sm text-gray-600">
                   Shipping: <span className="text-green-700">Free</span>
                 </p>
