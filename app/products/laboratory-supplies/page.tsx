@@ -11,7 +11,7 @@ const laboratoryBrands = [
     icon: Beaker,
     productCount: "1000+",
     specialties: ["Analytical Reagents", "HPLC Solvents", "Buffer Solutions", "Indicators"],
-    href: "/brand/qualigens",
+    href: "/products/qualigens",
   },
   {
     name: "Borosil",

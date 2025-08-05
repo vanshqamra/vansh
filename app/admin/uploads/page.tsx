@@ -58,12 +58,12 @@ export default function AdminUploadsPage() {
       const { data, error } = await supabase
         .from("quote_uploads")
         .select(`
-        *,
-        user_profiles (
-          full_name,
-          email
-        )
-      `)
+          *,
+          user_profiles (
+            full_name,
+            email
+          )
+        `)
         .order("created_at", { ascending: false })
 
       if (error) throw error
