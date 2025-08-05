@@ -11,22 +11,24 @@ import { Search, Plus } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
 
-import qualigensProducts from "@/lib/qualigens-products.json"  // ✅ DEFAULT import
+import qualigensProducts from "@/lib/qualigens-products.json"
 import { commercialChemicals } from "@/lib/data"
 import rankemProducts from "@/lib/rankem_products.json"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
+import whatmanProducts from "@/lib/whatman_products.json"
+
+function normalizeSearchText(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]/gi, "")
+}
 
 function SearchResults() {
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<any[]>([])
-  const [mounted, setMounted] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const resultsPerPage = 50
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     const query = searchParams.get("q") || ""
@@ -34,14 +36,14 @@ function SearchResults() {
   }, [searchParams])
 
   const matchesSearchQuery = (product: any, query: string): boolean => {
-    const q = query.trim().toLowerCase()
+    const q = normalizeSearchText(query.trim())
     if (!q) return false
 
     const searchFields: string[] = []
 
     const collectFields = (obj: any) => {
       if (typeof obj === "string") {
-        searchFields.push(obj.toLowerCase())
+        searchFields.push(normalizeSearchText(obj))
       } else if (typeof obj === "number") {
         searchFields.push(obj.toString())
       } else if (Array.isArray(obj)) {
@@ -117,7 +119,6 @@ function SearchResults() {
               price: price || "—"
             }
           }
-
           return null
         })
         .filter((product: any) => product && matchesSearchQuery(product, searchQuery))
@@ -154,12 +155,35 @@ function SearchResults() {
       return []
     })
 
-    setSearchResults([
+    const whatmanResults = (whatmanProducts?.variants || [])
+      .filter((variant: any) => matchesSearchQuery(variant, searchQuery))
+      .map((variant: any) => {
+        const specs = whatmanProducts.specs_headers?.filter(h => h.toLowerCase() !== "price")
+          .map((header: string) => `${header}: ${variant[header] ?? "—"}`) || []
+
+        return {
+          ...variant,
+          source: "whatman",
+          name: variant["name"] || variant["Name"] || variant["Code"] || "Whatman Product",
+          code: variant["Code"] || variant["code"] || "",
+          price: variant["Price"] || variant["price"] || "—",
+          description: whatmanProducts.description || "",
+          category: "Whatman",
+          title: whatmanProducts.title || "",
+          specs,
+        }
+      })
+
+    const combinedResults = [
       ...qualigensResults,
       ...commercialResults,
       ...rankemResults,
       ...borosilResults,
-    ])
+      ...whatmanResults,
+    ]
+
+    setSearchResults(combinedResults)
+    setCurrentPage(1)
   }, [searchQuery])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -173,7 +197,7 @@ function SearchResults() {
   }
 
   const handleAddToCart = (product: any) => {
-    if (!mounted || !isLoaded) {
+    if (!isLoaded) {
       toast({ title: "Loading...", description: "Please wait while the cart loads", variant: "destructive" })
       return
     }
@@ -203,7 +227,12 @@ function SearchResults() {
     }
   }
 
-  if (!mounted) return <div className="container mx-auto px-4 py-8">Loading...</div>
+  const paginatedResults = searchResults.slice(
+    (currentPage - 1) * resultsPerPage,
+    currentPage * resultsPerPage
+  )
+
+  const totalPages = Math.ceil(searchResults.length / resultsPerPage)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -228,41 +257,49 @@ function SearchResults() {
           )}
         </div>
 
-        {searchResults.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {searchResults.map((product) => (
-              <Card
-                key={`${product.source}-${product.id || product.code || Math.random().toString(36).substring(2, 10)}`}
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">{product.name || product.product || product.title}</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{product.source}</Badge>
-                    <Badge variant="outline">{product.category}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 mb-4">
-                    {product.code && <p className="text-sm text-slate-600">Code: {product.code}</p>}
-                    {product.description && <p className="text-sm text-slate-600">{product.description}</p>}
-                    {product.specs?.map((spec: string, idx: number) => (
-                      <p key={idx} className="text-sm text-slate-600">{spec}</p>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-blue-600">
-                      {typeof product.price === "number" ? `₹${product.price.toLocaleString()}` : product.price || "₹—"}
-                    </span>
-                    <Button onClick={() => handleAddToCart(product)} disabled={!isLoaded} className="bg-green-600 hover:bg-green-700">
-                      <Plus className="h-4 w-4 mr-2" />
-                      {isLoaded ? "Add to Cart" : "Loading..."}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        {paginatedResults.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedResults.map((product) => (
+                <Card
+                  key={`${product.source}-${product.id || product.code || Math.random().toString(36).substring(2, 10)}`}
+                  className="hover:shadow-lg transition-shadow"
+                >
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg">{product.name || product.product || product.title}</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">{product.source}</Badge>
+                      <Badge variant="outline">{product.category}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 mb-4">
+                      {product.code && <p className="text-sm text-slate-600">Code: {product.code}</p>}
+                      {product.description && <p className="text-sm text-slate-600">{product.description}</p>}
+                      {product.specs?.map((spec: string, idx: number) => (
+                        <p key={idx} className="text-sm text-slate-600">{spec}</p>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-blue-600">
+                        {typeof product.price === "number" ? `₹${product.price.toLocaleString()}` : `₹${product.price}`}
+                      </span>
+                      <Button onClick={() => handleAddToCart(product)} disabled={!isLoaded} className="bg-green-600 hover:bg-green-700">
+                        <Plus className="h-4 w-4 mr-2" />
+                        {isLoaded ? "Add to Cart" : "Loading..."}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-4 mt-8">
+                <Button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>Previous</Button>
+                <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => p + 1)}>Next</Button>
+              </div>
+            )}
+          </>
         ) : searchQuery ? (
           <div className="text-center py-12">
             <Search className="h-24 w-24 text-slate-400 mx-auto mb-6" />
