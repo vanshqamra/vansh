@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,33 +17,27 @@ import rankemProducts from "@/lib/rankem_products.json"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import whatmanProducts from "@/lib/whatman_products.json"
 
-function normalizeSearchText(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]/gi, "")
-}
-
 function SearchResults() {
   const searchParams = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter()
+  const initialQuery = searchParams.get("q") || ""
+
+  const [searchQuery, setSearchQuery] = useState(initialQuery)
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const resultsPerPage = 50
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
 
-  useEffect(() => {
-    const query = searchParams.get("q") || ""
-    setSearchQuery(query)
-  }, [searchParams])
-
   const matchesSearchQuery = (product: any, query: string): boolean => {
-    const q = normalizeSearchText(query.trim())
-    if (!q) return false
+    const normalizedQuery = query.trim().toLowerCase().replace(/[^a-z0-9]/gi, "")
+    if (!normalizedQuery) return false
 
     const searchFields: string[] = []
 
     const collectFields = (obj: any) => {
       if (typeof obj === "string") {
-        searchFields.push(normalizeSearchText(obj))
+        searchFields.push(obj.toLowerCase().replace(/[^a-z0-9]/gi, ""))
       } else if (typeof obj === "number") {
         searchFields.push(obj.toString())
       } else if (Array.isArray(obj)) {
@@ -54,17 +48,14 @@ function SearchResults() {
     }
 
     collectFields(product)
-    return searchFields.some((field) => field.includes(q))
+    return searchFields.some((field) => field.includes(normalizedQuery))
   }
 
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([])
-      return
-    }
+  const triggerSearch = (query: string) => {
+    router.replace(`/products/search?q=${encodeURIComponent(query)}`)
 
     const qualigensResults = (Array.isArray(qualigensProducts) ? qualigensProducts : qualigensProducts.data || [])
-      .filter((product) => matchesSearchQuery(product, searchQuery))
+      .filter((product) => matchesSearchQuery(product, query))
       .map((product) => ({
         ...product,
         source: "qualigens",
@@ -74,7 +65,7 @@ function SearchResults() {
       }))
 
     const commercialResults = commercialChemicals
-      .filter((product) => matchesSearchQuery(product, searchQuery))
+      .filter((product) => matchesSearchQuery(product, query))
       .map((product) => ({ ...product, source: "commercial" }))
 
     const rankemResults = rankemProducts.flatMap((group: any) =>
@@ -121,18 +112,18 @@ function SearchResults() {
           }
           return null
         })
-        .filter((product: any) => product && matchesSearchQuery(product, searchQuery))
+        .filter((product: any) => product && matchesSearchQuery(product, query))
     )
 
     const borosilResults = borosilProducts.flatMap((group: any) => {
       const groupMatch = (
-        group.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        group.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        group.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        group.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        group.title?.toLowerCase().includes(query.toLowerCase()) ||
+        group.category?.toLowerCase().includes(query.toLowerCase()) ||
+        group.product?.toLowerCase().includes(query.toLowerCase()) ||
+        group.description?.toLowerCase().includes(query.toLowerCase())
       )
 
-      const matchedVariants = (group.variants || []).filter((variant: any) => matchesSearchQuery(variant, searchQuery))
+      const matchedVariants = (group.variants || []).filter((variant: any) => matchesSearchQuery(variant, query))
 
       if (groupMatch || matchedVariants.length > 0) {
         const variantsToUse = groupMatch && matchedVariants.length === 0 ? group.variants : matchedVariants
@@ -156,7 +147,7 @@ function SearchResults() {
     })
 
     const whatmanResults = (whatmanProducts?.variants || [])
-      .filter((variant: any) => matchesSearchQuery(variant, searchQuery))
+      .filter((variant: any) => matchesSearchQuery(variant, query))
       .map((variant: any) => {
         const specs = whatmanProducts.specs_headers?.filter(h => h.toLowerCase() !== "price")
           .map((header: string) => `${header}: ${variant[header] ?? "—"}`) || []
@@ -184,16 +175,17 @@ function SearchResults() {
 
     setSearchResults(combinedResults)
     setCurrentPage(1)
-  }, [searchQuery])
+  }
+
+  useEffect(() => {
+    if (initialQuery) {
+      triggerSearch(initialQuery)
+    }
+  }, [initialQuery])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    if (searchQuery.trim()) {
-      const params = new URLSearchParams(window.location.search)
-      params.set("q", searchQuery)
-      window.history.pushState({}, "", `?${params.toString()}`)
-      window.dispatchEvent(new PopStateEvent("popstate"))
-    }
+    triggerSearch(searchQuery)
   }
 
   const handleAddToCart = (product: any) => {
