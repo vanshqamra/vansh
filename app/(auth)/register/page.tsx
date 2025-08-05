@@ -2,7 +2,9 @@
 
 import { signup } from "@/app/(auth)/actions"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card, CardContent, CardDescription, CardHeader, CardTitle
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
@@ -17,7 +19,9 @@ export default function RegisterPage() {
       <Card className="w-full max-w-lg bg-white/80 backdrop-blur-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Client Registration</CardTitle>
-          <CardDescription>Submit your details for approval to access the client portal.</CardDescription>
+          <CardDescription>
+            Submit your details for approval to access the client portal.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {state?.success ? (
