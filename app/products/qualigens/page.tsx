@@ -20,8 +20,10 @@ export default function QualigensPage() {
 
   // Sort products alphabetically by name
   const sortedProducts = useMemo(() => {
-    return [...qualigensProducts].sort((a, b) => a.name.localeCompare(b.name))
-  }, [])
+    return [...qualigensProducts].sort((a, b) =>
+      (a.name || "").localeCompare(b.name || "")
+    )
+  }, [qualigensProducts])
 
   // Filter products based on search and letter selection
   const filteredProducts = useMemo(() => {
