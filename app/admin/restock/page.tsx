@@ -1,4 +1,4 @@
-// ✅ quotation-builder.tsx (complete standalone version with array guards)
+// ✅ restock-builder.tsx (mirroring quotation builder with autofill and all products)
 "use client"
 
 import { useState } from "react"
@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Download } from "lucide-react"
 
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
@@ -24,6 +23,14 @@ interface RestockItem {
   price: number
 }
 
+interface ProductEntry {
+  productName: string
+  brand: string
+  code: string
+  packSize: string
+  price: number
+}
+
 export default function RestockPage() {
   const [items, setItems] = useState<RestockItem[]>([])
   const [form, setForm] = useState({
@@ -33,58 +40,87 @@ export default function RestockPage() {
     quantity: "",
     price: "",
   })
-  const [filtered, setFiltered] = useState<any[]>([])
+  const [filtered, setFiltered] = useState<ProductEntry[]>([])
 
-  const allProducts: any[] = [
-    ...(Array.isArray(borosilProducts) ? borosilProducts : []).flatMap((group) =>
-      (group.variants || []).map((variant) => ({
-        productName: group.product || group.title || group.name || "",
-        brand: "Borosil",
-        code: variant.code || "",
-        packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
-        price: parseFloat(variant.price),
-      }))
-    ),
-    ...(Array.isArray(rankemProducts) ? rankemProducts : []).flatMap((group) =>
-      (group.variants || []).map((variant) => ({
-        productName: group.product || group.title || group.name || "",
-        brand: "Rankem",
-        code: variant["Product Code"] || variant.code || "",
-        packSize: variant["Pack Size"] || variant.size || "",
-        price: parseFloat(variant["Price"]),
-      }))
-    ),
-    ...(Array.isArray(qualigensProducts) ? qualigensProducts : []).map((p) => ({
-      productName: p["Product Name"] || p.product || p.name || "",
-      brand: "Qualigens",
-      code: p["Product Code"] || p.code || "",
-      packSize: p["Pack Size"] || p.size || "",
-      price: parseFloat(p["Price"]),
-    })),
-    ...(Array.isArray(whatmanProducts) ? whatmanProducts : []).map((p) => ({
-      productName: p.name || p.title || "",
-      brand: "Whatman",
-      code: p.code || p["Product Code"] || "",
-      packSize: p.size || p["Pack Size"] || "",
-      price: parseFloat(p.price),
-    })),
-    ...(Array.isArray(himediaProducts) ? himediaProducts : []).flatMap((group) =>
-      (group.variants || []).map((v) => ({
-        productName: group.product || group.title || group.name || "",
-        brand: "HiMedia",
-        code: v["Product Code"] || v.code || "",
-        packSize: v["Pack Size"] || v.size || "",
-        price: parseFloat(v["Price"]),
-      }))
-    ),
-    ...(Array.isArray(commercialChemicals) ? commercialChemicals : []).map((p) => ({
-      productName: p.name || p["Product Name"] || "",
-      brand: "Bulk Chemical",
-      code: p.code || p["Product Code"] || "",
-      packSize: p.size || p["Pack Size"] || "",
-      price: parseFloat(p.price),
-    })),
-  ]
+  const allProducts: ProductEntry[] = []
+
+  if (Array.isArray(borosilProducts)) {
+    borosilProducts.forEach((group) => {
+      (group.variants || []).forEach((variant) => {
+        allProducts.push({
+          productName: group.product || group.title || group.name || "",
+          brand: "Borosil",
+          code: variant.code || "",
+          packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
+          price: parseFloat(variant.price),
+        })
+      })
+    })
+  }
+
+  if (Array.isArray(rankemProducts)) {
+    rankemProducts.forEach((group) => {
+      (group.variants || []).forEach((variant) => {
+        allProducts.push({
+          productName: group.product || group.title || group.name || "",
+          brand: "Rankem",
+          code: variant["Product Code"] || variant.code || "",
+          packSize: variant["Pack Size"] || variant.size || "",
+          price: parseFloat(variant["Price"]),
+        })
+      })
+    })
+  }
+
+  if (Array.isArray(qualigensProducts)) {
+    qualigensProducts.forEach((p) => {
+      allProducts.push({
+        productName: p["Product Name"] || p.product || p.name || "",
+        brand: "Qualigens",
+        code: p["Product Code"] || p.code || "",
+        packSize: p["Pack Size"] || p.size || "",
+        price: parseFloat(p["Price"]),
+      })
+    })
+  }
+
+  if (Array.isArray(whatmanProducts)) {
+    whatmanProducts.forEach((p) => {
+      allProducts.push({
+        productName: p.name || p.title || "",
+        brand: "Whatman",
+        code: p.code || p["Product Code"] || "",
+        packSize: p.size || p["Pack Size"] || "",
+        price: parseFloat(p.price),
+      })
+    })
+  }
+
+  if (Array.isArray(himediaProducts)) {
+    himediaProducts.forEach((group) => {
+      (group.variants || []).forEach((v) => {
+        allProducts.push({
+          productName: group.product || group.title || group.name || "",
+          brand: "HiMedia",
+          code: v["Product Code"] || v.code || "",
+          packSize: v["Pack Size"] || v.size || "",
+          price: parseFloat(v["Price"]),
+        })
+      })
+    })
+  }
+
+  if (Array.isArray(commercialChemicals)) {
+    commercialChemicals.forEach((p) => {
+      allProducts.push({
+        productName: p.name || p["Product Name"] || "",
+        brand: "Bulk Chemical",
+        code: p.code || p["Product Code"] || "",
+        packSize: p.size || p["Pack Size"] || "",
+        price: parseFloat(p.price),
+      })
+    })
+  }
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
@@ -107,13 +143,13 @@ export default function RestockPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">Restock Request</h1>
-        <p className="text-gray-500">Admin-only tool to mark needed items for reorder</p>
+        <h1 className="text-3xl font-bold">Restock Manager</h1>
+        <p className="text-gray-500">Track and add inventory requests</p>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Mark Product for Restock</CardTitle>
+          <CardTitle>Add Product to Restock List</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative md:col-span-3">
@@ -122,14 +158,11 @@ export default function RestockPage() {
               value={form.productName}
               onChange={(e) => {
                 const query = e.target.value.toLowerCase()
-                setForm({ ...form, productName: query })
-                setFiltered(
-                  allProducts.filter((p) =>
-                    `${p.productName || ""} ${p.code || ""} ${p.packSize || ""}`
-                      .toLowerCase()
-                      .includes(query)
-                  )
+                const results = allProducts.filter((p) =>
+                  `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
                 )
+                setForm({ ...form, productName: query })
+                setFiltered(results)
               }}
             />
             {form.productName && filtered.length > 0 && (
@@ -144,7 +177,7 @@ export default function RestockPage() {
                         brand: product.brand,
                         packSize: product.packSize,
                         quantity: "",
-                        price: product.price.toString(),
+                        price: product.price.toFixed(2),
                       })
                       setFiltered([])
                     }}
@@ -183,7 +216,7 @@ export default function RestockPage() {
       {items.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Restock Preview</CardTitle>
+            <CardTitle>Restock List</CardTitle>
           </CardHeader>
           <CardContent>
             <table className="w-full text-sm">
