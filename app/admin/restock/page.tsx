@@ -1,4 +1,4 @@
-// ✅ restock-builder.tsx (final fix with split identity and guaranteed price auto-pick)
+// ✅ quotation-builder.tsx (final fix with split identity and guaranteed price auto-pick)
 "use client"
 
 import { useState } from "react"
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { Download } from "lucide-react"
 
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
@@ -21,7 +22,6 @@ interface RestockItem {
   packSize: string
   quantity: number
   price: number
-  custom: boolean
 }
 
 interface ProductEntry {
@@ -116,7 +116,6 @@ export default function RestockBuilder() {
       packSize: form.packSize,
       quantity: parseInt(form.quantity),
       price: parseFloat(form.price),
-      custom: true,
     }
     setItems([...items, newItem])
     setForm({ productName: "", brand: "", packSize: "", quantity: "", price: "" })
@@ -129,7 +128,8 @@ export default function RestockBuilder() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">Restock List Builder</h1>
+        <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
+        <p className="text-gray-500">Restock Dashboard</p>
       </div>
 
       <Card className="mb-6">
@@ -186,19 +186,11 @@ export default function RestockBuilder() {
           </div>
           <div>
             <Label>Quantity</Label>
-            <Input
-              type="number"
-              value={form.quantity}
-              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-            />
+            <Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
           </div>
           <div>
             <Label>Price</Label>
-            <Input
-              type="number"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
-            />
+            <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
           </div>
           <div className="md:col-span-5 text-right">
             <Button onClick={handleAdd}>Add</Button>
@@ -209,7 +201,7 @@ export default function RestockBuilder() {
       {items.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Restock Preview</CardTitle>
+            <CardTitle>Restock List</CardTitle>
           </CardHeader>
           <CardContent>
             <table className="w-full text-sm">
