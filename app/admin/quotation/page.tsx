@@ -15,14 +15,13 @@ import whatmanProducts from "@/lib/whatman_products.json"
 import himediaProducts from "@/lib/himedia_products_grouped"
 import { commercialChemicals } from "@/lib/data"
 
-interface QuotationItem {
+interface RestockItem {
   id: number
   productName: string
   brand: string
   packSize: string
   quantity: number
   price: number
-  custom: boolean
 }
 
 interface ProductEntry {
@@ -33,8 +32,8 @@ interface ProductEntry {
   price: number
 }
 
-export default function QuotationBuilder() {
-  const [items, setItems] = useState<QuotationItem[]>([])
+export default function RestockBuilder() {
+  const [items, setItems] = useState<RestockItem[]>([])
   const [form, setForm] = useState({
     productName: "",
     brand: "",
@@ -110,14 +109,13 @@ export default function QuotationBuilder() {
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
-    const newItem: QuotationItem = {
+    const newItem: RestockItem = {
       id: Date.now(),
       productName: form.productName,
       brand: form.brand,
       packSize: form.packSize,
       quantity: parseInt(form.quantity),
       price: parseFloat(form.price),
-      custom: true,
     }
     setItems([...items, newItem])
     setForm({ productName: "", brand: "", packSize: "", quantity: "", price: "" })
@@ -127,18 +125,16 @@ export default function QuotationBuilder() {
     setItems(items.filter((item) => item.id !== id))
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
-        <p className="text-gray-500">Quotation Builder</p>
+        <p className="text-gray-500">Restock Dashboard</p>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Add Product to Quotation</CardTitle>
+          <CardTitle>Add Product to Restock</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative md:col-span-3">
@@ -205,7 +201,7 @@ export default function QuotationBuilder() {
       {items.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Quotation Preview</CardTitle>
+            <CardTitle>Restock List</CardTitle>
           </CardHeader>
           <CardContent>
             <table className="w-full text-sm">
@@ -238,12 +234,6 @@ export default function QuotationBuilder() {
                 ))}
               </tbody>
             </table>
-            <div className="text-right font-semibold mt-4 text-lg">Total: ₹{totalAmount.toFixed(2)}</div>
-            <div className="mt-4 text-right">
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" /> Export as PDF
-              </Button>
-            </div>
           </CardContent>
         </Card>
       )}
