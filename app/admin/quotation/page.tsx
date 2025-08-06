@@ -1,4 +1,4 @@
-// ✅ quotation-builder.tsx (complete standalone version with preview table)
+// ✅ quotation-builder.tsx (complete standalone version with array guards)
 "use client"
 
 import { useState } from "react"
@@ -37,42 +37,42 @@ export default function QuotationBuilder() {
   const [filtered, setFiltered] = useState<any[]>([])
 
   const allProducts: any[] = [
-    ...(borosilProducts || []).flatMap(group => (group.variants || []).map(variant => ({
+    ...(Array.isArray(borosilProducts) ? borosilProducts : []).flatMap(group => (group.variants || []).map(variant => ({
       productName: group.product,
       brand: "Borosil",
       code: variant.code,
       packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
       price: parseFloat(variant.price),
     }))),
-    ...(rankemProducts || []).flatMap(group => (group.variants || []).map(variant => ({
+    ...(Array.isArray(rankemProducts) ? rankemProducts : []).flatMap(group => (group.variants || []).map(variant => ({
       productName: group.product || group.title,
       brand: "Rankem",
       code: variant["Product Code"] || variant.code,
       packSize: variant["Pack Size"],
       price: parseFloat(variant["Price"]),
     }))),
-    ...(qualigensProducts || []).map(p => ({
+    ...(Array.isArray(qualigensProducts) ? qualigensProducts : []).map(p => ({
       productName: p["Product Name"],
       brand: "Qualigens",
       code: p["Product Code"],
       packSize: p["Pack Size"],
       price: parseFloat(p["Price"]),
     })),
-    ...(whatmanProducts || []).map(p => ({
+    ...(Array.isArray(whatmanProducts) ? whatmanProducts : []).map(p => ({
       productName: p.name,
       brand: "Whatman",
       code: p.code,
       packSize: p.size,
       price: parseFloat(p.price),
     })),
-    ...(himediaProducts || []).flatMap(group => (group.variants || []).map(v => ({
+    ...(Array.isArray(himediaProducts) ? himediaProducts : []).flatMap(group => (group.variants || []).map(v => ({
       productName: group.product || group.title,
       brand: "HiMedia",
       code: v["Product Code"] || v.code,
       packSize: v["Pack Size"] || v.size,
       price: parseFloat(v["Price"]),
     }))),
-    ...(commercialChemicals || []).map(p => ({
+    ...(Array.isArray(commercialChemicals) ? commercialChemicals : []).map(p => ({
       productName: p.name || p["Product Name"],
       brand: "Bulk Chemical",
       code: p.code || p["Product Code"],
