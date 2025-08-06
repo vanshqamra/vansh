@@ -37,46 +37,52 @@ export default function QuotationBuilder() {
   const [filtered, setFiltered] = useState<any[]>([])
 
   const allProducts: any[] = [
-    ...(Array.isArray(borosilProducts) ? borosilProducts : []).flatMap(group => (group.variants || []).map(variant => ({
-      productName: group.product,
-      brand: "Borosil",
-      code: variant.code,
-      packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
-      price: parseFloat(variant.price),
-    }))),
-    ...(Array.isArray(rankemProducts) ? rankemProducts : []).flatMap(group => (group.variants || []).map(variant => ({
-      productName: group.product || group.title,
-      brand: "Rankem",
-      code: variant["Product Code"] || variant.code,
-      packSize: variant["Pack Size"],
-      price: parseFloat(variant["Price"]),
-    }))),
-    ...(Array.isArray(qualigensProducts) ? qualigensProducts : []).map(p => ({
-      productName: p["Product Name"],
+    ...(Array.isArray(borosilProducts) ? borosilProducts : []).flatMap((group) =>
+      (group.variants || []).map((variant) => ({
+        productName: group.product || group.title || group.name || "",
+        brand: "Borosil",
+        code: variant.code || "",
+        packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
+        price: parseFloat(variant.price),
+      }))
+    ),
+    ...(Array.isArray(rankemProducts) ? rankemProducts : []).flatMap((group) =>
+      (group.variants || []).map((variant) => ({
+        productName: group.product || group.title || group.name || "",
+        brand: "Rankem",
+        code: variant["Product Code"] || variant.code || "",
+        packSize: variant["Pack Size"] || variant.size || "",
+        price: parseFloat(variant["Price"]),
+      }))
+    ),
+    ...(Array.isArray(qualigensProducts) ? qualigensProducts : []).map((p) => ({
+      productName: p["Product Name"] || p.product || p.name || "",
       brand: "Qualigens",
-      code: p["Product Code"],
-      packSize: p["Pack Size"],
+      code: p["Product Code"] || p.code || "",
+      packSize: p["Pack Size"] || p.size || "",
       price: parseFloat(p["Price"]),
     })),
-    ...(Array.isArray(whatmanProducts) ? whatmanProducts : []).map(p => ({
-      productName: p.name,
+    ...(Array.isArray(whatmanProducts) ? whatmanProducts : []).map((p) => ({
+      productName: p.name || p.title || "",
       brand: "Whatman",
-      code: p.code,
-      packSize: p.size,
+      code: p.code || p["Product Code"] || "",
+      packSize: p.size || p["Pack Size"] || "",
       price: parseFloat(p.price),
     })),
-    ...(Array.isArray(himediaProducts) ? himediaProducts : []).flatMap(group => (group.variants || []).map(v => ({
-      productName: group.product || group.title,
-      brand: "HiMedia",
-      code: v["Product Code"] || v.code,
-      packSize: v["Pack Size"] || v.size,
-      price: parseFloat(v["Price"]),
-    }))),
-    ...(Array.isArray(commercialChemicals) ? commercialChemicals : []).map(p => ({
-      productName: p.name || p["Product Name"],
+    ...(Array.isArray(himediaProducts) ? himediaProducts : []).flatMap((group) =>
+      (group.variants || []).map((v) => ({
+        productName: group.product || group.title || group.name || "",
+        brand: "HiMedia",
+        code: v["Product Code"] || v.code || "",
+        packSize: v["Pack Size"] || v.size || "",
+        price: parseFloat(v["Price"]),
+      }))
+    ),
+    ...(Array.isArray(commercialChemicals) ? commercialChemicals : []).map((p) => ({
+      productName: p.name || p["Product Name"] || "",
       brand: "Bulk Chemical",
-      code: p.code || p["Product Code"],
-      packSize: p.size || p["Pack Size"],
+      code: p.code || p["Product Code"] || "",
+      packSize: p.size || p["Pack Size"] || "",
       price: parseFloat(p.price),
     })),
   ]
@@ -123,7 +129,9 @@ export default function QuotationBuilder() {
                 setForm({ ...form, productName: query })
                 setFiltered(
                   allProducts.filter((p) =>
-                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
+                    `${p.productName || ""} ${p.code || ""} ${p.packSize || ""}`
+                      .toLowerCase()
+                      .includes(query)
                   )
                 )
               }}
