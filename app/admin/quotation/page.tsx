@@ -1,4 +1,4 @@
-// ✅ quotation-builder.tsx (final fix with visibility across all products and auto price pick)
+// ✅ quotation-builder.tsx (final fix with visibility across all products and auto price pick with editable field)
 "use client"
 
 import { useState } from "react"
@@ -182,7 +182,7 @@ export default function QuotationBuilder() {
                         brand: product.brand,
                         packSize: product.packSize,
                         quantity: "",
-                        price: product.price.toFixed(2),
+                        price: product.price.toString(),
                       })
                       setFiltered([])
                     }}
@@ -210,7 +210,12 @@ export default function QuotationBuilder() {
           </div>
           <div>
             <Label>Price</Label>
-            <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+            <Input
+              type="number"
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: e.target.value })}
+              placeholder="Enter price or auto-filled"
+            />
           </div>
           <div className="md:col-span-5 text-right">
             <Button onClick={handleAdd}>Add</Button>
