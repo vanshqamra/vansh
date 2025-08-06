@@ -1,4 +1,3 @@
-// ✅ quotation-builder.tsx (final fix with split identity and guaranteed price auto-pick)
 "use client"
 
 import { useState } from "react"
@@ -6,7 +5,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Download } from "lucide-react"
 
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
@@ -32,7 +30,7 @@ interface ProductEntry {
   price: number
 }
 
-export default function RestockBuilder() {
+export default function RestockPage() {
   const [items, setItems] = useState<RestockItem[]>([])
   const [form, setForm] = useState({
     productName: "",
@@ -45,10 +43,10 @@ export default function RestockBuilder() {
 
   const allProducts: ProductEntry[] = []
 
-  const addGroupedProducts = (source: any[], brand: string, extract: (group: any, variant: any) => ProductEntry) => {
+  const addGroupedProducts = (source: any[], brand: string, extract: (group: any, v: any) => ProductEntry) => {
     source?.forEach((group) => {
-      (group.variants || []).forEach((variant: any) => {
-        allProducts.push(extract(group, variant))
+      (group.variants || []).forEach((v: any) => {
+        allProducts.push(extract(group, v))
       })
     })
   }
@@ -59,6 +57,7 @@ export default function RestockBuilder() {
     })
   }
 
+  // ✅ Product sources
   addGroupedProducts(borosilProducts, "Borosil", (group, v) => ({
     productName: group.product || group.title || group.name || "",
     brand: "Borosil",
@@ -124,6 +123,8 @@ export default function RestockBuilder() {
   const removeItem = (id: number) => {
     setItems(items.filter((item) => item.id !== id))
   }
+
+  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -234,6 +235,9 @@ export default function RestockBuilder() {
                 ))}
               </tbody>
             </table>
+            <div className="text-right font-semibold mt-4 text-lg">
+              Total Restock: ₹{totalAmount.toFixed(2)}
+            </div>
           </CardContent>
         </Card>
       )}
