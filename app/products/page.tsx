@@ -1,9 +1,8 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, Beaker, Microscope, TestTube } from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge" // Make sure Badge component exists
+import { Badge } from "@/components/ui/badge"
 
 export const metadata: Metadata = {
   title: "Our Products",
@@ -16,18 +15,24 @@ const productCategories = [
     description: "High-volume, industrial-grade chemicals for your production needs.",
     href: "/products/bulk-chemicals",
     icon: <Beaker className="w-10 h-10 text-teal-500" />,
+    badge: "Request for Quote",
+    badgeColor: "bg-yellow-600",
   },
   {
     title: "Laboratory Chemicals, Glassware and Filter Paper",
     description: "A complete range of chemicals, lab glassware, and filtration products from trusted brands.",
     href: "/products/laboratory-supplies",
     icon: <TestTube className="w-10 h-10 text-teal-500" />,
+    badge: "Buy Now",
+    badgeColor: "bg-green-600",
   },
   {
     title: "Scientific Instruments",
     description: "Precision instruments and equipment to power your research and analysis.",
     href: "/products/scientific-instruments",
     icon: <Microscope className="w-10 h-10 text-teal-500" />,
+    badge: "Buy Now",
+    badgeColor: "bg-green-600",
   },
 ]
 
@@ -49,13 +54,16 @@ export default function ProductsPage() {
                 {category.icon}
                 <div>
                   <CardTitle>{category.title}</CardTitle>
-                  <Badge className="mt-1 text-xs bg-green-600 text-white">Buy Now</Badge>
+                  <Badge className={`mt-1 text-xs text-white ${category.badgeColor}`}>
+                    {category.badge}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent className="flex-grow flex flex-col justify-between">
                 <p className="text-slate-600 mb-4">{category.description}</p>
                 <span className="font-semibold text-blue-600 flex items-center gap-2">
-                  Explore Category <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  Explore Category{" "}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </CardContent>
             </Card>
