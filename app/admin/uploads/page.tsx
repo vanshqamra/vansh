@@ -37,21 +37,37 @@ interface QuoteUpload {
 
 export default function AdminUploadsPage() {
   const [uploads, setUploads] = useState<QuoteUpload[]>([])
-  const [loading, setLoading] = useState(true)
+  const [uploadsLoading, setUploadsLoading] = useState(true)
+  const [role, setRole] = useState<string | null>(null)
   const [selectedUpload, setSelectedUpload] = useState<QuoteUpload | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState("")
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
+    if (loading) return
     if (!user) {
       router.push("/login")
       return
     }
-    fetchUploads()
-  }, [user, router])
+    if (role === null) {
+      const fetchRole = async () => {
+        const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+        const userRole = profile?.role ?? null
+        setRole(userRole)
+        if (userRole !== "admin") {
+          router.push("/dashboard")
+        } else {
+          fetchUploads()
+        }
+      }
+      fetchRole()
+    } else if (role !== "admin") {
+      router.push("/dashboard")
+    }
+  }, [loading, user, role, router])
 
   const fetchUploads = async () => {
     try {
@@ -71,7 +87,7 @@ export default function AdminUploadsPage() {
     } catch (error) {
       console.error("Error fetching uploads:", error)
     } finally {
-      setLoading(false)
+      setUploadsLoading(false)
     }
   }
 
@@ -88,6 +104,7 @@ export default function AdminUploadsPage() {
 
       if (error) throw error
 
+      // Refresh the uploads list
       fetchUploads()
       setSelectedUpload(null)
     } catch (error) {
@@ -133,7 +150,7 @@ export default function AdminUploadsPage() {
     }
   }
 
-  if (loading) {
+  if (uploadsLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
@@ -154,6 +171,7 @@ export default function AdminUploadsPage() {
           </div>
         </div>
 
+        {/* Filters */}
         <Card className="mb-6">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
@@ -185,6 +203,7 @@ export default function AdminUploadsPage() {
           </CardContent>
         </Card>
 
+        {/* Uploads List */}
         <div className="grid gap-4">
           {filteredUploads.map((upload) => (
             <Card key={upload.id}>
@@ -232,7 +251,8 @@ export default function AdminUploadsPage() {
 
                   <div className="flex items-center gap-2 ml-4">
                     <Button variant="outline" size="sm" onClick={() => window.open(upload.file_url, "_blank")}>
-                      <Eye className="h-4 w-4 mr-1" /> View
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
                     </Button>
                     <Button
                       variant="outline"
@@ -244,7 +264,8 @@ export default function AdminUploadsPage() {
                         link.click()
                       }}
                     >
-                      <Download className="h-4 w-4 mr-1" /> Download
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
                     </Button>
                     <Dialog>
                       <DialogTrigger asChild>
