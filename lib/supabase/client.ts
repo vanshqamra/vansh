@@ -9,5 +9,11 @@ export function createClient() {
   }
 
   // Create a supabase client on the browser with project's credentials
-  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+  // and ensure the session is persisted across refreshes.
+  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      detectSessionInUrl: true,
+    },
+  })
 }

@@ -26,20 +26,19 @@ import {
   TestTube,
   Microscope,
   FlaskConical,
+  ClipboardList,
+  FileText,
 } from "lucide-react"
 import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
 import { Input } from "@/components/ui/input"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export function Header() {
-  const { user, signOut } = useAuth()
+  const { user, role, signOut } = useAuth()
   const { state } = useCart()
   const [mounted, setMounted] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     setMounted(true)
@@ -54,27 +53,6 @@ export function Header() {
       setSearchQuery("")
     }
   }
-
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (!session?.user) return
-
-      const { data } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", session.user.id)
-        .single()
-
-      if (data?.role === "admin") {
-        setIsAdmin(true)
-      }
-    }
-
-    checkAdmin()
-  }, [supabase])
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -182,23 +160,6 @@ export function Header() {
               Contact
             </Link>
 
-            {/* 🧾 Admin Links */}
-            {isAdmin && (
-              <>
-                <Link
-                  href="/admin/restock"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
-                >
-                  🧾 Restock Dashboard
-                </Link>
-                <Link
-                  href="/admin/quotation"
-                  className="text-sm font-medium hover:text-blue-600 transition-colors"
-                >
-                  📄 Quotation Builder
-                </Link>
-              </>
-            )}
           </nav>
 
           {/* Right side actions */}
@@ -252,6 +213,23 @@ export function Header() {
                       My Orders
                     </Link>
                   </DropdownMenuItem>
+                  {role === "admin" && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/restock" className="flex items-center">
+                          <ClipboardList className="mr-2 h-4 w-4" />
+                          Restock Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/quotation" className="flex items-center">
+                          <FileText className="mr-2 h-4 w-4" />
+                          Quotation Builder
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut} className="flex items-center text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
