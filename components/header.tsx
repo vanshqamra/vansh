@@ -55,16 +55,14 @@ export function Header() {
     }
   }
 
-  // 🔐 Fetch admin role from Supabase profiles table
   useEffect(() => {
     const checkAdmin = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
-
       if (!session?.user) return
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", session.user.id)
@@ -89,7 +87,7 @@ export function Header() {
               <div className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-pulse" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              {""}
+              Chemical Corporation
             </span>
           </Link>
 
@@ -184,14 +182,22 @@ export function Header() {
               Contact
             </Link>
 
-            {/* 🧾 Admin Link (Visible Only for Admins) */}
+            {/* 🧾 Admin Links */}
             {isAdmin && (
-              <Link
-                href="/admin/uploads/restock"
-                className="text-sm font-medium text-blue-600 hover:underline"
-              >
-                🧾 Restock Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/admin/restock"
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  🧾 Restock Dashboard
+                </Link>
+                <Link
+                  href="/admin/quotation"
+                  className="text-sm font-medium hover:text-blue-600 transition-colors"
+                >
+                  📄 Quotation Builder
+                </Link>
+              </>
             )}
           </nav>
 
@@ -272,7 +278,7 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-80 z-[70]">
-                {/* mobile menu content remains unchanged */}
+                {/* TODO: Add mobile version of admin links here if needed */}
               </SheetContent>
             </Sheet>
           </div>
