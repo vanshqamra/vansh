@@ -1,19 +1,19 @@
+// ✅ quotation-builder.tsx (complete standalone version with preview table)
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Download } from "lucide-react"
 
-// Product sources
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import { qualigensProducts } from "@/lib/qualigens-products"
 import whatmanProducts from "@/lib/whatman_products.json"
 import himediaProducts from "@/lib/himedia_products_grouped"
-import bulkChemicals from "@/lib/data"
+import { commercialChemicals } from "@/lib/data"
 
 interface QuotationItem {
   id: number
@@ -36,50 +36,43 @@ export default function QuotationBuilder() {
   })
   const [filtered, setFiltered] = useState<any[]>([])
 
-  // Load all product variants
   const allProducts: any[] = [
-    ...(borosilProducts as any[]).flatMap((group) =>
-      group.variants?.map((variant: any) => ({
-        productName: group.product,
-        brand: "Borosil",
-        code: variant.code,
-        packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
-        price: parseFloat(variant.price),
-      })) || []
-    ),
-    ...(rankemProducts as any[]).flatMap((group) =>
-      group.variants?.map((variant: any) => ({
-        productName: group.title || group.product,
-        brand: "Rankem",
-        code: variant["Product Code"] || variant.code,
-        packSize: variant["Pack Size"],
-        price: parseFloat(variant["Price"]),
-      })) || []
-    ),
-    ...(qualigensProducts as any[]).map((p) => ({
+    ...(borosilProducts || []).flatMap(group => (group.variants || []).map(variant => ({
+      productName: group.product,
+      brand: "Borosil",
+      code: variant.code,
+      packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
+      price: parseFloat(variant.price),
+    }))),
+    ...(rankemProducts || []).flatMap(group => (group.variants || []).map(variant => ({
+      productName: group.product || group.title,
+      brand: "Rankem",
+      code: variant["Product Code"] || variant.code,
+      packSize: variant["Pack Size"],
+      price: parseFloat(variant["Price"]),
+    }))),
+    ...(qualigensProducts || []).map(p => ({
       productName: p["Product Name"],
       brand: "Qualigens",
       code: p["Product Code"],
       packSize: p["Pack Size"],
       price: parseFloat(p["Price"]),
     })),
-    ...(whatmanProducts as any[]).map((p) => ({
+    ...(whatmanProducts || []).map(p => ({
       productName: p.name,
       brand: "Whatman",
       code: p.code,
       packSize: p.size,
       price: parseFloat(p.price),
     })),
-    ...(himediaProducts as any[]).flatMap((group) =>
-      group.variants?.map((variant: any) => ({
-        productName: group.title || group.product || "",
-        brand: "HiMedia",
-        code: variant["Product Code"] || variant.code,
-        packSize: variant["Pack Size"] || variant.size || "",
-        price: parseFloat(variant["Price"]),
-      })) || []
-    ),
-    ...(bulkChemicals as any[]).map((p) => ({
+    ...(himediaProducts || []).flatMap(group => (group.variants || []).map(v => ({
+      productName: group.product || group.title,
+      brand: "HiMedia",
+      code: v["Product Code"] || v.code,
+      packSize: v["Pack Size"] || v.size,
+      price: parseFloat(v["Price"]),
+    }))),
+    ...(commercialChemicals || []).map(p => ({
       productName: p.name || p["Product Name"],
       brand: "Bulk Chemical",
       code: p.code || p["Product Code"],
