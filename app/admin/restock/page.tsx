@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase/client"
+import { useEffect, useState, useMemo } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -32,36 +33,42 @@ export default function RestockPage() {
   })
   const [userRole, setUserRole] = useState<null | string>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     const checkAdmin = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
 
-      if (!session?.user) {
-        setUserRole(null)
+        if (!session?.user) {
+          router.replace("/login")
+          return
+        }
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single()
+
+        if (error || data?.role !== "admin") {
+          router.replace("/dashboard")
+          return
+        }
+
+        setUserRole("admin")
+      } catch (error) {
+        console.error("Error verifying admin status:", error)
+      } finally {
         setLoading(false)
-        return
       }
-
-      const { data, error } = await supabase
-        .from("profiles") // ✅ Corrected this line
-        .select("role")
-        .eq("id", session.user.id)
-        .single()
-
-      if (error || !data) {
-        setUserRole(null)
-      } else {
-        setUserRole(data.role)
-      }
-
-      setLoading(false)
     }
 
     checkAdmin()
-  }, [])
+  }, [router, supabase])
 
   const handleAdd = () => {
     if (!form.productName || !form.brand || !form.quantity) {
@@ -100,7 +107,7 @@ export default function RestockPage() {
   }
 
   if (loading) return <div className="p-10 text-center">Loading...</div>
-  if (userRole !== "admin") return <div className="p-10 text-center text-red-600 text-lg">403 – Forbidden</div>
+  if (userRole !== "admin") return null
 
   return (
     <div className="container mx-auto px-4 py-12">
