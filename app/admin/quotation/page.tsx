@@ -1,4 +1,4 @@
-// ✅ quotation-builder.tsx (final fix with visibility across all products and auto price pick with editable field)
+// ✅ quotation-builder.tsx (final fix with split identity and guaranteed price auto-pick)
 "use client"
 
 import { useState } from "react"
@@ -15,7 +15,7 @@ import whatmanProducts from "@/lib/whatman_products.json"
 import himediaProducts from "@/lib/himedia_products_grouped"
 import { commercialChemicals } from "@/lib/data"
 
-interface RestockItem {
+interface QuotationItem {
   id: number
   productName: string
   brand: string
@@ -33,8 +33,8 @@ interface ProductEntry {
   price: number
 }
 
-export default function RestockBuilder() {
-  const [items, setItems] = useState<RestockItem[]>([])
+export default function QuotationBuilder() {
+  const [items, setItems] = useState<QuotationItem[]>([])
   const [form, setForm] = useState({
     productName: "",
     brand: "",
@@ -46,87 +46,71 @@ export default function RestockBuilder() {
 
   const allProducts: ProductEntry[] = []
 
-  if (Array.isArray(borosilProducts)) {
-    borosilProducts.forEach((group) => {
-      (group.variants || []).forEach((variant) => {
-        allProducts.push({
-          productName: group.product || group.title || group.name || "",
-          brand: "Borosil",
-          code: variant.code || "",
-          packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
-          price: parseFloat(variant.price || "0") || 0,
-        })
+  const addGroupedProducts = (source: any[], brand: string, extract: (group: any, variant: any) => ProductEntry) => {
+    source?.forEach((group) => {
+      (group.variants || []).forEach((variant: any) => {
+        allProducts.push(extract(group, variant))
       })
     })
   }
 
-  if (Array.isArray(rankemProducts)) {
-    rankemProducts.forEach((group) => {
-      (group.variants || []).forEach((variant) => {
-        allProducts.push({
-          productName: group.product || group.title || group.name || "",
-          brand: "Rankem",
-          code: variant["Product Code"] || variant.code || "",
-          packSize: variant["Pack Size"] || variant.size || "",
-          price: parseFloat(variant["Price"] || "0") || 0,
-        })
-      })
+  const addFlatProducts = (source: any[], brand: string, extract: (p: any) => ProductEntry) => {
+    source?.forEach((p) => {
+      allProducts.push(extract(p))
     })
   }
 
-  if (Array.isArray(qualigensProducts)) {
-    qualigensProducts.forEach((p) => {
-      allProducts.push({
-        productName: p["Product Name"] || p.product || p.name || "",
-        brand: "Qualigens",
-        code: p["Product Code"] || p.code || "",
-        packSize: p["Pack Size"] || p.size || "",
-        price: parseFloat(p["Price"] || "0") || 0,
-      })
-    })
-  }
+  addGroupedProducts(borosilProducts, "Borosil", (group, v) => ({
+    productName: group.product || group.title || group.name || "",
+    brand: "Borosil",
+    code: v.code || "",
+    packSize: v.capacity || v["Pack Size"] || v.size || "",
+    price: parseFloat(v.price || "0") || 0,
+  }))
 
-  if (Array.isArray(whatmanProducts)) {
-    whatmanProducts.forEach((p) => {
-      allProducts.push({
-        productName: p.name || p.title || "",
-        brand: "Whatman",
-        code: p.code || p["Product Code"] || "",
-        packSize: p.size || p["Pack Size"] || "",
-        price: parseFloat(p.price || "0") || 0,
-      })
-    })
-  }
+  addGroupedProducts(rankemProducts, "Rankem", (group, v) => ({
+    productName: group.product || group.title || group.name || "",
+    brand: "Rankem",
+    code: v["Product Code"] || v.code || "",
+    packSize: v["Pack Size"] || v.size || "",
+    price: parseFloat(v["Price"] || "0") || 0,
+  }))
 
-  if (Array.isArray(himediaProducts)) {
-    himediaProducts.forEach((group) => {
-      (group.variants || []).forEach((v) => {
-        allProducts.push({
-          productName: group.product || group.title || group.name || "",
-          brand: "HiMedia",
-          code: v["Product Code"] || v.code || "",
-          packSize: v["Pack Size"] || v.size || "",
-          price: parseFloat(v["Price"] || "0") || 0,
-        })
-      })
-    })
-  }
+  addFlatProducts(qualigensProducts, "Qualigens", (p) => ({
+    productName: p["Product Name"] || p.product || p.name || "",
+    brand: "Qualigens",
+    code: p["Product Code"] || p.code || "",
+    packSize: p["Pack Size"] || p.size || "",
+    price: parseFloat(p["Price"] || "0") || 0,
+  }))
 
-  if (Array.isArray(commercialChemicals)) {
-    commercialChemicals.forEach((p) => {
-      allProducts.push({
-        productName: p.name || p["Product Name"] || "",
-        brand: "Bulk Chemical",
-        code: p.code || p["Product Code"] || "",
-        packSize: p.size || p["Pack Size"] || "",
-        price: parseFloat(p.price || "0") || 0,
-      })
-    })
-  }
+  addFlatProducts(whatmanProducts, "Whatman", (p) => ({
+    productName: p.name || p.title || "",
+    brand: "Whatman",
+    code: p.code || p["Product Code"] || "",
+    packSize: p.size || p["Pack Size"] || "",
+    price: parseFloat(p.price || "0") || 0,
+  }))
+
+  addGroupedProducts(himediaProducts, "HiMedia", (group, v) => ({
+    productName: group.product || group.title || group.name || "",
+    brand: "HiMedia",
+    code: v["Product Code"] || v.code || "",
+    packSize: v["Pack Size"] || v.size || "",
+    price: parseFloat(v["Price"] || "0") || 0,
+  }))
+
+  addFlatProducts(commercialChemicals, "Bulk Chemical", (p) => ({
+    productName: p.name || p["Product Name"] || "",
+    brand: "Bulk Chemical",
+    code: p.code || p["Product Code"] || "",
+    packSize: p.size || p["Pack Size"] || "",
+    price: parseFloat(p.price || "0") || 0,
+  }))
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
-    const newItem: RestockItem = {
+    const newItem: QuotationItem = {
       id: Date.now(),
       productName: form.productName,
       brand: form.brand,
@@ -143,15 +127,18 @@ export default function RestockBuilder() {
     setItems(items.filter((item) => item.id !== id))
   }
 
+  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">Restock List Builder</h1>
+        <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
+        <p className="text-gray-500">Quotation Builder</p>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Add Product to Restock</CardTitle>
+          <CardTitle>Add Product to Quotation</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative md:col-span-3">
@@ -207,11 +194,7 @@ export default function RestockBuilder() {
           </div>
           <div>
             <Label>Price</Label>
-            <Input
-              type="number"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
-            />
+            <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
           </div>
           <div className="md:col-span-5 text-right">
             <Button onClick={handleAdd}>Add</Button>
@@ -222,7 +205,7 @@ export default function RestockBuilder() {
       {items.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Restock Preview</CardTitle>
+            <CardTitle>Quotation Preview</CardTitle>
           </CardHeader>
           <CardContent>
             <table className="w-full text-sm">
@@ -255,6 +238,12 @@ export default function RestockBuilder() {
                 ))}
               </tbody>
             </table>
+            <div className="text-right font-semibold mt-4 text-lg">Total: ₹{totalAmount.toFixed(2)}</div>
+            <div className="mt-4 text-right">
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" /> Export as PDF
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
