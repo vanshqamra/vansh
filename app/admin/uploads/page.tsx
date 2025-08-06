@@ -88,7 +88,6 @@ export default function AdminUploadsPage() {
 
       if (error) throw error
 
-      // Refresh the uploads list
       fetchUploads()
       setSelectedUpload(null)
     } catch (error) {
@@ -155,7 +154,6 @@ export default function AdminUploadsPage() {
           </div>
         </div>
 
-        {/* Filters */}
         <Card className="mb-6">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
@@ -187,7 +185,6 @@ export default function AdminUploadsPage() {
           </CardContent>
         </Card>
 
-        {/* Uploads List */}
         <div className="grid gap-4">
           {filteredUploads.map((upload) => (
             <Card key={upload.id}>
@@ -235,8 +232,7 @@ export default function AdminUploadsPage() {
 
                   <div className="flex items-center gap-2 ml-4">
                     <Button variant="outline" size="sm" onClick={() => window.open(upload.file_url, "_blank")}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
+                      <Eye className="h-4 w-4 mr-1" /> View
                     </Button>
                     <Button
                       variant="outline"
@@ -248,8 +244,7 @@ export default function AdminUploadsPage() {
                         link.click()
                       }}
                     >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
+                      <Download className="h-4 w-4 mr-1" /> Download
                     </Button>
                     <Dialog>
                       <DialogTrigger asChild>
