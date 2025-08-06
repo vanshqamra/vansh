@@ -1,11 +1,14 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, Beaker, Microscope, TestTube } from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge" // Make sure Badge component exists
 
 export const metadata: Metadata = {
   title: "Our Products",
-  description: "Explore our main product categories: Bulk Chemicals, Laboratory Supplies, and Scientific Instruments.",
+  description: "Explore our main product categories: Bulk Chemicals, Laboratory Chemicals, Glassware and Filter Paper, and Scientific Instruments.",
 }
 
 const productCategories = [
@@ -16,8 +19,8 @@ const productCategories = [
     icon: <Beaker className="w-10 h-10 text-teal-500" />,
   },
   {
-    title: "Laboratory Supplies",
-    description: "A complete range of glassware, consumables, and reagents from leading brands.",
+    title: "Laboratory Chemicals, Glassware and Filter Paper",
+    description: "A complete range of chemicals, lab glassware, and filtration products from trusted brands.",
     href: "/products/laboratory-supplies",
     icon: <TestTube className="w-10 h-10 text-teal-500" />,
   },
@@ -45,7 +48,10 @@ export default function ProductsPage() {
             <Card className="h-full glow-on-hover bg-white/70 backdrop-blur-sm border-slate-200/80 flex flex-col">
               <CardHeader className="flex-row items-center gap-4">
                 {category.icon}
-                <CardTitle>{category.title}</CardTitle>
+                <div>
+                  <CardTitle>{category.title}</CardTitle>
+                  <Badge className="mt-1 text-xs bg-green-600 text-white">Buy Now</Badge>
+                </div>
               </CardHeader>
               <CardContent className="flex-grow flex flex-col justify-between">
                 <p className="text-slate-600 mb-4">{category.description}</p>
