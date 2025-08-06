@@ -15,7 +15,7 @@ import whatmanProducts from "@/lib/whatman_products.json"
 import himediaProducts from "@/lib/himedia_products_grouped"
 import { commercialChemicals } from "@/lib/data"
 
-interface QuotationItem {
+interface RestockItem {
   id: number
   productName: string
   brand: string
@@ -33,8 +33,8 @@ interface ProductEntry {
   price: number
 }
 
-export default function QuotationBuilder() {
-  const [items, setItems] = useState<QuotationItem[]>([])
+export default function RestockBuilder() {
+  const [items, setItems] = useState<RestockItem[]>([])
   const [form, setForm] = useState({
     productName: "",
     brand: "",
@@ -54,7 +54,7 @@ export default function QuotationBuilder() {
           brand: "Borosil",
           code: variant.code || "",
           packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
-          price: parseFloat(variant.price),
+          price: parseFloat(variant.price || "0") || 0,
         })
       })
     })
@@ -68,7 +68,7 @@ export default function QuotationBuilder() {
           brand: "Rankem",
           code: variant["Product Code"] || variant.code || "",
           packSize: variant["Pack Size"] || variant.size || "",
-          price: parseFloat(variant["Price"]),
+          price: parseFloat(variant["Price"] || "0") || 0,
         })
       })
     })
@@ -81,7 +81,7 @@ export default function QuotationBuilder() {
         brand: "Qualigens",
         code: p["Product Code"] || p.code || "",
         packSize: p["Pack Size"] || p.size || "",
-        price: parseFloat(p["Price"]),
+        price: parseFloat(p["Price"] || "0") || 0,
       })
     })
   }
@@ -93,7 +93,7 @@ export default function QuotationBuilder() {
         brand: "Whatman",
         code: p.code || p["Product Code"] || "",
         packSize: p.size || p["Pack Size"] || "",
-        price: parseFloat(p.price),
+        price: parseFloat(p.price || "0") || 0,
       })
     })
   }
@@ -106,7 +106,7 @@ export default function QuotationBuilder() {
           brand: "HiMedia",
           code: v["Product Code"] || v.code || "",
           packSize: v["Pack Size"] || v.size || "",
-          price: parseFloat(v["Price"]),
+          price: parseFloat(v["Price"] || "0") || 0,
         })
       })
     })
@@ -119,14 +119,14 @@ export default function QuotationBuilder() {
         brand: "Bulk Chemical",
         code: p.code || p["Product Code"] || "",
         packSize: p.size || p["Pack Size"] || "",
-        price: parseFloat(p.price),
+        price: parseFloat(p.price || "0") || 0,
       })
     })
   }
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
-    const newItem: QuotationItem = {
+    const newItem: RestockItem = {
       id: Date.now(),
       productName: form.productName,
       brand: form.brand,
@@ -143,18 +143,15 @@ export default function QuotationBuilder() {
     setItems(items.filter((item) => item.id !== id))
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
-        <p className="text-gray-500">Quotation Builder</p>
+        <h1 className="text-3xl font-bold">Restock List Builder</h1>
       </div>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Add Product to Quotation</CardTitle>
+          <CardTitle>Add Product to Restock</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative md:col-span-3">
@@ -182,7 +179,7 @@ export default function QuotationBuilder() {
                         brand: product.brand,
                         packSize: product.packSize,
                         quantity: "",
-                        price: product.price ? product.price.toString() : "",
+                        price: product.price.toString(),
                       })
                       setFiltered([])
                     }}
@@ -225,7 +222,7 @@ export default function QuotationBuilder() {
       {items.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Quotation Preview</CardTitle>
+            <CardTitle>Restock Preview</CardTitle>
           </CardHeader>
           <CardContent>
             <table className="w-full text-sm">
@@ -258,12 +255,6 @@ export default function QuotationBuilder() {
                 ))}
               </tbody>
             </table>
-            <div className="text-right font-semibold mt-4 text-lg">Total: ₹{totalAmount.toFixed(2)}</div>
-            <div className="mt-4 text-right">
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" /> Export as PDF
-              </Button>
-            </div>
           </CardContent>
         </Card>
       )}
