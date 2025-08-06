@@ -17,7 +17,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [role, setRole] = useState<string | null>(null)
+  const [role, setRole] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("user_role")
+    }
+    return null
+  })
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
@@ -38,12 +43,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (!error && data?.role) {
             setRole(data.role)
+            localStorage.setItem("user_role", data.role)
           }
         }
       } catch (error) {
         console.error("Error getting session or role:", error)
         setUser(null)
         setRole(null)
+        localStorage.removeItem("user_role")
       } finally {
         setLoading(false)
       }
@@ -67,11 +74,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (!error && data?.role) {
           setRole(data.role)
+          localStorage.setItem("user_role", data.role)
         } else {
           setRole(null)
+          localStorage.removeItem("user_role")
         }
       } else {
         setRole(null)
+        localStorage.removeItem("user_role")
       }
     })
 
@@ -83,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await supabase.auth.signOut()
       setUser(null)
       setRole(null)
+      localStorage.removeItem("user_role")
     } catch (error) {
       console.error("Error signing out:", error)
     }
