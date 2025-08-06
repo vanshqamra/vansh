@@ -9,101 +9,88 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
+import { Search } from "lucide-react"
+import borosilProducts from "@/lib/borosil_products_absolute_final.json"
+import rankemProducts from "@/lib/rankem_products.json"
+import { qualigensProducts } from "@/lib/qualigens-products"
+import { commercialChemicals } from "@/lib/data"
 
-type ReorderItem = {
-  id: number
-  productName: string
-  brand: string
-  packSize?: string
-  quantity: number
-  priority: string
-  notes?: string
-  status: "Not Ordered" | "Ordered"
-}
+const allProducts = [
+  ...borosilProducts.flatMap(group => group.variants.map(v => ({ ...v, name: v.name || group.product || "", brand: "Borosil" }))),
+  ...rankemProducts.flatMap(group => group.variants.map(v => ({ ...v, name: v.name || group.product || "", brand: "Rankem" }))),
+  ...qualigensProducts.map(p => ({ ...p, name: p["Product Name"], brand: "Qualigens" })),
+  ...commercialChemicals.map(p => ({ ...p, name: p.name, brand: "Commercial" })),
+]
 
 export default function RestockPage() {
-  const [items, setItems] = useState<ReorderItem[]>([])
-  const [form, setForm] = useState({
-    productName: "",
-    brand: "",
-    packSize: "",
-    quantity: "",
-    priority: "Medium",
-    notes: "",
-  })
-  const [userRole, setUserRole] = useState<null | string>(null)
+  const [items, setItems] = useState([])
+  const [search, setSearch] = useState("")
+  const [matches, setMatches] = useState([])
+  const [selected, setSelected] = useState(null)
+  const [quantity, setQuantity] = useState("")
+  const [notes, setNotes] = useState("")
+  const [priority, setPriority] = useState("Medium")
+  const [userRole, setUserRole] = useState(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     const checkAdmin = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
-        if (!session?.user) {
-          router.replace("/login")
-          return
-        }
+      if (!session?.user) return router.replace("/login")
 
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .single()
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .single()
 
-        if (error || data?.role !== "admin") {
-          router.replace("/dashboard")
-          return
-        }
+      if (error || data?.role !== "admin") return router.replace("/dashboard")
 
-        setUserRole("admin")
-      } catch (error) {
-        console.error("Error verifying admin status:", error)
-      } finally {
-        setLoading(false)
-      }
+      setUserRole("admin")
+      setLoading(false)
     }
 
     checkAdmin()
   }, [router, supabase])
 
-  const handleAdd = () => {
-    if (!form.productName || !form.brand || !form.quantity) {
-      alert("Product name, brand, and quantity are required.")
-      return
+  useEffect(() => {
+    if (search.trim().length > 1) {
+      const query = search.toLowerCase().replace(/[^a-z0-9]/gi, "")
+      const filtered = allProducts.filter(p => {
+        const key = (p.name + p.brand + (p["Product Code"] || "") + (p["CAS No"] || ""))
+          .toLowerCase()
+          .replace(/[^a-z0-9]/gi, "")
+        return key.includes(query)
+      })
+      setMatches(filtered.slice(0, 10))
+    } else {
+      setMatches([])
     }
+  }, [search])
 
-    const newItem: ReorderItem = {
+  const handleAdd = () => {
+    if (!selected || !quantity) return alert("Select product and quantity")
+    const newItem = {
       id: Date.now(),
-      productName: form.productName,
-      brand: form.brand,
-      packSize: form.packSize || "",
-      quantity: parseInt(form.quantity),
-      priority: form.priority,
-      notes: form.notes,
+      productName: selected.name,
+      brand: selected.brand,
+      packSize: selected["Pack Size"] || selected.packSize || "",
+      quantity: parseInt(quantity),
+      priority,
+      notes,
       status: "Not Ordered",
     }
-
     setItems([newItem, ...items])
-    setForm({
-      productName: "",
-      brand: "",
-      packSize: "",
-      quantity: "",
-      priority: "Medium",
-      notes: "",
-    })
-  }
-
-  const markAsOrdered = (id: number) => {
-    setItems(items.map(item => item.id === id ? { ...item, status: "Ordered" } : item))
-  }
-
-  const removeItem = (id: number) => {
-    setItems(items.filter(item => item.id !== id))
+    setSearch("")
+    setSelected(null)
+    setQuantity("")
+    setPriority("Medium")
+    setNotes("")
   }
 
   if (loading) return <div className="p-10 text-center">Loading...</div>
@@ -115,44 +102,60 @@ export default function RestockPage() {
 
       <Card className="mb-10 bg-white/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Add Missing Product</CardTitle>
+          <CardTitle>Search and Add Product</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CardContent className="space-y-4">
           <div>
-            <Label>Product Name</Label>
-            <Input value={form.productName} onChange={e => setForm({ ...form, productName: e.target.value })} />
+            <Label>Search Product</Label>
+            <div className="relative">
+              <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Type to search..." />
+              {matches.length > 0 && (
+                <div className="absolute bg-white border w-full shadow-md max-h-60 overflow-y-auto z-10">
+                  {matches.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setSelected(item)
+                        setSearch(item.name)
+                        setMatches([])
+                      }}
+                    >
+                      {item.name} <span className="text-xs text-gray-500">({item.brand})</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <Label>Brand / Supplier</Label>
-            <Input value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} />
-          </div>
-          <div>
-            <Label>Pack Size</Label>
-            <Input value={form.packSize} onChange={e => setForm({ ...form, packSize: e.target.value })} />
-          </div>
-          <div>
-            <Label>Quantity Needed</Label>
-            <Input type="number" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} />
-          </div>
-          <div>
-            <Label>Priority</Label>
-            <select
-              className="w-full rounded-md border border-gray-300 h-10 px-2"
-              value={form.priority}
-              onChange={e => setForm({ ...form, priority: e.target.value })}
-            >
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </div>
-          <div className="md:col-span-3">
-            <Label>Notes</Label>
-            <Textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
-          </div>
-          <div className="md:col-span-3 flex justify-end">
-            <Button onClick={handleAdd}>Add to Reorder List</Button>
-          </div>
+
+          {selected && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label>Quantity</Label>
+                <Input type="number" value={quantity} onChange={e => setQuantity(e.target.value)} />
+              </div>
+              <div>
+                <Label>Priority</Label>
+                <select
+                  className="w-full rounded-md border border-gray-300 h-10 px-2"
+                  value={priority}
+                  onChange={e => setPriority(e.target.value)}
+                >
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
+                </select>
+              </div>
+              <div className="md:col-span-3">
+                <Label>Notes</Label>
+                <Textarea value={notes} onChange={e => setNotes(e.target.value)} />
+              </div>
+              <div className="md:col-span-3 flex justify-end">
+                <Button onClick={handleAdd}>Add to Reorder List</Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -186,9 +189,9 @@ export default function RestockPage() {
                 <p className="text-sm text-slate-700">{item.notes}</p>
                 <div className="flex gap-2">
                   {item.status === "Not Ordered" && (
-                    <Button size="sm" onClick={() => markAsOrdered(item.id)}>Mark Ordered</Button>
+                    <Button size="sm" onClick={() => setItems(items.map(i => i.id === item.id ? { ...i, status: "Ordered" } : i))}>Mark Ordered</Button>
                   )}
-                  <Button variant="destructive" size="sm" onClick={() => removeItem(item.id)}>Remove</Button>
+                  <Button variant="destructive" size="sm" onClick={() => setItems(items.filter(i => i.id !== item.id))}>Remove</Button>
                 </div>
               </CardContent>
             </Card>
