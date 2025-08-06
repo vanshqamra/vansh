@@ -1,21 +1,45 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ShoppingCart, Package, TrendingUp, Clock, CheckCircle } from "lucide-react"
 import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
-import { ShoppingCart, Package, TrendingUp, Clock, CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { supabase } from "@/lib/supabase/client"
 
 export default function Dashboard() {
   const { user } = useAuth()
   const { state } = useCart()
   const [mounted, setMounted] = useState(false)
+  const [role, setRole] = useState<string | null>(null)
 
   useEffect(() => {
     setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session?.user) return
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .single()
+
+      if (!error && data) {
+        setRole(data.role)
+      }
+    }
+
+    fetchRole()
   }, [])
 
   if (!mounted) {
@@ -26,50 +50,16 @@ export default function Dashboard() {
   const cartTotal = state?.total || 0
   const cartItemCount = state?.itemCount || 0
 
-  // Mock data for orders and stats
   const recentOrders = [
-    {
-      id: "ORD-001",
-      date: "2024-01-15",
-      status: "Delivered",
-      total: 15750,
-      items: 3,
-    },
-    {
-      id: "ORD-002",
-      date: "2024-01-10",
-      status: "Processing",
-      total: 8900,
-      items: 2,
-    },
-    {
-      id: "ORD-003",
-      date: "2024-01-05",
-      status: "Shipped",
-      total: 22300,
-      items: 5,
-    },
+    { id: "ORD-001", date: "2024-01-15", status: "Delivered", total: 15750, items: 3 },
+    { id: "ORD-002", date: "2024-01-10", status: "Processing", total: 8900, items: 2 },
+    { id: "ORD-003", date: "2024-01-05", status: "Shipped", total: 22300, items: 5 },
   ]
 
   const stats = [
-    {
-      title: "Total Orders",
-      value: "12",
-      icon: Package,
-      description: "All time orders",
-    },
-    {
-      title: "Cart Items",
-      value: cartItemCount.toString(),
-      icon: ShoppingCart,
-      description: "Items in current cart",
-    },
-    {
-      title: "Cart Value",
-      value: `₹${cartTotal.toLocaleString()}`,
-      icon: TrendingUp,
-      description: "Current cart total",
-    },
+    { title: "Total Orders", value: "12", icon: Package, description: "All time orders" },
+    { title: "Cart Items", value: cartItemCount.toString(), icon: ShoppingCart, description: "Items in current cart" },
+    { title: "Cart Value", value: `₹${cartTotal.toLocaleString()}`, icon: TrendingUp, description: "Current cart total" },
   ]
 
   return (
@@ -122,8 +112,8 @@ export default function Dashboard() {
                           order.status === "Delivered"
                             ? "default"
                             : order.status === "Processing"
-                              ? "secondary"
-                              : "outline"
+                            ? "secondary"
+                            : "outline"
                         }
                       >
                         {order.status === "Delivered" && <CheckCircle className="h-3 w-3 mr-1" />}
@@ -215,6 +205,24 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Admin Tools */}
+        {role === "admin" && (
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Admin Tools</CardTitle>
+              <CardDescription>Only visible to admins</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Button variant="destructive" asChild>
+                <Link href="/dashboard/admin">Client Approvals</Link>
+              </Button>
+              <Button variant="destructive" asChild>
+                <Link href="/admin/restock">Restock Panel</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   )
