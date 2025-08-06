@@ -1,7 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Beaker, Microscope, TestTube, FlaskConical, Thermometer, Biohazard } from "lucide-react"
+import {
+  Beaker,
+  Microscope,
+  TestTube,
+  FlaskConical,
+  Thermometer,
+  Biohazard
+} from "lucide-react"
 import Link from "next/link"
 import brandDiscounts from "@/lib/brandDiscounts"
 
@@ -52,7 +59,7 @@ const laboratoryBrands = [
     icon: Biohazard,
     productCount: "5000+",
     specialties: ["Culture Media", "Prepared Plates", "Microbiological Tools", "Cell Biology"],
-    href: "/brand/HiMedia",
+    href: "/brand/himedia", // 🔧 updated here
   },
 ]
 

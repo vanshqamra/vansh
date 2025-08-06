@@ -49,7 +49,7 @@ export function ClientHeaderBrandDropdown() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/brand/HiMedia" className="flex items-center">
+          <Link href="/brand/himedia" className="flex items-center">
             <Image src="/images/logo-himedia.png" alt="HiMedia" width={20} height={20} className="mr-2" />
             HiMedia
           </Link>

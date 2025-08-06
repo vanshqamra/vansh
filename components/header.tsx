@@ -63,7 +63,7 @@ export function Header() {
               <div className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-pulse" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              {""}
+              Chemical Corporation
             </span>
           </Link>
 
@@ -137,7 +137,7 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/brand/HiMedia" className="flex items-center">
+                  <Link href="/brand/himedia" className="flex items-center">
                     <Image src="/images/logo-himedia.png" alt="HiMedia" width={20} height={20} className="mr-2" />
                     HiMedia
                   </Link>

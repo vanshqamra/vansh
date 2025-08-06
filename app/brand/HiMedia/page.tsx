@@ -1,13 +1,28 @@
 "use client"
 
 import { useState } from "react"
-import himediaProductsRaw from "@/lib/himedia_products_grouped"
+import part1 from "@/lib/himedia_products_part1.json"
+import part2 from "@/lib/himedia_products_part2.json"
+import part3 from "@/lib/himedia_products_part3.json"
+import part4 from "@/lib/himedia_products_part4.json"
+import part5 from "@/lib/himedia_products_part5.json"
+
 import { useCart } from "@/app/context/CartContext"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 
+// Merge all parts into one object
+const himediaProductsRaw = {
+  ...part1,
+  ...part2,
+  ...part3,
+  ...part4,
+  ...part5,
+}
+
+// Flatten grouped JSON
 const flattenProducts = (data) => {
   const result = []
   for (const main in data) {
@@ -75,7 +90,9 @@ export default function HiMediaBrandPage() {
               <p className="text-slate-600"><strong>Code:</strong> {product.code}</p>
               <p className="text-slate-600">
                 <strong>Price:</strong>{" "}
-                {product.price ? `₹${product.price}` : <span className="italic">On Request</span>}
+                {product.price
+                  ? `₹${product.price}`
+                  : <span className="italic">On Request</span>}
               </p>
               {product.price && (
                 <Button

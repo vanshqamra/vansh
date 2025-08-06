@@ -1,71 +1,78 @@
 "use client"
 
 import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 
-type Product = {
+interface Chemical {
   code: string
   name: string
   category: string
-  pack_size: string
-  price: string
 }
 
-interface BulkChemicalListProps {
-  products: Product[]
-  categories: string[]
+interface Props {
+  products: Chemical[]
+  categories?: string[]
 }
 
-export function BulkChemicalList({ products, categories }: BulkChemicalListProps) {
-  const [activeFilter, setActiveFilter] = useState("All")
+const getPackSize = (category: string) => {
+  const lower = category.toLowerCase()
+  if (lower.includes("acid") || lower.includes("solvent") || lower.includes("reagent")) {
+    return "25 / 50 / 200 L"
+  } else if (lower.includes("salt") || lower.includes("base")) {
+    return "25 / 50 / 200 KG"
+  }
+  return "25 / 50 / 200"
+}
 
-  const filteredProducts = activeFilter === "All" ? products : products.filter((p) => p.category === activeFilter)
+export function BulkChemicalList({ products }: Props) {
+  const [quantities, setQuantities] = useState<{ [code: string]: string }>({})
+
+  const handleQuantityChange = (code: string, value: string) => {
+    setQuantities((prev) => ({ ...prev, [code]: value }))
+  }
+
+  const handleRequestQuote = (name: string, code: string) => {
+    const qty = quantities[code] || "1"
+    const message = `Hello, I would like to request a quotation for:\n\nProduct: ${name}\nCode: ${code}\nQuantity: ${qty}`
+    const whatsappUrl = `https://wa.me/919915533998?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, "_blank")
+  }
 
   return (
-    <div>
-      <div className="flex flex-wrap justify-center gap-2 mb-10">
-        {categories.map((category) => (
-          <Button
-            key={category}
-            variant={activeFilter === category ? "default" : "outline"}
-            onClick={() => setActiveFilter(category)}
-            className="capitalize"
-          >
-            {category}
-          </Button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <Card
-            key={product.code}
-            className="flex flex-col justify-between shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-300"
-          >
-            <CardHeader>
-              <CardTitle className="text-base font-semibold leading-snug">{product.name}</CardTitle>
-              <p className="text-xs text-slate-500 pt-1">{product.code}</p>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium text-slate-600">Category:</span> {product.category}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-600">Pack Size:</span> {product.pack_size}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-600">Price:</span> {product.price}
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full">Request Quote</Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {products.map((chemical) => (
+        <Card key={chemical.code} className="bg-white/90">
+          <CardHeader>
+            <CardTitle className="text-blue-700 text-sm flex justify-between items-start">
+              <span>{chemical.name}</span>
+              <Badge className="text-xs">{getPackSize(chemical.category)}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm space-y-2">
+            <p className="text-slate-600"><strong>Code:</strong> {chemical.code}</p>
+            <p className="text-slate-600"><strong>Category:</strong> {chemical.category}</p>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                placeholder="Qty"
+                className="w-24"
+                value={quantities[chemical.code] || ""}
+                onChange={(e) => handleQuantityChange(chemical.code, e.target.value)}
+              />
+              <Button
+                size="sm"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => handleRequestQuote(chemical.name, chemical.code)}
+              >
+                Request Quotation
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   )
 }
