@@ -182,7 +182,7 @@ export default function QuotationBuilder() {
                         brand: product.brand,
                         packSize: product.packSize,
                         quantity: "",
-                        price: product.price.toString(),
+                        price: product.price ? product.price.toString() : "",
                       })
                       setFiltered([])
                     }}
@@ -214,7 +214,6 @@ export default function QuotationBuilder() {
               type="number"
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
-              placeholder="Enter price or auto-filled"
             />
           </div>
           <div className="md:col-span-5 text-right">
