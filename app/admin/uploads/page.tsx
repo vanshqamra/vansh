@@ -37,21 +37,37 @@ interface QuoteUpload {
 
 export default function AdminUploadsPage() {
   const [uploads, setUploads] = useState<QuoteUpload[]>([])
-  const [loading, setLoading] = useState(true)
+  const [uploadsLoading, setUploadsLoading] = useState(true)
+  const [role, setRole] = useState<string | null>(null)
   const [selectedUpload, setSelectedUpload] = useState<QuoteUpload | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState("")
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
+    if (loading) return
     if (!user) {
       router.push("/login")
       return
     }
-    fetchUploads()
-  }, [user, router])
+    if (role === null) {
+      const fetchRole = async () => {
+        const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+        const userRole = profile?.role ?? null
+        setRole(userRole)
+        if (userRole !== "admin") {
+          router.push("/dashboard")
+        } else {
+          fetchUploads()
+        }
+      }
+      fetchRole()
+    } else if (role !== "admin") {
+      router.push("/dashboard")
+    }
+  }, [loading, user, role, router])
 
   const fetchUploads = async () => {
     try {
@@ -71,7 +87,7 @@ export default function AdminUploadsPage() {
     } catch (error) {
       console.error("Error fetching uploads:", error)
     } finally {
-      setLoading(false)
+      setUploadsLoading(false)
     }
   }
 
@@ -134,7 +150,7 @@ export default function AdminUploadsPage() {
     }
   }
 
-  if (loading) {
+  if (uploadsLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
