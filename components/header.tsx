@@ -30,13 +30,16 @@ import {
 import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
 import { Input } from "@/components/ui/input"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export function Header() {
   const { user, signOut } = useAuth()
   const { state } = useCart()
   const [mounted, setMounted] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
     setMounted(true)
@@ -51,6 +54,29 @@ export function Header() {
       setSearchQuery("")
     }
   }
+
+  // 🔐 Fetch admin role from Supabase profiles table
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session?.user) return
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .single()
+
+      if (data?.role === "admin") {
+        setIsAdmin(true)
+      }
+    }
+
+    checkAdmin()
+  }, [supabase])
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -157,6 +183,16 @@ export function Header() {
             <Link href="/contact" className="text-sm font-medium hover:text-blue-600 transition-colors">
               Contact
             </Link>
+
+            {/* 🧾 Admin Link (Visible Only for Admins) */}
+            {isAdmin && (
+              <Link
+                href="/admin/uploads/restock"
+                className="text-sm font-medium text-blue-600 hover:underline"
+              >
+                🧾 Restock Dashboard
+              </Link>
+            )}
           </nav>
 
           {/* Right side actions */}
