@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase/client" // ✅ FIXED import path
+import { supabase } from "@/lib/supabase/client"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -46,7 +46,7 @@ export default function RestockPage() {
       }
 
       const { data, error } = await supabase
-        .from("users") // Change to "profiles" if that's where role is stored
+        .from("profiles") // ✅ Corrected this line
         .select("role")
         .eq("id", session.user.id)
         .single()
