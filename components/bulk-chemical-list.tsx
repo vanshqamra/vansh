@@ -1,71 +1,50 @@
+// components/BulkChemicalList.tsx
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { commercialChemicals } from "@/lib/data"
 
-type Product = {
-  code: string
-  name: string
-  category: string
-  pack_size: string
-  price: string
-}
+export function BulkChemicalList() {
+  const [quantities, setQuantities] = useState<Record<string, string>>({})
 
-interface BulkChemicalListProps {
-  products: Product[]
-  categories: string[]
-}
+  const handleQuantityChange = (code: string, value: string) => {
+    setQuantities((prev) => ({ ...prev, [code]: value }))
+  }
 
-export function BulkChemicalList({ products, categories }: BulkChemicalListProps) {
-  const [activeFilter, setActiveFilter] = useState("All")
+  const getDefaultUnit = (category: string) => {
+    return category === "Solvents" ? "L" : "kg"
+  }
 
-  const filteredProducts = activeFilter === "All" ? products : products.filter((p) => p.category === activeFilter)
+  const openWhatsApp = (product: { code: string; name: string; category: string }) => {
+    const qty = quantities[product.code] || ""
+    const unit = getDefaultUnit(product.category)
+    const message = `I would like to request a quotation for ${product.name} - ${qty} ${unit}.`
+    const encodedMessage = encodeURIComponent(message)
+    window.open(`https://wa.me/?text=${encodedMessage}`, "_blank")
+  }
 
   return (
-    <div>
-      <div className="flex flex-wrap justify-center gap-2 mb-10">
-        {categories.map((category) => (
-          <Button
-            key={category}
-            variant={activeFilter === category ? "default" : "outline"}
-            onClick={() => setActiveFilter(category)}
-            className="capitalize"
+    <div className="grid gap-4">
+      {commercialChemicals.map((product) => (
+        <div key={product.code} className="border p-4 rounded-xl shadow-md">
+          <div className="font-semibold text-lg">{product.name}</div>
+          <div className="text-sm text-gray-500 mb-2">Category: {product.category}</div>
+          <input
+            type="number"
+            placeholder={`Qty (${getDefaultUnit(product.category)})`}
+            value={quantities[product.code] || ""}
+            onChange={(e) => handleQuantityChange(product.code, e.target.value)}
+            className="border p-2 rounded w-full mb-2"
+          />
+          <button
+            onClick={() => openWhatsApp(product)}
+            className="bg-green-600 text-white px-4 py-2 rounded w-full"
           >
-            {category}
-          </Button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <Card
-            key={product.code}
-            className="flex flex-col justify-between shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-300"
-          >
-            <CardHeader>
-              <CardTitle className="text-base font-semibold leading-snug">{product.name}</CardTitle>
-              <p className="text-xs text-slate-500 pt-1">{product.code}</p>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium text-slate-600">Category:</span> {product.category}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-600">Pack Size:</span> {product.pack_size}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-600">Price:</span> {product.price}
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full">Request Quote</Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+            Request Quotation
+          </button>
+        </div>
+      ))}
     </div>
   )
 }
+
