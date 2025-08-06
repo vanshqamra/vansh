@@ -1,3 +1,6 @@
+// ✅ quotation-builder.tsx and restock-page.tsx in one document
+
+// --- Start of RestockPage.tsx ---
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
@@ -15,50 +18,44 @@ import rankemProducts from "@/lib/rankem_products.json"
 import { qualigensProducts } from "@/lib/qualigens-products"
 import whatmanProducts from "@/lib/whatman_products.json"
 import himediaProducts from "@/lib/himedia_products_grouped"
-import bulkChemicals from "@/lib/data"
+import { commercialChemicals } from "@/lib/data"
 
 const allProducts = [
-  ...(borosilProducts || []).flatMap((group) =>
-    (group.variants || []).map((v) => ({
-      name: group.product,
-      code: v.code,
-      packSize: v.capacity || v["Pack Size"] || v.size || "",
-      brand: "Borosil",
-    }))
-  ),
-  ...(rankemProducts || []).flatMap((group) =>
-    (group.variants || []).map((v) => ({
-      name: group.product || group.title || "",
-      code: v["Product Code"] || v.code,
-      packSize: v["Pack Size"] || "",
-      brand: "Rankem",
-    }))
-  ),
-  ...(qualigensProducts || []).map((p) => ({
+  ...borosilProducts.flatMap(group => group.variants?.map(variant => ({
+    name: group.product,
+    brand: "Borosil",
+    code: variant.code,
+    packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
+  })) || []),
+  ...rankemProducts.flatMap(group => group.variants?.map(variant => ({
+    name: group.product || group.title,
+    brand: "Rankem",
+    code: variant["Product Code"] || variant.code,
+    packSize: variant["Pack Size"],
+  })) || []),
+  ...qualigensProducts.map(p => ({
     name: p["Product Name"],
+    brand: "Qualigens",
     code: p["Product Code"],
     packSize: p["Pack Size"],
-    brand: "Qualigens",
   })),
-  ...(whatmanProducts || []).map((p) => ({
+  ...whatmanProducts.map(p => ({
     name: p.name,
+    brand: "Whatman",
     code: p.code,
     packSize: p.size,
-    brand: "Whatman",
   })),
-  ...(himediaProducts || []).flatMap((group) =>
-    (group.variants || []).map((v) => ({
-      name: group.product || group.title || "",
-      code: v["Product Code"] || v.code,
-      packSize: v["Pack Size"] || v.size || "",
-      brand: "HiMedia",
-    }))
-  ),
-  ...(commercialChemicals || []).map((p) => ({
-    name: p.name,
+  ...himediaProducts.flatMap(group => group.variants?.map(v => ({
+    name: group.product || group.title,
+    brand: "HiMedia",
+    code: v["Product Code"] || v.code,
+    packSize: v["Pack Size"] || v.size,
+  })) || []),
+  ...commercialChemicals.map(p => ({
+    name: p.name || p["Product Name"],
+    brand: "Bulk Chemical",
     code: p.code || p["Product Code"],
     packSize: p.size || p["Pack Size"],
-    brand: "Bulk Chemical",
   })),
 ]
 
@@ -101,10 +98,8 @@ export default function RestockPage() {
   useEffect(() => {
     if (search.trim().length > 1) {
       const query = search.toLowerCase().replace(/[^a-z0-9]/gi, "")
-      const filtered = allProducts.filter((p) => {
-        const key = `${p.name}${p.code}${p.packSize}${p.brand}`
-          .toLowerCase()
-          .replace(/[^a-z0-9]/gi, "")
+      const filtered = allProducts.filter(p => {
+        const key = `${p.name}${p.code}${p.packSize}${p.brand}`.toLowerCase().replace(/[^a-z0-9]/gi, "")
         return key.includes(query)
       })
       setMatches(filtered.slice(0, 15))
@@ -119,7 +114,7 @@ export default function RestockPage() {
       id: Date.now(),
       productName: selected.name,
       brand: selected.brand,
-      packSize: selected.packSize || "",
+      packSize: selected.packSize,
       quantity: parseInt(quantity),
       priority,
       notes,
@@ -139,16 +134,13 @@ export default function RestockPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-6">🧾 Reorder Dashboard</h1>
-
       <Card className="mb-10 bg-white/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle>Search and Add Product</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Search and Add Product</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div>
             <Label>Search Product</Label>
             <div className="relative">
-              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Type to search..." />
+              <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Type to search..." />
               {matches.length > 0 && (
                 <div className="absolute bg-white border w-full shadow-md max-h-60 overflow-y-auto z-10 text-sm">
                   {matches.map((item, idx) => (
@@ -162,9 +154,7 @@ export default function RestockPage() {
                       }}
                     >
                       <span className="font-medium">{item.name}</span>{" "}
-                      <span className="text-xs text-muted-foreground">
-                        [Code: {item.code}] • [Size: {item.packSize}] • [Brand: {item.brand}]
-                      </span>
+                      <span className="text-xs text-muted-foreground">[Code: {item.code}] • [Size: {item.packSize}] • [Brand: {item.brand}]</span>
                     </div>
                   ))}
                 </div>
@@ -174,16 +164,13 @@ export default function RestockPage() {
 
           {selected && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label>Quantity</Label>
-                <Input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-              </div>
+              <div><Label>Quantity</Label><Input type="number" value={quantity} onChange={e => setQuantity(e.target.value)} /></div>
               <div>
                 <Label>Priority</Label>
                 <select
                   className="w-full rounded-md border border-gray-300 h-10 px-2"
                   value={priority}
-                  onChange={(e) => setPriority(e.target.value)}
+                  onChange={e => setPriority(e.target.value)}
                 >
                   <option>High</option>
                   <option>Medium</option>
@@ -192,7 +179,7 @@ export default function RestockPage() {
               </div>
               <div className="md:col-span-3">
                 <Label>Notes</Label>
-                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+                <Textarea value={notes} onChange={e => setNotes(e.target.value)} />
               </div>
               <div className="md:col-span-3 flex justify-end">
                 <Button onClick={handleAdd}>Add to Reorder List</Button>
