@@ -1,15 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/utils/supabase/client" // adjust path to your supabase client
+import { supabase } from "@/lib/supabase/clients" // ✅ Updated import
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
-
-const supabase = createClient()
 
 type ReorderItem = {
   id: number
@@ -49,7 +47,7 @@ export default function RestockPage() {
       }
 
       const { data, error } = await supabase
-        .from("users") // change to 'profiles' if needed
+        .from("users") // or "profiles", depending on your schema
         .select("role")
         .eq("id", session.user.id)
         .single()
