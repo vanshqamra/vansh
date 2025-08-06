@@ -1,4 +1,4 @@
-// ✅ quotation-builder.tsx (complete standalone version with array guards)
+// ✅ quotation-builder.tsx (final fix with visibility across all products)
 "use client"
 
 import { useState } from "react"
@@ -36,56 +36,85 @@ export default function QuotationBuilder() {
   })
   const [filtered, setFiltered] = useState<any[]>([])
 
-  const allProducts: any[] = [
-    ...(Array.isArray(borosilProducts) ? borosilProducts : []).flatMap((group) =>
-      (group.variants || []).map((variant) => ({
-        productName: group.product || group.title || group.name || "",
-        brand: "Borosil",
-        code: variant.code || "",
-        packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
-        price: parseFloat(variant.price),
-      }))
-    ),
-    ...(Array.isArray(rankemProducts) ? rankemProducts : []).flatMap((group) =>
-      (group.variants || []).map((variant) => ({
-        productName: group.product || group.title || group.name || "",
-        brand: "Rankem",
-        code: variant["Product Code"] || variant.code || "",
-        packSize: variant["Pack Size"] || variant.size || "",
-        price: parseFloat(variant["Price"]),
-      }))
-    ),
-    ...(Array.isArray(qualigensProducts) ? qualigensProducts : []).map((p) => ({
-      productName: p["Product Name"] || p.product || p.name || "",
-      brand: "Qualigens",
-      code: p["Product Code"] || p.code || "",
-      packSize: p["Pack Size"] || p.size || "",
-      price: parseFloat(p["Price"]),
-    })),
-    ...(Array.isArray(whatmanProducts) ? whatmanProducts : []).map((p) => ({
-      productName: p.name || p.title || "",
-      brand: "Whatman",
-      code: p.code || p["Product Code"] || "",
-      packSize: p.size || p["Pack Size"] || "",
-      price: parseFloat(p.price),
-    })),
-    ...(Array.isArray(himediaProducts) ? himediaProducts : []).flatMap((group) =>
-      (group.variants || []).map((v) => ({
-        productName: group.product || group.title || group.name || "",
-        brand: "HiMedia",
-        code: v["Product Code"] || v.code || "",
-        packSize: v["Pack Size"] || v.size || "",
-        price: parseFloat(v["Price"]),
-      }))
-    ),
-    ...(Array.isArray(commercialChemicals) ? commercialChemicals : []).map((p) => ({
-      productName: p.name || p["Product Name"] || "",
-      brand: "Bulk Chemical",
-      code: p.code || p["Product Code"] || "",
-      packSize: p.size || p["Pack Size"] || "",
-      price: parseFloat(p.price),
-    })),
-  ]
+  const allProducts: any[] = []
+
+  if (Array.isArray(borosilProducts)) {
+    borosilProducts.forEach((group) => {
+      (group.variants || []).forEach((variant) => {
+        allProducts.push({
+          productName: group.product || group.title || group.name || "",
+          brand: "Borosil",
+          code: variant.code || "",
+          packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
+          price: parseFloat(variant.price),
+        })
+      })
+    })
+  }
+
+  if (Array.isArray(rankemProducts)) {
+    rankemProducts.forEach((group) => {
+      (group.variants || []).forEach((variant) => {
+        allProducts.push({
+          productName: group.product || group.title || group.name || "",
+          brand: "Rankem",
+          code: variant["Product Code"] || variant.code || "",
+          packSize: variant["Pack Size"] || variant.size || "",
+          price: parseFloat(variant["Price"]),
+        })
+      })
+    })
+  }
+
+  if (Array.isArray(qualigensProducts)) {
+    qualigensProducts.forEach((p) => {
+      allProducts.push({
+        productName: p["Product Name"] || p.product || p.name || "",
+        brand: "Qualigens",
+        code: p["Product Code"] || p.code || "",
+        packSize: p["Pack Size"] || p.size || "",
+        price: parseFloat(p["Price"]),
+      })
+    })
+  }
+
+  if (Array.isArray(whatmanProducts)) {
+    whatmanProducts.forEach((p) => {
+      allProducts.push({
+        productName: p.name || p.title || "",
+        brand: "Whatman",
+        code: p.code || p["Product Code"] || "",
+        packSize: p.size || p["Pack Size"] || "",
+        price: parseFloat(p.price),
+      })
+    })
+  }
+
+  if (Array.isArray(himediaProducts)) {
+    himediaProducts.forEach((group) => {
+      (group.variants || []).forEach((v) => {
+        allProducts.push({
+          productName: group.product || group.title || group.name || "",
+          brand: "HiMedia",
+          code: v["Product Code"] || v.code || "",
+          packSize: v["Pack Size"] || v.size || "",
+          price: parseFloat(v["Price"]),
+        })
+      })
+    })
+  }
+
+  if (Array.isArray(commercialChemicals)) {
+    commercialChemicals.forEach((p) => {
+      allProducts.push({
+        productName: p.name || p["Product Name"] || "",
+        brand: "Bulk Chemical",
+        code: p.code || p["Product Code"] || "",
+        packSize: p.size || p["Pack Size"] || "",
+        price: parseFloat(p.price),
+      })
+    })
+  }
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
@@ -129,9 +158,7 @@ export default function QuotationBuilder() {
                 setForm({ ...form, productName: query })
                 setFiltered(
                   allProducts.filter((p) =>
-                    `${p.productName || ""} ${p.code || ""} ${p.packSize || ""}`
-                      .toLowerCase()
-                      .includes(query)
+                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
                   )
                 )
               }}
