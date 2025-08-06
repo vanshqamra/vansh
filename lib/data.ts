@@ -101,17 +101,17 @@ export const labSupplyBrands = {
 }
 
 export function BulkChemicalList() {
-  const [quantities, setQuantities] = useState({})
+  const [quantities, setQuantities] = useState<Record<string, string>>({})
 
-  const handleQuantityChange = (code, value) => {
-    setQuantities(prev => ({ ...prev, [code]: value }))
+  const handleQuantityChange = (code: string, value: string) => {
+    setQuantities((prev) => ({ ...prev, [code]: value }))
   }
 
-  const getDefaultUnit = (category) => {
+  const getDefaultUnit = (category: string) => {
     return ["Solvents"].includes(category) ? "L" : "kg"
   }
 
-  const openWhatsApp = (product) => {
+  const openWhatsApp = (product: { code: string; name: string; category: string }) => {
     const qty = quantities[product.code] || ""
     const unit = getDefaultUnit(product.category)
     const message = `I would like to request a quotation for ${product.name} - ${qty} ${unit}.`
