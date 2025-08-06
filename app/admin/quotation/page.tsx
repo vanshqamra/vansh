@@ -1,4 +1,4 @@
-// ✅ quotation-builder.tsx (final fix with visibility across all products)
+// ✅ quotation-builder.tsx (final fix with visibility across all products and auto price pick)
 "use client"
 
 import { useState } from "react"
@@ -25,6 +25,14 @@ interface QuotationItem {
   custom: boolean
 }
 
+interface ProductEntry {
+  productName: string
+  brand: string
+  code: string
+  packSize: string
+  price: number
+}
+
 export default function QuotationBuilder() {
   const [items, setItems] = useState<QuotationItem[]>([])
   const [form, setForm] = useState({
@@ -34,9 +42,9 @@ export default function QuotationBuilder() {
     quantity: "",
     price: "",
   })
-  const [filtered, setFiltered] = useState<any[]>([])
+  const [filtered, setFiltered] = useState<ProductEntry[]>([])
 
-  const allProducts: any[] = []
+  const allProducts: ProductEntry[] = []
 
   if (Array.isArray(borosilProducts)) {
     borosilProducts.forEach((group) => {
@@ -155,12 +163,11 @@ export default function QuotationBuilder() {
               value={form.productName}
               onChange={(e) => {
                 const query = e.target.value.toLowerCase()
-                setForm({ ...form, productName: query })
-                setFiltered(
-                  allProducts.filter((p) =>
-                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
-                  )
+                const results = allProducts.filter((p) =>
+                  `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
                 )
+                setForm({ ...form, productName: query })
+                setFiltered(results)
               }}
             />
             {form.productName && filtered.length > 0 && (
@@ -175,7 +182,7 @@ export default function QuotationBuilder() {
                         brand: product.brand,
                         packSize: product.packSize,
                         quantity: "",
-                        price: product.price.toString(),
+                        price: product.price.toFixed(2),
                       })
                       setFiltered([])
                     }}
