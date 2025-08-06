@@ -12,8 +12,8 @@ import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import { qualigensProducts } from "@/lib/qualigens-products"
 import whatmanProducts from "@/lib/whatman_products.json"
-import himediaProducts from "@/lib/himedia_products_grouped.json"
-import bulkChemicals from "@/lib/commercial_chemicals.json"
+import himediaProducts from "@/lib/himedia_products_grouped"
+import bulkChemicals from "@/lib/data"
 
 interface QuotationItem {
   id: number
