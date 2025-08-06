@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Input } from "@/components/ui/input"
@@ -15,31 +15,42 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    // 🔐 Sign in
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-    if (error) {
-      setError(error.message)
+    if (loginError) {
+      setError(loginError.message)
       return
     }
 
-    // ✅ Fetch profile to check role
+    // 🧠 Fetch updated session right after login
     const {
       data: { session },
+      error: sessionError,
     } = await supabase.auth.getSession()
 
-    const userId = session?.user?.id
-    if (!userId) return router.push("/dashboard")
+    if (sessionError || !session?.user) {
+      setError("Failed to retrieve session.")
+      return
+    }
 
-    const { data, error: profileError } = await supabase
+    const userId = session.user.id
+
+    // 🧾 Fetch user role from `profiles` table
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", userId)
       .single()
 
-    if (profileError || !data) {
+    if (profileError || !profile) {
       router.push("/dashboard")
-    } else if (data.role === "admin") {
+    } else if (profile.role === "admin") {
       router.push("/admin/restock")
     } else {
       router.push("/dashboard")
@@ -52,17 +63,19 @@ export default function LoginPage() {
         type="email"
         placeholder="Email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         required
       />
       <Input
         type="password"
         placeholder="Password"
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <Button type="submit" className="w-full">Login</Button>
+      <Button type="submit" className="w-full">
+        Login
+      </Button>
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </form>
   )
