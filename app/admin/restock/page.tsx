@@ -1,4 +1,4 @@
-// ✅ quotation-builder.tsx (final fix with visibility across all products and auto price pick with editable field)
+// ✅ restock-builder.tsx (final fix with split identity and guaranteed price auto-pick)
 "use client"
 
 import { useState } from "react"
@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Download } from "lucide-react"
 
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
@@ -46,83 +45,67 @@ export default function RestockBuilder() {
 
   const allProducts: ProductEntry[] = []
 
-  if (Array.isArray(borosilProducts)) {
-    borosilProducts.forEach((group) => {
-      (group.variants || []).forEach((variant) => {
-        allProducts.push({
-          productName: group.product || group.title || group.name || "",
-          brand: "Borosil",
-          code: variant.code || "",
-          packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
-          price: parseFloat(variant.price),
-        })
+  const addGroupedProducts = (source: any[], brand: string, extract: (group: any, variant: any) => ProductEntry) => {
+    source?.forEach((group) => {
+      (group.variants || []).forEach((variant: any) => {
+        allProducts.push(extract(group, variant))
       })
     })
   }
 
-  if (Array.isArray(rankemProducts)) {
-    rankemProducts.forEach((group) => {
-      (group.variants || []).forEach((variant) => {
-        allProducts.push({
-          productName: group.product || group.title || group.name || "",
-          brand: "Rankem",
-          code: variant["Product Code"] || variant.code || "",
-          packSize: variant["Pack Size"] || variant.size || "",
-          price: parseFloat(variant["Price"]),
-        })
-      })
+  const addFlatProducts = (source: any[], brand: string, extract: (p: any) => ProductEntry) => {
+    source?.forEach((p) => {
+      allProducts.push(extract(p))
     })
   }
 
-  if (Array.isArray(qualigensProducts)) {
-    qualigensProducts.forEach((p) => {
-      allProducts.push({
-        productName: p["Product Name"] || p.product || p.name || "",
-        brand: "Qualigens",
-        code: p["Product Code"] || p.code || "",
-        packSize: p["Pack Size"] || p.size || "",
-        price: parseFloat(p["Price"]),
-      })
-    })
-  }
+  addGroupedProducts(borosilProducts, "Borosil", (group, v) => ({
+    productName: group.product || group.title || group.name || "",
+    brand: "Borosil",
+    code: v.code || "",
+    packSize: v.capacity || v["Pack Size"] || v.size || "",
+    price: parseFloat(v.price || "0") || 0,
+  }))
 
-  if (Array.isArray(whatmanProducts)) {
-    whatmanProducts.forEach((p) => {
-      allProducts.push({
-        productName: p.name || p.title || "",
-        brand: "Whatman",
-        code: p.code || p["Product Code"] || "",
-        packSize: p.size || p["Pack Size"] || "",
-        price: parseFloat(p.price),
-      })
-    })
-  }
+  addGroupedProducts(rankemProducts, "Rankem", (group, v) => ({
+    productName: group.product || group.title || group.name || "",
+    brand: "Rankem",
+    code: v["Product Code"] || v.code || "",
+    packSize: v["Pack Size"] || v.size || "",
+    price: parseFloat(v["Price"] || "0") || 0,
+  }))
 
-  if (Array.isArray(himediaProducts)) {
-    himediaProducts.forEach((group) => {
-      (group.variants || []).forEach((v) => {
-        allProducts.push({
-          productName: group.product || group.title || group.name || "",
-          brand: "HiMedia",
-          code: v["Product Code"] || v.code || "",
-          packSize: v["Pack Size"] || v.size || "",
-          price: parseFloat(v["Price"]),
-        })
-      })
-    })
-  }
+  addFlatProducts(qualigensProducts, "Qualigens", (p) => ({
+    productName: p["Product Name"] || p.product || p.name || "",
+    brand: "Qualigens",
+    code: p["Product Code"] || p.code || "",
+    packSize: p["Pack Size"] || p.size || "",
+    price: parseFloat(p["Price"] || "0") || 0,
+  }))
 
-  if (Array.isArray(commercialChemicals)) {
-    commercialChemicals.forEach((p) => {
-      allProducts.push({
-        productName: p.name || p["Product Name"] || "",
-        brand: "Bulk Chemical",
-        code: p.code || p["Product Code"] || "",
-        packSize: p.size || p["Pack Size"] || "",
-        price: parseFloat(p.price),
-      })
-    })
-  }
+  addFlatProducts(whatmanProducts, "Whatman", (p) => ({
+    productName: p.name || p.title || "",
+    brand: "Whatman",
+    code: p.code || p["Product Code"] || "",
+    packSize: p.size || p["Pack Size"] || "",
+    price: parseFloat(p.price || "0") || 0,
+  }))
+
+  addGroupedProducts(himediaProducts, "HiMedia", (group, v) => ({
+    productName: group.product || group.title || group.name || "",
+    brand: "HiMedia",
+    code: v["Product Code"] || v.code || "",
+    packSize: v["Pack Size"] || v.size || "",
+    price: parseFloat(v["Price"] || "0") || 0,
+  }))
+
+  addFlatProducts(commercialChemicals, "Bulk Chemical", (p) => ({
+    productName: p.name || p["Product Name"] || "",
+    brand: "Bulk Chemical",
+    code: p.code || p["Product Code"] || "",
+    packSize: p.size || p["Pack Size"] || "",
+    price: parseFloat(p.price || "0") || 0,
+  }))
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
@@ -179,7 +162,7 @@ export default function RestockBuilder() {
                         brand: product.brand,
                         packSize: product.packSize,
                         quantity: "",
-                        price: product.price ? product.price.toString() : "",
+                        price: product.price.toString(),
                       })
                       setFiltered([])
                     }}
@@ -203,7 +186,11 @@ export default function RestockBuilder() {
           </div>
           <div>
             <Label>Quantity</Label>
-            <Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+            <Input
+              type="number"
+              value={form.quantity}
+              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+            />
           </div>
           <div>
             <Label>Price</Label>
