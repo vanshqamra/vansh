@@ -9,17 +9,57 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
-import { Search } from "lucide-react"
+
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import { qualigensProducts } from "@/lib/qualigens-products"
+import whatmanProducts from "@/lib/whatman_products.json"
+import himediaProducts from "@/lib/himedia_products_grouped.json"
 import { commercialChemicals } from "@/lib/data"
 
 const allProducts = [
-  ...borosilProducts.flatMap(group => group.variants.map(v => ({ ...v, name: v.name || group.product || "", brand: "Borosil" }))),
-  ...rankemProducts.flatMap(group => group.variants.map(v => ({ ...v, name: v.name || group.product || "", brand: "Rankem" }))),
-  ...qualigensProducts.map(p => ({ ...p, name: p["Product Name"], brand: "Qualigens" })),
-  ...commercialChemicals.map(p => ({ ...p, name: p.name, brand: "Commercial" })),
+  ...(borosilProducts || []).flatMap((group) =>
+    (group.variants || []).map((v) => ({
+      name: group.product,
+      code: v.code,
+      packSize: v.capacity || v["Pack Size"] || v.size || "",
+      brand: "Borosil",
+    }))
+  ),
+  ...(rankemProducts || []).flatMap((group) =>
+    (group.variants || []).map((v) => ({
+      name: group.product || group.title || "",
+      code: v["Product Code"] || v.code,
+      packSize: v["Pack Size"] || "",
+      brand: "Rankem",
+    }))
+  ),
+  ...(qualigensProducts || []).map((p) => ({
+    name: p["Product Name"],
+    code: p["Product Code"],
+    packSize: p["Pack Size"],
+    brand: "Qualigens",
+  })),
+  ...(whatmanProducts || []).map((p) => ({
+    name: p.name,
+    code: p.code,
+    packSize: p.size,
+    brand: "Whatman",
+  })),
+  ...(himediaProducts || []).flatMap((group) =>
+    (group.variants || []).map((v) => ({
+      name: group.product || group.title || "",
+      code: v["Product Code"] || v.code,
+      packSize: v["Pack Size"] || v.size || "",
+      brand: "HiMedia",
+    }))
+  ),
+  ...(commercialChemicals || []).map((p) => ({
+    name: p.name,
+    code: p.code || p["Product Code"],
+    packSize: p.size || p["Pack Size"],
+    brand: "Bulk Chemical",
+  })),
 ]
 
 export default function RestockPage() {
@@ -61,13 +101,13 @@ export default function RestockPage() {
   useEffect(() => {
     if (search.trim().length > 1) {
       const query = search.toLowerCase().replace(/[^a-z0-9]/gi, "")
-      const filtered = allProducts.filter(p => {
-        const key = (p.name + p.brand + (p["Product Code"] || "") + (p["CAS No"] || ""))
+      const filtered = allProducts.filter((p) => {
+        const key = `${p.name}${p.code}${p.packSize}${p.brand}`
           .toLowerCase()
           .replace(/[^a-z0-9]/gi, "")
         return key.includes(query)
       })
-      setMatches(filtered.slice(0, 10))
+      setMatches(filtered.slice(0, 15))
     } else {
       setMatches([])
     }
@@ -79,7 +119,7 @@ export default function RestockPage() {
       id: Date.now(),
       productName: selected.name,
       brand: selected.brand,
-      packSize: selected["Pack Size"] || selected.packSize || "",
+      packSize: selected.packSize || "",
       quantity: parseInt(quantity),
       priority,
       notes,
@@ -108,20 +148,23 @@ export default function RestockPage() {
           <div>
             <Label>Search Product</Label>
             <div className="relative">
-              <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Type to search..." />
+              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Type to search..." />
               {matches.length > 0 && (
-                <div className="absolute bg-white border w-full shadow-md max-h-60 overflow-y-auto z-10">
+                <div className="absolute bg-white border w-full shadow-md max-h-60 overflow-y-auto z-10 text-sm">
                   {matches.map((item, idx) => (
                     <div
                       key={idx}
                       className="p-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
                         setSelected(item)
-                        setSearch(item.name)
+                        setSearch(`${item.name} (${item.code})`)
                         setMatches([])
                       }}
                     >
-                      {item.name} <span className="text-xs text-gray-500">({item.brand})</span>
+                      <span className="font-medium">{item.name}</span>{" "}
+                      <span className="text-xs text-muted-foreground">
+                        [Code: {item.code}] • [Size: {item.packSize}] • [Brand: {item.brand}]
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -133,14 +176,14 @@ export default function RestockPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label>Quantity</Label>
-                <Input type="number" value={quantity} onChange={e => setQuantity(e.target.value)} />
+                <Input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
               </div>
               <div>
                 <Label>Priority</Label>
                 <select
                   className="w-full rounded-md border border-gray-300 h-10 px-2"
                   value={priority}
-                  onChange={e => setPriority(e.target.value)}
+                  onChange={(e) => setPriority(e.target.value)}
                 >
                   <option>High</option>
                   <option>Medium</option>
@@ -149,7 +192,7 @@ export default function RestockPage() {
               </div>
               <div className="md:col-span-3">
                 <Label>Notes</Label>
-                <Textarea value={notes} onChange={e => setNotes(e.target.value)} />
+                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
               </div>
               <div className="md:col-span-3 flex justify-end">
                 <Button onClick={handleAdd}>Add to Reorder List</Button>
@@ -163,7 +206,7 @@ export default function RestockPage() {
         <div className="text-center text-slate-500">No items added yet.</div>
       ) : (
         <div className="space-y-4">
-          {items.map(item => (
+          {items.map((item) => (
             <Card key={item.id} className="bg-white/70 backdrop-blur">
               <CardHeader className="flex justify-between items-center flex-wrap gap-4">
                 <div>
