@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase/clients" // ✅ Updated import
+import { supabase } from "@/lib/supabase/client" // ✅ FIXED import path
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -33,7 +33,6 @@ export default function RestockPage() {
   const [userRole, setUserRole] = useState<null | string>(null)
   const [loading, setLoading] = useState(true)
 
-  // 🔐 Check for admin user
   useEffect(() => {
     const checkAdmin = async () => {
       const {
@@ -47,7 +46,7 @@ export default function RestockPage() {
       }
 
       const { data, error } = await supabase
-        .from("users") // or "profiles", depending on your schema
+        .from("users") // Change to "profiles" if that's where role is stored
         .select("role")
         .eq("id", session.user.id)
         .single()
@@ -107,7 +106,6 @@ export default function RestockPage() {
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-6">🧾 Reorder Dashboard</h1>
 
-      {/* Add Product Form */}
       <Card className="mb-10 bg-white/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Add Missing Product</CardTitle>
@@ -151,7 +149,6 @@ export default function RestockPage() {
         </CardContent>
       </Card>
 
-      {/* Reorder Table */}
       {items.length === 0 ? (
         <div className="text-center text-slate-500">No items added yet.</div>
       ) : (
