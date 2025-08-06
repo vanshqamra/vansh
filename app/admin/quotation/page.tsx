@@ -1,18 +1,19 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Download } from "lucide-react"
-import { useAuth } from "@/app/context/auth-context"
+
+// Product sources
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import { qualigensProducts } from "@/lib/qualigens-products"
 import whatmanProducts from "@/lib/whatman_products.json"
-import jsPDF from "jspdf"
+import himediaProducts from "@/lib/himedia_products_grouped.json"
+import bulkChemicals from "@/lib/commercial_chemicals.json"
 
 interface QuotationItem {
   id: number
@@ -24,48 +25,7 @@ interface QuotationItem {
   custom: boolean
 }
 
-const allProducts: any[] = [
-  ...(borosilProducts as any[]).flatMap(group =>
-    (group.variants || []).map((v: any) => ({
-      name: v.name || group.product || "",
-      brand: "Borosil",
-      packSize: v.packSize || v["Pack Size"] || (v.capacity_ml ? `${v.capacity_ml} ml` : ""),
-      price: typeof v.price === "number" ? v.price : Number(v.price) || 0,
-    }))
-  ),
-  ...(rankemProducts as any[]).flatMap(group =>
-    (group.variants || []).map((v: any) => ({
-      name: v["Description"] || v["Unnamed: 1"] || "",
-      brand: "Rankem",
-      packSize:
-        v["Pack\nSize"] || v["Pack Size"] || v["Pack size"] || v["Unnamed: 3"] || "",
-      price:
-        typeof v["List Price\n2025(INR)"] === "number"
-          ? v["List Price\n2025(INR)"]
-          : typeof v.Price === "number"
-            ? v.Price
-            : typeof v["Unnamed: 5"] === "number"
-              ? v["Unnamed: 5"]
-              : 0,
-    }))
-  ),
-  ...qualigensProducts.map(p => ({
-    name: p.name,
-    brand: "Qualigens",
-    packSize: p.packSize,
-    price: p.price,
-  })),
-  ...(((whatmanProducts as any)?.variants) || []).map((v: any) => ({
-    name: v.name || v["name"],
-    brand: "Whatman",
-    packSize: "",
-    price: typeof v.price === "number" ? v.price : Number(v.price) || 0,
-  })),
-]
-
 export default function QuotationBuilder() {
-  const { user, role, loading } = useAuth()
-  const router = useRouter()
   const [items, setItems] = useState<QuotationItem[]>([])
   const [form, setForm] = useState({
     productName: "",
@@ -74,45 +34,62 @@ export default function QuotationBuilder() {
     quantity: "",
     price: "",
   })
-  const [matches, setMatches] = useState<any[]>([])
+  const [filtered, setFiltered] = useState<any[]>([])
 
-  useEffect(() => {
-    if (!loading) {
-      if (!user) router.replace("/login")
-      else if (role !== "admin") router.replace("/dashboard")
-    }
-  }, [user, role, loading, router])
-
-  useEffect(() => {
-    const search = form.productName
-    if (search.trim().length > 1) {
-      const query = search.toLowerCase().replace(/[^a-z0-9]/g, "")
-      const filtered = allProducts.filter(p => {
-        const key = (p.name + p.brand + (p.packSize || ""))
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g, "")
-        return key.includes(query)
-      })
-      setMatches(filtered.slice(0, 10))
-    } else {
-      setMatches([])
-    }
-  }, [form.productName])
-
-  const handleSelect = (product: any) => {
-    setForm({
-      productName: product.name,
-      brand: product.brand,
-      packSize: product.packSize || "",
-      quantity: "",
-      price: product.price ? String(product.price) : "",
-    })
-    setMatches([])
-  }
+  // Load all product variants
+  const allProducts: any[] = [
+    ...(borosilProducts as any[]).flatMap((group) =>
+      group.variants?.map((variant: any) => ({
+        productName: group.product,
+        brand: "Borosil",
+        code: variant.code,
+        packSize: variant.capacity || variant["Pack Size"] || variant.size || "",
+        price: parseFloat(variant.price),
+      })) || []
+    ),
+    ...(rankemProducts as any[]).flatMap((group) =>
+      group.variants?.map((variant: any) => ({
+        productName: group.title || group.product,
+        brand: "Rankem",
+        code: variant["Product Code"] || variant.code,
+        packSize: variant["Pack Size"],
+        price: parseFloat(variant["Price"]),
+      })) || []
+    ),
+    ...(qualigensProducts as any[]).map((p) => ({
+      productName: p["Product Name"],
+      brand: "Qualigens",
+      code: p["Product Code"],
+      packSize: p["Pack Size"],
+      price: parseFloat(p["Price"]),
+    })),
+    ...(whatmanProducts as any[]).map((p) => ({
+      productName: p.name,
+      brand: "Whatman",
+      code: p.code,
+      packSize: p.size,
+      price: parseFloat(p.price),
+    })),
+    ...(himediaProducts as any[]).flatMap((group) =>
+      group.variants?.map((variant: any) => ({
+        productName: group.title || group.product || "",
+        brand: "HiMedia",
+        code: variant["Product Code"] || variant.code,
+        packSize: variant["Pack Size"] || variant.size || "",
+        price: parseFloat(variant["Price"]),
+      })) || []
+    ),
+    ...(bulkChemicals as any[]).map((p) => ({
+      productName: p.name || p["Product Name"],
+      brand: "Bulk Chemical",
+      code: p.code || p["Product Code"],
+      packSize: p.size || p["Pack Size"],
+      price: parseFloat(p.price),
+    })),
+  ]
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
-
     const newItem: QuotationItem = {
       id: Date.now(),
       productName: form.productName,
@@ -122,48 +99,15 @@ export default function QuotationBuilder() {
       price: parseFloat(form.price),
       custom: true,
     }
-
     setItems([...items, newItem])
     setForm({ productName: "", brand: "", packSize: "", quantity: "", price: "" })
   }
 
   const removeItem = (id: number) => {
-    setItems(items.filter(item => item.id !== id))
-  }
-
-  const exportPDF = () => {
-    const doc = new jsPDF()
-    doc.setFontSize(16)
-    doc.text("Chemical Corporation, Ludhiana", 14, 20)
-
-    doc.setFontSize(12)
-    let y = 30
-    doc.text("Product", 14, y)
-    doc.text("Brand", 60, y)
-    doc.text("Pack Size", 90, y)
-    doc.text("Qty", 120, y)
-    doc.text("Price", 140, y)
-    doc.text("Total", 170, y)
-    y += 6
-
-    items.forEach(item => {
-      doc.text(item.productName, 14, y)
-      doc.text(item.brand, 60, y)
-      doc.text(item.packSize, 90, y)
-      doc.text(String(item.quantity), 120, y)
-      doc.text(item.price.toFixed(2), 140, y)
-      doc.text((item.price * item.quantity).toFixed(2), 170, y)
-      y += 6
-    })
-
-    y += 4
-    doc.text(`Total: ₹${totalAmount.toFixed(2)}`, 14, y)
-    doc.save("quotation.pdf")
+    setItems(items.filter((item) => item.id !== id))
   }
 
   const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-  if (loading || role !== "admin") return null
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -177,52 +121,61 @@ export default function QuotationBuilder() {
           <CardTitle>Add Product to Quotation</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="md:col-span-2">
-            <Label>Product Name</Label>
-            <div className="relative">
-              <Input
-                value={form.productName}
-                onChange={e => setForm({ ...form, productName: e.target.value })}
-                placeholder="Type to search..."
-              />
-              {matches.length > 0 && (
-                <div className="absolute bg-white border w-full shadow-md max-h-60 overflow-y-auto z-10">
-                  {matches.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelect(item)}
-                    >
-                      {item.name} <span className="text-xs text-gray-500">({item.brand})</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          <div className="relative md:col-span-3">
+            <Label>Search Product</Label>
+            <Input
+              value={form.productName}
+              onChange={(e) => {
+                const query = e.target.value.toLowerCase()
+                setForm({ ...form, productName: query })
+                setFiltered(
+                  allProducts.filter((p) =>
+                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
+                  )
+                )
+              }}
+            />
+            {form.productName && filtered.length > 0 && (
+              <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
+                {filtered.slice(0, 50).map((product, index) => (
+                  <div
+                    key={index}
+                    className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => {
+                      setForm({
+                        productName: `${product.productName} (${product.code})`,
+                        brand: product.brand,
+                        packSize: product.packSize,
+                        quantity: "",
+                        price: product.price.toString(),
+                      })
+                      setFiltered([])
+                    }}
+                  >
+                    <span className="font-medium">{product.productName}</span>{" "}
+                    <span className="text-xs text-muted-foreground">
+                      [Code: {product.code}] • [Size: {product.packSize}]
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <Label>Brand</Label>
-            <Input value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} />
+            <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
           </div>
           <div>
             <Label>Pack Size</Label>
-            <Input value={form.packSize} onChange={e => setForm({ ...form, packSize: e.target.value })} />
+            <Input value={form.packSize} onChange={(e) => setForm({ ...form, packSize: e.target.value })} />
           </div>
           <div>
             <Label>Quantity</Label>
-            <Input
-              type="number"
-              value={form.quantity}
-              onChange={e => setForm({ ...form, quantity: e.target.value })}
-            />
+            <Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
           </div>
           <div>
             <Label>Price</Label>
-            <Input
-              type="number"
-              value={form.price}
-              onChange={e => setForm({ ...form, price: e.target.value })}
-            />
+            <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
           </div>
           <div className="md:col-span-5 text-right">
             <Button onClick={handleAdd}>Add</Button>
@@ -249,7 +202,7 @@ export default function QuotationBuilder() {
                 </tr>
               </thead>
               <tbody>
-                {items.map(item => (
+                {items.map((item) => (
                   <tr key={item.id} className="border-b">
                     <td className="py-2">{item.productName}</td>
                     <td className="text-center">{item.brand}</td>
@@ -268,7 +221,7 @@ export default function QuotationBuilder() {
             </table>
             <div className="text-right font-semibold mt-4 text-lg">Total: ₹{totalAmount.toFixed(2)}</div>
             <div className="mt-4 text-right">
-              <Button variant="outline" onClick={exportPDF}>
+              <Button variant="outline">
                 <Download className="mr-2 h-4 w-4" /> Export as PDF
               </Button>
             </div>
@@ -278,4 +231,3 @@ export default function QuotationBuilder() {
     </div>
   )
 }
-
