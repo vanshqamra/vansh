@@ -20,10 +20,10 @@ interface QuotationItem {
   discount: number;
   gst: number;
   hsnCode?: string;
-  custom: boolean;
 }
 
-const QuotationBuilder = () => {
+export default function QuotationBuilder() {
+  // Auth handling (client-side)
   const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true });
   useEffect(() => {
     import("@/app/context/auth-context").then((mod) => {
@@ -31,7 +31,6 @@ const QuotationBuilder = () => {
       setAuth({ role, loading });
     });
   }, []);
-
   if (!auth.loading && auth.role !== "admin") return <AccessDenied />;
 
   const [items, setItems] = useState<QuotationItem[]>([]);
@@ -48,12 +47,19 @@ const QuotationBuilder = () => {
   });
   const [filtered, setFiltered] = useState<ProductEntry[]>([]);
   const allProducts = useMemo(() => getAllProducts(), []);
-  const pdfRef = useRef(null);
+
+  useEffect(() => {
+    console.log(
+      "Loaded products for quotation:",
+      allProducts.length,
+      Array.from(new Set(allProducts.map((p) => p.brand)))
+    );
+  }, [allProducts]);
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return;
-    const matchedProduct = allProducts.find((p) => p.code === form.productCode);
-    let hsnValue = matchedProduct?.hsnCode || "";
+    const matched = allProducts.find((p) => p.code === form.productCode);
+    const hsn = matched?.hsnCode || "";
     const newItem: QuotationItem = {
       id: Date.now(),
       productCode: form.productCode,
@@ -64,50 +70,37 @@ const QuotationBuilder = () => {
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
       gst: parseFloat(form.gst || "0"),
-      hsnCode: hsnValue,
-      custom: true,
+      hsnCode: hsn,
     };
     setItems([...items, newItem]);
-    setForm({
-      productName: "",
-      productCode: "",
-      brand: "",
-      packSize: "",
-      quantity: "",
-      price: "",
-      discount: "",
-      gst: "",
-    });
+    setForm({ productName: "", productCode: "", brand: "", packSize: "", quantity: "", price: "", discount: "", gst: "" });
   };
 
-  const removeItem = (id: number) => setItems(items.filter((item) => item.id !== id));
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100), 0);
-  const gstAmount = items.reduce((sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100) * (item.gst / 100), 0);
-  const totalAmount = subtotal + gstAmount + transport;
+  const removeItem = (id: number) => setItems(items.filter((i) => i.id !== id));
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity * (1 - i.discount / 100), 0);
+  const gstTotal = items.reduce((sum, i) => sum + i.price * i.quantity * (1 - i.discount / 100) * (i.gst / 100), 0);
+  const total = subtotal + gstTotal + transport;
 
   const downloadQuotation = async () => {
-    const response = await fetch("/api/generate-quote", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        client: "Client Name",
-        date: new Date().toLocaleDateString(),
-        sr: items.map((item, index) => ({
-          sr: index + 1,
-          name: item.productName,
-          hsn: item.hsnCode || "",
-          qty: item.quantity,
-          price: item.price,
-          gst: item.gst,
-          discount: item.discount,
-          total: item.price * item.quantity * (1 - item.discount / 100) * (1 + item.gst / 100),
-        })),
-        transport,
-        total: totalAmount,
-      }),
-    });
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
+    const payload = {
+      client: "Client Name",
+      date: new Date().toLocaleDateString(),
+      sr: items.map((i, idx) => ({
+        sr: idx + 1,
+        description: i.productName,
+        hsn: i.hsnCode || "",
+        qty: i.quantity,
+        price: i.price,
+        discount: i.discount,
+        gst: i.gst,
+        total: i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
+      })),
+      transport,
+      total,
+    };
+    const res = await fetch("/api/generate-quote", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = "Quotation.docx";
@@ -129,117 +122,74 @@ const QuotationBuilder = () => {
           <CardHeader>
             <CardTitle>Add Product to Quotation</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4">
-            <div className="relative md:col-span-3">
+          <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4 relative">
+            <div className="md:col-span-3">
               <Label>Search Product</Label>
-                <Input
-                  value={form.productName}
-                  onChange={(e) => {
-                    const query = e.target.value.toLowerCase();
-                    const results = allProducts.filter((p) =>
-                      `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
-                    );
-                    setForm({ ...form, productName: e.target.value });
-                    setFiltered(results);
-                  }}
-                />
-                {form.productName && filtered.length > 0 && (
-                  <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
-                    {filtered.slice(0, 50).map((product, index) => (
-                      <div
-                        key={index}
-                        className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => {
-                          setForm({
-                            productName: product.productName,
-                            productCode: product.code,
-                            brand: product.brand,
-                            packSize: product.packSize,
-                            quantity: "",
-                            price: product.price ? product.price.toString() : "",
-                            discount: "",
-                            gst: "",
-                          });
-                          setFiltered([]);
-                        }}
-                      >
-                        <span className="font-medium">{product.productName}</span>{" "}
-                        <span className="text-xs text-muted-foreground">[Code: {product.code}] • [Size: {product.packSize}]</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            <div>
-              <Label>Brand</Label>
-              <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
+              <Input
+                value={form.productName}
+                onChange={(e) => {
+                  const q = e.target.value.toLowerCase();
+                  setForm({ ...form, productName: e.target.value });
+                  setFiltered(allProducts.filter((p) => `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(q)));
+                }}
+              />
+              {form.productName && filtered.length > 0 && (
+                <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
+                  {filtered.slice(0, 50).map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setForm({
+                          productName: p.productName,
+                          productCode: p.code,
+                          brand: p.brand,
+                          packSize: p.packSize,
+                          quantity: "",
+                          price: p.price.toString(),
+                          discount: "",
+                          gst: "",
+                        });
+                        setFiltered([]);
+                      }}
+                    >
+                      <span className="font-medium">{p.productName}</span> <span className="text-xs text-muted-foreground">[Code: {p.code}] • [Size: {p.packSize}]</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <div>
-              <Label>Quantity</Label>
-              <Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
-            </div>
-            <div>
-              <Label>Price</Label>
-              <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-            </div>
-            <div>
-              <Label>Discount %</Label>
-              <Input type="number" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} />
-            </div>
-            <div>
-              <Label>GST %</Label>
-              <Input type="number" value={form.gst} onChange={(e) => setForm({ ...form, gst: e.target.value })} />
-            </div>
-            <div className="md:col-span-6 text-right">
-              <Button onClick={handleAdd}>Add</Button>
-            </div>
+            <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
+            <div><Label>Quantity</Label><Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>
+            <div><Label>Price</Label><Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></div>
+            <div><Label>Discount %</Label><Input type="number" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} /></div>
+            <div><Label>GST %</Label><Input type="number" value={form.gst} onChange={(e) => setForm({ ...form, gst: e.target.value })} /></div>
+            <div className="md:col-span-6 text-right"><Button onClick={handleAdd}>Add</Button></div>
           </CardContent>
         </Card>
 
         {items.length > 0 && (
           <Card>
-            <CardHeader>
+            <CardHeader className="flex justify-between items-center">
               <CardTitle>Quotation Preview</CardTitle>
-              <div className="text-right">
-                <Button variant="outline" onClick={downloadQuotation}>Download DOCX</Button>
-              </div>
+              <Button variant="outline" onClick={downloadQuotation}>Download DOCX</Button>
             </CardHeader>
-            <CardContent ref={pdfRef} className="bg-white p-4">
-              <p className="text-sm text-muted-foreground mb-4">Chemical Corporation, India — GST: 03ADEPK1618H1Z1</p>
+            <CardContent className="bg-white p-4">
               <table className="w-full text-sm border">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2">Product</th>
-                    <th>Brand</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Disc%</th>
-                    <th>GST%</th>
-                    <th>HSN</th>
-                    <th>Total</th>
-                  </tr>
-                </thead>
+                <thead><tr className="border-b"><th>Product</th><th>Brand</th><th>Qty</th><th>Price</th><th>Disc%</th><th>GST%</th><th>HSN</th><th>Total</th></tr></thead>
                 <tbody>
-                  {items.map((item) => (
-                    <tr key={item.id} className="border-b">
-                      <td className="py-2">{item.productName} ({item.productCode})</td>
-                      <td className="text-center">{item.brand}</td>
-                      <td className="text-center">{item.quantity}</td>
-                      <td className="text-center">₹{item.price.toFixed(2)}</td>
-                      <td className="text-center">{item.discount}%</td>
-                      <td className="text-center">{item.gst}%</td>
-                      <td className="text-center">{item.hsnCode || "-"}</td>
-                      <td className="text-center">₹{(item.price * item.quantity * (1 - item.discount / 100) * (1 + item.gst / 100)).toFixed(2)}</td>
+                  {items.map((i) => (
+                    <tr key={i.id} className="border-b">
+                      <td>{i.productName} ({i.productCode})</td><td className="text-center">{i.brand}</td><td className="text-center">{i.quantity}</td><td className="text-center">₹{i.price.toFixed(2)}</td><td className="text-center">{i.discount}%</td><td className="text-center">{i.gst}%</td><td className="text-center">{i.hsnCode||"-"}</td><td className="text-center">₹{(i.price*i.quantity*(1-i.discount/100)*(1+i.gst/100)).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <div className="text-right font-medium mt-4 text-sm">
+              <div className="text-right mt-4 text-sm">
                 <p>Subtotal: ₹{subtotal.toFixed(2)}</p>
-                <p>GST Total: ₹{gstAmount.toFixed(2)}</p>
+                <p>GST Total: ₹{gstTotal.toFixed(2)}</p>
                 <p>Transport: ₹{transport.toFixed(2)}</p>
-                <p className="text-lg font-semibold mt-2">Total: ₹{totalAmount.toFixed(2)}</p>
-                <p className="mt-8 text-sm">Authorized Signatory</p>
+                <p className="mt-2 font-semibold">Total: ₹{total.toFixed(2)}</p>
               </div>
             </CardContent>
           </Card>
@@ -247,6 +197,4 @@ const QuotationBuilder = () => {
       </div>
     </>
   );
-};
-
-export default QuotationBuilder;
+}
