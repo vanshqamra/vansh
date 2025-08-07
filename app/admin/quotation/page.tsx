@@ -65,8 +65,8 @@ const QuotationBuilder = () => {
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
       gst: parseFloat(form.gst || "0"),
-      hsnCode: matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?."HSN Code" || "",
-      casNo: matchedProduct?.casNo || matchedProduct?.cas || matchedProduct?.CAS || matchedProduct?."CAS No" || "",
+      hsnCode: matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?.["HSN Code"] || "",
+      casNo: matchedProduct?.casNo || matchedProduct?.cas || matchedProduct?.CAS || matchedProduct?.["CAS No"] || "",
       custom: true,
     }
     setItems([...items, newItem])
@@ -116,7 +116,7 @@ const QuotationBuilder = () => {
                 onChange={(e) => {
                   const query = e.target.value.toLowerCase()
                   const results = allProducts.filter((p) =>
-                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
+                    `${p.productName} ${p.code}`.toLowerCase().includes(query)
                   )
                   setForm({ ...form, productName: query })
                   setFiltered(results)
@@ -143,7 +143,7 @@ const QuotationBuilder = () => {
                     >
                       <span className="font-medium">{product.productName}</span>{" "}
                       <span className="text-xs text-muted-foreground">
-                        [Code: {product.code}] • [Size: {product.packSize}]
+                        [Code: {product.code}]
                       </span>
                     </div>
                   ))}
