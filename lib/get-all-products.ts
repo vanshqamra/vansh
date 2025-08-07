@@ -4,6 +4,7 @@ export interface ProductEntry {
   code: string
   packSize: string
   price: number
+  hsnCode?: string
 }
 
 const normalizePrice = (value: any): number => {
@@ -19,6 +20,16 @@ const normalizePrice = (value: any): number => {
 function extractPrice(obj: any): number {
   const key = Object.keys(obj).find((k) => k.toLowerCase().includes("price"))
   return key ? normalizePrice(obj[key]) : 0
+}
+
+function extractHSN(obj: any): string {
+  return (
+    obj.hsnCode ||
+    obj.HSN ||
+    obj["HSN Code"] ||
+    (obj.specs ? obj.specs.HSN || obj.specs["HSN Code"] : "") ||
+    ""
+  )
 }
 
 export function getAllProducts(): ProductEntry[] {
@@ -45,7 +56,8 @@ export function getAllProducts(): ProductEntry[] {
     brand: "Borosil",
     code: v.code || "",
     packSize: v.capacity || v["Pack Size"] || v.size || "",
-    price: normalizePrice(v.price)
+    price: normalizePrice(v.price),
+    hsnCode: extractHSN(v)
   }))
 
   // Rankem
@@ -55,7 +67,8 @@ export function getAllProducts(): ProductEntry[] {
     brand: "Rankem",
     code: v["Product Code"] || v.code || "",
     packSize: v["Pack Size"] || v.size || "",
-    price: extractPrice(v)
+    price: extractPrice(v),
+    hsnCode: extractHSN(v)
   }))
 
   // Qualigens
@@ -65,7 +78,8 @@ export function getAllProducts(): ProductEntry[] {
     brand: "Qualigens",
     code: p["Product Code"] || p.code || "",
     packSize: p["Pack Size"] || p.size || "",
-    price: extractPrice(p)
+    price: extractPrice(p),
+    hsnCode: extractHSN(p)
   }))
 
   // Whatman
@@ -75,7 +89,8 @@ export function getAllProducts(): ProductEntry[] {
     brand: "Whatman",
     code: p.code || p["Product Code"] || "",
     packSize: p.size || p["Pack Size"] || "",
-    price: extractPrice(p)
+    price: extractPrice(p),
+    hsnCode: extractHSN(p)
   }))
 
   // HiMedia
@@ -85,7 +100,8 @@ export function getAllProducts(): ProductEntry[] {
     brand: "HiMedia",
     code: v["Product Code"] || v.code || "",
     packSize: v["Pack Size"] || v.size || v.packing || "",
-    price: extractPrice(v)
+    price: extractPrice(v),
+    hsnCode: extractHSN(v)
   }))
 
   // Bulk Chemical
@@ -95,7 +111,8 @@ export function getAllProducts(): ProductEntry[] {
     brand: "Bulk Chemical",
     code: p.code || p["Product Code"] || "",
     packSize: p.size || p["Pack Size"] || "",
-    price: extractPrice(p)
+    price: extractPrice(p),
+    hsnCode: extractHSN(p)
   }))
 
   return all
