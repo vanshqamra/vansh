@@ -34,7 +34,7 @@ export default function RestockPage() {
     price: "",
   })
   const [filtered, setFiltered] = useState<ProductEntry[]>([])
-  const allProducts = useMemo(() => getAllProducts(),
+  const allProducts = useMemo(() => getAllProducts(),[])
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
