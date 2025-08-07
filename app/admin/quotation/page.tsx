@@ -14,7 +14,6 @@ interface QuotationItem {
   productCode: string
   productName: string
   brand: string
-  packSize: string
   quantity: number
   price: number
   discount: number
@@ -44,7 +43,6 @@ const QuotationBuilder = () => {
     productName: "",
     productCode: "",
     brand: "",
-    packSize: "",
     quantity: "",
     price: "",
     discount: "",
@@ -63,7 +61,6 @@ const QuotationBuilder = () => {
       productCode: form.productCode,
       productName: form.productName,
       brand: form.brand,
-      packSize: form.packSize,
       quantity: parseInt(form.quantity),
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
@@ -77,7 +74,6 @@ const QuotationBuilder = () => {
       productName: "",
       productCode: "",
       brand: "",
-      packSize: "",
       quantity: "",
       price: "",
       discount: "",
@@ -137,7 +133,6 @@ const QuotationBuilder = () => {
                           productName: product.productName,
                           productCode: product.code,
                           brand: product.brand,
-                          packSize: product.packSize,
                           quantity: "",
                           price: product.price ? product.price.toString() : "",
                           discount: "",
@@ -158,10 +153,6 @@ const QuotationBuilder = () => {
             <div>
               <Label>Brand</Label>
               <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
-            </div>
-            <div>
-              <Label>Pack Size</Label>
-              <Input value={form.packSize} onChange={(e) => setForm({ ...form, packSize: e.target.value })} />
             </div>
             <div>
               <Label>Quantity</Label>
@@ -197,7 +188,6 @@ const QuotationBuilder = () => {
                   <tr className="border-b">
                     <th className="text-left py-2">Product</th>
                     <th>Brand</th>
-                    <th>Pack</th>
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Disc%</th>
@@ -212,7 +202,6 @@ const QuotationBuilder = () => {
                     <tr key={item.id} className="border-b">
                       <td className="py-2">{item.productName} ({item.productCode})</td>
                       <td className="text-center">{item.brand}</td>
-                      <td className="text-center">{item.packSize}</td>
                       <td className="text-center">{item.quantity}</td>
                       <td className="text-center">₹{item.price.toFixed(2)}</td>
                       <td className="text-center">{item.discount}%</td>
