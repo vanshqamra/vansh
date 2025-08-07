@@ -65,8 +65,8 @@ const QuotationBuilder = () => {
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
       gst: parseFloat(form.gst || "0"),
-      hsnCode: matchedProduct?.hsnCode,
-      casNo: matchedProduct?.casNo,
+      hsnCode: matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?."HSN Code" || "",
+      casNo: matchedProduct?.casNo || matchedProduct?.cas || matchedProduct?.CAS || matchedProduct?."CAS No" || "",
       custom: true,
     }
     setItems([...items, newItem])
