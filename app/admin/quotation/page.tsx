@@ -1,69 +1,49 @@
-"use client"
+"use client";
 
-import { useState, useMemo, useRef, useEffect } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { AccessDenied } from "@/components/access-denied"
-import { Header } from "@/components/header"
-import { getAllProducts, ProductEntry } from "@/lib/get-all-products"
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { AccessDenied } from "@/components/access-denied";
+import { Header } from "@/components/header";
+import { getAllProducts, ProductEntry } from "@/lib/get-all-products";
 
 interface QuotationItem {
-  id: number
-  productCode: string
-  productName: string
-  brand: string
-  quantity: number
-  price: number
-  discount: number
-  gst: number
-  hsnCode?: string
-  custom: boolean
+  id: number;
+  productCode: string;
+  productName: string;
+  brand: string;
+  quantity: number;
+  price: number;
+  discount: number;
+  gst: number;
+  hsnCode?: string;
+  custom: boolean;
 }
 
 const QuotationBuilder = () => {
-  const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true })
-
+  const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true });
   useEffect(() => {
     import("@/app/context/auth-context").then((mod) => {
-      const { role, loading } = mod.useAuth()
-      setAuth({ role, loading })
-    })
-  }, [])
+      const { role, loading } = mod.useAuth();
+      setAuth({ role, loading });
+    });
+  }, []);
 
-  if (!auth.loading && auth.role !== "admin") {
-    return <AccessDenied />
-  }
+  if (!auth.loading && auth.role !== "admin") return <AccessDenied />;
 
-  const [items, setItems] = useState<QuotationItem[]>([])
-  const [transport, setTransport] = useState(0)
-  const [form, setForm] = useState({
-    productName: "",
-    productCode: "",
-    brand: "",
-    quantity: "",
-    price: "",
-    discount: "",
-    gst: "",
-  })
-  const [filtered, setFiltered] = useState<ProductEntry[]>([])
-  const allProducts = useMemo(() => getAllProducts(), [])
-  const pdfRef = useRef(null)
+  const [items, setItems] = useState<QuotationItem[]>([]);
+  const [transport, setTransport] = useState(0);
+  const [form, setForm] = useState({ productName: "", productCode: "", brand: "", quantity: "", price: "", discount: "", gst: "" });
+  const [filtered, setFiltered] = useState<ProductEntry[]>([]);
+  const allProducts = useMemo(() => getAllProducts(), []);
+  const pdfRef = useRef(null);
 
   const handleAdd = () => {
-    if (!form.productName || !form.quantity || !form.price) return
-
-    const matchedProduct = allProducts.find((p) => p.code === form.productCode)
-
-    // Attempt deeper lookup through all object values
-    let hsnValue = matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?.["HSN Code"] || matchedProduct?.specs?.hsnCode || ""
-    if (!hsnValue && matchedProduct) {
-      const values = Object.values(matchedProduct)
-      const hsnMatch = values.find((v) => typeof v === "string" && /\d{4,}/.test(v) && /hsn/i.test(JSON.stringify(matchedProduct)))
-      if (hsnMatch) hsnValue = hsnMatch
-    }
-
+    if (!form.productName || !form.quantity || !form.price) return;
+    const matchedProduct = allProducts.find((p) => p.code === form.productCode);
+    let hsnValue = matchedProduct?.hsnCode || "";
     const newItem: QuotationItem = {
       id: Date.now(),
       productCode: form.productCode,
@@ -75,32 +55,46 @@ const QuotationBuilder = () => {
       gst: parseFloat(form.gst || "0"),
       hsnCode: hsnValue,
       custom: true,
-    }
-    setItems([...items, newItem])
-    setForm({
-      productName: "",
-      productCode: "",
-      brand: "",
-      quantity: "",
-      price: "",
-      discount: "",
-      gst: "",
-    })
-  }
+    };
+    setItems([...items, newItem]);
+    setForm({ productName: "", productCode: "", brand: "", quantity: "", price: "", discount: "", gst: "" });
+  };
 
-  const removeItem = (id: number) => {
-    setItems(items.filter((item) => item.id !== id))
-  }
+  const removeItem = (id: number) => setItems(items.filter((item) => item.id !== id));
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100), 0);
+  const gstAmount = items.reduce((sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100) * (item.gst / 100), 0);
+  const totalAmount = subtotal + gstAmount + transport;
 
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100),
-    0
-  )
-  const gstAmount = items.reduce(
-    (sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100) * (item.gst / 100),
-    0
-  )
-  const totalAmount = subtotal + gstAmount + transport
+  const downloadQuotation = async () => {
+    const response = await fetch("/api/generate-quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        client: "Client Name",
+        date: new Date().toLocaleDateString(),
+        sr: items.map((item, index) => ({
+          sr: index + 1,
+          name: item.productName,
+          hsn: item.hsnCode || "",
+          qty: item.quantity,
+          price: item.price,
+          gst: item.gst,
+          discount: item.discount,
+          total: item.price * item.quantity * (1 - item.discount / 100) * (1 + item.gst / 100),
+        })),
+        transport,
+        total: totalAmount,
+      }),
+    });
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Quotation.docx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
 
   return (
     <>
@@ -121,12 +115,10 @@ const QuotationBuilder = () => {
               <Input
                 value={form.productName}
                 onChange={(e) => {
-                  const query = e.target.value.toLowerCase()
-                  const results = allProducts.filter((p) =>
-                    `${p.productName} ${p.code}`.toLowerCase().includes(query)
-                  )
-                  setForm({ ...form, productName: query })
-                  setFiltered(results)
+                  const query = e.target.value.toLowerCase();
+                  const results = allProducts.filter((p) => `${p.productName} ${p.code}`.toLowerCase().includes(query));
+                  setForm({ ...form, productName: query });
+                  setFiltered(results);
                 }}
               />
               {form.productName && filtered.length > 0 && (
@@ -144,14 +136,12 @@ const QuotationBuilder = () => {
                           price: product.price ? product.price.toString() : "",
                           discount: "",
                           gst: "",
-                        })
-                        setFiltered([])
+                        });
+                        setFiltered([]);
                       }}
                     >
                       <span className="font-medium">{product.productName}</span>{" "}
-                      <span className="text-xs text-muted-foreground">
-                        [Code: {product.code}]
-                      </span>
+                      <span className="text-xs text-muted-foreground">[Code: {product.code}]</span>
                     </div>
                   ))}
                 </div>
@@ -187,6 +177,9 @@ const QuotationBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle>Quotation Preview</CardTitle>
+              <div className="text-right">
+                <Button variant="outline" onClick={downloadQuotation}>Download DOCX</Button>
+              </div>
             </CardHeader>
             <CardContent ref={pdfRef} className="bg-white p-4">
               <p className="text-sm text-muted-foreground mb-4">Chemical Corporation, India — GST: 03ADEPK1618H1Z1</p>
@@ -213,14 +206,11 @@ const QuotationBuilder = () => {
                       <td className="text-center">{item.discount}%</td>
                       <td className="text-center">{item.gst}%</td>
                       <td className="text-center">{item.hsnCode || "-"}</td>
-                      <td className="text-center">
-                        ₹{(item.price * item.quantity * (1 - item.discount / 100) * (1 + item.gst / 100)).toFixed(2)}
-                      </td>
+                      <td className="text-center">₹{(item.price * item.quantity * (1 - item.discount / 100) * (1 + item.gst / 100)).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-
               <div className="text-right font-medium mt-4 text-sm">
                 <p>Subtotal: ₹{subtotal.toFixed(2)}</p>
                 <p>GST Total: ₹{gstAmount.toFixed(2)}</p>
@@ -233,7 +223,7 @@ const QuotationBuilder = () => {
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default QuotationBuilder
+export default QuotationBuilder;
