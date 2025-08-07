@@ -37,7 +37,7 @@ const QuotationBuilder = () => {
   const [transport, setTransport] = useState(0);
   const [form, setForm] = useState({ productName: "", productCode: "", brand: "", quantity: "", price: "", discount: "", gst: "" });
   const [filtered, setFiltered] = useState<ProductEntry[]>([]);
-  const allProducts = useMemo(() => getAllProducts(),[])
+  const allProducts = useMemo(() => getAllProducts(),[]);
   const pdfRef = useRef(null);
 
   const handleAdd = () => {
