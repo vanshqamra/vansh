@@ -13,7 +13,7 @@ import borosilProducts from "@/lib/borosil_products_absolute_final.json";
 import rankemProducts from "@/lib/rankem_products.json";
 import qualigensProducts from "@/lib/qualigens-products.json";
 import whatmanData from "@/lib/whatman_products.json";
-import himediaData from "@/lib/himedia_products_grouped.json";
+import himediaData from "@/lib/himedia_products_grouped";
 import { commercialChemicals as bulkProducts } from "@/lib/data";
 
 interface QuotationItem {
