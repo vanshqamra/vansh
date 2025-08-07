@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -32,12 +32,13 @@ import {
 import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
 import { Input } from "@/components/ui/input"
+import { useSearch } from "@/app/context/search-context"
 
 export function Header() {
   const { user, role, signOut } = useAuth()
   const { state } = useCart()
+  const { searchQuery, setSearchQuery } = useSearch()
   const [mounted, setMounted] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
   const router = useRouter()
 
   useEffect(() => {
@@ -50,7 +51,6 @@ export function Header() {
     e.preventDefault()
     if (searchQuery.trim()) {
       router.push(`/products/search?q=${encodeURIComponent(searchQuery)}`)
-      setSearchQuery("")
     }
   }
 

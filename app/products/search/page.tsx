@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Plus } from "lucide-react"
 import { useCart } from "@/app/context/CartContext"
+import { useSearch } from "@/app/context/search-context"
 import { useToast } from "@/hooks/use-toast"
 
 import qualigensProducts from "@/lib/qualigens-products.json"
@@ -21,8 +22,7 @@ function SearchResults() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialQuery = searchParams.get("q") || ""
-
-  const [searchQuery, setSearchQuery] = useState(initialQuery)
+  const { searchQuery, setSearchQuery } = useSearch()
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const resultsPerPage = 50
@@ -179,9 +179,10 @@ function SearchResults() {
 
   useEffect(() => {
     if (initialQuery) {
+      setSearchQuery(initialQuery)
       triggerSearch(initialQuery)
     }
-  }, [initialQuery])
+  }, [initialQuery, setSearchQuery])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
