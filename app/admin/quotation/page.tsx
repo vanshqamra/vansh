@@ -55,7 +55,14 @@ const QuotationBuilder = () => {
     if (!form.productName || !form.quantity || !form.price) return
 
     const matchedProduct = allProducts.find((p) => p.code === form.productCode)
-    const hsnValue = matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?.["HSN Code"] || matchedProduct?.specs?.hsnCode || ""
+
+    // Attempt deeper lookup through all object values
+    let hsnValue = matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?.["HSN Code"] || matchedProduct?.specs?.hsnCode || ""
+    if (!hsnValue && matchedProduct) {
+      const values = Object.values(matchedProduct)
+      const hsnMatch = values.find((v) => typeof v === "string" && /\d{4,}/.test(v) && /hsn/i.test(JSON.stringify(matchedProduct)))
+      if (hsnMatch) hsnValue = hsnMatch
+    }
 
     const newItem: QuotationItem = {
       id: Date.now(),
