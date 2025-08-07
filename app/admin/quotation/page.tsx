@@ -18,6 +18,7 @@ interface QuotationItem {
   quantity: number
   price: number
   discount: number
+  gst: number
   hsnCode?: string
   casNo?: string
   custom: boolean
@@ -27,7 +28,6 @@ const QuotationBuilder = () => {
   const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true })
 
   useEffect(() => {
-    // Dynamically import useAuth only in browser
     import("@/app/context/auth-context").then((mod) => {
       const { role, loading } = mod.useAuth()
       setAuth({ role, loading })
@@ -39,7 +39,6 @@ const QuotationBuilder = () => {
   }
 
   const [items, setItems] = useState<QuotationItem[]>([])
-  const [gst, setGst] = useState(0)
   const [transport, setTransport] = useState(0)
   const [form, setForm] = useState({
     productName: "",
@@ -49,6 +48,7 @@ const QuotationBuilder = () => {
     quantity: "",
     price: "",
     discount: "",
+    gst: "",
   })
   const [filtered, setFiltered] = useState<ProductEntry[]>([])
   const allProducts = useMemo(() => getAllProducts(), [])
@@ -67,6 +67,7 @@ const QuotationBuilder = () => {
       quantity: parseInt(form.quantity),
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
+      gst: parseFloat(form.gst || "0"),
       hsnCode: matchedProduct?.hsnCode,
       casNo: matchedProduct?.casNo,
       custom: true,
@@ -80,6 +81,7 @@ const QuotationBuilder = () => {
       quantity: "",
       price: "",
       discount: "",
+      gst: "",
     })
   }
 
@@ -91,7 +93,10 @@ const QuotationBuilder = () => {
     (sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100),
     0
   )
-  const gstAmount = subtotal * (gst / 100)
+  const gstAmount = items.reduce(
+    (sum, item) => sum + item.price * item.quantity * (1 - item.discount / 100) * (item.gst / 100),
+    0
+  )
   const totalAmount = subtotal + gstAmount + transport
 
   return (
@@ -136,6 +141,7 @@ const QuotationBuilder = () => {
                           quantity: "",
                           price: product.price ? product.price.toString() : "",
                           discount: "",
+                          gst: "",
                         })
                         setFiltered([])
                       }}
@@ -169,6 +175,10 @@ const QuotationBuilder = () => {
               <Label>Discount %</Label>
               <Input type="number" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} />
             </div>
+            <div>
+              <Label>GST %</Label>
+              <Input type="number" value={form.gst} onChange={(e) => setForm({ ...form, gst: e.target.value })} />
+            </div>
             <div className="md:col-span-6 text-right">
               <Button onClick={handleAdd}>Add</Button>
             </div>
@@ -191,6 +201,7 @@ const QuotationBuilder = () => {
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Disc%</th>
+                    <th>GST%</th>
                     <th>HSN</th>
                     <th>CAS</th>
                     <th>Total</th>
@@ -205,9 +216,12 @@ const QuotationBuilder = () => {
                       <td className="text-center">{item.quantity}</td>
                       <td className="text-center">₹{item.price.toFixed(2)}</td>
                       <td className="text-center">{item.discount}%</td>
+                      <td className="text-center">{item.gst}%</td>
                       <td className="text-center">{item.hsnCode || "-"}</td>
                       <td className="text-center">{item.casNo || "-"}</td>
-                      <td className="text-center">₹{(item.price * item.quantity * (1 - item.discount / 100)).toFixed(2)}</td>
+                      <td className="text-center">
+                        ₹{(item.price * item.quantity * (1 - item.discount / 100) * (1 + item.gst / 100)).toFixed(2)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -215,22 +229,12 @@ const QuotationBuilder = () => {
 
               <div className="text-right font-medium mt-4 text-sm">
                 <p>Subtotal: ₹{subtotal.toFixed(2)}</p>
-                <p>GST ({gst}%): ₹{gstAmount.toFixed(2)}</p>
+                <p>GST Total: ₹{gstAmount.toFixed(2)}</p>
                 <p>Transport: ₹{transport.toFixed(2)}</p>
                 <p className="text-lg font-semibold mt-2">Total: ₹{totalAmount.toFixed(2)}</p>
                 <p className="mt-8 text-sm">Authorized Signatory</p>
               </div>
             </CardContent>
-            {/* PDF export button temporarily disabled */}
-            {/* <div className="flex justify-end px-6 pb-4">
-              <Pdf targetRef={pdfRef} filename="quotation.pdf">
-                {({ toPdf }) => (
-                  <Button variant="outline" onClick={toPdf}>
-                    <Download className="mr-2 h-4 w-4" /> Export as PDF
-                  </Button>
-                )}
-              </Pdf>
-            </div> */}
           </Card>
         )}
       </div>
