@@ -23,7 +23,7 @@ interface QuotationItem {
 }
 
 export default function QuotationBuilder() {
-  // Auth handling (client-side)
+  // auth
   const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true });
   useEffect(() => {
     import("@/app/context/auth-context").then((mod) => {
@@ -33,21 +33,17 @@ export default function QuotationBuilder() {
   }, []);
   if (!auth.loading && auth.role !== "admin") return <AccessDenied />;
 
+  // state
   const [items, setItems] = useState<QuotationItem[]>([]);
   const [transport, setTransport] = useState(0);
   const [form, setForm] = useState({
-    productName: "",
-    productCode: "",
-    brand: "",
-    packSize: "",
-    quantity: "",
-    price: "",
-    discount: "",
-    gst: "",
+    productName: "", productCode: "", brand: "", packSize: "",
+    quantity: "", price: "", discount: "", gst: "",
   });
   const [filtered, setFiltered] = useState<ProductEntry[]>([]);
   const allProducts = useMemo(() => getAllProducts(), []);
 
+  // debug
   useEffect(() => {
     console.log(
       "Loaded products for quotation:",
@@ -56,6 +52,7 @@ export default function QuotationBuilder() {
     );
   }, [allProducts]);
 
+  // add item
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return;
     const matched = allProducts.find((p) => p.code === form.productCode);
@@ -76,16 +73,17 @@ export default function QuotationBuilder() {
     setForm({ productName: "", productCode: "", brand: "", packSize: "", quantity: "", price: "", discount: "", gst: "" });
   };
 
-  const removeItem = (id: number) => setItems(items.filter((i) => i.id !== id));
+  // calculations
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity * (1 - i.discount / 100), 0);
   const gstTotal = items.reduce((sum, i) => sum + i.price * i.quantity * (1 - i.discount / 100) * (i.gst / 100), 0);
   const total = subtotal + gstTotal + transport;
 
+  // DOWNLOAD: now sending `products` key
   const downloadQuotation = async () => {
     const payload = {
       client: "Client Name",
       date: new Date().toLocaleDateString(),
-      sr: items.map((i, idx) => ({
+      products: items.map((i, idx) => ({
         sr: idx + 1,
         description: i.productName,
         hsn: i.hsnCode || "",
@@ -98,7 +96,12 @@ export default function QuotationBuilder() {
       transport,
       total,
     };
-    const res = await fetch("/api/generate-quote", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    console.log("Generating DOCX with data:", payload);
+    const res = await fetch("/api/generate-quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -118,11 +121,11 @@ export default function QuotationBuilder() {
           <p className="text-gray-500">Quotation Builder</p>
         </div>
 
+        {/* Form */}
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Add Product to Quotation</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Add Product to Quotation</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4 relative">
+            {/* Search */}
             <div className="md:col-span-3">
               <Label>Search Product</Label>
               <Input
@@ -130,7 +133,9 @@ export default function QuotationBuilder() {
                 onChange={(e) => {
                   const q = e.target.value.toLowerCase();
                   setForm({ ...form, productName: e.target.value });
-                  setFiltered(allProducts.filter((p) => `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(q)));
+                  setFiltered(allProducts.filter((p) =>
+                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(q)
+                  ));
                 }}
               />
               {form.productName && filtered.length > 0 && (
@@ -153,12 +158,17 @@ export default function QuotationBuilder() {
                         setFiltered([]);
                       }}
                     >
-                      <span className="font-medium">{p.productName}</span> <span className="text-xs text-muted-foreground">[Code: {p.code}] • [Size: {p.packSize}]</span>
+                      <span className="font-medium">{p.productName}</span>{" "}
+                      <span className="text-xs text-muted-foreground">
+                        [Code: {p.code}] • [Size: {p.packSize}]
+                      </span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
+
+            {/* Other fields */}
             <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
             <div><Label>Quantity</Label><Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></div>
             <div><Label>Price</Label><Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></div>
@@ -168,6 +178,7 @@ export default function QuotationBuilder() {
           </CardContent>
         </Card>
 
+        {/* Preview & Download */}
         {items.length > 0 && (
           <Card>
             <CardHeader className="flex justify-between items-center">
@@ -176,11 +187,25 @@ export default function QuotationBuilder() {
             </CardHeader>
             <CardContent className="bg-white p-4">
               <table className="w-full text-sm border">
-                <thead><tr className="border-b"><th>Product</th><th>Brand</th><th>Qty</th><th>Price</th><th>Disc%</th><th>GST%</th><th>HSN</th><th>Total</th></tr></thead>
+                <thead>
+                  <tr className="border-b">
+                    <th>Product</th><th>Brand</th><th>Qty</th><th>Price</th>
+                    <th>Disc%</th><th>GST%</th><th>HSN</th><th>Total</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {items.map((i) => (
                     <tr key={i.id} className="border-b">
-                      <td>{i.productName} ({i.productCode})</td><td className="text-center">{i.brand}</td><td className="text-center">{i.quantity}</td><td className="text-center">₹{i.price.toFixed(2)}</td><td className="text-center">{i.discount}%</td><td className="text-center">{i.gst}%</td><td className="text-center">{i.hsnCode||"-"}</td><td className="text-center">₹{(i.price*i.quantity*(1-i.discount/100)*(1+i.gst/100)).toFixed(2)}</td>
+                      <td>{i.productName} ({i.productCode})</td>
+                      <td className="text-center">{i.brand}</td>
+                      <td className="text-center">{i.quantity}</td>
+                      <td className="text-center">₹{i.price.toFixed(2)}</td>
+                      <td className="text-center">{i.discount}%</td>
+                      <td className="text-center">{i.gst}%</td>
+                      <td className="text-center">{i.hsnCode || "-"}</td>
+                      <td className="text-center">
+                        ₹{(i.price * i.quantity * (1 - i.discount/100) * (1 + i.gst/100)).toFixed(2)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
