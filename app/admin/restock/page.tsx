@@ -13,6 +13,7 @@ import { getAllProducts, ProductEntry } from "@/lib/get-all-products"
 interface RestockItem {
   id: number
   productName: string
+  code: string
   brand: string
   packSize: string
   quantity: number
@@ -28,26 +29,39 @@ export default function RestockPage() {
   const [items, setItems] = useState<RestockItem[]>([])
   const [form, setForm] = useState({
     productName: "",
+    code: "",
     brand: "",
     packSize: "",
     quantity: "",
     price: "",
+    discount: "",
+    gst: "",
   })
   const [filtered, setFiltered] = useState<ProductEntry[]>([])
-  const allProducts = useMemo(() => getAllProducts(),[]);
+  const allProducts = useMemo(() => getAllProducts(), [])
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
     const newItem: RestockItem = {
       id: Date.now(),
       productName: form.productName,
+      code: form.code,
       brand: form.brand,
       packSize: form.packSize,
       quantity: parseInt(form.quantity),
       price: parseFloat(form.price),
     }
     setItems([...items, newItem])
-    setForm({ productName: "", brand: "", packSize: "", quantity: "", price: "" })
+    setForm({
+      productName: "",
+      code: "",
+      brand: "",
+      packSize: "",
+      quantity: "",
+      price: "",
+      discount: "",
+      gst: "",
+    })
   }
 
   const removeItem = (id: number) => {
@@ -92,7 +106,7 @@ export default function RestockPage() {
                   const results = allProducts.filter((p) =>
                     `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
                   )
-                  setForm({ ...form, productName: query })
+                  setForm({ ...form, productName: e.target.value })
                   setFiltered(results)
                 }}
               />
@@ -104,11 +118,14 @@ export default function RestockPage() {
                       className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
                         setForm({
-                          productName: `${product.productName} (${product.code})`,
+                          productName: product.productName,
+                          code: product.code,
                           brand: product.brand,
                           packSize: product.packSize,
                           quantity: "",
                           price: product.price ? product.price.toString() : "",
+                          discount: "",
+                          gst: "",
                         })
                         setFiltered([])
                       }}
