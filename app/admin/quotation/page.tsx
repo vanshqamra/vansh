@@ -13,7 +13,7 @@ import borosilProducts from "@/lib/borosil_products_absolute_final.json";
 import rankemProducts from "@/lib/rankem_products.json";
 import qualigensProducts from "@/lib/qualigens-products.json";
 import whatmanData from "@/lib/whatman_products.json";
-import himediaData from "@/lib/himedia_products_grouped.json";
+import himediaData from "@/lib/himedia_products_grouped";
 import { commercialChemicals as bulkProducts } from "@/lib/data";
 
 interface QuotationItem {
@@ -141,22 +141,27 @@ export default function QuotationBuilder() {
       });
     });
 
-    // HiMedia
-    (himediaData || []).forEach((g: any) =>
-      (g.variants || []).forEach((v: any) => {
-        const desc = g.product || g.title || "";
-        const size = v["Pack Size"] || v.size || "";
-        const name = size ? `${desc} (${size})` : desc;
-        all.push({
-          productName: name,
-          code: v["Product Code"] || v.code || "",
-          brand: "HiMedia",
-          packSize: size,
-          price: parseFloat(v.price) || 0,
-          hsnCode: "",
-        });
-      })
-    );
+    //if (Array.isArray(himediaData)) {
+    himediaData.forEach((group: any) => {
+      // only run if this group has variants
+      if (Array.isArray(group.variants)) {
+        group.variants.forEach((variant: any) => {
+          // your flatten logic:
+          const desc = group.product || group.title || "";
+          const size = variant["Pack Size"] || variant.size || "";
+          const name = size ? `${desc} (${size})` : desc;
+          all.push({
+            productName: name,
+            code: variant["Product Code"] || variant.code || "",
+            brand: "HiMedia",
+            packSize: size,
+            price: parseFloat(variant.price) || 0,
+            hsnCode: variant["HSN Code"] || "",
+          });
+        });  // <-- closes group.variants.forEach
+      }      // <-- closes if Array.isArray(group.variants)
+    });    // <-- closes himediaData.forEach
+  }  
 
     // Bulk Commercial
     (bulkProducts || []).forEach((p: any) => {
