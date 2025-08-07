@@ -13,7 +13,7 @@ const timelineEvents = [
     year: "1948",
     event: "Company Founded",
     description:
-      "Chemical Corporation was established in Ludhiana to serve regional industry needs with essential chemicals.",
+      "Chemical Corporation was established in Ludhiana to serve regional industry needs with essential lab chemicals.",
   },
   {
     year: "1962",
