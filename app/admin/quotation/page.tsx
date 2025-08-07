@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useAuth } from "@/app/context/auth-context"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -12,18 +12,7 @@ import { AccessDenied } from "@/components/access-denied"
 import { Download, Send } from "lucide-react"
 import jsPDF from "jspdf"
 
-import borosilProducts from "@/lib/borosil_products_absolute_final.json"
-import rankemProducts from "@/lib/rankem_products.json"
-import { qualigensProducts } from "@/lib/qualigens-products"
-import whatmanProducts from "@/lib/whatman_products.json"
-import himediaProducts from "@/lib/himedia_products_grouped"
-import { commercialChemicals } from "@/lib/data"
-
-function safeArray<T = any>(value: T[]): T[]
-function safeArray(value: any): any[]
-function safeArray(value: any): any[] {
-  return Array.isArray(value) ? value : []
-}
+import { getAllProducts, ProductEntry } from "@/lib/get-all-products"
 
 interface QuotationItem {
   id: number
@@ -35,13 +24,6 @@ interface QuotationItem {
   custom: boolean
 }
 
-interface ProductEntry {
-  productName: string
-  brand: string
-  code: string
-  packSize: string
-  price: number
-}
 
 export default function QuotationBuilder() {
   const { role, loading } = useAuth()
@@ -58,70 +40,7 @@ export default function QuotationBuilder() {
     price: "",
   })
   const [filtered, setFiltered] = useState<ProductEntry[]>([])
-
-  const allProducts: ProductEntry[] = []
-
-  const addGroupedProducts = (source: any, brand: string, extract: (g: any, v: any) => ProductEntry) => {
-    safeArray(source).forEach((group) => {
-      safeArray(group.variants).forEach((variant: any) => {
-        allProducts.push(extract(group, variant))
-      })
-    })
-  }
-
-  const addFlatProducts = (source: any, brand: string, extract: (p: any) => ProductEntry) => {
-    safeArray(source).forEach((p) => {
-      allProducts.push(extract(p))
-    })
-  }
-
-  addGroupedProducts(safeArray(borosilProducts), "Borosil", (group, v) => ({
-  productName: group.product || group.title || group.name || "",
-  brand: "Borosil",
-  code: v.code || "",
-  packSize: v.capacity || v["Pack Size"] || v.size || "",
-  price: parseFloat(v.price || "0") || 0,
-}))
-
-addGroupedProducts(safeArray(rankemProducts), "Rankem", (group, v) => ({
-  productName: group.product || group.title || group.name || "",
-  brand: "Rankem",
-  code: v["Product Code"] || v.code || "",
-  packSize: v["Pack Size"] || v.size || "",
-  price: parseFloat(v["Price"] || "0") || 0,
-}))
-
-addFlatProducts(safeArray(qualigensProducts), "Qualigens", (p) => ({
-  productName: p["Product Name"] || p.product || p.name || "",
-  brand: "Qualigens",
-  code: p["Product Code"] || p.code || "",
-  packSize: p["Pack Size"] || p.size || "",
-  price: parseFloat(p["Price"] || "0") || 0,
-}))
-
-addFlatProducts(safeArray(whatmanProducts), "Whatman", (p) => ({
-  productName: p.name || p.title || "",
-  brand: "Whatman",
-  code: p.code || p["Product Code"] || "",
-  packSize: p.size || p["Pack Size"] || "",
-  price: parseFloat(p.price || "0") || 0,
-}))
-
-addGroupedProducts(safeArray(himediaProducts), "HiMedia", (group, v) => ({
-  productName: group.product || group.title || group.name || "",
-  brand: "HiMedia",
-  code: v["Product Code"] || v.code || "",
-  packSize: v["Pack Size"] || v.size || "",
-  price: parseFloat(v["Price"] || "0") || 0,
-}))
-
-addFlatProducts(safeArray(commercialChemicals), "Bulk Chemical", (p) => ({
-  productName: p.name || p["Product Name"] || "",
-  brand: "Bulk Chemical",
-  code: p.code || p["Product Code"] || "",
-  packSize: p.size || p["Pack Size"] || "",
-  price: parseFloat(p.price || "0") || 0,
-  }))
+  const allProducts = useMemo(() => getAllProducts(), [])
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
@@ -192,7 +111,7 @@ addFlatProducts(safeArray(commercialChemicals), "Bulk Chemical", (p) => ({
                         brand: product.brand,
                         packSize: product.packSize,
                         quantity: "",
-                        price: product.price.toString(),
+                        price: product.price ? product.price.toString() : "",
                       })
                       setFiltered([])
                     }}
