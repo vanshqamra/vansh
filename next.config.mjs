@@ -10,12 +10,13 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  transpilePackages: ["docxtemplater", "pizzip"],
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Prevent bundling of server-only libraries in client build
       config.externals.push({
-        docxtemplater: 'commonjs2 docxtemplater',
-        pizzip: 'commonjs2 pizzip',
+        docxtemplater: "commonjs2 docxtemplater",
+        pizzip: "commonjs2 pizzip",
       });
     }
     return config;
