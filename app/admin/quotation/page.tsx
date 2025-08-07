@@ -1,16 +1,13 @@
 "use client"
 
 import { useState, useMemo, useRef, useEffect } from "react"
-import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { AccessDenied } from "@/components/access-denied"
-import { Download } from "lucide-react"
 import { Header } from "@/components/header"
 import { getAllProducts, ProductEntry } from "@/lib/get-all-products"
-import Pdf from "react-to-pdf"
 
 interface QuotationItem {
   id: number
@@ -224,7 +221,8 @@ const QuotationBuilder = () => {
                 <p className="mt-8 text-sm">Authorized Signatory</p>
               </div>
             </CardContent>
-            <div className="flex justify-end px-6 pb-4">
+            {/* PDF export button temporarily disabled */}
+            {/* <div className="flex justify-end px-6 pb-4">
               <Pdf targetRef={pdfRef} filename="quotation.pdf">
                 {({ toPdf }) => (
                   <Button variant="outline" onClick={toPdf}>
@@ -232,7 +230,7 @@ const QuotationBuilder = () => {
                   </Button>
                 )}
               </Pdf>
-            </div>
+            </div> */}
           </Card>
         )}
       </div>
