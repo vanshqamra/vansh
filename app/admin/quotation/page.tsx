@@ -141,27 +141,31 @@ export default function QuotationBuilder() {
       });
     });
 
-    //if (Array.isArray(himediaData)) {
-    himediaData.forEach((group: any) => {
-      // only run if this group has variants
-      if (Array.isArray(group.variants)) {
-        group.variants.forEach((variant: any) => {
-          // your flatten logic:
-          const desc = group.product || group.title || "";
-          const size = variant["Pack Size"] || variant.size || "";
-          const name = size ? `${desc} (${size})` : desc;
-          all.push({
-            productName: name,
-            code: variant["Product Code"] || variant.code || "",
-            brand: "HiMedia",
-            packSize: size,
-            price: parseFloat(variant.price) || 0,
-            hsnCode: variant["HSN Code"] || "",
-          });
-        });  // <-- closes group.variants.forEach
-      }      // <-- closes if Array.isArray(group.variants)
-    });    // <-- closes himediaData.forEach
-  }  
+    const allProducts = useMemo<FlatProduct[]>(() => {
+  const all: FlatProduct[] = [];
+
+  // … Borosil, Rankem, Qualigens, Whatman, HiMedia guarded code …
+
+  // Bulk Commercial
+  if (Array.isArray(bulkProducts)) {
+    bulkProducts.forEach((p: any) => {
+      const desc = p.name || p["Product Name"] || "";
+      const size = p.size || p["Pack Size"] || "";
+      const name = size ? `${desc} (${size})` : desc;
+      all.push({
+        productName: name,
+        code: p.code || "",
+        brand: "Bulk Chemical",
+        packSize: size,
+        price: parseFloat(p.price) || 0,
+        hsnCode: p["HSN Code"] || "",
+      });
+    });
+  }
+
+  return all; // ← Make sure this return is here
+}, []); // ← closes useMemo
+
 
     // Bulk Commercial
     (bulkProducts || []).forEach((p: any) => {
