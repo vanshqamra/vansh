@@ -60,8 +60,17 @@ export default function RestockPage() {
       price: parseFloat(form.price),
     };
     setItems([...items, newItem]);
-    setForm({ productName: "", code: "", brand: "", packSize: "", quantity: "", price: "", discount: "", gst: "" });
-  };
+    setForm({
+      productName: "",
+      code: "",
+      brand: "",
+      packSize: "",
+      quantity: "",
+      price: "",
+      discount: "",
+      gst: "",
+    });
+  }; // ← ensure this semicolon and brace are present
 
   const removeItem = (id: number) => {
     setItems(items.filter((item) => item.id !== id));
@@ -69,7 +78,15 @@ export default function RestockPage() {
 
   const exportCSV = () => {
     const headers = ["Product", "Code", "Brand", "Pack Size", "Qty", "Price", "Total"];
-    const rows = items.map((i) => [i.productName, i.code, i.brand, i.packSize, i.quantity, i.price, i.price * i.quantity]);
+    const rows = items.map((i) => [
+      i.productName,
+      i.code,
+      i.brand,
+      i.packSize,
+      i.quantity,
+      i.price,
+      i.price * i.quantity,
+    ]);
     const csvContent = [headers, ...rows]
       .map((row) => row.map((v) => `"${v}"`).join(","))
       .join("\n");
@@ -138,6 +155,7 @@ export default function RestockPage() {
                 </div>
               )}
             </div>
+
             <div>
               <Label>Brand</Label>
               <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
@@ -151,4 +169,60 @@ export default function RestockPage() {
               <Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
             </div>
             <div>
-              <Label>Price</nLabel>
+              <Label>Price</Label>
+              <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+            </div>
+            <div className="md:col-span-5 text-right">
+              <Button onClick={handleAdd}>Add</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {items.length > 0 && (
+          <Card>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <CardTitle>Restock List</CardTitle>
+              <Button variant="outline" size="sm" onClick={exportCSV}>
+                Export CSV
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2">Product</th>
+                    <th>Code</th>
+                    <th>Brand</th>
+                    <th>Pack Size</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.id} className="border-b">
+                      <td className="py-2">{item.productName}</td>
+                      <td className="text-center">{item.code}</td>
+                      <td className="text-center">{item.brand}</td>
+                      <td className="text-center">{item.packSize}</td>
+                      <td className="text-center">{item.quantity}</td>
+                      <td className="text-center">₹{item.price.toFixed(2)}</td>
+                      <td className="text-center">₹{(item.price * item.quantity).toFixed(2)}</td>
+                      <td className="text-center">
+                        <Button variant="destructive" size="sm" onClick={() => removeItem(item.id)}>
+                          Remove
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </>
+  );
+}
