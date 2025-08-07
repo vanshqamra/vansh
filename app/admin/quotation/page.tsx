@@ -19,7 +19,6 @@ interface QuotationItem {
   discount: number
   gst: number
   hsnCode?: string
-  casNo?: string
   custom: boolean
 }
 
@@ -56,6 +55,8 @@ const QuotationBuilder = () => {
     if (!form.productName || !form.quantity || !form.price) return
 
     const matchedProduct = allProducts.find((p) => p.code === form.productCode)
+    const hsnValue = matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?.["HSN Code"] || matchedProduct?.specs?.hsnCode || ""
+
     const newItem: QuotationItem = {
       id: Date.now(),
       productCode: form.productCode,
@@ -65,8 +66,7 @@ const QuotationBuilder = () => {
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
       gst: parseFloat(form.gst || "0"),
-      hsnCode: matchedProduct?.hsnCode || matchedProduct?.hsn || matchedProduct?.HSN || matchedProduct?.["HSN Code"] || "",
-      casNo: matchedProduct?.casNo || matchedProduct?.cas || matchedProduct?.CAS || matchedProduct?.["CAS No"] || "",
+      hsnCode: hsnValue,
       custom: true,
     }
     setItems([...items, newItem])
@@ -193,7 +193,6 @@ const QuotationBuilder = () => {
                     <th>Disc%</th>
                     <th>GST%</th>
                     <th>HSN</th>
-                    <th>CAS</th>
                     <th>Total</th>
                   </tr>
                 </thead>
@@ -207,7 +206,6 @@ const QuotationBuilder = () => {
                       <td className="text-center">{item.discount}%</td>
                       <td className="text-center">{item.gst}%</td>
                       <td className="text-center">{item.hsnCode || "-"}</td>
-                      <td className="text-center">{item.casNo || "-"}</td>
                       <td className="text-center">
                         ₹{(item.price * item.quantity * (1 - item.discount / 100) * (1 + item.gst / 100)).toFixed(2)}
                       </td>
