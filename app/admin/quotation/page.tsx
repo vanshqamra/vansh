@@ -1,7 +1,7 @@
 "use client"
 
 export const dynamic = "force-dynamic"
-
+const safeArray = (x: any): any[] => (Array.isArray(x) ? x : []);
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
