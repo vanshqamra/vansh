@@ -42,7 +42,7 @@ export default function QuotationBuilder() {
   // Auth (client-side import)
   const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true });
   useEffect(() => {
-    import("@/app/context/auth-context").then((mod) => {
+    import("@/app/context/auth-context").then(mod => {
       const { role, loading } = mod.useAuth();
       setAuth({ role, loading });
     });
@@ -70,120 +70,127 @@ export default function QuotationBuilder() {
     const all: FlatProduct[] = [];
 
     // Borosil
-    borosilProducts.forEach((g: any) =>
-      (g.variants || []).forEach((v: any) => {
-        const category = g.category || g.product || "";
-        const size = v.capacity_ml
-          ? `${v.capacity_ml}ml`
-          : v["Pack Size"] || v.size || "";
-        const base = category ? `${category} – ${g.product}` : g.product;
-        const name = size ? `${base} (${size})` : base;
-        all.push({
-          productName: name,
-          code: v.code || "",
-          brand: "Borosil",
-          packSize: size,
-          price: parseFloat(v.price) || 0,
-          hsnCode: v["HSN Code"] || "",
-        });
-      })
-    );
+    if (Array.isArray(borosilProducts)) {
+      borosilProducts.forEach((g: any) => {
+        if (Array.isArray(g.variants)) {
+          g.variants.forEach((v: any) => {
+            const category = g.category || g.product || "";
+            const size = v.capacity_ml
+              ? `${v.capacity_ml}ml`
+              : v["Pack Size"] || v.size || "";
+            const base = category ? `${category} – ${g.product}` : g.product;
+            const name = size ? `${base} (${size})` : base;
+            all.push({
+              productName: name,
+              code: v.code || "",
+              brand: "Borosil",
+              packSize: size,
+              price: parseFloat(v.price) || 0,
+              hsnCode: v["HSN Code"] || "",
+            });
+          });
+        }
+      });
+    }
 
     // Rankem
-    rankemProducts.forEach((g: any) =>
-      (g.variants || []).forEach((v: any) => {
-        const desc =
-          typeof v.Description === "string" && v.Description.trim()
-            ? v.Description.trim()
-            : g.title || g.product || "";
+    if (Array.isArray(rankemProducts)) {
+      rankemProducts.forEach((g: any) => {
+        if (Array.isArray(g.variants)) {
+          g.variants.forEach((v: any) => {
+            const desc = typeof v.Description === "string" && v.Description.trim()
+              ? v.Description.trim()
+              : g.title || g.product || "";
+            const size = v["Pack Size"] || v.size || "";
+            const name = size ? `${desc} (${size})` : desc;
+            all.push({
+              productName: name,
+              code: v["Cat No"] || v["Product Code"] || "",
+              brand: "Rankem",
+              packSize: size,
+              price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
+              hsnCode: v["HSN Code"] || "",
+            });
+          });
+        }
+      });
+    }
+
+    // Qualigens
+    if (Array.isArray(qualigensProducts)) {
+      qualigensProducts.forEach((p: any) => {
+        const desc = p["Product Name"] || p.name || "";
+        const size = p["Pack Size"] || p.size || "";
+        const name = size ? `${desc} (${size})` : desc;
+        all.push({
+          productName: name,
+          code: p["Product Code"] || p.code || "",
+          brand: "Qualigens",
+          packSize: size,
+          price: parseFloat(p.Price) || 0,
+          hsnCode: p["HSN Code"] || "",
+        });
+      });
+    }
+
+    // Whatman
+    if (whatmanData && Array.isArray(whatmanData.variants)) {
+      whatmanData.variants.forEach((v: any) => {
+        const desc = whatmanData.title || "";
         const size = v["Pack Size"] || v.size || "";
         const name = size ? `${desc} (${size})` : desc;
         all.push({
           productName: name,
-          code: v["Cat No"] || v["Product Code"] || "",
-          brand: "Rankem",
+          code: v.Code || v.code || "",
+          brand: "Whatman",
           packSize: size,
-          price:
-            parseFloat(v["List Price\n2025(INR)"] || v.Price) ||
-            0,
-          hsnCode: v["HSN Code"] || "",
+          price: parseFloat(v.Price) || 0,
+          hsnCode: "",
         });
-      })
-    );
-
-    // Qualigens
-    (qualigensProducts || []).forEach((p: any) => {
-      const desc = p["Product Name"] || p.name || "";
-      const size = p["Pack Size"] || p.size || "";
-      const name = size ? `${desc} (${size})` : desc;
-      all.push({
-        productName: name,
-        code: p["Product Code"] || p.code || "",
-        brand: "Qualigens",
-        packSize: size,
-        price: parseFloat(p.Price) || 0,
-        hsnCode: p["HSN Code"] || "",
       });
-    });
+    }
 
-    // Whatman
-    (whatmanData.variants || []).forEach((v: any) => {
-      const desc = whatmanData.title || "";
-      const size = v["Pack Size"] || v.size || "";
-      const name = size ? `${desc} (${size})` : desc;
-      all.push({
-        productName: name,
-        code: v.Code || v.code || "",
-        brand: "Whatman",
-        packSize: size,
-        price: parseFloat(v.Price) || 0,
-        hsnCode: "",
+    // HiMedia
+    if (Array.isArray(himediaData)) {
+      himediaData.forEach((g: any) => {
+        if (Array.isArray(g.variants)) {
+          g.variants.forEach((v: any) => {
+            const desc = g.product || g.title || "";
+            const size = v["Pack Size"] || v.size || "";
+            const name = size ? `${desc} (${size})` : desc;
+            all.push({
+              productName: name,
+              code: v["Product Code"] || v.code || "",
+              brand: "HiMedia",
+              packSize: size,
+              price: parseFloat(v.price) || 0,
+              hsnCode: v["HSN Code"] || "",
+            });
+          });
+        }
       });
-    });
-
-    const allProducts = useMemo<FlatProduct[]>(() => {
-  const all: FlatProduct[] = [];
-
-  // … Borosil, Rankem, Qualigens, Whatman, HiMedia guarded code …
-
-  // Bulk Commercial
-  if (Array.isArray(bulkProducts)) {
-    bulkProducts.forEach((p: any) => {
-      const desc = p.name || p["Product Name"] || "";
-      const size = p.size || p["Pack Size"] || "";
-      const name = size ? `${desc} (${size})` : desc;
-      all.push({
-        productName: name,
-        code: p.code || "",
-        brand: "Bulk Chemical",
-        packSize: size,
-        price: parseFloat(p.price) || 0,
-        hsnCode: p["HSN Code"] || "",
-      });
-    });
-  }
-
-  return all; // ← Make sure this return is here
-}, []); // ← closes useMemo
-
+    }
 
     // Bulk Commercial
-    (bulkProducts || []).forEach((p: any) => {
-      const desc = p.name || p["Product Name"] || "";
-      const size = p.size || p["Pack Size"] || "";
-      const name = size ? `${desc} (${size})` : desc;
-      all.push({
-        productName: name,
-        code: p.code || "",
-        brand: "Bulk Chemical",
-        packSize: size,
-        price: parseFloat(p.price) || 0,
-        hsnCode: "",
+    if (Array.isArray(bulkProducts)) {
+      bulkProducts.forEach((p: any) => {
+        const desc = p.name || p["Product Name"] || "";
+        const size = p.size || p["Pack Size"] || "";
+        const name = size ? `${desc} (${size})` : desc;
+        all.push({
+          productName: name,
+          code: p.code || "",
+          brand: "Bulk Chemical",
+          packSize: size,
+          price: parseFloat(p.price) || 0,
+          hsnCode: p["HSN Code"] || "",
+        });
       });
-    });
+    }
 
     return all;
   }, []);
+
 
   // Close dropdown on outside clicks
   useEffect(() => {
