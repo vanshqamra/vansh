@@ -1,13 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
-  images: { unoptimized: true },
-  experimental: {
-    // 🚫 prevents Next.js from exporting dynamic routes statically
-    appDir: true,
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-  output: 'standalone', // ✅ tell Next.js this is a server-rendered app
-}
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  images: {
+    unoptimized: true,
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Prevent bundling of server-only libraries in client build
+      config.externals.push({
+        docxtemplater: 'commonjs2 docxtemplater',
+        pizzip: 'commonjs2 pizzip',
+      });
+    }
+    return config;
+  },
+};
 
-export default nextConfig
+export default nextConfig;
