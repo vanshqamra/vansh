@@ -1,3 +1,5 @@
+import PizZip from "pizzip";
+import Docxtemplater from "docxtemplater";
 const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
 const fs = require("fs");
