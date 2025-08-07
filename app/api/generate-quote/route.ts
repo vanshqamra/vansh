@@ -1,6 +1,6 @@
 // app/api/generate-quote/route.ts
 import { NextResponse } from "next/server";
-const { generateQuoteDocx } = require("@/app/admin/quotation/utils/fillQuoteTemplate.js");
+const { generateQuoteDocx } = require("@/app/admin/quotation/utils/fillQuoteTemplate");
 
 export async function POST(req: Request) {
   const body = await req.json(); // contains tags like { client, date, products, etc. }
