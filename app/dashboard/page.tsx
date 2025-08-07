@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button"
 import { ShoppingCart, Package, TrendingUp, Clock, CheckCircle } from "lucide-react"
 import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
-import { supabase } from "@/lib/supabase/client"
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client"
 
 export default function Dashboard() {
   const { user } = useAuth()
   const { state } = useCart()
+  const supabase = createSupabaseBrowserClient()
   const [mounted, setMounted] = useState(false)
   const [role, setRole] = useState<string | null>(null)
 
