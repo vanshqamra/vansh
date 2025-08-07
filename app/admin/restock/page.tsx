@@ -34,8 +34,6 @@ export default function RestockPage() {
     packSize: "",
     quantity: "",
     price: "",
-    discount: "",
-    gst: "",
   });
   const [filtered, setFiltered] = useState<ProductEntry[]>([]);
   const allProducts = useMemo(() => getAllProducts(), []);
@@ -56,10 +54,10 @@ export default function RestockPage() {
       code: form.code,
       brand: form.brand,
       packSize: form.packSize,
-      quantity: parseInt(form.quantity),
+      quantity: parseInt(form.quantity, 10),
       price: parseFloat(form.price),
     };
-    setItems([...items, newItem]);
+    setItems((prev) => [...prev, newItem]);
     setForm({
       productName: "",
       code: "",
@@ -67,13 +65,11 @@ export default function RestockPage() {
       packSize: "",
       quantity: "",
       price: "",
-      discount: "",
-      gst: "",
     });
-  }; // ← ensure this semicolon and brace are present
+  };
 
   const removeItem = (id: number) => {
-    setItems(items.filter((item) => item.id !== id));
+    setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const exportCSV = () => {
@@ -83,20 +79,17 @@ export default function RestockPage() {
       i.code,
       i.brand,
       i.packSize,
-      i.quantity,
-      i.price,
-      i.price * i.quantity,
+      i.quantity.toString(),
+      i.price.toFixed(2),
+      (i.price * i.quantity).toFixed(2),
     ]);
-    const csvContent = [headers, ...rows]
-      .map((row) => row.map((v) => `"${v}"`).join(","))
-      .join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+    const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
-    link.href = url;
+    link.href = URL.createObjectURL(blob);
     link.download = "restock.csv";
     link.click();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(link.href);
   };
 
   return (
@@ -118,37 +111,36 @@ export default function RestockPage() {
               <Input
                 value={form.productName}
                 onChange={(e) => {
-                  const query = e.target.value.toLowerCase();
-                  const results = allProducts.filter((p) =>
-                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
+                  const q = e.target.value.toLowerCase();
+                  setForm((f) => ({ ...f, productName: e.target.value }));
+                  setFiltered(
+                    allProducts.filter((p) =>
+                      `${p.productName}${p.code}${p.packSize}`.toLowerCase().includes(q)
+                    )
                   );
-                  setForm({ ...form, productName: e.target.value });
-                  setFiltered(results);
                 }}
               />
               {form.productName && filtered.length > 0 && (
                 <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
-                  {filtered.slice(0, 50).map((product, index) => (
+                  {filtered.slice(0, 50).map((p, idx) => (
                     <div
-                      key={index}
+                      key={idx}
                       className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
+                      onClick={() =>
                         setForm({
-                          productName: product.productName,
-                          code: product.code,
-                          brand: product.brand,
-                          packSize: product.packSize,
+                          productName: p.productName,
+                          code: p.code,
+                          brand: p.brand,
+                          packSize: p.packSize,
                           quantity: "",
-                          price: product.price.toString(),
-                          discount: "",
-                          gst: "",
-                        });
-                        setFiltered([]);
-                      }}
+                          price: "",
+                        })
+                      }
                     >
-                      <span className="font-medium">{product.productName}</span>{" "}
+                      <span className="font-medium">{p.productName}</span>
                       <span className="text-xs text-muted-foreground">
-                        [Code: {product.code}] • [Size: {product.packSize}]
+                        {" "}
+                        [Code: {p.code}] [Size: {p.packSize}]
                       </span>
                     </div>
                   ))}
@@ -158,19 +150,27 @@ export default function RestockPage() {
 
             <div>
               <Label>Brand</Label>
-              <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
+              <Input value={form.brand} onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))} />
             </div>
             <div>
               <Label>Pack Size</Label>
-              <Input value={form.packSize} onChange={(e) => setForm({ ...form, packSize: e.target.value })} />
+              <Input value={form.packSize} onChange={(e) => setForm((f) => ({ ...f, packSize: e.target.value }))} />
             </div>
             <div>
               <Label>Quantity</Label>
-              <Input type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+              <Input
+                type="number"
+                value={form.quantity}
+                onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
+              />
             </div>
             <div>
               <Label>Price</Label>
-              <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+              <Input
+                type="number"
+                value={form.price}
+                onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
+              />
             </div>
             <div className="md:col-span-5 text-right">
               <Button onClick={handleAdd}>Add</Button>
@@ -201,17 +201,17 @@ export default function RestockPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((item) => (
-                    <tr key={item.id} className="border-b">
-                      <td className="py-2">{item.productName}</td>
-                      <td className="text-center">{item.code}</td>
-                      <td className="text-center">{item.brand}</td>
-                      <td className="text-center">{item.packSize}</td>
-                      <td className="text-center">{item.quantity}</td>
-                      <td className="text-center">₹{item.price.toFixed(2)}</td>
-                      <td className="text-center">₹{(item.price * item.quantity).toFixed(2)}</td>
-                      <td className="text-center">
-                        <Button variant="destructive" size="sm" onClick={() => removeItem(item.id)}>
+                  {items.map((i) => (
+                    <tr key={i.id} className="border-b">
+                      <td>{i.productName}</td>
+                      <td>{i.code}</td>
+                      <td>{i.brand}</td>
+                      <td>{i.packSize}</td>
+                      <td>{i.quantity}</td>
+                      <td>₹{i.price.toFixed(2)}</td>
+                      <td>₹{(i.quantity * i.price).toFixed(2)}</td>
+                      <td>
+                        <Button variant="destructive" size="sm" onClick={() => removeItem(i.id)}>
                           Remove
                         </Button>
                       </td>
