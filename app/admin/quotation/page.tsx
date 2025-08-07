@@ -7,9 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { AccessDenied } from "@/components/access-denied"
-import { Download, Send } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
+import { Download } from "lucide-react"
 import { Header } from "@/components/header"
 import { getAllProducts, ProductEntry } from "@/lib/get-all-products"
 
@@ -88,7 +86,10 @@ export default function QuotationBuilder() {
   const gstAmount = subtotal * (gst / 100)
   const totalAmount = subtotal + gstAmount + transport
 
-  const exportPDF = () => {
+  const handleExportPDF = async () => {
+    const { default: jsPDF } = await import("jspdf")
+    const autoTable = (await import("jspdf-autotable")).default
+
     const doc = new jsPDF()
     doc.setFontSize(16)
     doc.text("Chemical Corporation, India", 14, 15)
@@ -273,7 +274,7 @@ export default function QuotationBuilder() {
               </div>
 
               <div className="mt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={exportPDF}>
+                <Button variant="outline" onClick={handleExportPDF}>
                   <Download className="mr-2 h-4 w-4" /> Export as PDF
                 </Button>
               </div>
