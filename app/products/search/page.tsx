@@ -17,6 +17,7 @@ import { commercialChemicals } from "@/lib/data"
 import rankemProducts from "@/lib/rankem_products.json"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import whatmanProducts from "@/lib/whatman_products.json"
+import himediaData from "@/lib/himedia_products_grouped.json"
 
 function SearchResults() {
   const searchParams = useSearchParams()
