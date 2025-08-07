@@ -40,26 +40,34 @@ export default function RestockPage() {
     price: "",
   })
   const [filtered, setFiltered] = useState<ProductEntry[]>([])
-
   const allProducts: ProductEntry[] = []
 
-  const addGroupedProducts = (source: any[], brand: string, extract: (group: any, variant: any) => ProductEntry) => {
-    source?.forEach((group) => {
+  const addGroupedProducts = (
+    source: any,
+    brand: string,
+    extract: (group: any, variant: any) => ProductEntry
+  ) => {
+    if (!Array.isArray(source)) return
+    source.forEach((group) => {
       (group.variants || []).forEach((variant: any) => {
         allProducts.push(extract(group, variant))
       })
     })
   }
 
-  const addFlatProducts = (source: any[], brand: string, extract: (p: any) => ProductEntry) => {
-    source?.forEach((p) => {
+  const addFlatProducts = (
+    source: any,
+    brand: string,
+    extract: (p: any) => ProductEntry
+  ) => {
+    if (!Array.isArray(source)) return
+    source.forEach((p) => {
       allProducts.push(extract(p))
     })
   }
 
-  // Populate all product types
   addGroupedProducts(borosilProducts, "Borosil", (group, v) => ({
-    productName: group.product || group.title || group.name || "",
+    productName: group.product || group.title || "",
     brand: "Borosil",
     code: v.code || "",
     packSize: v.capacity || v["Pack Size"] || v.size || "",
@@ -67,7 +75,7 @@ export default function RestockPage() {
   }))
 
   addGroupedProducts(rankemProducts, "Rankem", (group, v) => ({
-    productName: group.product || group.title || group.name || "",
+    productName: group.product || group.title || "",
     brand: "Rankem",
     code: v["Product Code"] || v.code || "",
     packSize: v["Pack Size"] || v.size || "",
@@ -75,7 +83,7 @@ export default function RestockPage() {
   }))
 
   addFlatProducts(qualigensProducts, "Qualigens", (p) => ({
-    productName: p["Product Name"] || p.product || p.name || "",
+    productName: p["Product Name"] || p.product || "",
     brand: "Qualigens",
     code: p["Product Code"] || p.code || "",
     packSize: p["Pack Size"] || p.size || "",
@@ -91,7 +99,7 @@ export default function RestockPage() {
   }))
 
   addGroupedProducts(himediaProducts, "HiMedia", (group, v) => ({
-    productName: group.product || group.title || group.name || "",
+    productName: group.product || group.title || "",
     brand: "HiMedia",
     code: v["Product Code"] || v.code || "",
     packSize: v["Pack Size"] || v.size || "",
@@ -128,7 +136,7 @@ export default function RestockPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
-        <p className="text-gray-500">Admin Restock Panel</p>
+        <p className="text-gray-500">Restock Dashboard</p>
       </div>
 
       <Card className="mb-6">
