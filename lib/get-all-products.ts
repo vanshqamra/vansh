@@ -1,3 +1,12 @@
+// /lib/get-all-products.ts
+
+import borosilProducts from "@/lib/borosil_products_absolute_final.json"
+import rankemProducts from "@/lib/rankem_products.json"
+import { qualigensProducts as qualigens } from "@/lib/qualigens-products"
+import whatman from "@/lib/whatman_products.json"
+import himedia from "@/lib/himedia_products_grouped"
+import { commercialChemicals as bulk } from "@/lib/data"
+
 export interface ProductEntry {
   productName: string
   brand: string
@@ -32,7 +41,12 @@ function extractHSN(obj: any): string {
   )
 }
 
+// Simple cache to avoid recomputation
+let cached: ProductEntry[] | null = null
+
 export function getAllProducts(): ProductEntry[] {
+  if (cached) return cached
+
   const all: ProductEntry[] = []
 
   const addGrouped = (source: any, brand: string, extract: (g: any, v: any) => ProductEntry) => {
@@ -50,70 +64,71 @@ export function getAllProducts(): ProductEntry[] {
   }
 
   // Borosil
-  const borosil = require("@/lib/borosil_products_absolute_final.json")
-  addGrouped(borosil, "Borosil", (group, v) => ({
-    productName: group.product || group.title || group.name || "",
+  addGrouped(borosilProducts, "Borosil", (group, v) => ({
+    productName: group.product || group.title || group.name || "Borosil Product",
     brand: "Borosil",
     code: v.code || "",
-    packSize: v.capacity || v["Pack Size"] || v.size || "",
+    packSize:
+      v.capacity ||
+      v["Pack Size"] ||
+      v["pack size"] ||
+      v.size ||
+      v.volume ||
+      "",
     price: normalizePrice(v.price),
-    hsnCode: extractHSN(v)
+    hsnCode: extractHSN(v),
   }))
 
   // Rankem
-  const rankem = require("@/lib/rankem_products.json")
-  addGrouped(rankem, "Rankem", (group, v) => ({
-    productName: group.product || group.title || group.name || "",
+  addGrouped(rankemProducts, "Rankem", (group, v) => ({
+    productName: group.product || group.title || group.name || "Rankem Product",
     brand: "Rankem",
-    code: v["Product Code"] || v.code || "",
-    packSize: v["Pack Size"] || v.size || "",
+    code: v["Product Code"] || v.code || v["Cat No"] || "",
+    packSize: v["Pack Size"] || v.size || v["Pack\nSize"] || "",
     price: extractPrice(v),
-    hsnCode: extractHSN(v)
+    hsnCode: extractHSN(v),
   }))
 
   // Qualigens
-  const qualigens = require("@/lib/qualigens-products").qualigensProducts
   addFlat(qualigens, "Qualigens", (p) => ({
-    productName: p["Product Name"] || p.product || p.name || "",
+    productName: p["Product Name"] || p.product || p.name || "Qualigens Product",
     brand: "Qualigens",
     code: p["Product Code"] || p.code || "",
     packSize: p["Pack Size"] || p.size || "",
     price: extractPrice(p),
-    hsnCode: extractHSN(p)
+    hsnCode: extractHSN(p),
   }))
 
   // Whatman
-  const whatman = require("@/lib/whatman_products.json")
-  addFlat(whatman, "Whatman", (p) => ({
-    productName: p.name || p.title || "",
+  addFlat(whatman?.variants || [], "Whatman", (p) => ({
+    productName: p.name || p.title || "Whatman Product",
     brand: "Whatman",
-    code: p.code || p["Product Code"] || "",
+    code: p.code || p["Code"] || "",
     packSize: p.size || p["Pack Size"] || "",
     price: extractPrice(p),
-    hsnCode: extractHSN(p)
+    hsnCode: extractHSN(p),
   }))
 
   // HiMedia
-  const himedia = require("@/lib/himedia_products_grouped").default
   addGrouped(himedia, "HiMedia", (group, v) => ({
-    productName: group.product || group.title || group.name || "",
+    productName: group.product || group.title || group.name || "HiMedia Product",
     brand: "HiMedia",
     code: v["Product Code"] || v.code || "",
     packSize: v["Pack Size"] || v.size || v.packing || "",
     price: extractPrice(v),
-    hsnCode: extractHSN(v)
+    hsnCode: extractHSN(v),
   }))
 
-  // Bulk Chemical
-  const bulk = require("@/lib/data").commercialChemicals
+  // Bulk / Commercial
   addFlat(bulk, "Bulk Chemical", (p) => ({
-    productName: p.name || p["Product Name"] || "",
+    productName: p.name || p["Product Name"] || "Bulk Chemical",
     brand: "Bulk Chemical",
     code: p.code || p["Product Code"] || "",
     packSize: p.size || p["Pack Size"] || "",
     price: extractPrice(p),
-    hsnCode: extractHSN(p)
+    hsnCode: extractHSN(p),
   }))
 
+  cached = all
   return all
 }
