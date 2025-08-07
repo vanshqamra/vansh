@@ -1,14 +1,19 @@
 "use server";
 
-import PizZip from "pizzip";
-import Docxtemplater from "docxtemplater";
-const PizZip = require("pizzip");
-const Docxtemplater = require("docxtemplater");
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
-async function generateQuoteDocx(data) {
-  const filePath = path.join(process.cwd(), "app", "admin", "quotation", "quote template.docx");
+export async function generateQuoteDocx(data) {
+  const PizZip = (await import("pizzip")).default;
+  const Docxtemplater = (await import("docxtemplater")).default;
+
+  const filePath = path.join(
+    process.cwd(),
+    "app",
+    "admin",
+    "quotation",
+    "quote template.docx",
+  );
   const content = fs.readFileSync(filePath, "binary");
 
   const zip = new PizZip(content);
@@ -25,5 +30,3 @@ async function generateQuoteDocx(data) {
   const buffer = doc.getZip().generate({ type: "nodebuffer" });
   return buffer;
 }
-
-module.exports = { generateQuoteDocx };
