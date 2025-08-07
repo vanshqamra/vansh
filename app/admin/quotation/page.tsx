@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { useAuth } from "@/app/context/auth-context"
+import { useState, useMemo, useRef, useEffect } from "react"
+import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,6 +10,7 @@ import { AccessDenied } from "@/components/access-denied"
 import { Download } from "lucide-react"
 import { Header } from "@/components/header"
 import { getAllProducts, ProductEntry } from "@/lib/get-all-products"
+import Pdf from "react-to-pdf"
 
 interface QuotationItem {
   id: number
@@ -25,9 +26,18 @@ interface QuotationItem {
   custom: boolean
 }
 
-export default function QuotationBuilder() {
-  const { role, loading } = useAuth()
-  if (!loading && role !== "admin") {
+const QuotationBuilder = () => {
+  const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true })
+
+  useEffect(() => {
+    // Dynamically import useAuth only in browser
+    import("@/app/context/auth-context").then((mod) => {
+      const { role, loading } = mod.useAuth()
+      setAuth({ role, loading })
+    })
+  }, [])
+
+  if (!auth.loading && auth.role !== "admin") {
     return <AccessDenied />
   }
 
@@ -45,6 +55,7 @@ export default function QuotationBuilder() {
   })
   const [filtered, setFiltered] = useState<ProductEntry[]>([])
   const allProducts = useMemo(() => getAllProducts(), [])
+  const pdfRef = useRef(null)
 
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
@@ -85,45 +96,6 @@ export default function QuotationBuilder() {
   )
   const gstAmount = subtotal * (gst / 100)
   const totalAmount = subtotal + gstAmount + transport
-
-  const handleExportPDF = async () => {
-    const { default: jsPDF } = await import("jspdf")
-    const autoTable = (await import("jspdf-autotable")).default
-
-    const doc = new jsPDF()
-    doc.setFontSize(16)
-    doc.text("Chemical Corporation, India", 14, 15)
-    doc.setFontSize(10)
-    doc.text("GST - 03ADEPK1618H1Z1", 14, 22)
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 22)
-
-    autoTable(doc, {
-      startY: 28,
-      head: [["Product", "Brand", "Pack", "Qty", "Price", "Disc%", "HSN", "CAS", "Total"]],
-      body: items.map((item) => [
-        `${item.productName} (${item.productCode})`,
-        item.brand,
-        item.packSize,
-        item.quantity,
-        `₹${item.price.toFixed(2)}`,
-        `${item.discount}%`,
-        item.hsnCode || "-",
-        item.casNo || "-",
-        `₹${(item.price * item.quantity * (1 - item.discount / 100)).toFixed(2)}`,
-      ]),
-    })
-
-    doc.text(`Subtotal: ₹${subtotal.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10)
-    doc.text(`GST (${gst}%): ₹${gstAmount.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 16)
-    doc.text(`Transport: ₹${transport.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 22)
-    doc.setFontSize(12)
-    doc.text(`Total: ₹${totalAmount.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 30)
-
-    doc.setFontSize(10)
-    doc.text("\n\nAuthorized Signatory", 150, doc.lastAutoTable.finalY + 45)
-
-    doc.save("quotation.pdf")
-  }
 
   return (
     <>
@@ -211,8 +183,9 @@ export default function QuotationBuilder() {
             <CardHeader>
               <CardTitle>Quotation Preview</CardTitle>
             </CardHeader>
-            <CardContent>
-              <table className="w-full text-sm">
+            <CardContent ref={pdfRef} className="bg-white p-4">
+              <p className="text-sm text-muted-foreground mb-4">Chemical Corporation, India — GST: 03ADEPK1618H1Z1</p>
+              <table className="w-full text-sm border">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-2">Product</th>
@@ -221,8 +194,9 @@ export default function QuotationBuilder() {
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Disc%</th>
+                    <th>HSN</th>
+                    <th>CAS</th>
                     <th>Total</th>
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -234,54 +208,36 @@ export default function QuotationBuilder() {
                       <td className="text-center">{item.quantity}</td>
                       <td className="text-center">₹{item.price.toFixed(2)}</td>
                       <td className="text-center">{item.discount}%</td>
+                      <td className="text-center">{item.hsnCode || "-"}</td>
+                      <td className="text-center">{item.casNo || "-"}</td>
                       <td className="text-center">₹{(item.price * item.quantity * (1 - item.discount / 100)).toFixed(2)}</td>
-                      <td className="text-center">
-                        <Button variant="destructive" size="sm" onClick={() => removeItem(item.id)}>
-                          Remove
-                        </Button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-
-              <div className="mt-4 flex flex-col sm:flex-row gap-4 justify-end items-end">
-                <div>
-                  <Label>GST (%)</Label>
-                  <Input
-                    type="number"
-                    className="w-32"
-                    value={gst}
-                    onChange={(e) => setGst(parseFloat(e.target.value || "0"))}
-                  />
-                </div>
-                <div>
-                  <Label>Transport (₹)</Label>
-                  <Input
-                    type="number"
-                    className="w-32"
-                    value={transport}
-                    onChange={(e) => setTransport(parseFloat(e.target.value || "0"))}
-                  />
-                </div>
-              </div>
 
               <div className="text-right font-medium mt-4 text-sm">
                 <p>Subtotal: ₹{subtotal.toFixed(2)}</p>
                 <p>GST ({gst}%): ₹{gstAmount.toFixed(2)}</p>
                 <p>Transport: ₹{transport.toFixed(2)}</p>
                 <p className="text-lg font-semibold mt-2">Total: ₹{totalAmount.toFixed(2)}</p>
-              </div>
-
-              <div className="mt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={handleExportPDF}>
-                  <Download className="mr-2 h-4 w-4" /> Export as PDF
-                </Button>
+                <p className="mt-8 text-sm">Authorized Signatory</p>
               </div>
             </CardContent>
+            <div className="flex justify-end px-6 pb-4">
+              <Pdf targetRef={pdfRef} filename="quotation.pdf">
+                {({ toPdf }) => (
+                  <Button variant="outline" onClick={toPdf}>
+                    <Download className="mr-2 h-4 w-4" /> Export as PDF
+                  </Button>
+                )}
+              </Pdf>
+            </div>
           </Card>
         )}
       </div>
     </>
   )
 }
+
+export default QuotationBuilder
