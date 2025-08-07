@@ -13,7 +13,7 @@ import borosilProducts from "@/lib/borosil_products_absolute_final.json";
 import rankemProducts from "@/lib/rankem_products.json";
 import qualigensProducts from "@/lib/qualigens-products.json";
 import whatmanData from "@/lib/whatman_products.json";
-import himediaData from "@/lib/himedia_products_grouped";
+import himediaData from "@/lib/himedia_products_grouped.json";
 import { commercialChemicals as bulkProducts } from "@/lib/data";
 
 interface QuotationItem {
@@ -65,16 +65,16 @@ export default function QuotationBuilder() {
   const [filtered, setFiltered] = useState<FlatProduct[]>([]);
   const pdfRef = useRef<HTMLDivElement>(null);
 
-  // Build allProducts inlined
+  // Build allProducts inlined with fixes for Borosil and Rankem
   const allProducts = useMemo<FlatProduct[]>(() => {
     const all: FlatProduct[] = [];
 
-    // Borosil
+    // Borosil: include category with product
     borosilProducts.forEach((g: any) =>
       Array.isArray(g.variants) &&
       g.variants.forEach((v: any) =>
         all.push({
-          productName: g.product || g.title || "",
+          productName: `${g.category || g.product} – ${g.product}`,
           code: v.code || "",
           brand: "Borosil",
           packSize: v.capacity_ml?.toString() || "",
@@ -84,75 +84,79 @@ export default function QuotationBuilder() {
       )
     );
 
-    // Rankem
+    // Rankem: use variant.Description or fallback
     rankemProducts.forEach((g: any) =>
       Array.isArray(g.variants) &&
-      g.variants.forEach((v: any) =>
+      g.variants.forEach((v: any) => {
+        const name =
+          typeof v.Description === "string" && v.Description.trim().length > 0
+            ? v.Description
+            : g.title || g.product || "Rankem Product";
         all.push({
-          productName: g.product || g.title || "",
+          productName: name,
           code: v["Cat No"] || v["Product Code"] || "",
           brand: "Rankem",
           packSize: v["Pack Size"] || "",
           price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
           hsnCode: v["HSN Code"] || "",
-        })
-      )
+        });
+      })
     );
 
     // Qualigens
     Array.isArray(qualigensProducts) &&
-    qualigensProducts.forEach((p: any) =>
-      all.push({
-        productName: p["Product Name"] || "",
-        code: p["Product Code"] || "",
-        brand: "Qualigens",
-        packSize: p["Pack Size"] || "",
-        price: parseFloat(p.Price) || 0,
-        hsnCode: p["HSN Code"] || "",
-      })
-    );
+      qualigensProducts.forEach((p: any) =>
+        all.push({
+          productName: p["Product Name"] || "",
+          code: p["Product Code"] || "",
+          brand: "Qualigens",
+          packSize: p["Pack Size"] || "",
+          price: parseFloat(p.Price) || 0,
+          hsnCode: p["HSN Code"] || "",
+        })
+      );
 
-    // Whatman (flat under .variants)
+    // Whatman
     Array.isArray(whatmanData.variants) &&
-    whatmanData.variants.forEach((v: any) =>
-      all.push({
-        productName: whatmanData.title || "",
-        code: v.Code || v.code || "",
-        brand: "Whatman",
-        packSize: v["Pack Size"] || "",
-        price: parseFloat(v.Price) || 0,
-        hsnCode: "",
-      })
-    );
+      whatmanData.variants.forEach((v: any) =>
+        all.push({
+          productName: whatmanData.title || "",
+          code: v.Code || v.code || "",
+          brand: "Whatman",
+          packSize: v["Pack Size"] || "",
+          price: parseFloat(v.Price) || 0,
+          hsnCode: "",
+        })
+      );
 
     // HiMedia
     Array.isArray(himediaData) &&
-    himediaData.forEach((g: any) =>
-      Array.isArray(g.variants) &&
-      g.variants.forEach((v: any) =>
-        all.push({
-          productName: g.product || g.title || "",
-          code: v["Product Code"] || v.code || "",
-          brand: "HiMedia",
-          packSize: v["Pack Size"] || "",
-          price: parseFloat(v.price) || 0,
-          hsnCode: "",
-        })
-      )
-    );
+      himediaData.forEach((g: any) =>
+        Array.isArray(g.variants) &&
+        g.variants.forEach((v: any) =>
+          all.push({
+            productName: g.product || g.title || "",
+            code: v["Product Code"] || v.code || "",
+            brand: "HiMedia",
+            packSize: v["Pack Size"] || "",
+            price: parseFloat(v.price) || 0,
+            hsnCode: "",
+          })
+        )
+      );
 
     // Bulk Commercial
     Array.isArray(bulkProducts) &&
-    bulkProducts.forEach((p: any) =>
-      all.push({
-        productName: p.name || "",
-        code: p.code || "",
-        brand: "Bulk Chemical",
-        packSize: p.size || "",
-        price: parseFloat(p.price) || 0,
-        hsnCode: "",
-      })
-    );
+      bulkProducts.forEach((p: any) =>
+        all.push({
+          productName: p.name || "",
+          code: p.code || "",
+          brand: "Bulk Chemical",
+          packSize: p.size || "",
+          price: parseFloat(p.price) || 0,
+          hsnCode: "",
+        })
+      );
 
     return all;
   }, []);
@@ -177,7 +181,7 @@ export default function QuotationBuilder() {
       productName: form.productName,
       brand: form.brand,
       packSize: form.packSize,
-      quantity: parseInt(form.quantity),
+      quantity: parseInt(form.quantity, 10),
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
       gst: parseFloat(form.gst || "0"),
@@ -196,7 +200,7 @@ export default function QuotationBuilder() {
     });
   };
 
-  // Remove
+  // Remove item
   const removeItem = (id: number) => setItems((prev) => prev.filter((i) => i.id !== id));
 
   // Totals
@@ -233,9 +237,7 @@ export default function QuotationBuilder() {
     const link = document.createElement("a");
     link.href = url;
     link.download = "Quotation.docx";
-    document.body.appendChild(link);
     link.click();
-    link.remove();
   };
 
   return (
@@ -259,9 +261,11 @@ export default function QuotationBuilder() {
                 onChange={(e) => {
                   const q = e.target.value.toLowerCase();
                   setForm((f) => ({ ...f, productName: e.target.value }));
-                  setFiltered(allProducts.filter((p) =>
-                    `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(q)
-                  ));
+                  setFiltered(
+                    allProducts.filter((p) =>
+                      `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(q)
+                    )
+                  );
                 }}
               />
               {form.productName && filtered.length > 0 && (
@@ -283,10 +287,7 @@ export default function QuotationBuilder() {
                         })
                       }
                     >
-                      <span className="font-medium">{p.productName}</span>{" "}
-                      <span className="text-xs text-muted-foreground">
-                        [Code: {p.code}] • [Size: {p.packSize}]
-                      </span>
+                      <span className="font-medium">{p.productName}</span> <span className="text-xs text-muted-foreground">[Code: {p.code}] • [Size: {p.packSize}]</span>
                     </div>
                   ))}
                 </div>
@@ -297,9 +298,7 @@ export default function QuotationBuilder() {
             <div><Label>Price</Label><Input type="number" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} /></div>
             <div><Label>Discount %</Label><Input type="number" value={form.discount} onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value }))} /></div>
             <div><Label>GST %</Label><Input type="number" value={form.gst} onChange={(e) => setForm((f) => ({ ...f, gst: e.target.value }))} /></div>
-            <div className="md:col-span-6 text-right">
-              <Button onClick={handleAdd}>Add</Button>
-            </div>
+            <div className="md:col-span-6 text-right"><Button onClick={handleAdd}>Add</Button></div>
           </CardContent>
         </Card>
 
