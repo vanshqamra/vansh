@@ -1,14 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
+  images: { unoptimized: true },
+  experimental: {
+    // 🚫 prevents Next.js from exporting dynamic routes statically
+    appDir: true,
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  images: {
-    unoptimized: true,
-  },
+  output: 'standalone', // ✅ tell Next.js this is a server-rendered app
 }
 
 export default nextConfig
