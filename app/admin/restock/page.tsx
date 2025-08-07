@@ -43,10 +43,10 @@ export default function RestockPage() {
 
   const allProducts: ProductEntry[] = []
 
-  const addGroupedProducts = (source: any[], brand: string, extract: (group: any, v: any) => ProductEntry) => {
+  const addGroupedProducts = (source: any[], brand: string, extract: (group: any, variant: any) => ProductEntry) => {
     source?.forEach((group) => {
-      (group.variants || []).forEach((v: any) => {
-        allProducts.push(extract(group, v))
+      (group.variants || []).forEach((variant: any) => {
+        allProducts.push(extract(group, variant))
       })
     })
   }
@@ -57,7 +57,7 @@ export default function RestockPage() {
     })
   }
 
-  // ✅ Product sources
+  // Populate all product types
   addGroupedProducts(borosilProducts, "Borosil", (group, v) => ({
     productName: group.product || group.title || group.name || "",
     brand: "Borosil",
@@ -124,13 +124,11 @@ export default function RestockPage() {
     setItems(items.filter((item) => item.id !== id))
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
-        <p className="text-gray-500">Restock Dashboard</p>
+        <p className="text-gray-500">Admin Restock Panel</p>
       </div>
 
       <Card className="mb-6">
@@ -235,9 +233,6 @@ export default function RestockPage() {
                 ))}
               </tbody>
             </table>
-            <div className="text-right font-semibold mt-4 text-lg">
-              Total Restock: ₹{totalAmount.toFixed(2)}
-            </div>
           </CardContent>
         </Card>
       )}
