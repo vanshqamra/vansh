@@ -1,13 +1,16 @@
 "use client"
 
 export const dynamic = "force-dynamic"
-const safeArray = (x: any): any[] => (Array.isArray(x) ? x : []);
+
 import { useState } from "react"
+import { notFound } from "next/navigation"
+import { useAuth } from "@/app/context/auth-context"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Download } from "lucide-react"
+import { Download, Send } from "lucide-react"
+import jsPDF from "jspdf"
 
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
@@ -15,6 +18,12 @@ import { qualigensProducts } from "@/lib/qualigens-products"
 import whatmanProducts from "@/lib/whatman_products.json"
 import himediaProducts from "@/lib/himedia_products_grouped"
 import { commercialChemicals } from "@/lib/data"
+
+function safeArray<T = any>(value: T[]): T[]
+function safeArray(value: any): any[]
+function safeArray(value: any): any[] {
+  return Array.isArray(value) ? value : []
+}
 
 interface QuotationItem {
   id: number
@@ -35,6 +44,11 @@ interface ProductEntry {
 }
 
 export default function QuotationBuilder() {
+  const { role, loading } = useAuth()
+  if (!loading && role !== "admin") {
+    notFound()
+  }
+
   const [items, setItems] = useState<QuotationItem[]>([])
   const [form, setForm] = useState({
     productName: "",
@@ -48,17 +62,15 @@ export default function QuotationBuilder() {
   const allProducts: ProductEntry[] = []
 
   const addGroupedProducts = (source: any, brand: string, extract: (g: any, v: any) => ProductEntry) => {
-    if (!Array.isArray(source)) return
-    source.forEach((group) => {
-      (group.variants || []).forEach((variant: any) => {
+    safeArray(source).forEach((group) => {
+      safeArray(group.variants).forEach((variant: any) => {
         allProducts.push(extract(group, variant))
       })
     })
   }
 
   const addFlatProducts = (source: any, brand: string, extract: (p: any) => ProductEntry) => {
-    if (!Array.isArray(source)) return
-    source.forEach((p) => {
+    safeArray(source).forEach((p) => {
       allProducts.push(extract(p))
     })
   }
@@ -128,6 +140,17 @@ addFlatProducts(safeArray(commercialChemicals), "Bulk Chemical", (p) => ({
 
   const removeItem = (id: number) => {
     setItems(items.filter((item) => item.id !== id))
+  }
+
+  const handleSendEmail = () => {
+    const doc = new jsPDF()
+    doc.text("Quotation", 10, 10)
+    let y = 20
+    items.forEach((item) => {
+      doc.text(`${item.productName} - Qty: ${item.quantity} - ₹${item.price}`, 10, y)
+      y += 10
+    })
+    doc.save("quotation.pdf")
   }
 
   const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -242,7 +265,10 @@ addFlatProducts(safeArray(commercialChemicals), "Bulk Chemical", (p) => ({
               </tbody>
             </table>
             <div className="text-right font-semibold mt-4 text-lg">Total: ₹{totalAmount.toFixed(2)}</div>
-            <div className="mt-4 text-right">
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="outline" onClick={handleSendEmail}>
+                <Send className="mr-2 h-4 w-4" /> Send by Email
+              </Button>
               <Button variant="outline">
                 <Download className="mr-2 h-4 w-4" /> Export as PDF
               </Button>

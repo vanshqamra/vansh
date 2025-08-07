@@ -1,7 +1,8 @@
 "use client"
 
-const safeArray = (x: any): any[] => (Array.isArray(x) ? x : []);
 import { useState } from "react"
+import { notFound } from "next/navigation"
+import { useAuth } from "@/app/context/auth-context"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,6 +14,12 @@ import { qualigensProducts } from "@/lib/qualigens-products"
 import whatmanProducts from "@/lib/whatman_products.json"
 import himediaProducts from "@/lib/himedia_products_grouped"
 import { commercialChemicals } from "@/lib/data"
+
+function safeArray<T = any>(value: T[]): T[]
+function safeArray(value: any): any[]
+function safeArray(value: any): any[] {
+  return Array.isArray(value) ? value : []
+}
 
 interface RestockItem {
   id: number
@@ -32,6 +39,11 @@ interface ProductEntry {
 }
 
 export default function RestockPage() {
+  const { role, loading } = useAuth()
+  if (!loading && role !== "admin") {
+    notFound()
+  }
+
   const [items, setItems] = useState<RestockItem[]>([])
   const [form, setForm] = useState({
     productName: "",
@@ -48,9 +60,8 @@ export default function RestockPage() {
     brand: string,
     extract: (group: any, variant: any) => ProductEntry
   ) => {
-    if (!Array.isArray(source)) return
-    source.forEach((group) => {
-      (group.variants || []).forEach((variant: any) => {
+    safeArray(source).forEach((group) => {
+      safeArray(group.variants).forEach((variant: any) => {
         allProducts.push(extract(group, variant))
       })
     })
@@ -61,8 +72,7 @@ export default function RestockPage() {
     brand: string,
     extract: (p: any) => ProductEntry
   ) => {
-    if (!Array.isArray(source)) return
-    source.forEach((p) => {
+    safeArray(source).forEach((p) => {
       allProducts.push(extract(p))
     })
   }
@@ -131,6 +141,21 @@ addFlatProducts(safeArray(commercialChemicals), "Bulk Chemical", (p) => ({
 
   const removeItem = (id: number) => {
     setItems(items.filter((item) => item.id !== id))
+  }
+
+  const exportCSV = () => {
+    const headers = ["Product", "Brand", "Pack Size", "Qty", "Price", "Total"]
+    const rows = items.map((i) => [i.productName, i.brand, i.packSize, i.quantity, i.price, i.price * i.quantity])
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((v) => `"${v}"`).join(","))
+      .join("\n")
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = "restock.csv"
+    link.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -208,8 +233,9 @@ addFlatProducts(safeArray(commercialChemicals), "Bulk Chemical", (p) => ({
 
       {items.length > 0 && (
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Restock List</CardTitle>
+            <Button variant="outline" size="sm" onClick={exportCSV}>Export CSV</Button>
           </CardHeader>
           <CardContent>
             <table className="w-full text-sm">
