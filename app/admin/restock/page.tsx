@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { notFound } from "next/navigation"
 import { useAuth } from "@/app/context/auth-context"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { AccessDenied } from "@/components/access-denied"
 
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import rankemProducts from "@/lib/rankem_products.json"
@@ -41,7 +41,7 @@ interface ProductEntry {
 export default function RestockPage() {
   const { role, loading } = useAuth()
   if (!loading && role !== "admin") {
-    notFound()
+    return <AccessDenied />
   }
 
   const [items, setItems] = useState<RestockItem[]>([])
