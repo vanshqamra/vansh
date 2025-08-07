@@ -2,8 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ClientProviders from "./providers";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { SiteShell } from "@/components/site-shell";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         {/* All client-stateful code lives inside ClientProviders */}
         <ClientProviders>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <SiteShell>{children}</SiteShell>
         </ClientProviders>
       </body>
     </html>
