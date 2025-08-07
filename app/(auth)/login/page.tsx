@@ -61,11 +61,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-      <Card className="w-full max-w-md p-6 shadow-lg">
+    <div className="relative min-h-screen flex items-center justify-center bg-[url('/images/hero-background.png')] bg-cover bg-center">
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-md" />
+      <Card className="relative w-full max-w-md p-6 shadow-xl bg-white/60 backdrop-blur-md border border-white/40">
         <CardHeader className="space-y-2 text-center">
           <Image src="/placeholder-logo.png" alt="Chemical Corporation" width={48} height={48} className="mx-auto" />
-          <CardTitle className="text-2xl">Login to Chemical Corporation Portal</CardTitle>
+          <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+            Login to Chemical Corporation Portal
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -78,6 +81,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="bg-white/70 backdrop-blur-sm"
               />
             </div>
             <div className="space-y-2">
@@ -89,6 +93,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="bg-white/70 backdrop-blur-sm"
               />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
