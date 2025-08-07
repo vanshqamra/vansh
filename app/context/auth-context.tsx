@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client"
 import type { User } from "@supabase/supabase-js"
 
 interface AuthContextType {
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     return null
   })
-  const supabase = useMemo(() => createClient(), [])
+  const supabase = useMemo(() => createSupabaseBrowserClient(), [])
 
   useEffect(() => {
     const getInitialSession = async () => {

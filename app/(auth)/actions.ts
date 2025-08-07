@@ -1,9 +1,9 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { createSupabaseServerClient } from "@/lib/supabase/server-client"
 
 export async function signup(_: any, formData: FormData) {
-  const supabase = createClient()
+  const supabase = createSupabaseServerClient()
 
   const name = formData.get("name") as string
   const email = formData.get("email") as string

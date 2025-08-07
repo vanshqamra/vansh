@@ -1,11 +1,11 @@
-import { createClient } from "@/lib/supabase/server"
+import { createSupabaseServerClient } from "@/lib/supabase/server-client"
 import { redirect } from "next/navigation"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { revalidatePath } from "next/cache"
 
 export default async function AdminDashboardPage() {
-  const supabase = createClient()
+  const supabase = createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -26,7 +26,7 @@ export default async function AdminDashboardPage() {
 
   async function approveClient(formData: FormData) {
     "use server"
-    const supabase = createClient()
+    const supabase = createSupabaseServerClient()
     const clientId = formData.get("clientId") as string
     const status = formData.get("status") === "true"
 

@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { FileText, Download, Eye, Trash2, Calendar, User, Building, Phone, Mail } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client"
 import { useAuth } from "@/app/context/auth-context"
 import { useRouter } from "next/navigation"
 
@@ -44,7 +44,7 @@ export default function AdminUploadsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const { user, loading } = useAuth()
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = createSupabaseBrowserClient()
 
   useEffect(() => {
     if (loading) return
