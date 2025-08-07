@@ -66,52 +66,52 @@ export default function RestockPage() {
     })
   }
 
-  addGroupedProducts(borosilProducts, "Borosil", (group, v) => ({
-    productName: group.product || group.title || "",
-    brand: "Borosil",
-    code: v.code || "",
-    packSize: v.capacity || v["Pack Size"] || v.size || "",
-    price: parseFloat(v.price || "0") || 0,
-  }))
+  addGroupedProducts(safeArray(borosilProducts), "Borosil", (group, v) => ({
+  productName: group.product || group.title || group.name || "",
+  brand: "Borosil",
+  code: v.code || "",
+  packSize: v.capacity || v["Pack Size"] || v.size || "",
+  price: parseFloat(v.price || "0") || 0,
+}))
 
-  addGroupedProducts(rankemProducts, "Rankem", (group, v) => ({
-    productName: group.product || group.title || "",
-    brand: "Rankem",
-    code: v["Product Code"] || v.code || "",
-    packSize: v["Pack Size"] || v.size || "",
-    price: parseFloat(v["Price"] || "0") || 0,
-  }))
+addGroupedProducts(safeArray(rankemProducts), "Rankem", (group, v) => ({
+  productName: group.product || group.title || group.name || "",
+  brand: "Rankem",
+  code: v["Product Code"] || v.code || "",
+  packSize: v["Pack Size"] || v.size || "",
+  price: parseFloat(v["Price"] || "0") || 0,
+}))
 
-  addFlatProducts(qualigensProducts, "Qualigens", (p) => ({
-    productName: p["Product Name"] || p.product || "",
-    brand: "Qualigens",
-    code: p["Product Code"] || p.code || "",
-    packSize: p["Pack Size"] || p.size || "",
-    price: parseFloat(p["Price"] || "0") || 0,
-  }))
+addFlatProducts(safeArray(qualigensProducts), "Qualigens", (p) => ({
+  productName: p["Product Name"] || p.product || p.name || "",
+  brand: "Qualigens",
+  code: p["Product Code"] || p.code || "",
+  packSize: p["Pack Size"] || p.size || "",
+  price: parseFloat(p["Price"] || "0") || 0,
+}))
 
-  addFlatProducts(whatmanProducts, "Whatman", (p) => ({
-    productName: p.name || p.title || "",
-    brand: "Whatman",
-    code: p.code || p["Product Code"] || "",
-    packSize: p.size || p["Pack Size"] || "",
-    price: parseFloat(p.price || "0") || 0,
-  }))
+addFlatProducts(safeArray(whatmanProducts), "Whatman", (p) => ({
+  productName: p.name || p.title || "",
+  brand: "Whatman",
+  code: p.code || p["Product Code"] || "",
+  packSize: p.size || p["Pack Size"] || "",
+  price: parseFloat(p.price || "0") || 0,
+}))
 
-  addGroupedProducts(himediaProducts, "HiMedia", (group, v) => ({
-    productName: group.product || group.title || "",
-    brand: "HiMedia",
-    code: v["Product Code"] || v.code || "",
-    packSize: v["Pack Size"] || v.size || "",
-    price: parseFloat(v["Price"] || "0") || 0,
-  }))
+addGroupedProducts(safeArray(himediaProducts), "HiMedia", (group, v) => ({
+  productName: group.product || group.title || group.name || "",
+  brand: "HiMedia",
+  code: v["Product Code"] || v.code || "",
+  packSize: v["Pack Size"] || v.size || "",
+  price: parseFloat(v["Price"] || "0") || 0,
+}))
 
-  addFlatProducts(commercialChemicals, "Bulk Chemical", (p) => ({
-    productName: p.name || p["Product Name"] || "",
-    brand: "Bulk Chemical",
-    code: p.code || p["Product Code"] || "",
-    packSize: p.size || p["Pack Size"] || "",
-    price: parseFloat(p.price || "0") || 0,
+addFlatProducts(safeArray(commercialChemicals), "Bulk Chemical", (p) => ({
+  productName: p.name || p["Product Name"] || "",
+  brand: "Bulk Chemical",
+  code: p.code || p["Product Code"] || "",
+  packSize: p.size || p["Pack Size"] || "",
+  price: parseFloat(p.price || "0") || 0,
   }))
 
   const handleAdd = () => {
