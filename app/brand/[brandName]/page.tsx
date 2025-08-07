@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { notFound } from "next/navigation"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
@@ -10,6 +10,7 @@ import qualigensProductsRaw from "@/lib/qualigens-products.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useSearch } from "@/app/context/search-context"
 
 if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor"
 
@@ -26,9 +27,13 @@ export default function BrandPage({ params }) {
 
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
-  const [searchTerm, setSearchTerm] = useState("")
+  const { searchQuery, setSearchQuery } = useSearch()
   const [currentPage, setCurrentPage] = useState(1)
   const productsPerPage = 50
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
 
   let grouped = []
 
@@ -80,13 +85,14 @@ export default function BrandPage({ params }) {
     })
 
     const filtered = flat.filter(({ variant, groupMeta }) => {
+      const query = searchQuery.toLowerCase()
       const variantMatch = Object.values(variant).some((val) =>
-        String(val).toLowerCase().includes(searchTerm.toLowerCase()),
+        String(val).toLowerCase().includes(query),
       )
       const metaMatch =
-        groupMeta.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        groupMeta.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        groupMeta.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        groupMeta.title?.toLowerCase().includes(query) ||
+        groupMeta.category?.toLowerCase().includes(query) ||
+        groupMeta.description?.toLowerCase().includes(query)
       return variantMatch || metaMatch
     })
 
@@ -124,7 +130,19 @@ export default function BrandPage({ params }) {
       ;(group.variants || []).forEach((variant) => flat.push({ variant, groupMeta }))
     })
 
-    const paginated = flat.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
+    const filtered = flat.filter(({ variant, groupMeta }) => {
+      const query = searchQuery.toLowerCase()
+      const variantMatch = Object.values(variant).some((val) =>
+        String(val).toLowerCase().includes(query),
+      )
+      const metaMatch =
+        groupMeta.title?.toLowerCase().includes(query) ||
+        groupMeta.category?.toLowerCase().includes(query) ||
+        groupMeta.description?.toLowerCase().includes(query)
+      return variantMatch || metaMatch
+    })
+
+    const paginated = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
 
     const groupedMap = {}
     paginated.forEach(({ variant, groupMeta }) => {
@@ -146,7 +164,13 @@ export default function BrandPage({ params }) {
       notFound()
     }
 
-    const paginated = qualigensProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
+    const filtered = qualigensProducts.filter((p) =>
+      Object.values(p).some((val) =>
+        String(val).toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    )
+
+    const paginated = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
 
     grouped = [
       {
@@ -239,8 +263,8 @@ export default function BrandPage({ params }) {
         type="text"
         placeholder="Search products..."
         className="mb-8 max-w-md"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
 
       {grouped.map((group, index) => (

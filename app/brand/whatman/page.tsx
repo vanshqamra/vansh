@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { notFound } from "next/navigation"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
@@ -8,6 +8,7 @@ import { labSupplyBrands } from "@/lib/data"
 import whatmanProducts from "@/lib/whatman_products.json"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useSearch } from "@/app/context/search-context"
 
 const normalizeKey = (key: string) =>
   key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
@@ -19,7 +20,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
 
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
-  const [searchTerm, setSearchTerm] = useState("")
+  const { searchQuery, setSearchQuery } = useSearch()
   const [page, setPage] = useState(1)
   const itemsPerPage = 50
 
@@ -27,7 +28,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
 
   const filteredVariants = group.variants.filter((variant) =>
     Object.values(variant).some((val) =>
-      String(val).toLowerCase().includes(searchTerm.toLowerCase())
+      String(val).toLowerCase().includes(searchQuery.toLowerCase())
     )
   )
 
@@ -36,6 +37,10 @@ export default function BrandPage({ params }: { params: { brandName: string } })
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   )
+
+  useEffect(() => {
+    setPage(1)
+  }, [searchQuery])
 
   const handleAddToCart = (variant: any) => {
     addItem({
@@ -56,11 +61,8 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       <Input
         placeholder="Search by name, code, price, etc."
         className="mb-6"
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value)
-          setPage(1) // Reset to first page on new search
-        }}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
 
       <div className="overflow-x-auto">
