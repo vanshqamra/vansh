@@ -1,3 +1,5 @@
+"use server";
+
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 const PizZip = require("pizzip");
