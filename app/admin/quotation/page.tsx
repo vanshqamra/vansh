@@ -14,6 +14,7 @@ interface QuotationItem {
   productCode: string;
   productName: string;
   brand: string;
+  packSize: string;
   quantity: number;
   price: number;
   discount: number;
@@ -35,9 +36,18 @@ const QuotationBuilder = () => {
 
   const [items, setItems] = useState<QuotationItem[]>([]);
   const [transport, setTransport] = useState(0);
-  const [form, setForm] = useState({ productName: "", productCode: "", brand: "", quantity: "", price: "", discount: "", gst: "" });
+  const [form, setForm] = useState({
+    productName: "",
+    productCode: "",
+    brand: "",
+    packSize: "",
+    quantity: "",
+    price: "",
+    discount: "",
+    gst: "",
+  });
   const [filtered, setFiltered] = useState<ProductEntry[]>([]);
-  const allProducts = useMemo(() => getAllProducts(),[]);
+  const allProducts = useMemo(() => getAllProducts(), []);
   const pdfRef = useRef(null);
 
   const handleAdd = () => {
@@ -49,6 +59,7 @@ const QuotationBuilder = () => {
       productCode: form.productCode,
       productName: form.productName,
       brand: form.brand,
+      packSize: form.packSize,
       quantity: parseInt(form.quantity),
       price: parseFloat(form.price),
       discount: parseFloat(form.discount || "0"),
@@ -57,7 +68,16 @@ const QuotationBuilder = () => {
       custom: true,
     };
     setItems([...items, newItem]);
-    setForm({ productName: "", productCode: "", brand: "", quantity: "", price: "", discount: "", gst: "" });
+    setForm({
+      productName: "",
+      productCode: "",
+      brand: "",
+      packSize: "",
+      quantity: "",
+      price: "",
+      discount: "",
+      gst: "",
+    });
   };
 
   const removeItem = (id: number) => setItems(items.filter((item) => item.id !== id));
@@ -112,41 +132,44 @@ const QuotationBuilder = () => {
           <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4">
             <div className="relative md:col-span-3">
               <Label>Search Product</Label>
-              <Input
-                value={form.productName}
-                onChange={(e) => {
-                  const query = e.target.value.toLowerCase();
-                  const results = allProducts.filter((p) => `${p.productName} ${p.code}`.toLowerCase().includes(query));
-                  setForm({ ...form, productName: query });
-                  setFiltered(results);
-                }}
-              />
-              {form.productName && filtered.length > 0 && (
-                <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
-                  {filtered.slice(0, 50).map((product, index) => (
-                    <div
-                      key={index}
-                      className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        setForm({
-                          productName: product.productName,
-                          productCode: product.code,
-                          brand: product.brand,
-                          quantity: "",
-                          price: product.price ? product.price.toString() : "",
-                          discount: "",
-                          gst: "",
-                        });
-                        setFiltered([]);
-                      }}
-                    >
-                      <span className="font-medium">{product.productName}</span>{" "}
-                      <span className="text-xs text-muted-foreground">[Code: {product.code}]</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                <Input
+                  value={form.productName}
+                  onChange={(e) => {
+                    const query = e.target.value.toLowerCase();
+                    const results = allProducts.filter((p) =>
+                      `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(query)
+                    );
+                    setForm({ ...form, productName: e.target.value });
+                    setFiltered(results);
+                  }}
+                />
+                {form.productName && filtered.length > 0 && (
+                  <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
+                    {filtered.slice(0, 50).map((product, index) => (
+                      <div
+                        key={index}
+                        className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setForm({
+                            productName: product.productName,
+                            productCode: product.code,
+                            brand: product.brand,
+                            packSize: product.packSize,
+                            quantity: "",
+                            price: product.price ? product.price.toString() : "",
+                            discount: "",
+                            gst: "",
+                          });
+                          setFiltered([]);
+                        }}
+                      >
+                        <span className="font-medium">{product.productName}</span>{" "}
+                        <span className="text-xs text-muted-foreground">[Code: {product.code}] • [Size: {product.packSize}]</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             <div>
               <Label>Brand</Label>
               <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
