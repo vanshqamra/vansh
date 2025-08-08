@@ -26,56 +26,32 @@ function getVisibleColumns(
   variants: Record<string, any>[],
   specs_headers: string[]
 ) {
-  const showCode = variants.some(v => {
-    const codeKeys = ["code", "product_code", "Product Code"];
-    return codeKeys.some(k => v[k] || v[normalizeKey(k)]);
-  });
-  const showPrice = variants.some(v => {
-    const priceKeys = ["price", "Price", "price_piece", "price_/piece", "Price /Piece"];
-    return priceKeys.some(k => v[k] || v[normalizeKey(k)]);
-  });
+  const showCode = variants.some(v => Boolean(v.code));
+  const showPrice = variants.some(v => typeof v.price === "number" && v.price > 0);
   const visibleSpecs = specs_headers.filter(h => {
     const nk = normalizeKey(h);
-    if (
-      nk === "product_code" ||
-      nk === "code" ||
-      nk === "price" ||
-      nk === "price_piece"
-    )
-      return false;
+    if (nk === "product_code" || nk === "code" || nk === "price" || nk === "price_piece") return false;
     return variants.some(v => {
-      const keyOptions = [
-        nk,
-        h,
-        nk === "code" ? "product_code" : null,
-        nk === "product_code" ? "code" : null,
-        nk === "price" ? "price_/piece" : null,
-        nk === "price_piece" ? "price" : null,
-        "price",
-        "price_piece",
-        "price_/piece"
-      ].filter(Boolean);
-      return keyOptions.some(
-        k => v[k] !== undefined && v[k] !== "" && v[k] !== "—"
-      );
+      // Check both normalized and raw keys for this header
+      const val = v[nk] ?? v[h];
+      return val !== undefined && val !== "" && val !== "—";
     });
   });
   return { showCode, visibleSpecs, showPrice };
 }
 
-// ——— pre-process Borosil: preserve original headers, normalize every variant ———
-const normalizedBorosil = borosilProducts.map((group) => {
-  const specs_headers =
-    Array.isArray(group.specs_headers) && group.specs_headers.length > 0
-      ? group.specs_headers.map(h => h.trim())
-      : Object.keys(group.variants?.[0] || {});
 
   const variants = (group.variants || []).map((rawV) => {
     const v: Record<string, any> = {};
     for (const [k, val] of Object.entries(rawV)) {
       v[normalizeKey(k)] = val;
-      v[k] = val; // store both original and normalized keys
     }
+    const priceRaw =
+      v[normalizeKey("Price /Piece")] ??
+      v.price_piece ??
+      v.price;
+    v.price = Number(String(priceRaw).replace(/,/g, "")) || 0;
+    v.code = v.code ?? v.product_code ?? "";
     return v;
   });
 
@@ -166,35 +142,13 @@ export default function BrandPage({ params }) {
       if (!map[key]) map[key] = { ...groupMeta, variants: [] };
 
       const row: Record<string, any> = {};
-      // Code
-      const codeKeys = ["code", "product_code", "Product Code"];
-      row["Code"] = codeKeys.map(k => variant[k] || variant[normalizeKey(k)]).find(Boolean) || "";
-      // For all headers
-      groupMeta.specs_headers.forEach((header) => {
-        const nk = normalizeKey(header);
-        const keyOptions = [
-          nk,
-          header,
-          nk === "code" ? "product_code" : null,
-          nk === "product_code" ? "code" : null,
-          nk === "price" ? "price_/piece" : null,
-          nk === "price_piece" ? "price" : null,
-          "price",
-          "price_piece",
-          "price_/piece"
-        ].filter(Boolean);
-        let found = "—";
-        for (const k of keyOptions) {
-          if (variant[k] !== undefined && variant[k] !== "") {
-            found = variant[k];
-            break;
-          }
-        }
-        row[header] = found;
-      });
-      // Price
-      const priceKeys = ["price", "Price", "price_piece", "price_/piece", "Price /Piece"];
-      row["Price"] = priceKeys.map(k => Number(variant[k] || variant[normalizeKey(k)])).find(v => !isNaN(v) && v > 0) || "";
+row["Code"] = variant.code || variant["product_code"] || variant["Product Code"] || "";
+groupMeta.specs_headers.forEach((header) => {
+  const nk = normalizeKey(header);
+  // Check both normalized and raw keys for header
+  row[header] = variant[nk] ?? variant[header] ?? "—";
+});
+row["Price"] = variant.price;
 
       map[key].variants.push(row);
     });
@@ -283,7 +237,7 @@ export default function BrandPage({ params }) {
   const handleAdd = (row: any, group: any) => {
     if (!isLoaded)
       return toast({ title: "Loading...", description: "Please wait", variant: "destructive" });
-    const price = Number(row["Price"]);
+    const price = row["Price"];
     if (typeof price !== "number" || price <= 0)
       return toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" });
     const name = row["Product Name"] || group.title;
