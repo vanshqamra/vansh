@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useSearch } from "@/app/context/search-context";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-// ——— helper to normalize strings to snake_case ———
+// ——— helper to normalize any header/raw-key to snake_case ———
 function normalizeKey(str: string) {
   return str
     .toLowerCase()
@@ -21,37 +21,47 @@ function normalizeKey(str: string) {
     .replace(/_+/g, "_");
 }
 
-// ——— determine visible columns based on data rows ———
+// ——— determine which columns to display based on data presence ———
 function getVisibleColumns(
-  rows: Array<Record<string, any>>,
+  variants: Record<string, any>[],
   specs_headers: string[]
 ) {
-  const showCode = rows.some(r => Boolean(r.__code));
-  const showPrice = rows.some(r => typeof r.__price === "number" && r.__price > 0);
-  const visibleSpecs = specs_headers.filter(h =>
-    rows.some(r => {
-      const v = r[h];
-      return v !== undefined && v !== "" && v !== "—";
-    })
-  );
+  // show Code if any variant has code
+  const showCode = variants.some(v => Boolean(v.code));
+  // show Price if any variant price > 0
+  const showPrice = variants.some(v => typeof v.price === "number" && v.price > 0);
+  // filter out code and price headers from specs, then show only those with data
+  const visibleSpecs = specs_headers
+    .filter(h => {
+      const nk = normalizeKey(h);
+      // exclude any header that's the product code or price field
+      if (nk === "product_code" || nk === "code" || nk === "price" || nk === "price_piece") return false;
+      return variants.some(v => {
+        const val = v[normalizeKey(h)];
+        return val !== undefined && val !== "" && val !== "—";
+      });
+    });
   return { showCode, visibleSpecs, showPrice };
 }
 
-// ——— pre-process Borosil: keep original specs, normalize variants ———
-const normalizedBorosil = borosilProducts.map(group => {
+// ——— pre-process Borosil: preserve original headers, normalize every variant ———
+const normalizedBorosil = borosilProducts.map((group) => {
   const specs_headers =
     Array.isArray(group.specs_headers) && group.specs_headers.length > 0
       ? group.specs_headers.map(h => h.trim())
       : Object.keys(group.variants?.[0] || {});
 
-  const variants = (group.variants || []).map(raw => {
+  const variants = (group.variants || []).map((rawV) => {
     const v: Record<string, any> = {};
-    Object.entries(raw).forEach(([k, val]) => {
+    for (const [k, val] of Object.entries(rawV)) {
       v[normalizeKey(k)] = val;
-    });
-    const rawPrice = v[normalizeKey("Price /Piece")] ?? v.price_piece ?? v.price;
-    v.price = Number(String(rawPrice).replace(/,/g, "")) || 0;
-    v.code = v.code ?? v.product_code ?? "";
+    }
+    const priceRaw =
+      v[normalizeKey("Price /Piece")] ??
+      v.price_piece ??
+      v.price;
+    v.price = Number(String(priceRaw).replace(/,/g, "")) || 0;
+    v.code = v.code ?? v.product_code ?? v["Product Code"] ?? "";
     return v;
   });
 
@@ -74,86 +84,125 @@ export default function BrandPage({ params }) {
   const [page, setPage] = useState(initialPage);
   const productsPerPage = 50;
 
+  // update URL on page change
   useEffect(() => {
-    const qp = new URLSearchParams();
-    qp.set("page", page.toString());
-    router.replace(`${pathname}?${qp.toString()}`, { scroll: false });
+    const params = new URLSearchParams();
+    params.set("page", page.toString());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [page, router, pathname]);
 
-  useEffect(() => setPage(1), [searchQuery]);
+  // reset to first page when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
 
   let grouped: Array<any> = [];
 
-  // ——— Borosil branch ———
+  // ——— Borosil ———
   if (brandKey === "borosil") {
-    const flat: Array<{ row: Record<string, any>; meta: any }> = [];
+    const flat: Array<{ variant: Record<string, any>; groupMeta: any }> = [];
     normalizedBorosil.forEach((group, idx) => {
       const { specs_headers, variants } = group;
-      const title =
-        group.title && !group.title.toLowerCase().startsWith("untitled group")
-          ? group.title
-          : group.product?.trim() || group.category?.trim() ||
-            group.description?.split("\n")[0]?.trim() || `Group ${idx + 1}`;
-      const category =
-        group.category && !group.category.toLowerCase().startsWith("untitled group")
-          ? group.category
-          : group.product?.trim() || title;
+      const resolvedTitle =
+        group.product?.trim() ||
+        group.title?.trim() ||
+        group.category?.trim() ||
+        group.description?.split("\n")[0]?.trim() ||
+        `Group ${idx + 1}`;
+      const resolvedCategory =
+        group.category?.trim() || group.product?.trim() || resolvedTitle;
 
-      variants.forEach(variant => {
-        const row: Record<string, any> = {};
-        specs_headers.forEach(h => {
-          const val = variant[normalizeKey(h)];
-          row[h] = val != null && val !== "" ? val : "—";
-        });
-        row.__code = variant.code;
-        row.__price = variant.price;
-        flat.push({ row, meta: { ...group, title, category } });
+      const baseMeta = {
+        ...group,
+        title: group.title?.toLowerCase().startsWith("untitled group")
+          ? resolvedTitle
+          : group.title || resolvedTitle,
+        category: group.category?.toLowerCase().startsWith("untitled group")
+          ? resolvedCategory
+          : group.category || resolvedCategory,
+        specs_headers,
+        description: group.description || "",
+      };
+
+      variants.forEach((variant) => {
+        flat.push({ variant, groupMeta: baseMeta });
       });
     });
 
-    const filtered = flat.filter(({ row, meta }) => {
+    const filtered = flat.filter(({ variant, groupMeta }) => {
       const q = searchQuery.toLowerCase();
       return (
-        Object.values(row).some(v => String(v).toLowerCase().includes(q)) ||
-        meta.title.toLowerCase().includes(q) ||
-        meta.category.toLowerCase().includes(q) ||
-        meta.description.toLowerCase().includes(q)
+        Object.values(variant).some(v =>
+          String(v).toLowerCase().includes(q)
+        ) ||
+        groupMeta.title.toLowerCase().includes(q) ||
+        groupMeta.category.toLowerCase().includes(q) ||
+        groupMeta.description.toLowerCase().includes(q)
       );
     });
 
-    const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage);
+    const paginated = filtered.slice(
+      (page - 1) * productsPerPage,
+      page * productsPerPage
+    );
 
     const map: Record<string, any> = {};
-    paginated.forEach(({ row, meta }) => {
-      const key = `${meta.category}-${meta.title}`;
-      if (!map[key]) map[key] = { ...meta, specs_headers: meta.specs_headers, variants: [] };
+    paginated.forEach(({ variant, groupMeta }) => {
+      const key = `${groupMeta.category}-${groupMeta.title}`;
+      if (!map[key]) map[key] = { ...groupMeta, variants: [] };
+
+      const row: Record<string, any> = {};
+      row["Code"] = variant.code;
+      groupMeta.specs_headers.forEach((header) => {
+        const nk = normalizeKey(header);
+        row[header] = variant[nk] ?? "—";
+      });
+      row["Price"] = variant.price;
+
       map[key].variants.push(row);
     });
 
     grouped = Object.values(map);
   }
 
-  // ——— Qualigens branch ———
+  // ——— Qualigens ———
   else if (brandKey === "qualigens") {
     let qualigensProducts: any[] = [];
     try {
       const raw = qualigensProductsRaw.default || qualigensProductsRaw;
-      qualigensProducts = Array.isArray(raw.data) ? raw.data : Array.isArray(raw) ? raw : [];
+      qualigensProducts = Array.isArray(raw.data)
+        ? raw.data
+        : Array.isArray(raw)
+        ? raw
+        : [];
     } catch {
       notFound();
     }
 
     const filtered = qualigensProducts.filter(p =>
-      Object.values(p).some(v => String(v).toLowerCase().includes(searchQuery.toLowerCase()))
+      Object.values(p).some(v =>
+        String(v).toLowerCase().includes(searchQuery.toLowerCase())
+      )
     );
-    const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage);
+    const paginated = filtered.slice(
+      (page - 1) * productsPerPage,
+      page * productsPerPage
+    );
 
     grouped = [
       {
         category: "Qualigens",
         title: "Qualigens Products",
         description: "",
-        specs_headers: ["Product Code","CAS No","Product Name","Pack Size","Packing","Price","HSN Code"],
+        specs_headers: [
+          "Product Code",
+          "CAS No",
+          "Product Name",
+          "Pack Size",
+          "Packing",
+          "Price",
+          "HSN Code",
+        ],
         variants: paginated.map(p => ({
           "Product Code": p["Product Code"] || "",
           "CAS No": p["CAS No"] || "",
@@ -167,72 +216,114 @@ export default function BrandPage({ params }) {
     ];
   }
 
-  // ——— Rankem branch ———
+  // ——— Rankem ———
   else if (brandKey === "rankem") {
-    const flat: Array<{ row: any; meta: any }> = [];
-    rankemProducts.forEach(group => {
+    const flat: Array<{ variant: Record<string, any>; groupMeta: any }> = [];
+    rankemProducts.forEach((group) => {
       const variants = group.variants || [];
-      variants.forEach(v => flat.push({ row: v, meta: group }));
+      variants.forEach((v) => flat.push({ variant: v, groupMeta: group }));
     });
-    const filtered = flat.filter(({ row, meta }) =>
-      Object.values(row).some(v => String(v).toLowerCase().includes(searchQuery.toLowerCase())) ||
-      meta.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const filtered = flat.filter(({ variant, groupMeta }) =>
+      Object.values(variant).some(v =>
+        String(v).toLowerCase().includes(searchQuery.toLowerCase())
+      ) ||
+      groupMeta.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage);
+    const paginated = filtered.slice(
+      (page - 1) * productsPerPage,
+      page * productsPerPage
+    );
     const map: Record<string, any> = {};
-    paginated.forEach(({ row, meta }) => {
-      const key = `${meta.category}-${meta.title}`;
-      if (!map[key]) map[key] = { ...meta, specs_headers: [], variants: [] };
-      map[key].variants.push(row);
+    paginated.forEach(({ variant, groupMeta }) => {
+      const key = `${groupMeta.category}-${groupMeta.title}`;
+      if (!map[key]) map[key] = { ...groupMeta, variants: [] };
+      map[key].variants.push(variant);
     });
     grouped = Object.values(map);
   }
 
   // ——— Add to Cart handler ———
   const handleAdd = (row: any, group: any) => {
-    if (!isLoaded) return toast({ title: "Loading...", description: "Please wait", variant: "destructive" });
-    const price = row.__price;
-    if (typeof price !== "number" || price <= 0) return toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" });
-    const code = row.__code;
+    if (!isLoaded)
+      return toast({ title: "Loading...", description: "Please wait", variant: "destructive" });
+    const price = row["Price"];
+    if (typeof price !== "number" || price <= 0)
+      return toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" });
     const name = row["Product Name"] || group.title;
-    addItem({ id: `${brandKey}-${code}`, name, productName: name, catNo: code, productCode: code, price, quantity: 1, brand: brand.name, category: group.category, image: null });
+    const catNo = row["Product Code"] || row.Code || "";
+    addItem({
+      id: `${brandKey}-${catNo}`,
+      name,
+      productName: name,
+      catNo,
+      productCode: catNo,
+      casNo: row["CAS No"] || "",
+      packSize: row["Pack Size"] || "",
+      packing: row.Packing || "",
+      hsn: row["HSN Code"] || "",
+      price,
+      quantity: 1,
+      brand: brand.name,
+      category: group.category,
+      image: null,
+    });
     toast({ title: "Added to Cart", description: `${name} added.`, variant: "default" });
   };
 
-  const total = grouped.reduce((sum, g) => sum + g.variants.length, 0);
-  const totalPages = Math.ceil(total / productsPerPage);
+  const totalVariants =
+    brandKey === "borosil"
+      ? normalizedBorosil.reduce((sum, g) => sum + g.variants.length, 0)
+      : brandKey === "qualigens"
+      ? (qualigensProductsRaw.default || qualigensProductsRaw).data?.length || 0
+      : brandKey === "rankem"
+      ? rankemProducts.reduce((sum, g) => sum + (g.variants?.length || 0), 0)
+      : 0;
+  const totalPages = Math.ceil(totalVariants / productsPerPage);
 
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-6">{brand.name} Products</h1>
-      <Input type="text" placeholder="Search products..." className="mb-8 max-w-md" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+      <Input
+        type="text"
+        placeholder="Search products..."
+        className="mb-8 max-w-md"
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+      />
       {grouped.map((group, gi) => {
-        const { showCode, visibleSpecs, showPrice } = getVisibleColumns(group.variants, group.specs_headers);
+        const { showCode, visibleSpecs, showPrice } = getVisibleColumns(
+          group.variants,
+          group.specs_headers
+        );
         return (
-          <div key={`grp-${gi}`} className="mb-12">
+          <div key={`group-${gi}-${group.title}`} className="mb-12">
             <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">{group.category}</h3>
             <h2 className="text-xl font-bold text-blue-700 mb-2">{group.title}</h2>
             {group.description && <p className="text-sm text-gray-600 whitespace-pre-line mb-4">{group.description}</p>}
-            <div className="overflow-auto border rounded mb-4">
-              <table className="min-w-full text-sm text-left text-gray-700">
-                <thead className="bg-gray-100 text-xs uppercase font-semibold"><tr>
-                  {showCode && <th className="px-3 py-2">Code</th>}
-                  {visibleSpecs.map((h,i) => <th key={i} className="px-3 py-2">{h}</th>)}
-                  {showPrice && <th className="px-3 py-2">Price</th>}
-                  <th className="px-3 py-2"></th>
-                </tr></thead>
-                <tbody>
-                  {group.variants.map((row, ri) => (
-                    <tr key={`row-${gi}-${ri}`} className="border-t">
-                      {showCode && <td className="px-3 py-2">{row.__code}</td>}
-                      {visibleSpecs.map((h, ci) => <td key={ci} className="px-3 py-2">{row[h]}</td>)}
-                      {showPrice && <td className="px-3 py-2">{row.__price}</td>}
-                      <td className="px-3 py-2"><Button size="xs" onClick={() => handleAdd(row, group)} disabled={!isLoaded}>Add to Cart</Button></td>
+            {group.variants.length > 0 && (
+              <div className="overflow-auto border rounded mb-4">
+                <table className="min-w-full text-sm text-left text-gray-700">
+                  <thead className="bg-gray-100 text-xs uppercase font-semibold">
+                    <tr>
+                      {showCode && <th className="px-3 py-2">Code</th>}
+                      {visibleSpecs.map((h, i) => <th key={i} className="px-3 py-2">{h}</th>)}
+                      {showPrice && <th className="px-3 py-2">Price</th>}
+                      <th className="px-3 py-2"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {group.variants.map((row, ri) => (
+                      <tr key={`row-${gi}-${ri}`} className="border-t">
+                        {showCode && <td className="px-3 py-2">{row.Code}</td>}
+                        {visibleSpecs.map((h, ci) => <td key={ci} className="px-3 py-2">{row[h]}</td>)}
+                        {showPrice && <td className="px-3 py-2">{row.Price}</td>}
+                        <td className="px-3 py-2"><Button size="xs" onClick={() => handleAdd(row, group)} disabled={!isLoaded}>Add to Cart</Button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         );
       })}
@@ -243,7 +334,9 @@ export default function BrandPage({ params }) {
           <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
         </div>
       )}
-      {grouped.length === 0 && <div className="text-center py-12"><p className="text-gray-500">No products found matching your search.</p></div>}
+      {grouped.length === 0 && (
+        <div className="text-center py-12"><p className="text-gray-500">No products found matching your search.</p></div>
+      )}
     </div>
   );
 }
