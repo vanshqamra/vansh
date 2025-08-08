@@ -62,10 +62,19 @@ export default function BrandPage({ params }) {
   borosilProducts.forEach((group, idx) => {
     const variants = group.variants || [];
     // if specs_headers is missing, fall back to raw keys of the first variant
-    const specs =
-      Array.isArray(group.specs_headers) && group.specs_headers.length > 0
-        ? group.specs_headers
-        : Object.keys(variants[0] || {});
+   // NEW — start with any defined specs_headers, then append ALL raw keys
+const firstV = variants[0] || {};
+const rawKeys = Object.keys(firstV);
+
+// make a copy of your existing headers (if any)
+const specs = Array.isArray(group.specs_headers) && group.specs_headers.length > 0
+  ? [...group.specs_headers]
+  : [];
+
+// append any missing fields (product code, price, etc.)
+rawKeys.forEach((k) => {
+  if (!specs.includes(k)) specs.push(k);
+});
 
     // resolve title/category exactly as before
     const resolvedTitle =
@@ -130,7 +139,7 @@ export default function BrandPage({ params }) {
     const row: Record<string, any> = {};
     groupMeta.specs_headers.forEach((header) => {
   const want = normalizeKey(header);
-  // find the one variant-entry whose rawKey normalizes to the same string
+  // find the one raw key whose normalized form matches
   const match = Object.entries(variant).find(
     ([rawKey]) => normalizeKey(rawKey) === want
   );
