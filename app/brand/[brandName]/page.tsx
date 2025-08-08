@@ -40,6 +40,12 @@ function getVisibleColumns(
   return { showCode, visibleSpecs, showPrice };
 }
 
+// ——— pre-process Borosil: preserve original headers, normalize every variant ———
+const normalizedBorosil = borosilProducts.map((group) => {
+  const specs_headers =
+    Array.isArray(group.specs_headers) && group.specs_headers.length > 0
+      ? group.specs_headers.map(h => h.trim())
+      : Object.keys(group.variants?.[0] || {});
 
   const variants = (group.variants || []).map((rawV) => {
     const v: Record<string, any> = {};
@@ -51,7 +57,7 @@ function getVisibleColumns(
       v.price_piece ??
       v.price;
     v.price = Number(String(priceRaw).replace(/,/g, "")) || 0;
-    v.code = v.code ?? v.product_code ?? "";
+    v.code = v.code ?? v.product_code ?? v["Product Code"] ?? "";
     return v;
   });
 
@@ -142,13 +148,13 @@ export default function BrandPage({ params }) {
       if (!map[key]) map[key] = { ...groupMeta, variants: [] };
 
       const row: Record<string, any> = {};
-row["Code"] = variant.code || variant["product_code"] || variant["Product Code"] || "";
-groupMeta.specs_headers.forEach((header) => {
-  const nk = normalizeKey(header);
-  // Check both normalized and raw keys for header
-  row[header] = variant[nk] ?? variant[header] ?? "—";
-});
-row["Price"] = variant.price;
+      row["Code"] = variant.code || variant["product_code"] || variant["Product Code"] || "";
+      groupMeta.specs_headers.forEach((header) => {
+        const nk = normalizeKey(header);
+        // Check both normalized and raw keys for header
+        row[header] = variant[nk] ?? variant[header] ?? "—";
+      });
+      row["Price"] = variant.price;
 
       map[key].variants.push(row);
     });
