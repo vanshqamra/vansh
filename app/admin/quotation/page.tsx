@@ -91,21 +91,29 @@ export default function QuotationBuilder() {
 
     // Rankem
     if (Array.isArray(rankemProducts)) {
-      rankemProducts.forEach((g: any) => {
-        ;(g.variants || []).forEach((v: any) => {
-          const desc =
-            typeof v.Description === "string" && v.Description.trim()
-              ? v.Description.trim()
-              : g.title || g.product || "";
-          const size = v["Pack Size"] || v.size || "";
-          const name = size ? `${desc} (${size})` : desc;
-          all.push({
-            productName: name,
-            code: v["Cat No"] || v["Product Code"] || "",
-            brand: "Rankem",
-            packSize: size,
-            price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
-            hsnCode: v["HSN Code"] || "",
+  rankemProducts.forEach((g: any) => {
+    ;(g.variants || []).forEach((v: any) => {
+      // 1) description (the actual name)
+      const desc =
+        typeof v.Description === "string" && v.Description.trim()
+          ? v.Description.trim()
+          : g.title || g.product || "";
+
+      // 2) look for every possible “pack size” key they might’ve used
+      const size =
+        v["Pack Size"] ||
+        v["Pack\nSize"] ||
+        v.Packing ||
+        v.size ||
+        "";
+
+      all.push({
+        productName: desc,                         // just the name
+        code: v["Cat No"] || v["Product Code"] || "",
+        brand: "Rankem",
+        packSize: size,                            // now correct
+        price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
+        hsnCode: v["HSN Code"] || "",
           });
         });
       });
