@@ -39,17 +39,17 @@ interface FlatProduct {
 }
 
 export default function QuotationBuilder() {
-  // Auth (client-side import)
+  // — Auth —
   const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true });
   useEffect(() => {
-    import("@/app/context/auth-context").then(mod => {
+    import("@/app/context/auth-context").then((mod) => {
       const { role, loading } = mod.useAuth();
       setAuth({ role, loading });
     });
   }, []);
   if (!auth.loading && auth.role !== "admin") return <AccessDenied />;
 
-  // State
+  // — State & Refs —
   const [items, setItems] = useState<QuotationItem[]>([]);
   const [transport, setTransport] = useState(0);
   const [form, setForm] = useState({
@@ -65,54 +65,49 @@ export default function QuotationBuilder() {
   const [filtered, setFiltered] = useState<FlatProduct[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Flatten all brand catalogs into a single array
+  // — Flatten all catalogs into one array once —
   const allProducts = useMemo<FlatProduct[]>(() => {
     const all: FlatProduct[] = [];
 
     // Borosil
     if (Array.isArray(borosilProducts)) {
       borosilProducts.forEach((g: any) => {
-        if (Array.isArray(g.variants)) {
-          g.variants.forEach((v: any) => {
-            const category = g.category || g.product || "";
-            const size = v.capacity_ml
-              ? `${v.capacity_ml}ml`
-              : v["Pack Size"] || v.size || "";
-            const base = category ? `${category} – ${g.product}` : g.product;
-            const name = size ? `${base} (${size})` : base;
-            all.push({
-              productName: name,
-              code: v.code || "",
-              brand: "Borosil",
-              packSize: size,
-              price: parseFloat(v.price) || 0,
-              hsnCode: v["HSN Code"] || "",
-            });
+        const category = g.category || g.product || "";
+        const base = category ? `${category} – ${g.product}` : g.product || "";
+        ;(g.variants || []).forEach((v: any) => {
+          const size = v.capacity_ml ? `${v.capacity_ml}ml` : v["Pack Size"] || v.size || "";
+          const name = size ? `${base} (${size})` : base;
+          all.push({
+            productName: name,
+            code: v.code || "",
+            brand: "Borosil",
+            packSize: size,
+            price: parseFloat(v.price) || 0,
+            hsnCode: v["HSN Code"] || "",
           });
-        }
+        });
       });
     }
 
     // Rankem
     if (Array.isArray(rankemProducts)) {
       rankemProducts.forEach((g: any) => {
-        if (Array.isArray(g.variants)) {
-          g.variants.forEach((v: any) => {
-            const desc = typeof v.Description === "string" && v.Description.trim()
+        ;(g.variants || []).forEach((v: any) => {
+          const desc =
+            typeof v.Description === "string" && v.Description.trim()
               ? v.Description.trim()
               : g.title || g.product || "";
-            const size = v["Pack Size"] || v.size || "";
-            const name = size ? `${desc} (${size})` : desc;
-            all.push({
-              productName: name,
-              code: v["Cat No"] || v["Product Code"] || "",
-              brand: "Rankem",
-              packSize: size,
-              price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
-              hsnCode: v["HSN Code"] || "",
-            });
+          const size = v["Pack Size"] || v.size || "";
+          const name = size ? `${desc} (${size})` : desc;
+          all.push({
+            productName: name,
+            code: v["Cat No"] || v["Product Code"] || "",
+            brand: "Rankem",
+            packSize: size,
+            price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
+            hsnCode: v["HSN Code"] || "",
           });
-        }
+        });
       });
     }
 
@@ -153,21 +148,19 @@ export default function QuotationBuilder() {
     // HiMedia
     if (Array.isArray(himediaData)) {
       himediaData.forEach((g: any) => {
-        if (Array.isArray(g.variants)) {
-          g.variants.forEach((v: any) => {
-            const desc = g.product || g.title || "";
-            const size = v["Pack Size"] || v.size || "";
-            const name = size ? `${desc} (${size})` : desc;
-            all.push({
-              productName: name,
-              code: v["Product Code"] || v.code || "",
-              brand: "HiMedia",
-              packSize: size,
-              price: parseFloat(v.price) || 0,
-              hsnCode: v["HSN Code"] || "",
-            });
+        ;(g.variants || []).forEach((v: any) => {
+          const desc = g.product || g.title || "";
+          const size = v.packing || v["Pack Size"] || v.size || "";
+          const name = size ? `${desc} (${size})` : desc;
+          all.push({
+            productName: name,
+            code: v.code || v["Product Code"] || "",
+            brand: "HiMedia",
+            packSize: size,
+            price: parseFloat(v.rate || v.price) || 0,
+            hsnCode: v.hsn || v["HSN Code"] || "",
           });
-        }
+        });
       });
     }
 
@@ -179,7 +172,7 @@ export default function QuotationBuilder() {
         const name = size ? `${desc} (${size})` : desc;
         all.push({
           productName: name,
-          code: p.code || "",
+          code: p.code || p["Product Code"] || "",
           brand: "Bulk Chemical",
           packSize: size,
           price: parseFloat(p.price) || 0,
@@ -191,8 +184,7 @@ export default function QuotationBuilder() {
     return all;
   }, []);
 
-
-  // Close dropdown on outside clicks
+  // — Close dropdown when clicking outside —
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -203,17 +195,19 @@ export default function QuotationBuilder() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  // Search input handler
+  // — Search handler —
   const handleSearch = (q: string) => {
     setForm((f) => ({ ...f, productName: q }));
+    if (!q) return setFiltered([]);
+    const lower = q.toLowerCase();
     setFiltered(
       allProducts.filter((p) =>
-        p.productName.toLowerCase().includes(q.toLowerCase())
+        `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(lower)
       )
     );
   };
 
-  // Dropdown item selection
+  // — When user selects one result —
   const handleSelect = (p: FlatProduct) => {
     setForm({
       productName: p.productName,
@@ -228,18 +222,16 @@ export default function QuotationBuilder() {
     setFiltered([]);
   };
 
-  // Add line item
+  // — Add item to quotation —
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return;
-    const match = allProducts.find(
-      (x) => x.productName === form.productName && x.packSize === form.packSize
-    );
+    const match = allProducts.find((x) => x.code === form.productCode);
     const hsn = match?.hsnCode || "";
     setItems((prev) => [
       ...prev,
       {
         id: Date.now(),
-        productCode: match?.code || "",
+        productCode: form.productCode,
         productName: form.productName,
         brand: form.brand,
         packSize: form.packSize,
@@ -262,23 +254,15 @@ export default function QuotationBuilder() {
     });
   };
 
-  // Remove line item
-  const removeItem = (id: number) =>
-    setItems((prev) => prev.filter((i) => i.id !== id));
+  // — Remove item —
+  const removeItem = (id: number) => setItems((prev) => prev.filter((i) => i.id !== id));
 
-  // Totals
-  const subtotal = items.reduce(
-    (s, i) => s + i.price * i.quantity * (1 - i.discount / 100),
-    0
-  );
-  const gstTotal = items.reduce(
-    (s, i) =>
-      s + i.price * i.quantity * (1 - i.discount / 100) * (i.gst / 100),
-    0
-  );
+  // — Totals —
+  const subtotal = items.reduce((s, i) => s + i.price * i.quantity * (1 - i.discount / 100), 0);
+  const gstTotal = items.reduce((s, i) => s + i.price * i.quantity * (1 - i.discount / 100) * (i.gst / 100), 0);
   const total = subtotal + gstTotal + transport;
 
-  // Download DOCX
+  // — Download DOCX —
   const downloadQuotation = async () => {
     const payload = {
       client: "Client Name",
@@ -291,8 +275,7 @@ export default function QuotationBuilder() {
         price: i.price,
         discount: i.discount,
         gst: i.gst,
-        total:
-          i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
+        total: i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
       })),
       transport,
       total,
@@ -319,17 +302,12 @@ export default function QuotationBuilder() {
         </div>
 
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Add Product to Quotation</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Add Product to Quotation</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-7 gap-4 relative">
             {/* Search */}
             <div className="md:col-span-3">
               <Label>Search Product</Label>
-              <Input
-                value={form.productName}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
+              <Input value={form.productName} onChange={(e) => handleSearch(e.target.value)} />
               {filtered.length > 0 && (
                 <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
                   {filtered.slice(0, 50).map((p, idx) => (
@@ -338,95 +316,36 @@ export default function QuotationBuilder() {
                       className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
                       onClick={() => handleSelect(p)}
                     >
-                      <span className="font-medium">{p.productName}</span>
+                      {p.productName}{" "}
+                      <span className="text-xs text-muted-foreground">
+                        ({p.packSize}) – {p.code}
+                      </span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-
-            {/* Other fields */}
-            <div>
-              <Label>Brand</Label>
-              <Input
-                value={form.brand}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, brand: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Pack Size</Label>
-              <Input value={form.packSize} readOnly />
-            </div>
-            <div>
-              <Label>Qty</Label>
-              <Input
-                type="number"
-                value={form.quantity}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, quantity: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Price</Label>
-              <Input
-                type="number"
-                value={form.price}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, price: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Discount %</Label>
-              <Input
-                type="number"
-                value={form.discount}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, discount: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <Label>GST %</Label>
-              <Input
-                type="number"
-                value={form.gst}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, gst: e.target.value }))
-                }
-              />
-            </div>
-            <div className="md:col-span-7 text-right">
-              <Button onClick={handleAdd}>Add</Button>
-            </div>
+            <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm(f => ({ ...f, brand: e.target.value }))} /></div>
+            <div><Label>Pack Size</Label><Input value={form.packSize} readOnly /></div>
+            <div><Label>Qty</Label><Input type="number" value={form.quantity} onChange={(e) => setForm(f => ({ ...f, quantity: e.target.value }))} /></div>
+            <div><Label>Price</Label><Input type="number" value={form.price} onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} /></div>
+            <div><Label>Discount %</Label><Input type="number" value={form.discount} onChange={(e) => setForm(f => ({ ...f, discount: e.target.value }))} /></div>
+            <div><Label>GST %</Label><Input type="number" value={form.gst} onChange={(e) => setForm(f => ({ ...f, gst: e.target.value }))} /></div>
+            <div className="md:col-span-7 text-right"><Button onClick={handleAdd}>Add</Button></div>
           </CardContent>
         </Card>
 
-        {/* Preview Table */}
         {items.length > 0 && (
           <Card>
             <CardHeader className="flex justify-between items-center">
               <CardTitle>Quotation Preview</CardTitle>
-              <Button variant="outline" onClick={downloadQuotation}>
-                Download DOCX
-              </Button>
+              <Button variant="outline" onClick={downloadQuotation}>Download DOCX</Button>
             </CardHeader>
             <CardContent className="bg-white p-4">
               <table className="w-full text-sm border">
                 <thead>
                   <tr className="border-b">
-                    <th>Product</th>
-                    <th>Brand</th>
-                    <th>Pack Size</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Disc%</th>
-                    <th>GST%</th>
-                    <th>HSN</th>
-                    <th>Total</th>
+                    <th>Product</th><th>Brand</th><th>Pack Size</th><th>Qty</th><th>Price</th><th>Disc%</th><th>GST%</th><th>HSN</th><th>Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -439,17 +358,9 @@ export default function QuotationBuilder() {
                       <td className="text-center">₹{i.price.toFixed(2)}</td>
                       <td className="text-center">{i.discount}%</td>
                       <td className="text-center">{i.gst}%</td>
+                      <td className="text-center">{i.hsnCode || "—"}</td>
                       <td className="text-center">
-                        {i.hsnCode || "-"}
-                      </td>
-                      <td className="text-center">
-                        ₹
-                        {(
-                          i.price *
-                          i.quantity *
-                          (1 - i.discount / 100) *
-                          (1 + i.gst / 100)
-                        ).toFixed(2)}
+                        ₹{(i.price * i.quantity * (1 - i.discount/100) * (1 + i.gst/100)).toFixed(2)}
                       </td>
                     </tr>
                   ))}
