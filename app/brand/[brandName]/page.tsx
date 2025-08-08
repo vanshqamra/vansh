@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "@/app/context/search-context";
 
-// normalizeKey defined only once:
+// ← only one normalizeKey helper:
 function normalizeKey(str: string) {
   return str
     .toLowerCase()
@@ -20,13 +20,7 @@ function normalizeKey(str: string) {
     .replace(/_+/g, "_");
 }
 
-if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor"
-
-const normalizeKey = (key) =>
-  key
-    ?.toLowerCase()
-    .replace(/[^a-z0-9]/gi, "")
-    .trim()
+if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor";
 
 export default function BrandPage({ params }) {
   const brandKey = params.brandName
