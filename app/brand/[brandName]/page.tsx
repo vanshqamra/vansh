@@ -129,9 +129,14 @@ export default function BrandPage({ params }) {
 
     const row: Record<string, any> = {};
     groupMeta.specs_headers.forEach((header) => {
-      const k = normalizeKey(header);
-      row[header] = variant[k] ?? "";
-    });
+  const want = normalizeKey(header);
+  // find the one variant-entry whose rawKey normalizes to the same string
+  const match = Object.entries(variant).find(
+    ([rawKey]) => normalizeKey(rawKey) === want
+  );
+  row[header] = match?.[1] ?? "";
+});
+
 
     groupedMap[key].variants.push(row)
     })
