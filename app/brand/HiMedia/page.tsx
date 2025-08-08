@@ -8,22 +8,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 
-const flattenProducts = (data) => {
+const flattenProducts = (data: any[]) => {
   const result = []
-  for (const main in data) {
-    for (const header in data[main]) {
-      for (const sub in data[main][header]) {
-        for (const item of data[main][header][sub]) {
+
+  for (const section of data) {
+    const main_section = section.main_section
+
+    for (const header of section.header_sections || []) {
+      const header_section = header.header_section
+
+      for (const sub of header.sub_sections || []) {
+        const sub_section = sub.sub_section
+
+        for (const item of sub.products || []) {
           result.push({
             ...item,
-            main_section: main,
-            header_section: header,
-            sub_section: sub,
+            main_section,
+            header_section,
+            sub_section,
+            price: item.rate || item.price || null,
           })
         }
       }
     }
   }
+
   return result
 }
 
@@ -75,7 +84,9 @@ export default function HiMediaBrandPage() {
               <p className="text-slate-600"><strong>Code:</strong> {product.code}</p>
               <p className="text-slate-600">
                 <strong>Price:</strong>{" "}
-                {product.price ? `₹${product.price}` : <span className="italic">On Request</span>}
+                {product.price
+                  ? `₹${product.price}`
+                  : <span className="italic">On Request</span>}
               </p>
               {product.price && (
                 <Button
