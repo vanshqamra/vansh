@@ -137,19 +137,18 @@ export default function QuotationBuilder() {
     }
 
     // Whatman
-    ;(whatmanData.variants || []).forEach((v: any) => {
-  // use the variant’s own name (fall back to title only if missing)
-  const desc = (v.name || v.title || whatmanData.title || "").trim();
-  const size = v["Pack Size"] || v.size || "";
-  const name = size ? `${desc} (${size})` : desc;
-
-  all.push({
-    productName: name,
-    code:       v.Code || v.code || "",
-    brand:      "Whatman",
-    packSize:   size,
-    price:      parseFloat(v.Price) || 0,
-    hsnCode: "",
+    if (Array.isArray(whatmanData.variants)) {
+  whatmanData.variants.forEach((v: any) => {
+    const desc = (v.name || v.title || whatmanData.title || "").trim();
+    const size = v["Pack Size"] || v.size || "";
+    const name = size ? `${desc} (${size})` : desc;
+    all.push({
+      productName: name,
+      code:       v.Code  || v.code   || "",
+      brand:      "Whatman",
+      packSize:   size,
+      price:      parseFloat(v.Price?.toString() || "") || 0,
+      hsnCode: "",
         });
       });
     }
