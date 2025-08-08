@@ -26,20 +26,38 @@ function getVisibleColumns(
   variants: Record<string, any>[],
   specs_headers: string[]
 ) {
-  const showCode = variants.some(v => Boolean(v.code));
-  const showPrice = variants.some(v => typeof v.price === "number" && v.price > 0);
+  const showCode = variants.some(v => {
+    const codeKeys = ["code", "product_code", "Product Code"];
+    return codeKeys.some(k => v[k] || v[normalizeKey(k)]);
+  });
+  const showPrice = variants.some(v => {
+    const priceKeys = ["price", "Price", "price_piece", "price_/piece", "Price /Piece"];
+    return priceKeys.some(k => v[k] || v[normalizeKey(k)]);
+  });
   const visibleSpecs = specs_headers.filter(h => {
     const nk = normalizeKey(h);
-    if (nk === "product_code" || nk === "code" || nk === "price" || nk === "price_piece") return false;
+    if (
+      nk === "product_code" ||
+      nk === "code" ||
+      nk === "price" ||
+      nk === "price_piece"
+    )
+      return false;
     return variants.some(v => {
-      // Try all plausible keys for this header
       const keyOptions = [
         nk,
         h,
         nk === "code" ? "product_code" : null,
-        nk === "price" ? "price_/piece" : null
+        nk === "product_code" ? "code" : null,
+        nk === "price" ? "price_/piece" : null,
+        nk === "price_piece" ? "price" : null,
+        "price",
+        "price_piece",
+        "price_/piece"
       ].filter(Boolean);
-      return keyOptions.some(k => v[k] !== undefined && v[k] !== "" && v[k] !== "—");
+      return keyOptions.some(
+        k => v[k] !== undefined && v[k] !== "" && v[k] !== "—"
+      );
     });
   });
   return { showCode, visibleSpecs, showPrice };
@@ -56,13 +74,8 @@ const normalizedBorosil = borosilProducts.map((group) => {
     const v: Record<string, any> = {};
     for (const [k, val] of Object.entries(rawV)) {
       v[normalizeKey(k)] = val;
+      v[k] = val; // store both original and normalized keys
     }
-    const priceRaw =
-      v[normalizeKey("Price /Piece")] ??
-      v.price_piece ??
-      v.price;
-    v.price = Number(String(priceRaw).replace(/,/g, "")) || 0;
-    v.code = v.code ?? v.product_code ?? v["Product Code"] ?? "";
     return v;
   });
 
@@ -153,15 +166,22 @@ export default function BrandPage({ params }) {
       if (!map[key]) map[key] = { ...groupMeta, variants: [] };
 
       const row: Record<string, any> = {};
-      row["Code"] = variant.code || variant["product_code"] || variant["Product Code"] || "";
+      // Code
+      const codeKeys = ["code", "product_code", "Product Code"];
+      row["Code"] = codeKeys.map(k => variant[k] || variant[normalizeKey(k)]).find(Boolean) || "";
+      // For all headers
       groupMeta.specs_headers.forEach((header) => {
         const nk = normalizeKey(header);
-        // Try all plausible keys for this header
         const keyOptions = [
           nk,
           header,
           nk === "code" ? "product_code" : null,
-          nk === "price" ? "price_/piece" : null
+          nk === "product_code" ? "code" : null,
+          nk === "price" ? "price_/piece" : null,
+          nk === "price_piece" ? "price" : null,
+          "price",
+          "price_piece",
+          "price_/piece"
         ].filter(Boolean);
         let found = "—";
         for (const k of keyOptions) {
@@ -172,7 +192,9 @@ export default function BrandPage({ params }) {
         }
         row[header] = found;
       });
-      row["Price"] = variant.price;
+      // Price
+      const priceKeys = ["price", "Price", "price_piece", "price_/piece", "Price /Piece"];
+      row["Price"] = priceKeys.map(k => Number(variant[k] || variant[normalizeKey(k)])).find(v => !isNaN(v) && v > 0) || "";
 
       map[key].variants.push(row);
     });
@@ -261,7 +283,7 @@ export default function BrandPage({ params }) {
   const handleAdd = (row: any, group: any) => {
     if (!isLoaded)
       return toast({ title: "Loading...", description: "Please wait", variant: "destructive" });
-    const price = row["Price"];
+    const price = Number(row["Price"]);
     if (typeof price !== "number" || price <= 0)
       return toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" });
     const name = row["Product Name"] || group.title;
