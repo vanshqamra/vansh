@@ -142,25 +142,29 @@ export default function QuotationBuilder() {
     // 1) fallback name/title for the product
     const desc = whatmanData.title || whatmanData.name || "";
 
-    // 2) try all the keys they might be using for size
-    const size =
-      v["Pack Size"] ||
-      v["pack size"] ||
-      v["Pack\nSize"] ||
-      v.size ||
-      v["Size"] ||
-      "";
+  // 2) try every key they might’ve used for pack-size
+  const size =
+    v["Pack Size"] ??
+    v["pack size"] ??
+    v["Pack\nSize"] ??
+    v.packing ??
+    v["Packing"] ??
+    v.size ??
+    "";
 
-    // 3) build the display name just like Rankem
-    const name = size ? `${desc} (${size})` : desc;
+  // 3) full display name: “Title – 25 pk”
+  const name = [desc, size].filter(Boolean).join(" – ");
 
-    all.push({
-      productName: name,
-      code: v.Code || v.code || v["Product Code"] || "",
-      brand: "Whatman",
-      packSize: size,                            // ← now populated
-      price: parseFloat(v.Price || v.price) || 0,
-      hsnCode: "",
+  // 4) code might live under Code, code, or Product Code
+  const code = v.Code || v.code || v["Product Code"] || "";
+
+  all.push({
+    productName: name,
+    code,
+    brand: "Whatman",
+    packSize: size,
+    price: parseFloat(v.Price || v.price) || 0,
+    hsnCode: "",
         });
       });
     }
@@ -330,16 +334,27 @@ export default function QuotationBuilder() {
               <Input value={form.productName} onChange={(e) => handleSearch(e.target.value)} />
               {filtered.length > 0 && (
                 <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
-                  {filtered.slice(0, 50).map((p, idx) => (
+                  {filtered.slice(0,50).map((p, idx) => (
                     <div
                       key={idx}
                       className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelect(p)}
+                      onClick={() => {
+                        // Point 3: append code into the displayed productName
+                        setForm({
+                          productName: `${p.productName} [${p.code}]`,
+                          productCode: p.code,
+                          brand: p.brand,
+                          packSize: p.packSize,
+                          quantity: "",
+                          price: p.price.toString(),
+                          discount: "",
+                          gst: "",
+                       });
+                       setFiltered([]);
+                     }}
                     >
-                      {p.productName}{" "}
-                      <span className="text-xs text-muted-foreground">
-                        ({p.packSize}) – {p.code}
-                      </span>
+                      <span className="font-medium">{p.productName}</span>
+                     <span className="text-xs text-muted-foreground">[Size: {p.packSize}] • [Code: {p.code}]</span>
                     </div>
                   ))}
                 </div>
