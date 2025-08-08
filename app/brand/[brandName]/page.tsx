@@ -1,16 +1,24 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { notFound } from "next/navigation"
-import { useCart } from "@/app/context/CartContext"
-import { useToast } from "@/hooks/use-toast"
-import { labSupplyBrands } from "@/lib/data"
-import borosilProducts from "@/lib/borosil_products_absolute_final.json"
-import qualigensProductsRaw from "@/lib/qualigens-products.json"
-import rankemProducts from "@/lib/rankem_products.json"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useSearch } from "@/app/context/search-context"
+import { useState, useEffect } from "react";
+import { notFound } from "next/navigation";
+import { useCart } from "@/app/context/CartContext";
+import { useToast } from "@/hooks/use-toast";
+import { labSupplyBrands } from "@/lib/data";
+import borosilProducts from "@/lib/borosil_products_absolute_final.json";
+import qualigensProductsRaw from "@/lib/qualigens-products.json";
+import rankemProducts from "@/lib/rankem_products.json";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useSearch } from "@/app/context/search-context";
+
+// normalizeKey defined only once:
+function normalizeKey(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "_")
+    .replace(/_+/g, "_");
+}
 
 if (labSupplyBrands.rankem) labSupplyBrands.rankem.name = "Avantor"
 
@@ -54,107 +62,84 @@ export default function BrandPage({ params }) {
   })()
 
   if (brandKey === "borosil") {
-    const flat = []
-    borosilProducts.forEach((group, idx) => {
-      const variants = group.variants || []
-      const specs =
-        Array.isArray(group.specs_headers) && group.specs_headers.length > 0
-          ? group.specs_headers
-          : Object.keys(variants[0] || {})
+  // 1) flatten all variants with normalized keys
+  const flat: Array<{ variant: Record<string, any>; groupMeta: any }> = [];
 
-      const resolvedTitle =
-        group.product?.trim() ||
-        group.title?.trim() ||
-        group.category?.trim() ||
-        group.description?.split("\n")[0]?.trim() ||
-        `Group ${idx + 1}`
+  borosilProducts.forEach((group, idx) => {
+    const variants = group.variants || [];
+    // if specs_headers is missing, fall back to raw keys of the first variant
+    const specs =
+      Array.isArray(group.specs_headers) && group.specs_headers.length > 0
+        ? group.specs_headers
+        : Object.keys(variants[0] || {});
 
-      const resolvedCategory = group.category?.trim() || group.product?.trim() || resolvedTitle
+    // resolve title/category exactly as before
+    const resolvedTitle =
+      group.product?.trim() ||
+      group.title?.trim() ||
+      group.category?.trim() ||
+      group.description?.split("\n")[0]?.trim() ||
+      `Group ${idx + 1}`;
+    const resolvedCategory =
+      group.category?.trim() || group.product?.trim() || resolvedTitle;
 
-      const baseMeta = {
-        ...group,
-        title: group.title?.toLowerCase().startsWith("untitled group") ? resolvedTitle : group.title || resolvedTitle,
-        category: group.category?.toLowerCase().startsWith("untitled group")
+    const baseMeta = {
+      ...group,
+      title:
+        group.title?.toLowerCase().startsWith("untitled group")
+          ? resolvedTitle
+          : group.title || resolvedTitle,
+      category:
+        group.category?.toLowerCase().startsWith("untitled group")
           ? resolvedCategory
           : group.category || resolvedCategory,
-        specs_headers: specs,
-        description: group.description || "",
-      }
+      specs_headers: specs,
+      description: group.description || "",
+    };
 
-      variants.forEach((v) => flat.push({ variant: v, groupMeta: baseMeta }))
-    })
+    variants.forEach((rawV) => {
+      // normalize every key on each variant
+      const variant: Record<string, any> = {};
+      Object.entries(rawV).forEach(([k, val]) => {
+        variant[normalizeKey(k)] = val;
+      });
+      flat.push({ variant, groupMeta: baseMeta });
+    });
+  });
 
-    const filtered = flat.filter(({ variant, groupMeta }) => {
-      const query = searchQuery.toLowerCase()
-      const variantMatch = Object.values(variant).some((val) =>
-        String(val).toLowerCase().includes(query),
-      )
-      const metaMatch =
-        groupMeta.title?.toLowerCase().includes(query) ||
-        groupMeta.category?.toLowerCase().includes(query) ||
-        groupMeta.description?.toLowerCase().includes(query)
-      return variantMatch || metaMatch
-    })
+  // 2) filter by search
+  const filtered = flat.filter(({ variant, groupMeta }) => {
+    const q = searchQuery.toLowerCase();
+    const variantMatch = Object.values(variant).some((v) =>
+      String(v).toLowerCase().includes(q),
+    );
+    const metaMatch =
+      groupMeta.title.toLowerCase().includes(q) ||
+      groupMeta.category.toLowerCase().includes(q) ||
+      groupMeta.description.toLowerCase().includes(q);
+    return variantMatch || metaMatch;
+  });
 
-    const paginated = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
+  // 3) paginate
+  const paginated = filtered.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage,
+  );
 
-    const groupedMap = {}
-    paginated.forEach(({ variant, groupMeta }) => {
-      if (!groupMeta.specs_headers?.length) return
+  // 4) regroup into tables, looking up each header via normalized key
+  const groupedMap: Record<string, any> = {};
+  paginated.forEach(({ variant, groupMeta }) => {
+    if (!groupMeta.specs_headers?.length) return;
+    const key = `${groupMeta.category}-${groupMeta.title}`;
+    if (!groupedMap[key]) groupedMap[key] = { ...groupMeta, variants: [] };
 
-      const key = `${groupMeta.category}-${groupMeta.title}`
-      if (!groupedMap[key]) groupedMap[key] = { ...groupMeta, variants: [] }
+    const row: Record<string, any> = {};
+    groupMeta.specs_headers.forEach((header) => {
+      const k = normalizeKey(header);
+      row[header] = variant[k] ?? "";
+    });
 
-      const row = {}
-      groupMeta.specs_headers.forEach((header) => {
-        const normKey = header.toLowerCase()
-        row[header] = variant[header] || variant[normKey] || ""
-      })
-
-      groupedMap[key].variants.push(row)
-    })
-
-    grouped = Object.values(groupedMap).filter((g) => g.variants.length > 0)
-  } else if (brandKey === "rankem") {
-    const flat = []
-    rankemProducts.forEach((group, idx) => {
-      const cleanTitle = group.title?.startsWith("Table")
-        ? group.category || `Group-${idx}`
-        : group.title || group.category || `Group-${idx}`
-      const groupMeta = {
-        title: cleanTitle,
-        category: group.category || cleanTitle,
-        description: group.description || "",
-        specs_headers: group.specs_headers || [],
-      }
-      ;(group.variants || []).forEach((variant) => flat.push({ variant, groupMeta }))
-    })
-
-    const filtered = flat.filter(({ variant, groupMeta }) => {
-      const query = searchQuery.toLowerCase()
-      const variantMatch = Object.values(variant).some((val) =>
-        String(val).toLowerCase().includes(query),
-      )
-      const metaMatch =
-        groupMeta.title?.toLowerCase().includes(query) ||
-        groupMeta.category?.toLowerCase().includes(query) ||
-        groupMeta.description?.toLowerCase().includes(query)
-      return variantMatch || metaMatch
-    })
-
-    const paginated = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
-
-    const groupedMap = {}
-    paginated.forEach(({ variant, groupMeta }) => {
-      const key = `${groupMeta.category}-${groupMeta.title}`
-      if (!groupedMap[key]) groupedMap[key] = { ...groupMeta, variants: [] }
-
-      const row = {}
-      groupMeta.specs_headers.forEach((header) => {
-        const normKey = header.toLowerCase()
-        row[header] = variant[header] || variant[normKey] || ""
-      })
-      groupedMap[key].variants.push(row)
+    groupedMap[key].variants.push(row)
     })
 
     grouped = Object.values(groupedMap)
