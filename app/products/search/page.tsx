@@ -17,7 +17,7 @@ import { commercialChemicals } from "@/lib/data"
 import rankemProducts from "@/lib/rankem_products.json"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import whatmanProducts from "@/lib/whatman_products.json"
-import himediaData from "@/lib/himedia_products_grouped.json"
+import himediaData from "@/lib/himedia_products_grouped"
 
 function SearchResults() {
   const searchParams = useSearchParams()
@@ -166,12 +166,35 @@ function SearchResults() {
         }
       })
 
+    const himediaResults = himediaData.flatMap((section: any) =>
+      section.header_sections?.flatMap((header: any) =>
+        header.sub_sections?.flatMap((sub: any) =>
+          sub.products?.filter((product: any) => matchesSearchQuery(product, query)).map((product: any) => ({
+            ...product,
+            name: product.name || "HiMedia Product",
+            code: product.code || "—",
+            price: product.rate || "—",
+            source: "himedia",
+            category: section.main_section,
+            title: header.header_section,
+            description: sub.sub_section,
+            specs: [
+              `Packing: ${product.packing || "—"}`,
+              `HSN: ${product.hsn || "—"}`,
+              `GST: ${product.gst || "—"}%`
+            ]
+          }))
+        )
+      )
+    )
+
     const combinedResults = [
       ...qualigensResults,
       ...commercialResults,
       ...rankemResults,
       ...borosilResults,
       ...whatmanResults,
+      ...himediaResults,
     ]
 
     setSearchResults(combinedResults)
