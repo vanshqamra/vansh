@@ -26,30 +26,20 @@ function getVisibleColumns(
   variants: Record<string, any>[],
   specs_headers: string[]
 ) {
-  // show Code if any variant has code
   const showCode = variants.some(v => Boolean(v.code));
-  // show Price if any variant price > 0
   const showPrice = variants.some(v => typeof v.price === "number" && v.price > 0);
-  // filter out code and price headers from specs, then show only those with data
-  const visibleSpecs = specs_headers
-    .filter(h => {
-      const nk = normalizeKey(h);
-      // exclude any header that's the product code or price field
-      if (nk === "product_code" || nk === "code" || nk === "price" || nk === "price_piece") return false;
-      return variants.some(v => {
-        const val = v[normalizeKey(h)];
-        return val !== undefined && val !== "" && val !== "—";
-      });
+  const visibleSpecs = specs_headers.filter(h => {
+    const nk = normalizeKey(h);
+    if (nk === "product_code" || nk === "code" || nk === "price" || nk === "price_piece") return false;
+    return variants.some(v => {
+      // Check both normalized and raw keys for this header
+      const val = v[nk] ?? v[h];
+      return val !== undefined && val !== "" && val !== "—";
     });
+  });
   return { showCode, visibleSpecs, showPrice };
 }
 
-// ——— pre-process Borosil: preserve original headers, normalize every variant ———
-const normalizedBorosil = borosilProducts.map((group) => {
-  const specs_headers =
-    Array.isArray(group.specs_headers) && group.specs_headers.length > 0
-      ? group.specs_headers.map(h => h.trim())
-      : Object.keys(group.variants?.[0] || {});
 
   const variants = (group.variants || []).map((rawV) => {
     const v: Record<string, any> = {};
@@ -61,7 +51,7 @@ const normalizedBorosil = borosilProducts.map((group) => {
       v.price_piece ??
       v.price;
     v.price = Number(String(priceRaw).replace(/,/g, "")) || 0;
-    v.code = v.code ?? v.product_code ?? v["Product Code"] ?? "";
+    v.code = v.code ?? v.product_code ?? "";
     return v;
   });
 
@@ -152,12 +142,13 @@ export default function BrandPage({ params }) {
       if (!map[key]) map[key] = { ...groupMeta, variants: [] };
 
       const row: Record<string, any> = {};
-      row["Code"] = variant.code;
-      groupMeta.specs_headers.forEach((header) => {
-        const nk = normalizeKey(header);
-        row[header] = variant[nk] ?? "—";
-      });
-      row["Price"] = variant.price;
+row["Code"] = variant.code || variant["product_code"] || variant["Product Code"] || "";
+groupMeta.specs_headers.forEach((header) => {
+  const nk = normalizeKey(header);
+  // Check both normalized and raw keys for header
+  row[header] = variant[nk] ?? variant[header] ?? "—";
+});
+row["Price"] = variant.price;
 
       map[key].variants.push(row);
     });
@@ -306,7 +297,8 @@ export default function BrandPage({ params }) {
                   <thead className="bg-gray-100 text-xs uppercase font-semibold">
                     <tr>
                       {showCode && <th className="px-3 py-2">Code</th>}
-                      {visibleSpecs.map((h, i) => <th key={i} className="px-3 py-2">{h}</th>)}
+                      {visibleSpecs.map((h, i) => <th key={i} className="px-3 py-2">{h}</th>)
+                      }
                       {showPrice && <th className="px-3 py-2">Price</th>}
                       <th className="px-3 py-2"></th>
                     </tr>
