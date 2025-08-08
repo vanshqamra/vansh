@@ -12,7 +12,7 @@ export async function generateQuoteDocx(data) {
     "app",
     "admin",
     "quotation",
-    "quote template.docx",
+    "Quotetemplate.docx",
   );
   const content = fs.readFileSync(filePath, "binary");
 
