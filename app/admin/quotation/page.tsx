@@ -138,33 +138,20 @@ export default function QuotationBuilder() {
 
     // Whatman
     if (Array.isArray(whatmanData.variants)) {
-  whatmanData.variants.forEach((v: any) => {
-    // 1) fallback name/title for the product
-    const desc = whatmanData.title || whatmanData.name || "";
-
-  // 2) try every key they might’ve used for pack-size
-  const size =
-    v["Pack Size"] ??
-    v["pack size"] ??
-    v["Pack\nSize"] ??
-    v.packing ??
-    v["Packing"] ??
-    v.size ??
-    "";
-
-  // 3) full display name: “Title – 25 pk”
-  const name = [desc, size].filter(Boolean).join(" – ");
-
-  // 4) code might live under Code, code, or Product Code
-  const code = v.Code || v.code || v["Product Code"] || "";
-
-  all.push({
-    productName: name,
-    code,
-    brand: "Whatman",
-    packSize: size,
-    price: parseFloat(v.Price || v.price) || 0,
-    hsnCode: "",
+  whatmanData.variants || []).forEach((v: any) => {
+-  const desc = whatmanData.title || "";
++;(whatmanData.variants || []).forEach((v: any) => {
++  // use the variant’s own name, falling back to the group title only if missing
++  const desc = (v.name || v.title || whatmanData.title || "").trim();
+   const size = v["Pack Size"] || v.size || "";
+   const name = size ? `${desc} (${size})` : desc;
+   all.push({
+     productName: name,
+     code: v.Code || v.code || "",
+     brand: "Whatman",
+     packSize: size,
+     price: parseFloat(v.Price) || 0,
+     hsnCode: "",
         });
       });
     }
