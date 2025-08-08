@@ -278,6 +278,7 @@ const downloadQuotation = async () => {
     description: i.productName,
     brand:       i.brand,     // ← brand added
     qty:         i.quantity,
+    packSize:    i.packSize,
     price:       i.price,     // ← price added
     discount:    i.discount,
     gst:         i.gst,
