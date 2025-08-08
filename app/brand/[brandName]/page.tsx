@@ -32,9 +32,14 @@ function getVisibleColumns(
     const nk = normalizeKey(h);
     if (nk === "product_code" || nk === "code" || nk === "price" || nk === "price_piece") return false;
     return variants.some(v => {
-      // Check both normalized and raw keys for this header
-      const val = v[nk] ?? v[h];
-      return val !== undefined && val !== "" && val !== "—";
+      // Try all plausible keys for this header
+      const keyOptions = [
+        nk,
+        h,
+        nk === "code" ? "product_code" : null,
+        nk === "price" ? "price_/piece" : null
+      ].filter(Boolean);
+      return keyOptions.some(k => v[k] !== undefined && v[k] !== "" && v[k] !== "—");
     });
   });
   return { showCode, visibleSpecs, showPrice };
@@ -151,8 +156,21 @@ export default function BrandPage({ params }) {
       row["Code"] = variant.code || variant["product_code"] || variant["Product Code"] || "";
       groupMeta.specs_headers.forEach((header) => {
         const nk = normalizeKey(header);
-        // Check both normalized and raw keys for header
-        row[header] = variant[nk] ?? variant[header] ?? "—";
+        // Try all plausible keys for this header
+        const keyOptions = [
+          nk,
+          header,
+          nk === "code" ? "product_code" : null,
+          nk === "price" ? "price_/piece" : null
+        ].filter(Boolean);
+        let found = "—";
+        for (const k of keyOptions) {
+          if (variant[k] !== undefined && variant[k] !== "") {
+            found = variant[k];
+            break;
+          }
+        }
+        row[header] = found;
       });
       row["Price"] = variant.price;
 
