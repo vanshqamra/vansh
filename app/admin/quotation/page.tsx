@@ -137,18 +137,30 @@ export default function QuotationBuilder() {
     }
 
     // Whatman
-    if (whatmanData && Array.isArray(whatmanData.variants)) {
-      whatmanData.variants.forEach((v: any) => {
-        const desc = whatmanData.title || "";
-        const size = v["Pack Size"] || v.size || "";
-        const name = size ? `${desc} (${size})` : desc;
-        all.push({
-          productName: name,
-          code: v.Code || v.code || "",
-          brand: "Whatman",
-          packSize: size,
-          price: parseFloat(v.Price) || 0,
-          hsnCode: "",
+    if (Array.isArray(whatmanData.variants)) {
+  whatmanData.variants.forEach((v: any) => {
+    // 1) fallback name/title for the product
+    const desc = whatmanData.title || whatmanData.name || "";
+
+    // 2) try all the keys they might be using for size
+    const size =
+      v["Pack Size"] ||
+      v["pack size"] ||
+      v["Pack\nSize"] ||
+      v.size ||
+      v["Size"] ||
+      "";
+
+    // 3) build the display name just like Rankem
+    const name = size ? `${desc} (${size})` : desc;
+
+    all.push({
+      productName: name,
+      code: v.Code || v.code || v["Product Code"] || "",
+      brand: "Whatman",
+      packSize: size,                            // ← now populated
+      price: parseFloat(v.Price || v.price) || 0,
+      hsnCode: "",
         });
       });
     }
