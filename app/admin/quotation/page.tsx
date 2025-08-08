@@ -271,23 +271,32 @@ export default function QuotationBuilder() {
   const total = subtotal + gstTotal + transport;
 
   // — Download DOCX —
-  const downloadQuotation = async () => {
-    const payload = {
-      client: "Client Name",
-      date: new Date().toLocaleDateString(),
-      products: items.map((i, idx) => ({
-        sr: idx + 1,
-        description: i.productName,
-        hsn: i.hsnCode || "",
-        qty: i.quantity,
-        price: i.price,
-        discount: i.discount,
-        gst: i.gst,
-        total: i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
-      })),
-      transport,
-      total,
-    };
+const downloadQuotation = async () => {
+  // 1) Build the line‐items array, including brand & price
+  const products = items.map((i, idx) => ({
+    sr:          idx + 1,
+    description: i.productName,
+    brand:       i.brand,     // ← brand added
+    qty:         i.quantity,
+    price:       i.price,     // ← price added
+    discount:    i.discount,
+    gst:         i.gst,
+    hsn:         i.hsnCode || "",
+    total:       i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
+  }));
+
+  // 2) Compute grand total (sum of line‐totals + transport)
+  const sumOfLines = products.reduce((sum, p) => sum + p.total, 0);
+  const grandTotal  = sumOfLines + transport;
+
+  // 3) Send payload with products & grandTotal
+  const payload = {
+    client:     "Client Name",
+    date:       new Date().toLocaleDateString(),
+    products,                 // ← your array of items
+    transport,                // ← transport charge
+    grandTotal,               // ← the new grand total field
+  };
     const res = await fetch("/api/generate-quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
