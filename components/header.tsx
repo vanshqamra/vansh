@@ -55,22 +55,23 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div className="container mx-auto px-3 sm:px-4">
+        {/* Top bar — compact on mobile, normal on md+ */}
+        <div className="flex h-12 md:h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="relative">
-              <FlaskConical className="h-8 w-8 text-blue-600" />
-              <div className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-pulse" />
+              <FlaskConical className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
+              <div className="absolute -top-1 -right-1 h-2.5 w-2.5 md:h-3 md:w-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-pulse" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+            <span className="text-base md:text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent leading-none">
               Chemical Corporation
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center gap-5">
             <Link href="/" className="text-sm font-medium hover:text-blue-600 transition-colors">
               Home
             </Link>
@@ -159,13 +160,12 @@ export function Header() {
             <Link href="/contact" className="text-sm font-medium hover:text-blue-600 transition-colors">
               Contact
             </Link>
-
           </nav>
 
           {/* Right side actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* Desktop Search Input */}
-            <form onSubmit={handleHeaderSearch} className="hidden md:flex items-center space-x-2">
+            <form onSubmit={handleHeaderSearch} className="hidden md:flex items-center gap-2">
               <Input
                 type="text"
                 placeholder="Search..."
@@ -173,7 +173,7 @@ export function Header() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-8 w-48 text-sm"
               />
-              <Button type="submit" size="icon" variant="ghost">
+              <Button type="submit" size="icon" variant="ghost" className="h-8 w-8">
                 <Search className="h-4 w-4" />
               </Button>
             </form>
@@ -183,7 +183,7 @@ export function Header() {
               <Link href="/cart">
                 <ShoppingCart className="h-4 w-4" />
                 {totalItems > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-blue-600">
+                  <Badge className="absolute -top-2 -right-2 h-5 min-w-[1.25rem] px-1 rounded-full p-0 flex items-center justify-center text-[10px] bg-blue-600">
                     {totalItems}
                   </Badge>
                 )}
@@ -194,7 +194,7 @@ export function Header() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     <span className="hidden sm:inline-block">{user.email?.split("@")[0]}</span>
                     <ChevronDown className="h-3 w-3" />
@@ -238,7 +238,7 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/login">Login</Link>
                 </Button>
@@ -251,7 +251,7 @@ export function Header() {
             {/* Mobile Menu Button */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="md:hidden">
+                <Button variant="ghost" size="sm" className="md:hidden h-8 w-8 p-0">
                   <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
@@ -260,6 +260,28 @@ export function Header() {
               </SheetContent>
             </Sheet>
           </div>
+        </div>
+
+        {/* Slim mobile search row (separate from the top to keep header short) */}
+        <div className="md:hidden pb-2">
+          <form onSubmit={handleHeaderSearch} className="relative">
+            <Input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-9 w-full pl-9 text-sm"
+            />
+            <Button
+              type="submit"
+              size="icon"
+              variant="ghost"
+              className="absolute left-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 text-gray-600"
+              aria-label="Search"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </form>
         </div>
       </div>
     </header>
