@@ -67,7 +67,7 @@ export default function PastQuotationsPage() {
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  onClick={() => router.push(`/admin/quotations?quoteId=${row.id}`)}
+                  onClick={() => router.push(`/admin/quotation?quoteId=${row.id}`)}
                 >
                   Open in Builder
                 </Button>
