@@ -22,19 +22,24 @@ export default function PastQuotationsPage() {
   const [rows, setRows] = useState<QuotationRow[]>([])
   const [loading, setLoading] = useState(false)
   const [statusMsg, setStatusMsg] = useState<string>("")
+  const [raw, setRaw] = useState<any>(null) // debug: raw API payload
   const router = useRouter()
 
   async function load() {
     setLoading(true)
     setStatusMsg("Loading…")
     try {
-      const res = await fetch(`/api/quotations${q ? `?q=${encodeURIComponent(q)}` : ""}`)
+      const res = await fetch(`/api/quotations${q ? `?q=${encodeURIComponent(q)}` : ""}`, {
+        cache: "no-store", // important: bypass cache
+      })
       const json = await res.json()
+      setRaw(json)
       if (!res.ok) {
         setStatusMsg(`API error: ${json?.error || res.status}`)
         setRows([])
       } else {
-        setStatusMsg(`Found ${Array.isArray(json) ? json.length : 0} quotations`)
+        const count = Array.isArray(json) ? json.length : 0
+        setStatusMsg(`Found ${count} quotation${count === 1 ? "" : "s"}`)
         setRows(json || [])
       }
     } catch (e: any) {
@@ -45,7 +50,10 @@ export default function PastQuotationsPage() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function createTestQuotation() {
     setStatusMsg("Creating test quotation…")
@@ -83,7 +91,7 @@ export default function PastQuotationsPage() {
         setStatusMsg(`Create failed: ${json?.error || res.status}`)
       } else {
         setStatusMsg("Created test quotation ✓")
-        await load()
+        await load() // refresh list
       }
     } catch (e: any) {
       setStatusMsg(`Create failed (network): ${e?.message || e}`)
@@ -108,10 +116,22 @@ export default function PastQuotationsPage() {
         <span className="text-sm text-muted-foreground">{statusMsg}</span>
       </div>
 
+      {raw && (
+        <details className="text-xs text-muted-foreground">
+          <summary>Show raw API response</summary>
+          <pre className="whitespace-pre-wrap break-all">{JSON.stringify(raw, null, 2)}</pre>
+        </details>
+      )}
+
       <Card>
         <CardContent className="p-0">
           <div className="grid grid-cols-6 gap-2 px-4 py-3 font-medium border-b">
-            <div>Date</div><div>Client</div><div>Title</div><div>Status</div><div>Total</div><div>Actions</div>
+            <div>Date</div>
+            <div>Client</div>
+            <div>Title</div>
+            <div>Status</div>
+            <div>Total</div>
+            <div>Actions</div>
           </div>
 
           {rows.map((row) => (
@@ -120,7 +140,9 @@ export default function PastQuotationsPage() {
               <div>{row.client_name || "—"}</div>
               <div className="truncate">{row.title || "—"}</div>
               <div>{row.status || "—"}</div>
-              <div>{row.totals_json?.total ?? "—"} {row.currency || ""}</div>
+              <div>
+                {row.totals_json?.total ?? "—"} {row.currency || ""}
+              </div>
               <div className="flex gap-2">
                 <Button
                   size="sm"
