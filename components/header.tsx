@@ -28,6 +28,7 @@ import {
   FlaskConical,
   ClipboardList,
   FileText,
+  History, // ← added
 } from "lucide-react"
 import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
@@ -223,9 +224,15 @@ export function Header() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/admin/quotation" className="flex items-center">
+                        <Link href="/admin/quotations" className="flex items-center">
                           <FileText className="mr-2 h-4 w-4" />
                           Quotation Builder
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/past-quotations" className="flex items-center">
+                          <History className="mr-2 h-4 w-4" />
+                          Past Quotations
                         </Link>
                       </DropdownMenuItem>
                     </>
