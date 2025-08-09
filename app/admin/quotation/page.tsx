@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { AccessDenied } from "@/components/access-denied";
 import { Header } from "@/components/header";
+import { useSearchParams } from "next/navigation";
 
 // Brand data imports
 import borosilProducts from "@/lib/borosil_products_absolute_final.json";
@@ -64,6 +65,36 @@ export default function QuotationBuilder() {
   });
   const [filtered, setFiltered] = useState<FlatProduct[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  // — Load from Past Quotation —
+const sp = useSearchParams();
+const quoteId = sp.get("quoteId");
+
+useEffect(() => {
+  if (!quoteId) return;
+  (async () => {
+    const res = await fetch(`/api/quotations/${quoteId}`);
+    if (!res.ok) return;
+    const q = await res.json();
+
+    const saved = q.data_json || {};
+    const restoredItems = (saved.items || []).map((i: any, idx: number) => ({
+      id: Date.now() + idx,
+      productCode: i.productCode || "",
+      productName: i.productName || "",
+      brand: i.brand || "",
+      packSize: i.packSize || "",
+      quantity: Number(i.quantity) || 0,
+      price: Number(i.price) || 0,
+      discount: Number(i.discount) || 0,
+      gst: Number(i.gst) || 0,
+      hsnCode: i.hsnCode || "",
+    }));
+
+    setItems(restoredItems);
+    setTransport(Number(saved.transport || 0));
+  })();
+}, [quoteId]);
+
 
   // — Flatten all catalogs into one array once —
   const allProducts = useMemo<FlatProduct[]>(() => {
@@ -298,6 +329,34 @@ const downloadQuotation = async () => {
     transport,                // ← transport charge
     grandTotal,               // ← the new grand total field
   };
+  // — Save a JSON twin to the portal —
+try {
+  await fetch("/api/quotations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: `Quotation - ${new Date().toLocaleDateString()}`,
+      clientName: "Client Name",          // replace later if you add client fields
+      clientEmail: null,
+      status: "DRAFT",
+      currency: "INR",
+      totalsJson: {
+        subtotal,
+        gstTotal,
+        transport,
+        total,                             // (= subtotal + gstTotal + transport)
+      },
+      dataJson: {
+        items,                             // your current items state
+        transport,
+      },
+      // docxUrl: null                     // optional if you later upload the file to storage
+    }),
+  });
+} catch (e) {
+  console.error("Save quotation failed", e);
+}
+
     const res = await fetch("/api/generate-quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
