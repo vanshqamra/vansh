@@ -224,7 +224,7 @@ export function Header() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/admin/quotations" className="flex items-center">
+                        <Link href="/admin/quotation" className="flex items-center">
                           <FileText className="mr-2 h-4 w-4" />
                           Quotation Builder
                         </Link>
