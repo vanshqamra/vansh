@@ -21,49 +21,106 @@ export default function PastQuotationsPage() {
   const [q, setQ] = useState("")
   const [rows, setRows] = useState<QuotationRow[]>([])
   const [loading, setLoading] = useState(false)
+  const [statusMsg, setStatusMsg] = useState<string>("")
   const router = useRouter()
 
   async function load() {
     setLoading(true)
-    const res = await fetch(`/api/quotations${q ? `?q=${encodeURIComponent(q)}` : ""}`)
-    const json = await res.json()
-    setRows(json || [])
-    setLoading(false)
+    setStatusMsg("Loading…")
+    try {
+      const res = await fetch(`/api/quotations${q ? `?q=${encodeURIComponent(q)}` : ""}`)
+      const json = await res.json()
+      if (!res.ok) {
+        setStatusMsg(`API error: ${json?.error || res.status}`)
+        setRows([])
+      } else {
+        setStatusMsg(`Found ${Array.isArray(json) ? json.length : 0} quotations`)
+        setRows(json || [])
+      }
+    } catch (e: any) {
+      setStatusMsg(`Network error: ${e?.message || e}`)
+      setRows([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [])
 
+  async function createTestQuotation() {
+    setStatusMsg("Creating test quotation…")
+    try {
+      const res = await fetch("/api/quotations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `Test Quote ${new Date().toLocaleString()}`,
+          clientName: "Test Client",
+          clientEmail: null,
+          status: "DRAFT",
+          currency: "INR",
+          totalsJson: { subtotal: 100, gstTotal: 18, transport: 0, total: 118 },
+          dataJson: {
+            items: [
+              {
+                productCode: "TST-001",
+                productName: "Test Product",
+                brand: "Demo",
+                packSize: "1 pc",
+                quantity: 1,
+                price: 100,
+                discount: 0,
+                gst: 18,
+                hsnCode: "0000",
+              },
+            ],
+            transport: 0,
+          },
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setStatusMsg(`Create failed: ${json?.error || res.status}`)
+      } else {
+        setStatusMsg("Created test quotation ✓")
+        await load()
+      }
+    } catch (e: any) {
+      setStatusMsg(`Create failed (network): ${e?.message || e}`)
+    }
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-4 flex gap-2">
+    <div className="container mx-auto px-4 py-8 space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
         <Input
           placeholder="Search client/title/status"
           value={q}
           onChange={(e) => setQ(e.target.value)}
+          className="w-64"
         />
         <Button onClick={load} disabled={loading}>
-          {loading ? "Loading..." : "Search"}
+          {loading ? "Loading…" : "Search"}
         </Button>
+        <Button variant="secondary" onClick={createTestQuotation}>
+          Create test quotation
+        </Button>
+        <span className="text-sm text-muted-foreground">{statusMsg}</span>
       </div>
 
       <Card>
         <CardContent className="p-0">
           <div className="grid grid-cols-6 gap-2 px-4 py-3 font-medium border-b">
-            <div>Date</div>
-            <div>Client</div>
-            <div>Title</div>
-            <div>Status</div>
-            <div>Total</div>
-            <div>Actions</div>
+            <div>Date</div><div>Client</div><div>Title</div><div>Status</div><div>Total</div><div>Actions</div>
           </div>
 
           {rows.map((row) => (
             <div key={row.id} className="grid grid-cols-6 gap-2 px-4 py-3 border-b items-center">
-              <div>{new Date(row.created_at).toLocaleDateString()}</div>
-              <div>{row.client_name}</div>
-              <div className="truncate">{row.title}</div>
-              <div>{row.status}</div>
-              <div>{row.totals_json?.total ?? "-"} {row.currency}</div>
+              <div>{row.created_at ? new Date(row.created_at).toLocaleDateString() : "—"}</div>
+              <div>{row.client_name || "—"}</div>
+              <div className="truncate">{row.title || "—"}</div>
+              <div>{row.status || "—"}</div>
+              <div>{row.totals_json?.total ?? "—"} {row.currency || ""}</div>
               <div className="flex gap-2">
                 <Button
                   size="sm"
