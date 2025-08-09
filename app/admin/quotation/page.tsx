@@ -43,7 +43,6 @@ function QuotationBuilderInner() {
   // — Auth —
   const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true })
   useEffect(() => {
-    // keep your original dynamic import approach
     import("@/app/context/auth-context").then((mod) => {
       const { role, loading } = mod.useAuth()
       setAuth({ role, loading })
@@ -52,6 +51,9 @@ function QuotationBuilderInner() {
   if (!auth.loading && auth.role !== "admin") return <AccessDenied />
 
   // — State & Refs —
+  const [clientName, setClientName] = useState("")     // NEW
+  const [clientEmail, setClientEmail] = useState("")   // NEW
+
   const [items, setItems] = useState<QuotationItem[]>([])
   const [transport, setTransport] = useState(0)
   const [form, setForm] = useState({
@@ -70,15 +72,14 @@ function QuotationBuilderInner() {
   // — Load from Past Quotation —
   const sp = useSearchParams()
   const quoteId = sp.get("quoteId")
-
   useEffect(() => {
     if (!quoteId) return
     ;(async () => {
       const res = await fetch(`/api/quotations/${quoteId}`)
       if (!res.ok) return
       const q = await res.json()
-
       const saved = q.data_json || {}
+
       const restoredItems = (saved.items || []).map((i: any, idx: number) => ({
         id: Date.now() + idx,
         productCode: i.productCode || "",
@@ -94,6 +95,9 @@ function QuotationBuilderInner() {
 
       setItems(restoredItems)
       setTransport(Number(saved.transport || 0))
+      // optional if you save these later:
+      if (q.client_name) setClientName(q.client_name)
+      if (q.client_email) setClientEmail(q.client_email)
     })()
   }, [quoteId])
 
@@ -129,12 +133,7 @@ function QuotationBuilderInner() {
             typeof v.Description === "string" && v.Description.trim()
               ? v.Description.trim()
               : g.title || g.product || ""
-          const size =
-            v["Pack Size"] ||
-            v["Pack\nSize"] ||
-            v.Packing ||
-            v.size ||
-            ""
+          const size = v["Pack Size"] || v["Pack\nSize"] || v.Packing || v.size || ""
           all.push({
             productName: desc,
             code: v["Cat No"] || v["Product Code"] || "",
@@ -301,9 +300,9 @@ function QuotationBuilderInner() {
   )
   const total = subtotal + gstTotal + transport
 
-  // — Download DOCX —
+  // — Download DOCX (and save JSON to portal) —
   const downloadQuotation = async () => {
-    // 1) Build the line‐items array, including brand & price
+    // 1) Build line items
     const products = items.map((i, idx) => ({
       sr: idx + 1,
       description: i.productName,
@@ -317,41 +316,33 @@ function QuotationBuilderInner() {
       total: i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
     }))
 
-    // 2) Compute grand total (sum of line‐totals + transport)
+    // 2) Compute grand total (sum of line totals + transport)
     const sumOfLines = products.reduce((sum, p) => sum + p.total, 0)
     const grandTotal = sumOfLines + transport
 
     // 3) DOCX payload
     const payload = {
-      client: "Client Name",
+      client: clientName || "Client Name",
       date: new Date().toLocaleDateString(),
       products,
       transport,
       grandTotal,
     }
 
-    // — Save a JSON twin to the portal —
+    // 3.5) SAVE to Supabase (so Past Quotations can render)
     try {
       const saveRes = await fetch("/api/quotations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: `Quotation - ${new Date().toLocaleDateString()}`,
-          clientName: "Client Name", // replace later if you add a client field
-          clientEmail: null,
+          title: clientName ? `Quotation - ${clientName}` : `Quotation - ${new Date().toLocaleDateString()}`,
+          clientName: clientName || "Client Name",
+          clientEmail: clientEmail || null,
           status: "DRAFT",
           currency: "INR",
-          totalsJson: {
-            subtotal,
-            gstTotal,
-            transport,
-            total, // using total = subtotal + gstTotal + transport
-          },
-          dataJson: {
-            items,
-            transport,
-          },
-          // docxUrl: null, // set if you upload file to storage later
+          totalsJson: { subtotal, gstTotal, transport, total }, // total = subtotal + gst + transport
+          dataJson: { items, transport },
+          // docxUrl: null, // optional if you upload the file to storage later
         }),
       })
       if (!saveRes.ok) {
@@ -384,10 +375,24 @@ function QuotationBuilderInner() {
           <p className="text-gray-500">Quotation Builder</p>
         </div>
 
+        {/* Client Details */}
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Add Product to Quotation</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Client Details</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label>Client Name</Label>
+              <Input value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Acme Labs" />
+            </div>
+            <div>
+              <Label>Client Email</Label>
+              <Input type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="buyer@acme.com" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Add Product */}
+        <Card className="mb-6">
+          <CardHeader><CardTitle>Add Product to Quotation</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-7 gap-4 relative">
             {/* Search */}
             <div className="md:col-span-3">
@@ -425,10 +430,7 @@ function QuotationBuilderInner() {
 
             <div>
               <Label>Brand</Label>
-              <Input
-                value={form.brand}
-                onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))}
-              />
+              <Input value={form.brand} onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))} />
             </div>
             <div>
               <Label>Pack Size</Label>
@@ -436,35 +438,19 @@ function QuotationBuilderInner() {
             </div>
             <div>
               <Label>Qty</Label>
-              <Input
-                type="number"
-                value={form.quantity}
-                onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-              />
+              <Input type="number" value={form.quantity} onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))} />
             </div>
             <div>
               <Label>Price</Label>
-              <Input
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-              />
+              <Input type="number" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} />
             </div>
             <div>
               <Label>Discount %</Label>
-              <Input
-                type="number"
-                value={form.discount}
-                onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value }))}
-              />
+              <Input type="number" value={form.discount} onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value }))} />
             </div>
             <div>
               <Label>GST %</Label>
-              <Input
-                type="number"
-                value={form.gst}
-                onChange={(e) => setForm((f) => ({ ...f, gst: e.target.value }))}
-              />
+              <Input type="number" value={form.gst} onChange={(e) => setForm((f) => ({ ...f, gst: e.target.value }))} />
             </div>
             <div className="md:col-span-7 text-right">
               <Button onClick={handleAdd}>Add</Button>
@@ -472,15 +458,14 @@ function QuotationBuilderInner() {
           </CardContent>
         </Card>
 
+        {/* Preview */}
         {items.length > 0 && (
           <Card>
             <CardHeader className="flex justify-between items-center">
               <CardTitle>Quotation Preview</CardTitle>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="transport" className="text-sm">
-                    Transport
-                  </Label>
+                  <Label htmlFor="transport" className="text-sm">Transport</Label>
                   <Input
                     id="transport"
                     type="number"
@@ -498,16 +483,8 @@ function QuotationBuilderInner() {
               <table className="w-full text-sm border">
                 <thead>
                   <tr className="border-b">
-                    <th>Product</th>
-                    <th>Brand</th>
-                    <th>Pack Size</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Disc%</th>
-                    <th>GST%</th>
-                    <th>HSN</th>
-                    <th>Total</th>
-                    <th></th>
+                    <th>Product</th><th>Brand</th><th>Pack Size</th><th>Qty</th>
+                    <th>Price</th><th>Disc%</th><th>GST%</th><th>HSN</th><th>Total</th><th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -522,18 +499,10 @@ function QuotationBuilderInner() {
                       <td className="text-center">{i.gst}%</td>
                       <td className="text-center">{i.hsnCode || "—"}</td>
                       <td className="text-center">
-                        ₹
-                        {(
-                          i.price *
-                          i.quantity *
-                          (1 - i.discount / 100) *
-                          (1 + i.gst / 100)
-                        ).toFixed(2)}
+                        ₹{(i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100)).toFixed(2)}
                       </td>
                       <td className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => removeItem(i.id)}>
-                          Remove
-                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => removeItem(i.id)}>Remove</Button>
                       </td>
                     </tr>
                   ))}
