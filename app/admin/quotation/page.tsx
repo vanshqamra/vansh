@@ -1,58 +1,59 @@
-"use client";
+"use client"
 
-import { useState, useMemo, useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { AccessDenied } from "@/components/access-denied";
-import { Header } from "@/components/header";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { AccessDenied } from "@/components/access-denied"
+import { Header } from "@/components/header"
 
 // Brand data imports
-import borosilProducts from "@/lib/borosil_products_absolute_final.json";
-import rankemProducts from "@/lib/rankem_products.json";
-import qualigensProducts from "@/lib/qualigens-products.json";
-import whatmanData from "@/lib/whatman_products.json";
-import himediaData from "@/lib/himedia_products_grouped";
-import { commercialChemicals as bulkProducts } from "@/lib/data";
+import borosilProducts from "@/lib/borosil_products_absolute_final.json"
+import rankemProducts from "@/lib/rankem_products.json"
+import qualigensProducts from "@/lib/qualigens-products.json"
+import whatmanData from "@/lib/whatman_products.json"
+import himediaData from "@/lib/himedia_products_grouped"
+import { commercialChemicals as bulkProducts } from "@/lib/data"
 
 interface QuotationItem {
-  id: number;
-  productCode: string;
-  productName: string;
-  brand: string;
-  packSize: string;
-  quantity: number;
-  price: number;
-  discount: number;
-  gst: number;
-  hsnCode?: string;
+  id: number
+  productCode: string
+  productName: string
+  brand: string
+  packSize: string
+  quantity: number
+  price: number
+  discount: number
+  gst: number
+  hsnCode?: string
 }
 
 interface FlatProduct {
-  productName: string;
-  code: string;
-  brand: string;
-  packSize: string;
-  price: number;
-  hsnCode?: string;
+  productName: string
+  code: string
+  brand: string
+  packSize: string
+  price: number
+  hsnCode?: string
 }
 
-export default function QuotationBuilder() {
+function QuotationBuilderInner() {
   // — Auth —
-  const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true });
+  const [auth, setAuth] = useState<{ role: string; loading: boolean }>({ role: "", loading: true })
   useEffect(() => {
+    // keep your original dynamic import approach
     import("@/app/context/auth-context").then((mod) => {
-      const { role, loading } = mod.useAuth();
-      setAuth({ role, loading });
-    });
-  }, []);
-  if (!auth.loading && auth.role !== "admin") return <AccessDenied />;
+      const { role, loading } = mod.useAuth()
+      setAuth({ role, loading })
+    })
+  }, [])
+  if (!auth.loading && auth.role !== "admin") return <AccessDenied />
 
   // — State & Refs —
-  const [items, setItems] = useState<QuotationItem[]>([]);
-  const [transport, setTransport] = useState(0);
+  const [items, setItems] = useState<QuotationItem[]>([])
+  const [transport, setTransport] = useState(0)
   const [form, setForm] = useState({
     productName: "",
     productCode: "",
@@ -62,52 +63,52 @@ export default function QuotationBuilder() {
     price: "",
     discount: "",
     gst: "",
-  });
-  const [filtered, setFiltered] = useState<FlatProduct[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  })
+  const [filtered, setFiltered] = useState<FlatProduct[]>([])
+  const containerRef = useRef<HTMLDivElement>(null)
+
   // — Load from Past Quotation —
-const sp = useSearchParams();
-const quoteId = sp.get("quoteId");
+  const sp = useSearchParams()
+  const quoteId = sp.get("quoteId")
 
-useEffect(() => {
-  if (!quoteId) return;
-  (async () => {
-    const res = await fetch(`/api/quotations/${quoteId}`);
-    if (!res.ok) return;
-    const q = await res.json();
+  useEffect(() => {
+    if (!quoteId) return
+    ;(async () => {
+      const res = await fetch(`/api/quotations/${quoteId}`)
+      if (!res.ok) return
+      const q = await res.json()
 
-    const saved = q.data_json || {};
-    const restoredItems = (saved.items || []).map((i: any, idx: number) => ({
-      id: Date.now() + idx,
-      productCode: i.productCode || "",
-      productName: i.productName || "",
-      brand: i.brand || "",
-      packSize: i.packSize || "",
-      quantity: Number(i.quantity) || 0,
-      price: Number(i.price) || 0,
-      discount: Number(i.discount) || 0,
-      gst: Number(i.gst) || 0,
-      hsnCode: i.hsnCode || "",
-    }));
+      const saved = q.data_json || {}
+      const restoredItems = (saved.items || []).map((i: any, idx: number) => ({
+        id: Date.now() + idx,
+        productCode: i.productCode || "",
+        productName: i.productName || "",
+        brand: i.brand || "",
+        packSize: i.packSize || "",
+        quantity: Number(i.quantity) || 0,
+        price: Number(i.price) || 0,
+        discount: Number(i.discount) || 0,
+        gst: Number(i.gst) || 0,
+        hsnCode: i.hsnCode || "",
+      }))
 
-    setItems(restoredItems);
-    setTransport(Number(saved.transport || 0));
-  })();
-}, [quoteId]);
-
+      setItems(restoredItems)
+      setTransport(Number(saved.transport || 0))
+    })()
+  }, [quoteId])
 
   // — Flatten all catalogs into one array once —
   const allProducts = useMemo<FlatProduct[]>(() => {
-    const all: FlatProduct[] = [];
+    const all: FlatProduct[] = []
 
     // Borosil
     if (Array.isArray(borosilProducts)) {
       borosilProducts.forEach((g: any) => {
-        const category = g.category || g.product || "";
-        const base = category ? `${category} – ${g.product}` : g.product || "";
+        const category = g.category || g.product || ""
+        const base = category ? `${category} – ${g.product}` : g.product || ""
         ;(g.variants || []).forEach((v: any) => {
-          const size = v.capacity_ml ? `${v.capacity_ml}ml` : v["Pack Size"] || v.size || "";
-          const name = size ? `${base} (${size})` : base;
+          const size = v.capacity_ml ? `${v.capacity_ml}ml` : v["Pack Size"] || v.size || ""
+          const name = size ? `${base} (${size})` : base
           all.push({
             productName: name,
             code: v.code || "",
@@ -115,47 +116,43 @@ useEffect(() => {
             packSize: size,
             price: parseFloat(v.price) || 0,
             hsnCode: v["HSN Code"] || "",
-          });
-        });
-      });
+          })
+        })
+      })
     }
 
     // Rankem
     if (Array.isArray(rankemProducts)) {
-  rankemProducts.forEach((g: any) => {
-    ;(g.variants || []).forEach((v: any) => {
-      // 1) description (the actual name)
-      const desc =
-        typeof v.Description === "string" && v.Description.trim()
-          ? v.Description.trim()
-          : g.title || g.product || "";
-
-      // 2) look for every possible “pack size” key they might’ve used
-      const size =
-        v["Pack Size"] ||
-        v["Pack\nSize"] ||
-        v.Packing ||
-        v.size ||
-        "";
-
-      all.push({
-        productName: desc,                         // just the name
-        code: v["Cat No"] || v["Product Code"] || "",
-        brand: "Rankem",
-        packSize: size,                            // now correct
-        price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
-        hsnCode: v["HSN Code"] || "",
-          });
-        });
-      });
+      rankemProducts.forEach((g: any) => {
+        ;(g.variants || []).forEach((v: any) => {
+          const desc =
+            typeof v.Description === "string" && v.Description.trim()
+              ? v.Description.trim()
+              : g.title || g.product || ""
+          const size =
+            v["Pack Size"] ||
+            v["Pack\nSize"] ||
+            v.Packing ||
+            v.size ||
+            ""
+          all.push({
+            productName: desc,
+            code: v["Cat No"] || v["Product Code"] || "",
+            brand: "Rankem",
+            packSize: size,
+            price: parseFloat(v["List Price\n2025(INR)"] || v.Price) || 0,
+            hsnCode: v["HSN Code"] || "",
+          })
+        })
+      })
     }
 
     // Qualigens
     if (Array.isArray(qualigensProducts)) {
-      qualigensProducts.forEach((p: any) => {
-        const desc = p["Product Name"] || p.name || "";
-        const size = p["Pack Size"] || p.size || "";
-        const name = size ? `${desc} (${size})` : desc;
+      ;(qualigensProducts as any[]).forEach((p: any) => {
+        const desc = p["Product Name"] || p.name || ""
+        const size = p["Pack Size"] || p.size || ""
+        const name = size ? `${desc} (${size})` : desc
         all.push({
           productName: name,
           code: p["Product Code"] || p.code || "",
@@ -163,34 +160,34 @@ useEffect(() => {
           packSize: size,
           price: parseFloat(p.Price) || 0,
           hsnCode: p["HSN Code"] || "",
-        });
-      });
+        })
+      })
     }
 
     // Whatman
-    if (Array.isArray(whatmanData.variants)) {
-  whatmanData.variants.forEach((v: any) => {
-    const desc = (v.name || v.title || whatmanData.title || "").trim();
-    const size = v["Pack Size"] || v.size || "";
-    const name = size ? `${desc} (${size})` : desc;
-    all.push({
-      productName: name,
-      code:       v.Code  || v.code   || "",
-      brand:      "Whatman",
-      packSize:   size,
-      price:      parseFloat(v.Price?.toString() || "") || 0,
-      hsnCode: "",
-        });
-      });
+    if (Array.isArray((whatmanData as any).variants)) {
+      ;(whatmanData as any).variants.forEach((v: any) => {
+        const desc = (v.name || v.title || (whatmanData as any).title || "").trim()
+        const size = v["Pack Size"] || v.size || ""
+        const name = size ? `${desc} (${size})` : desc
+        all.push({
+          productName: name,
+          code: v.Code || v.code || "",
+          brand: "Whatman",
+          packSize: size,
+          price: parseFloat(v.Price?.toString() || "") || 0,
+          hsnCode: "",
+        })
+      })
     }
 
     // HiMedia
     if (Array.isArray(himediaData)) {
-      himediaData.forEach((g: any) => {
+      ;(himediaData as any[]).forEach((g: any) => {
         ;(g.variants || []).forEach((v: any) => {
-          const desc = g.product || g.title || "";
-          const size = v.packing || v["Pack Size"] || v.size || "";
-          const name = size ? `${desc} (${size})` : desc;
+          const desc = g.product || g.title || ""
+          const size = v.packing || v["Pack Size"] || v.size || ""
+          const name = size ? `${desc} (${size})` : desc
           all.push({
             productName: name,
             code: v.code || v["Product Code"] || "",
@@ -198,17 +195,17 @@ useEffect(() => {
             packSize: size,
             price: parseFloat(v.rate || v.price) || 0,
             hsnCode: v.hsn || v["HSN Code"] || "",
-          });
-        });
-      });
+          })
+        })
+      })
     }
 
     // Bulk Commercial
     if (Array.isArray(bulkProducts)) {
-      bulkProducts.forEach((p: any) => {
-        const desc = p.name || p["Product Name"] || "";
-        const size = p.size || p["Pack Size"] || "";
-        const name = size ? `${desc} (${size})` : desc;
+      ;(bulkProducts as any[]).forEach((p: any) => {
+        const desc = p.name || p["Product Name"] || ""
+        const size = p.size || p["Pack Size"] || ""
+        const name = size ? `${desc} (${size})` : desc
         all.push({
           productName: name,
           code: p.code || p["Product Code"] || "",
@@ -216,35 +213,35 @@ useEffect(() => {
           packSize: size,
           price: parseFloat(p.price) || 0,
           hsnCode: p["HSN Code"] || "",
-        });
-      });
+        })
+      })
     }
 
-    return all;
-  }, []);
+    return all
+  }, [])
 
   // — Close dropdown when clicking outside —
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setFiltered([]);
+        setFiltered([])
       }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, []);
+    }
+    document.addEventListener("mousedown", onClick)
+    return () => document.removeEventListener("mousedown", onClick)
+  }, [])
 
   // — Search handler —
   const handleSearch = (q: string) => {
-    setForm((f) => ({ ...f, productName: q }));
-    if (!q) return setFiltered([]);
-    const lower = q.toLowerCase();
+    setForm((f) => ({ ...f, productName: q }))
+    if (!q) return setFiltered([])
+    const lower = q.toLowerCase()
     setFiltered(
       allProducts.filter((p) =>
         `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(lower)
       )
-    );
-  };
+    )
+  }
 
   // — When user selects one result —
   const handleSelect = (p: FlatProduct) => {
@@ -257,15 +254,15 @@ useEffect(() => {
       price: p.price.toString(),
       discount: "",
       gst: "",
-    });
-    setFiltered([]);
-  };
+    })
+    setFiltered([])
+  }
 
   // — Add item to quotation —
   const handleAdd = () => {
-    if (!form.productName || !form.quantity || !form.price) return;
-    const match = allProducts.find((x) => x.code === form.productCode);
-    const hsn = match?.hsnCode || "";
+    if (!form.productName || !form.quantity || !form.price) return
+    const match = allProducts.find((x) => x.code === form.productCode)
+    const hsn = match?.hsnCode || ""
     setItems((prev) => [
       ...prev,
       {
@@ -280,7 +277,7 @@ useEffect(() => {
         gst: +form.gst,
         hsnCode: hsn,
       },
-    ]);
+    ])
     setForm({
       productName: "",
       productCode: "",
@@ -290,84 +287,93 @@ useEffect(() => {
       price: "",
       discount: "",
       gst: "",
-    });
-  };
+    })
+  }
 
   // — Remove item —
-  const removeItem = (id: number) => setItems((prev) => prev.filter((i) => i.id !== id));
+  const removeItem = (id: number) => setItems((prev) => prev.filter((i) => i.id !== id))
 
   // — Totals —
-  const subtotal = items.reduce((s, i) => s + i.price * i.quantity * (1 - i.discount / 100), 0);
-  const gstTotal = items.reduce((s, i) => s + i.price * i.quantity * (1 - i.discount / 100) * (i.gst / 100), 0);
-  const total = subtotal + gstTotal + transport;
+  const subtotal = items.reduce((s, i) => s + i.price * i.quantity * (1 - i.discount / 100), 0)
+  const gstTotal = items.reduce(
+    (s, i) => s + i.price * i.quantity * (1 - i.discount / 100) * (i.gst / 100),
+    0
+  )
+  const total = subtotal + gstTotal + transport
 
   // — Download DOCX —
-const downloadQuotation = async () => {
-  // 1) Build the line‐items array, including brand & price
-  const products = items.map((i, idx) => ({
-    sr:          idx + 1,
-    description: i.productName,
-    brand:       i.brand,     // ← brand added
-    qty:         i.quantity,
-    packSize:    i.packSize,
-    price:       i.price,     // ← price added
-    discount:    i.discount,
-    gst:         i.gst,
-    hsn:         i.hsnCode || "",
-    total:       i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
-  }));
+  const downloadQuotation = async () => {
+    // 1) Build the line‐items array, including brand & price
+    const products = items.map((i, idx) => ({
+      sr: idx + 1,
+      description: i.productName,
+      brand: i.brand,
+      qty: i.quantity,
+      packSize: i.packSize,
+      price: i.price,
+      discount: i.discount,
+      gst: i.gst,
+      hsn: i.hsnCode || "",
+      total: i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
+    }))
 
-  // 2) Compute grand total (sum of line‐totals + transport)
-  const sumOfLines = products.reduce((sum, p) => sum + p.total, 0);
-  const grandTotal  = sumOfLines + transport;
+    // 2) Compute grand total (sum of line‐totals + transport)
+    const sumOfLines = products.reduce((sum, p) => sum + p.total, 0)
+    const grandTotal = sumOfLines + transport
 
-  // 3) Send payload with products & grandTotal
-  const payload = {
-    client:     "Client Name",
-    date:       new Date().toLocaleDateString(),
-    products,                 // ← your array of items
-    transport,                // ← transport charge
-    grandTotal,               // ← the new grand total field
-  };
-  // — Save a JSON twin to the portal —
-try {
-  await fetch("/api/quotations", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      title: `Quotation - ${new Date().toLocaleDateString()}`,
-      clientName: "Client Name",          // replace later if you add client fields
-      clientEmail: null,
-      status: "DRAFT",
-      currency: "INR",
-      totalsJson: {
-        subtotal,
-        gstTotal,
-        transport,
-        total,                             // (= subtotal + gstTotal + transport)
-      },
-      dataJson: {
-        items,                             // your current items state
-        transport,
-      },
-      // docxUrl: null                     // optional if you later upload the file to storage
-    }),
-  });
-} catch (e) {
-  console.error("Save quotation failed", e);
-}
+    // 3) DOCX payload
+    const payload = {
+      client: "Client Name",
+      date: new Date().toLocaleDateString(),
+      products,
+      transport,
+      grandTotal,
+    }
 
+    // — Save a JSON twin to the portal —
+    try {
+      const saveRes = await fetch("/api/quotations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `Quotation - ${new Date().toLocaleDateString()}`,
+          clientName: "Client Name", // replace later if you add a client field
+          clientEmail: null,
+          status: "DRAFT",
+          currency: "INR",
+          totalsJson: {
+            subtotal,
+            gstTotal,
+            transport,
+            total, // using total = subtotal + gstTotal + transport
+          },
+          dataJson: {
+            items,
+            transport,
+          },
+          // docxUrl: null, // set if you upload file to storage later
+        }),
+      })
+      if (!saveRes.ok) {
+        const err = await saveRes.json().catch(() => ({}))
+        console.error("Save quotation failed:", err)
+      }
+    } catch (e) {
+      console.error("Save quotation failed:", e)
+    }
+
+    // 4) Generate DOCX (existing flow)
     const res = await fetch("/api/generate-quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-    });
-    const blob = await res.blob();
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = "Quotation.docx";
-    link.click();
-  };
+    })
+    const blob = await res.blob()
+    const link = document.createElement("a")
+    link.href = window.URL.createObjectURL(blob)
+    link.download = "Quotation.docx"
+    link.click()
+  }
 
   return (
     <>
@@ -379,7 +385,9 @@ try {
         </div>
 
         <Card className="mb-6">
-          <CardHeader><CardTitle>Add Product to Quotation</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Add Product to Quotation</CardTitle>
+          </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-7 gap-4 relative">
             {/* Search */}
             <div className="md:col-span-3">
@@ -387,12 +395,11 @@ try {
               <Input value={form.productName} onChange={(e) => handleSearch(e.target.value)} />
               {filtered.length > 0 && (
                 <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
-                  {filtered.slice(0,50).map((p, idx) => (
+                  {filtered.slice(0, 50).map((p, idx) => (
                     <div
                       key={idx}
                       className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
-                        // Point 3: append code into the displayed productName
                         setForm({
                           productName: `${p.productName} [${p.code}]`,
                           productCode: p.code,
@@ -402,24 +409,66 @@ try {
                           price: p.price.toString(),
                           discount: "",
                           gst: "",
-                       });
-                       setFiltered([]);
-                     }}
+                        })
+                        setFiltered([])
+                      }}
                     >
-                      <span className="font-medium">{p.productName}</span>
-                     <span className="text-xs text-muted-foreground">[Size: {p.packSize}] • [Code: {p.code}]</span>
+                      <span className="font-medium">{p.productName}</span>{" "}
+                      <span className="text-xs text-muted-foreground">
+                        [Size: {p.packSize}] • [Code: {p.code}]
+                      </span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm(f => ({ ...f, brand: e.target.value }))} /></div>
-            <div><Label>Pack Size</Label><Input value={form.packSize} readOnly /></div>
-            <div><Label>Qty</Label><Input type="number" value={form.quantity} onChange={(e) => setForm(f => ({ ...f, quantity: e.target.value }))} /></div>
-            <div><Label>Price</Label><Input type="number" value={form.price} onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))} /></div>
-            <div><Label>Discount %</Label><Input type="number" value={form.discount} onChange={(e) => setForm(f => ({ ...f, discount: e.target.value }))} /></div>
-            <div><Label>GST %</Label><Input type="number" value={form.gst} onChange={(e) => setForm(f => ({ ...f, gst: e.target.value }))} /></div>
-            <div className="md:col-span-7 text-right"><Button onClick={handleAdd}>Add</Button></div>
+
+            <div>
+              <Label>Brand</Label>
+              <Input
+                value={form.brand}
+                onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Pack Size</Label>
+              <Input value={form.packSize} readOnly />
+            </div>
+            <div>
+              <Label>Qty</Label>
+              <Input
+                type="number"
+                value={form.quantity}
+                onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Price</Label>
+              <Input
+                type="number"
+                value={form.price}
+                onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Discount %</Label>
+              <Input
+                type="number"
+                value={form.discount}
+                onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>GST %</Label>
+              <Input
+                type="number"
+                value={form.gst}
+                onChange={(e) => setForm((f) => ({ ...f, gst: e.target.value }))}
+              />
+            </div>
+            <div className="md:col-span-7 text-right">
+              <Button onClick={handleAdd}>Add</Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -427,13 +476,38 @@ try {
           <Card>
             <CardHeader className="flex justify-between items-center">
               <CardTitle>Quotation Preview</CardTitle>
-              <Button variant="outline" onClick={downloadQuotation}>Download DOCX</Button>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="transport" className="text-sm">
+                    Transport
+                  </Label>
+                  <Input
+                    id="transport"
+                    type="number"
+                    value={transport}
+                    onChange={(e) => setTransport(+e.target.value || 0)}
+                    className="h-8 w-28"
+                  />
+                </div>
+                <Button variant="outline" onClick={downloadQuotation}>
+                  Download DOCX
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="bg-white p-4">
               <table className="w-full text-sm border">
                 <thead>
                   <tr className="border-b">
-                    <th>Product</th><th>Brand</th><th>Pack Size</th><th>Qty</th><th>Price</th><th>Disc%</th><th>GST%</th><th>HSN</th><th>Total</th>
+                    <th>Product</th>
+                    <th>Brand</th>
+                    <th>Pack Size</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Disc%</th>
+                    <th>GST%</th>
+                    <th>HSN</th>
+                    <th>Total</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -448,7 +522,18 @@ try {
                       <td className="text-center">{i.gst}%</td>
                       <td className="text-center">{i.hsnCode || "—"}</td>
                       <td className="text-center">
-                        ₹{(i.price * i.quantity * (1 - i.discount/100) * (1 + i.gst/100)).toFixed(2)}
+                        ₹
+                        {(
+                          i.price *
+                          i.quantity *
+                          (1 - i.discount / 100) *
+                          (1 + i.gst / 100)
+                        ).toFixed(2)}
+                      </td>
+                      <td className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => removeItem(i.id)}>
+                          Remove
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -465,5 +550,13 @@ try {
         )}
       </div>
     </>
-  );
+  )
+}
+
+export default function QuotationBuilderPage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading quotation…</div>}>
+      <QuotationBuilderInner />
+    </Suspense>
+  )
 }
