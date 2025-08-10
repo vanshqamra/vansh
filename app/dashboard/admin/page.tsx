@@ -24,7 +24,6 @@ type QuoteRow = {
   title: string | null
   status: string | null
   client_email: string | null
-  // if you also store user_id on quotations, you can add it here
 }
 
 type ProfileRow = {
@@ -39,7 +38,6 @@ type ProfileRow = {
 export default async function AdminDashboardPage() {
   const supabase = getServerSupabase()
   if (!supabase) {
-    // Minimal shell if env vars missing during build
     return (
       <div className="container mx-auto py-10">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -48,22 +46,14 @@ export default async function AdminDashboardPage() {
     )
   }
 
-  // Auth
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
-  // Role check
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single()
-
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
   if (profile?.role !== "admin") redirect("/dashboard")
 
-  // Fetch data in parallel
   const [{ data: orders }, { data: quotes }, { data: pending }] = await Promise.all([
     supabase
       .from("orders")
