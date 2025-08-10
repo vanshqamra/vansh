@@ -73,6 +73,12 @@ export default async function AdminDashboardPage() {
       .limit(10),
   ])
 
+  const formatIST = (iso: string) =>
+    new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+
+  const formatINR = (n: number) =>
+    n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
+
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
@@ -100,13 +106,23 @@ export default async function AdminDashboardPage() {
                 Restock Page
               </Link>
             </Button>
+
+            {/* Split actions via tabs on the same page */}
             <Button asChild variant="destructive" className="justify-start">
-              <Link href="/admin/review">
+              <Link href="/admin/review?tab=clients">
                 <Users className="mr-2 h-4 w-4" />
-                Client Approvals & Review
+                Client Approvals
               </Link>
             </Button>
             <Button asChild variant="outline" className="justify-start">
+              <Link href="/admin/review?tab=orders">
+                <Package className="mr-2 h-4 w-4" />
+                Order Reviews
+              </Link>
+            </Button>
+
+            {/* (Optional) Keep uploads link if you use it elsewhere */}
+            <Button asChild variant="outline" className="justify-start sm:col-span-2 lg:col-span-1">
               <Link href="/dashboard/upload">
                 <ClipboardList className="mr-2 h-4 w-4" />
                 Upload/Import Quotes
@@ -141,7 +157,7 @@ export default async function AdminDashboardPage() {
                 <tbody>
                   {(orders || []).map((o: OrderRow) => (
                     <tr key={o.id} className="border-b last:border-none">
-                      <td className="py-2 pr-4">{new Date(o.created_at).toLocaleString()}</td>
+                      <td className="py-2 pr-4">{formatIST(o.created_at)}</td>
                       <td className="py-2 pr-4 font-mono">{o.id}</td>
                       <td className="py-2 pr-4">
                         <Badge
@@ -159,14 +175,13 @@ export default async function AdminDashboardPage() {
                         </Badge>
                       </td>
                       <td className="py-2 pr-4 font-semibold">
-                        {typeof o.grand_total === "number"
-                          ? o.grand_total.toLocaleString("en-IN", { style: "currency", currency: "INR" })
-                          : "—"}
+                        {typeof o.grand_total === "number" ? formatINR(o.grand_total) : "—"}
                       </td>
                       <td className="py-2 pr-4">
                         <div className="flex gap-2">
+                          {/* Deep link with tab + orderId so Review page can fetch & render details */}
                           <Button asChild size="sm" variant="outline">
-                            <Link href={`/admin/review#${o.id}`}>Open in Review</Link>
+                            <Link href={`/admin/review?tab=orders&orderId=${o.id}`}>Open in Review</Link>
                           </Button>
                         </div>
                       </td>
@@ -206,7 +221,7 @@ export default async function AdminDashboardPage() {
                 <tbody>
                   {(quotes || []).map((q: QuoteRow) => (
                     <tr key={q.id} className="border-b last:border-none">
-                      <td className="py-2 pr-4">{new Date(q.created_at).toLocaleString()}</td>
+                      <td className="py-2 pr-4">{formatIST(q.created_at)}</td>
                       <td className="py-2 pr-4">{q.title || q.id}</td>
                       <td className="py-2 pr-4">
                         <Badge variant={q.status === "APPROVED" ? "default" : q.status === "REJECTED" ? "destructive" : "secondary"}>
@@ -259,7 +274,7 @@ export default async function AdminDashboardPage() {
               <tbody>
                 {(pending || []).map((p: ProfileRow) => (
                   <tr key={p.id} className="border-b last:border-none">
-                    <td className="py-2 pr-4">{new Date(p.created_at).toLocaleString()}</td>
+                    <td className="py-2 pr-4">{formatIST(p.created_at)}</td>
                     <td className="py-2 pr-4">{p.full_name || "—"}</td>
                     <td className="py-2 pr-4">{p.email || "—"}</td>
                     <td className="py-2 pr-4">{p.company || "—"}</td>
@@ -281,9 +296,12 @@ export default async function AdminDashboardPage() {
             </table>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 flex gap-2">
             <Button asChild>
-              <Link href="/admin/review">Open Client Approvals & Live Review</Link>
+              <Link href="/admin/review?tab=clients">Open Client Approvals</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/review?tab=orders">Open Order Reviews</Link>
             </Button>
           </div>
         </CardContent>
