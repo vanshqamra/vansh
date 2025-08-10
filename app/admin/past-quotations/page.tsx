@@ -9,10 +9,12 @@ import { Card, CardContent } from "@/components/ui/card"
 type QuotationRow = {
   id: string
   created_at: string
-  title: string
-  client_name: string
-  status: string
-  currency: string
+  // title removed from the UI, but it's fine if your API still sends it
+  title?: string | null
+  client_name: string | null
+  client_email: string | null   // ← add this
+  status: string | null
+  currency: string | null
   totals_json: { total?: number } | null
   docx_url?: string | null
 }
@@ -30,7 +32,7 @@ export default function PastQuotationsPage() {
     setStatusMsg("Loading…")
     try {
       const res = await fetch(`/api/quotations${q ? `?q=${encodeURIComponent(q)}` : ""}`, {
-        cache: "no-store", // important: bypass cache
+        cache: "no-store",
       })
       const json = await res.json()
       setRaw(json)
@@ -38,9 +40,9 @@ export default function PastQuotationsPage() {
         setStatusMsg(`API error: ${json?.error || res.status}`)
         setRows([])
       } else {
-        const count = Array.isArray(json) ? json.length : 0
-        setStatusMsg(`Found ${count} quotation${count === 1 ? "" : "s"}`)
-        setRows(json || [])
+        const list = Array.isArray(json) ? json : []
+        setStatusMsg(`Found ${list.length} quotation${list.length === 1 ? "" : "s"}`)
+        setRows(list)
       }
     } catch (e: any) {
       setStatusMsg(`Network error: ${e?.message || e}`)
@@ -64,7 +66,7 @@ export default function PastQuotationsPage() {
         body: JSON.stringify({
           title: `Test Quote ${new Date().toLocaleString()}`,
           clientName: "Test Client",
-          clientEmail: null,
+          clientEmail: "buyer@test.com", // set one so you can see it render
           status: "DRAFT",
           currency: "INR",
           totalsJson: { subtotal: 100, gstTotal: 18, transport: 0, total: 118 },
@@ -91,7 +93,7 @@ export default function PastQuotationsPage() {
         setStatusMsg(`Create failed: ${json?.error || res.status}`)
       } else {
         setStatusMsg("Created test quotation ✓")
-        await load() // refresh list
+        await load()
       }
     } catch (e: any) {
       setStatusMsg(`Create failed (network): ${e?.message || e}`)
@@ -102,7 +104,7 @@ export default function PastQuotationsPage() {
     <div className="container mx-auto px-4 py-8 space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Input
-          placeholder="Search client/title/status"
+          placeholder="Search client/email/status"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           className="w-64"
@@ -128,7 +130,7 @@ export default function PastQuotationsPage() {
           <div className="grid grid-cols-6 gap-2 px-4 py-3 font-medium border-b">
             <div>Date</div>
             <div>Client</div>
-            <div>Title</div>
+            <div>Email</div>     {/* ← changed from Title */}
             <div>Status</div>
             <div>Total</div>
             <div>Actions</div>
@@ -136,12 +138,12 @@ export default function PastQuotationsPage() {
 
           {rows.map((row) => (
             <div key={row.id} className="grid grid-cols-6 gap-2 px-4 py-3 border-b items-center">
-              <div>{row.created_at ? new Date(row.created_at).toLocaleDateString() : "—"}</div>
-              <div>{row.client_name || "—"}</div>
-              <div className="truncate">{row.title || "—"}</div>
-              <div>{row.status || "—"}</div>
+              <div>{row.created_at ? new Date(row.created_at).toLocaleDateString() : ""}</div>
+              <div>{row.client_name || ""}</div>
+              <div className="truncate">{row.client_email || ""}</div> {/* ← email, empty if none */}
+              <div>{row.status || ""}</div>
               <div>
-                {row.totals_json?.total ?? "—"} {row.currency || ""}
+                {row.totals_json?.total ?? ""} {row.currency || ""}
               </div>
               <div className="flex gap-2">
                 <Button
