@@ -1,92 +1,158 @@
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+// app/dashboard/admin/page.tsx
+export const dynamic = "force-dynamic"
+export const runtime = "nodejs"
 
-import { getServerSupabase } from "@/lib/supabase/server-client"
 import { redirect } from "next/navigation"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { getServerSupabase } from "@/lib/supabase/server-client"
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { revalidatePath } from "next/cache"
+import Link from "next/link"
+import { Package, ClipboardList, Settings, Users } from "lucide-react"
+
+type Order = {
+  id: string
+  created_at: string
+  status: "pending" | "confirmed" | "fulfilled" | "cancelled"
+  grand_total: number | null
+  user_id: string
+}
 
 export default async function AdminDashboardPage() {
-  const supabase = createSupabaseServerClient()
+  const supabase = getServerSupabase()
+  if (!supabase) {
+    // If env vars are missing during build, render minimal shell
+    return (
+      <div className="container mx-auto py-12">
+        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+        <p className="text-muted-foreground">Supabase is not configured.</p>
+      </div>
+    )
+  }
+
+  // Auth
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
   if (!user) redirect("/login")
 
-  // Get admin profile
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+  // Role check
+  const { data: profile, error: profileErr } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single()
 
-  if (profile?.role !== "admin") {
+  if (profileErr || profile?.role !== "admin") {
     redirect("/dashboard")
   }
 
-  const { data: clients } = await supabase
-    .from("profiles")
-    .select("id, full_name, email, company_name, gst_no, contact_number, address, approved")
+  // Latest real orders (for all customers)
+  const { data: orders } = await supabase
+    .from("orders")
+    .select("id, created_at, status, grand_total, user_id")
     .order("created_at", { ascending: false })
-
-  async function approveClient(formData: FormData) {
-    "use server"
-    const supabase = getServerSupabase()
-      if (!supabase) {
-        // during build/prerender with missing env, render a minimal shell
-        return <div />
-      }
-    
-    const clientId = formData.get("clientId") as string
-    const status = formData.get("status") === "true"
-
-    await supabase.from("profiles").update({ approved: status }).eq("id", clientId)
-    revalidatePath("/dashboard/admin")
-  }
+    .limit(20)
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-6">Client Approvals</h1>
-      <div className="grid gap-6">
-        {clients?.map((client) => (
-          <Card key={client.id}>
-            <CardHeader>
-              <CardTitle>
-                {client.company_name} ({client.full_name})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>
-                <strong>Email:</strong> {client.email}
-              </p>
-              <p>
-                <strong>GST:</strong> {client.gst_no}
-              </p>
-              <p>
-                <strong>Phone:</strong> {client.contact_number}
-              </p>
-              <p>
-                <strong>Address:</strong> {client.address}
-              </p>
-              <div className="mt-4 flex gap-2">
-                {!client.approved ? (
-                  <form action={approveClient}>
-                    <input type="hidden" name="clientId" value={client.id} />
-                    <input type="hidden" name="status" value="true" />
-                    <Button type="submit">Approve</Button>
-                  </form>
-                ) : (
-                  <form action={approveClient}>
-                    <input type="hidden" name="clientId" value={client.id} />
-                    <input type="hidden" name="status" value="false" />
-                    <Button type="submit" variant="destructive">
-                      Revoke
-                    </Button>
-                  </form>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="container mx-auto py-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <p className="text-muted-foreground">Quick controls and a live feed of incoming orders.</p>
       </div>
+
+      {/* Admin Quick Links */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Admin Quick Links</CardTitle>
+          <CardDescription>Tools you’ll use most often</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Button asChild variant="default" className="justify-start">
+              <Link href="/quotations/builder">
+                <ClipboardList className="mr-2 h-4 w-4" />
+                Quotation Builder
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" className="justify-start">
+              <Link href="/admin/restock">
+                <Settings className="mr-2 h-4 w-4" />
+                Restock Page
+              </Link>
+            </Button>
+            <Button asChild variant="destructive" className="justify-start">
+              <Link href="/admin/review">
+                <Users className="mr-2 h-4 w-4" />
+                Client Approvals & Review
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="justify-start">
+              <Link href="/dashboard/upload">
+                <ClipboardList className="mr-2 h-4 w-4" />
+                Upload/Import Quotes
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Orders Received */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Orders Received
+          </CardTitle>
+          <CardDescription>Latest 20 orders across all customers</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left border-b">
+                  <th className="py-2 pr-4">Placed</th>
+                  <th className="py-2 pr-4">Order ID</th>
+                  <th className="py-2 pr-4">Status</th>
+                  <th className="py-2 pr-4">Total</th>
+                  <th className="py-2 pr-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(orders || []).map((o: Order) => (
+                  <tr key={o.id} className="border-b last:border-none">
+                    <td className="py-2 pr-4">{new Date(o.created_at).toLocaleString()}</td>
+                    <td className="py-2 pr-4 font-mono">{o.id}</td>
+                    <td className="py-2 pr-4 capitalize">{o.status}</td>
+                    <td className="py-2 pr-4 font-semibold">
+                      {typeof o.grand_total === "number"
+                        ? o.grand_total.toLocaleString("en-IN", { style: "currency", currency: "INR" })
+                        : "—"}
+                    </td>
+                    <td className="py-2 pr-4">
+                      <div className="flex gap-2">
+                        <Button asChild size="sm" variant="outline">
+                          <Link href={`/admin/review#${o.id}`}>Open in Review</Link>
+                        </Button>
+                        {/* If you have an order details page, link it here */}
+                        {/* <Button asChild size="sm" variant="secondary">
+                          <Link href={`/orders/${o.id}`}>Details</Link>
+                        </Button> */}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {(!orders || orders.length === 0) && (
+                  <tr>
+                    <td className="py-6 text-center text-muted-foreground" colSpan={5}>
+                      No orders yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
