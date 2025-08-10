@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import { getServerSupabase } from "@/lib/supabase/server-client"
 import { redirect } from "next/navigation"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -26,7 +29,12 @@ export default async function AdminDashboardPage() {
 
   async function approveClient(formData: FormData) {
     "use server"
-    const supabase = createSupabaseServerClient()
+    const supabase = getServerSupabase()
+      if (!supabase) {
+        // during build/prerender with missing env, render a minimal shell
+        return <div />
+      }
+    
     const clientId = formData.get("clientId") as string
     const status = formData.get("status") === "true"
 
