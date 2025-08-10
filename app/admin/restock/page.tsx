@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@/app/context/auth-context";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,6 @@ interface RestockItem {
   packSize: string;
   quantity: number;
   price: number;
-  setFiltered([]); // ✅ hides the dropdown
 }
 
 export default function RestockPage() {
@@ -38,8 +37,21 @@ export default function RestockPage() {
   });
   const [filtered, setFiltered] = useState<ProductEntry[]>([]);
   const allProducts = useMemo(() => getAllProducts(), []);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside (like quotations page)
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setFiltered([]);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
 
   useEffect(() => {
+    // Quick sanity log, like you had
     console.log(
       "Loaded products:",
       allProducts.length,
@@ -96,7 +108,7 @@ export default function RestockPage() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8" ref={containerRef}>
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
           <p className="text-gray-500">Restock Dashboard</p>
@@ -106,42 +118,48 @@ export default function RestockPage() {
           <CardHeader>
             <CardTitle>Add Product to Restock</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4 relative">
+            {/* Search */}
             <div className="relative md:col-span-3">
               <Label>Search Product</Label>
               <Input
                 value={form.productName}
                 onChange={(e) => {
-                  const q = e.target.value.toLowerCase();
-                  setForm((f) => ({ ...f, productName: e.target.value }));
+                  const q = e.target.value;
+                  const lower = q.toLowerCase();
+                  setForm((f) => ({ ...f, productName: q }));
+                  if (!q) {
+                    setFiltered([]);
+                    return;
+                  }
                   setFiltered(
                     allProducts.filter((p) =>
-                      `${p.productName}${p.code}${p.packSize}`.toLowerCase().includes(q)
+                      `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(lower)
                     )
                   );
                 }}
               />
-              {form.productName && filtered.length > 0 && (
+              {filtered.length > 0 && (
                 <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
                   {filtered.slice(0, 50).map((p, idx) => (
                     <div
                       key={idx}
                       className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                      onClick={() =>
+                      onClick={() => {
                         setForm({
-                          productName: p.productName,
+                          productName: `${p.productName} [${p.code}]`,
                           code: p.code,
                           brand: p.brand,
                           packSize: p.packSize,
                           quantity: "",
-                          price: "",
-                        })
-                      }
+                          price: p.price ? String(p.price) : "",
+                        });
+                        setFiltered([]); // ✅ close dropdown
+                      }}
                     >
-                      <span className="font-medium">{p.productName}</span>
+                      <span className="font-medium">{p.productName}</span>{" "}
                       <span className="text-xs text-muted-foreground">
-                        {" "}
-                        [Code: {p.code}] [Size: {p.packSize}]
+                        [Code: {p.code}] • [Size: {p.packSize}]
                       </span>
                     </div>
                   ))}
@@ -151,12 +169,20 @@ export default function RestockPage() {
 
             <div>
               <Label>Brand</Label>
-              <Input value={form.brand} onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))} />
+              <Input
+                value={form.brand}
+                onChange={(e) => setForm((f) => ({ ...f, brand: e.target.value }))}
+              />
             </div>
+
             <div>
               <Label>Pack Size</Label>
-              <Input value={form.packSize} onChange={(e) => setForm((f) => ({ ...f, packSize: e.target.value }))} />
+              <Input
+                value={form.packSize}
+                onChange={(e) => setForm((f) => ({ ...f, packSize: e.target.value }))}
+              />
             </div>
+
             <div>
               <Label>Quantity</Label>
               <Input
@@ -165,6 +191,7 @@ export default function RestockPage() {
                 onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
               />
             </div>
+
             <div>
               <Label>Price</Label>
               <Input
@@ -173,7 +200,8 @@ export default function RestockPage() {
                 onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
               />
             </div>
-            <div className="md:col-span-5 text-right">
+
+            <div className="md:col-span-6 text-right">
               <Button onClick={handleAdd}>Add</Button>
             </div>
           </CardContent>
