@@ -316,6 +316,7 @@ function QuotationBuilderInner() {
     const products = items.map((i, idx) => ({
       sr: idx + 1,
       description: i.productName,
+      brand: i.brand,
       hsn: i.hsnCode || "",
       packSize: i.packSize,
       qty: i.quantity,
