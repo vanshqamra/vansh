@@ -14,7 +14,7 @@ type OrderRow = {
   id: string
   created_at: string
   status: "pending" | "confirmed" | "fulfilled" | "cancelled"
-  grand_total: number
+  grand_total: number | null
 }
 
 type QuoteRow = {
@@ -70,7 +70,7 @@ export default function Dashboard() {
       setOrdersCount(count ?? 0)
 
       // REAL quotations created by this user
-      // If your quotations table links by email, keep this. If you store user_id, change to .eq("user_id", uid)
+      // If your quotations table stores user_id, switch filter to .eq("user_id", uid)
       if (session?.user?.email) {
         const { data: q } = await supabase
           .from("quotations")
@@ -81,7 +81,7 @@ export default function Dashboard() {
         setQuotes(q || [])
       }
     })()
-  }, [mounted])
+  }, [mounted, supabase])
 
   const stats = useMemo(() => ([
     { title: "Total Orders", value: String(ordersCount), icon: Package, description: "All time orders" },
@@ -247,4 +247,23 @@ export default function Dashboard() {
                       <p className="font-medium text-sm">{q.title || q.id}</p>
                       <p className="text-xs text-gray-500">{new Date(q.created_at).toLocaleString()}</p>
                     </div>
-                    <
+                    <div className="text-right">
+                      <Badge variant={q.status === "APPROVED" ? "default" : q.status === "REJECTED" ? "destructive" : "secondary"}>
+                        {q.status || "PENDING"}
+                      </Badge>
+                      <div className="mt-2">
+                        <Button asChild size="sm" variant="outline">
+                          <Link href={`/quotations/${q.id}`}>Open</Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
