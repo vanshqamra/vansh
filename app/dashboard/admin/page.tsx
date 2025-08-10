@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server-client"
+import { getServerSupabase } from "@/lib/supabase/server-client"
 import { redirect } from "next/navigation"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
