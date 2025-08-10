@@ -163,29 +163,44 @@ function QuotationBuilderInner() {
       })
     }
 
-    // Whatman
-    if (Array.isArray((whatmanData as any).variants)) {
-      ;(whatmanData as any).variants.forEach((v: any) => {
-        const desc = (v.name || v.title || (whatmanData as any).title || "").trim()
-        const size = v["Pack Size"] || v.size || ""
-        const name = size ? `${desc} (${size})` : desc
-        all.push({
-          productName: name,
-          code: v.Code || v.code || "",
-          brand: "Whatman",
-          packSize: size,
-          price: parseFloat(v.Price?.toString() || "") || 0,
-          hsnCode: "",
-        })
-      })
-    }
+    // Whatman — ensure price parses from string/number safely
+try {
+  const src: any = (whatmanData as any)?.default ?? whatmanData;
+  const variants: any[] = Array.isArray(src?.variants) ? src.variants : [];
 
-    // HiMedia — groups with { sub_section, products: [...] }
+  variants.forEach((v) => {
+    const desc = (v.name || v.title || src.title || "").toString().trim();
+    const size = (v["Pack Size"] || v.size || "").toString().trim();
+    const name = size ? `${desc} (${size})` : desc;
+
+    const code = v.Code || v.code || "";
+
+    const priceRaw = v.Price ?? v.price ?? v["List Price"] ?? 0;
+    const price =
+      typeof priceRaw === "string"
+        ? parseFloat(priceRaw.replace(/[^\d.]/g, ""))
+        : Number(priceRaw) || 0;
+
+    all.push({
+      productName: name,
+      code,
+      brand: "Whatman",
+      packSize: size,
+      price,
+      hsnCode: "",
+    });
+  });
+} catch (e) {
+  console.warn("Whatman parse error:", e);
+}
+
+
+    // HiMedia — groups shaped like { sub_section, products: [...] }
 try {
   const src: any = (himediaData as any)?.default ?? himediaData;
 
   const clean = (s: any) =>
-    (typeof s === "string" ? s.replace(/\u2028|\u2029/g, "").trim() : s ?? "");
+    typeof s === "string" ? s.replace(/[\u2028\u2029]/g, "").trim() : (s ?? "");
 
   if (Array.isArray(src)) {
     src.forEach((grp: any) => {
@@ -196,8 +211,8 @@ try {
         clean(grp?.name) ||
         "HiMedia";
 
-      const products = Array.isArray(grp?.products) ? grp.products : [];
-      products.forEach((v: any) => {
+      const products: any[] = Array.isArray(grp?.products) ? grp.products : [];
+      products.forEach((v) => {
         const code =
           clean(v.code) ||
           clean(v["Product Code"]) ||
@@ -216,7 +231,13 @@ try {
         const desc = clean(v.name) || groupName;
         const name = size ? `${desc} (${size})` : desc;
 
-        const priceNum = parseFloat(String(v.rate ?? v.price ?? v.Price ?? 0)) || 0;
+        // rate/price can be number or string; strip any commas/₹ etc.
+        const priceRaw = v.rate ?? v.price ?? v.Price ?? 0;
+        const price =
+          typeof priceRaw === "string"
+            ? parseFloat(priceRaw.replace(/[^\d.]/g, ""))
+            : Number(priceRaw) || 0;
+
         const hsn = clean(v.hsn) || clean(v["HSN Code"]) || "";
 
         all.push({
@@ -224,7 +245,7 @@ try {
           code,
           brand: "HiMedia",
           packSize: size,
-          price: priceNum,
+          price,
           hsnCode: hsn,
         });
       });
@@ -233,6 +254,7 @@ try {
 } catch (e) {
   console.warn("HiMedia parse error:", e);
 }
+
 
 
 
