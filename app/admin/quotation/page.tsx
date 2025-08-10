@@ -280,14 +280,24 @@ try {
 
   // — Close dropdown when clicking outside —
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setFiltered([])
-      }
+  console.log(
+    "Totals:",
+    allProducts.length,
+    "HiMedia:", allProducts.filter(p => p.brand === "HiMedia").length,
+    "Whatman:", allProducts.filter(p => p.brand === "Whatman").length
+  )
+}, [allProducts])
+
+// Existing effect for closing dropdown when clicking outside
+useEffect(() => {
+  const onClick = (e: MouseEvent) => {
+    if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      setFiltered([])
     }
-    document.addEventListener("mousedown", onClick)
-    return () => document.removeEventListener("mousedown", onClick)
-  }, [])
+  }
+  document.addEventListener("mousedown", onClick)
+  return () => document.removeEventListener("mousedown", onClick)
+}, [])
 
   // — Search handler —
   const handleSearch = (q: string) => {
