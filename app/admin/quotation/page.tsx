@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -68,7 +68,7 @@ function QuotationBuilderInner() {
     gst: "",
   })
   const [filtered, setFiltered] = useState<FlatProduct[]>([])
-  const containerRef = useRef<HTMLDivElement>(null)
+
 
   // — Load from Past Quotation —
   const sp = useSearchParams()
