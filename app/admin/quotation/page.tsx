@@ -468,7 +468,7 @@ function QuotationBuilderInner() {
                     id="transport"
                     type="number"
                     value={transport}
-                    onChange={(e) => setTransport(+e.target.value || 0)}
+                    onChange={(e) => setTransportStr(e.target.value)}
                     className="h-8 w-28"
                   />
                 </div>
