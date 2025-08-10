@@ -2,20 +2,20 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(request: NextRequest) {
+  // Only guard /admin paths (faster + simpler)
+  if (!request.nextUrl.pathname.startsWith("/admin")) {
+    return NextResponse.next()
+  }
+
   let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+    request: { headers: request.headers },
   })
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  // This is the crucial check. If the environment variables are not set,
-  // we bypass all Supabase logic to prevent the app from crashing.
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Supabase environment variables are not set. Middleware is bypassing authentication.")
-    return response
+    console.error("Supabase env vars missing. Bypassing auth in middleware.")
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -36,19 +36,26 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  await supabase.auth.getUser()
+  // 1) Must be logged in
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
+
+  // 2) Must be admin (profiles.id = auth.users.id)
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single()
+
+  if (error || profile?.role !== "admin") {
+    return NextResponse.redirect(new URL("/", request.url))
+  }
 
   return response
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/admin/:path*"],
 }
