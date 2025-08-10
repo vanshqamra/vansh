@@ -22,7 +22,7 @@ type Profile = {
   company: string | null
   phone: string | null
   gstin: string | null
-  role: "pending" | "client" | "admin"
+  role: "pending" | "client" | "admin" | "rejected"
   created_at: string
 }
 
@@ -38,6 +38,21 @@ type Order = {
   grand_total: number
 }
 
+type OrderItem = {
+  id: string
+  created_at: string
+  order_id: string
+  product_id: string | null
+  product_name: string
+  brand: string | null
+  product_code: string | null
+  pack_size: string | null
+  quantity: number
+  unit_price: number
+  tax_rate: number | null
+  line_total: number
+}
+
 // ---------- HELPERS ----------
 const currency = (n: number | null | undefined) =>
   typeof n === "number" ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "—"
@@ -46,12 +61,10 @@ async function approveUser(userId: string) {
   const { error } = await supabase.from("profiles").update({ role: "client" }).eq("id", userId)
   if (error) throw error
 }
-
 async function rejectUser(userId: string) {
   const { error } = await supabase.from("profiles").update({ role: "rejected" }).eq("id", userId)
   if (error) throw error
 }
-
 async function setOrderStatus(orderId: string, status: Order["status"]) {
   const { error } = await supabase.from("orders").update({ status }).eq("id", orderId)
   if (error) throw error
@@ -69,6 +82,11 @@ export default function AdminReviewPage() {
   // Orders state
   const [orders, setOrders] = useState<Order[]>([])
   const [orderQ, setOrderQ] = useState("")
+
+  // Items viewer state
+  const [openOrderId, setOpenOrderId] = useState<string | null>(null)
+  const [items, setItems] = useState<OrderItem[]>([])
+  const [itemsLoading, setItemsLoading] = useState(false)
 
   // Initial fetch
   useEffect(() => {
@@ -99,33 +117,19 @@ export default function AdminReviewPage() {
   useEffect(() => {
     const channel = supabase
       .channel("admin-review")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "profiles" },
-        (payload) => {
-          setAccounts((prev) => [payload.new as Profile, ...prev])
-        }
+      // profiles
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, (payload) =>
+        setAccounts((prev) => [payload.new as Profile, ...prev])
       )
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "profiles" },
-        (payload) => {
-          setAccounts((prev) => prev.map((p) => (p.id === (payload.new as any).id ? (payload.new as Profile) : p)))
-        }
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, (payload) =>
+        setAccounts((prev) => prev.map((p) => (p.id === (payload.new as any).id ? (payload.new as Profile) : p)))
       )
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "orders" },
-        (payload) => {
-          setOrders((prev) => [payload.new as Order, ...prev])
-        }
+      // orders
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) =>
+        setOrders((prev) => [payload.new as Order, ...prev])
       )
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "orders" },
-        (payload) => {
-          setOrders((prev) => prev.map((o) => (o.id === (payload.new as any).id ? (payload.new as Order) : o)))
-        }
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, (payload) =>
+        setOrders((prev) => prev.map((o) => (o.id === (payload.new as any).id ? (payload.new as Order) : o)))
       )
       .subscribe()
 
@@ -134,23 +138,34 @@ export default function AdminReviewPage() {
     }
   }, [])
 
+  // Search filters
   const filteredAccounts = useMemo(() => {
     const q = acctQ.trim().toLowerCase()
     if (!q) return accounts
     return accounts.filter((a) =>
-      [a.email, a.full_name, a.company, a.phone, a.gstin, a.role]
-        .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(q))
+      [a.email, a.full_name, a.company, a.phone, a.gstin, a.role].filter(Boolean).some((v) => String(v).toLowerCase().includes(q))
     )
   }, [accounts, acctQ])
 
   const filteredOrders = useMemo(() => {
     const q = orderQ.trim().toLowerCase()
     if (!q) return orders
-    return orders.filter((o) =>
-      [o.id, o.status].some((v) => String(v).toLowerCase().includes(q))
-    )
+    return orders.filter((o) => [o.id, o.status].some((v) => String(v).toLowerCase().includes(q)))
   }, [orders, orderQ])
+
+  // View order items
+  async function viewItems(orderId: string) {
+    setOpenOrderId(orderId)
+    setItems([])
+    setItemsLoading(true)
+    const { data, error } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", orderId)
+      .order("created_at", { ascending: true })
+    setItemsLoading(false)
+    if (!error) setItems((data || []) as OrderItem[])
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -260,7 +275,17 @@ export default function AdminReviewPage() {
                         <td className="py-2 pr-4">{new Date(o.created_at).toLocaleString()}</td>
                         <td className="py-2 pr-4 font-mono">{o.id}</td>
                         <td className="py-2 pr-4">
-                          <Badge variant={o.status === "pending" ? "secondary" : o.status === "confirmed" ? "default" : o.status === "fulfilled" ? "outline" : "destructive"}>
+                          <Badge
+                            variant={
+                              o.status === "pending"
+                                ? "secondary"
+                                : o.status === "confirmed"
+                                ? "default"
+                                : o.status === "fulfilled"
+                                ? "outline"
+                                : "destructive"
+                            }
+                          >
                             {o.status}
                           </Badge>
                         </td>
@@ -271,13 +296,16 @@ export default function AdminReviewPage() {
                         <td className="py-2 pr-4 font-semibold">{currency(o.grand_total)}</td>
                         <td className="py-2 pr-4">
                           <div className="flex gap-2">
-                            <Button size="sm" variant="default" onClick={() => setOrderStatus(o.id, "confirmed")}> 
+                            <Button size="sm" variant="outline" onClick={() => viewItems(o.id)}>
+                              View
+                            </Button>
+                            <Button size="sm" variant="default" onClick={() => setOrderStatus(o.id, "confirmed")}>
                               <CheckCircle2 className="mr-2 h-4 w-4" /> Confirm
                             </Button>
-                            <Button size="sm" variant="secondary" onClick={() => setOrderStatus(o.id, "fulfilled")}> 
+                            <Button size="sm" variant="secondary" onClick={() => setOrderStatus(o.id, "fulfilled")}>
                               <ChevronDown className="mr-2 h-4 w-4" /> Fulfil
                             </Button>
-                            <Button size="sm" variant="destructive" onClick={() => setOrderStatus(o.id, "cancelled")}> 
+                            <Button size="sm" variant="destructive" onClick={() => setOrderStatus(o.id, "cancelled")}>
                               <XCircle className="mr-2 h-4 w-4" /> Cancel
                             </Button>
                           </div>
@@ -294,6 +322,51 @@ export default function AdminReviewPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Items panel */}
+              {openOrderId && (
+                <div className="mt-4 rounded-xl border p-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Items for Order {openOrderId}</h3>
+                    <Button variant="ghost" size="sm" onClick={() => setOpenOrderId(null)}>
+                      Close
+                    </Button>
+                  </div>
+
+                  {itemsLoading ? (
+                    <div className="text-sm text-muted-foreground mt-2">Loading items…</div>
+                  ) : items.length === 0 ? (
+                    <div className="text-sm text-muted-foreground mt-2">No items found</div>
+                  ) : (
+                    <div className="overflow-x-auto mt-3">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-left border-b">
+                            <th className="py-2 pr-4">Product</th>
+                            <th className="py-2 pr-4">Code</th>
+                            <th className="py-2 pr-4">Pack</th>
+                            <th className="py-2 pr-4">Qty</th>
+                            <th className="py-2 pr-4">Unit</th>
+                            <th className="py-2 pr-4">Line Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {items.map((it) => (
+                            <tr key={it.id} className="border-b last:border-none">
+                              <td className="py-2 pr-4">{it.product_name}</td>
+                              <td className="py-2 pr-4">{it.product_code || "—"}</td>
+                              <td className="py-2 pr-4">{it.pack_size || "—"}</td>
+                              <td className="py-2 pr-4">{it.quantity}</td>
+                              <td className="py-2 pr-4">{currency(it.unit_price)}</td>
+                              <td className="py-2 pr-4">{currency(it.line_total)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
