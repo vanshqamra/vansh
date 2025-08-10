@@ -51,8 +51,8 @@ function QuotationBuilderInner() {
   if (!auth.loading && auth.role !== "admin") return <AccessDenied />
 
   // — State & Refs —
-  const [clientName, setClientName] = useState("")     // NEW
-  const [clientEmail, setClientEmail] = useState("")   // NEW
+  const [clientName, setClientName] = useState("")
+  const [clientEmail, setClientEmail] = useState("")
 
   const [items, setItems] = useState<QuotationItem[]>([])
   const [transport, setTransport] = useState(0)
@@ -95,7 +95,6 @@ function QuotationBuilderInner() {
 
       setItems(restoredItems)
       setTransport(Number(saved.transport || 0))
-      // optional if you save these later:
       if (q.client_name) setClientName(q.client_name)
       if (q.client_email) setClientEmail(q.client_email)
     })()
@@ -302,30 +301,31 @@ function QuotationBuilderInner() {
 
   // — Download DOCX (and save JSON to portal) —
   const downloadQuotation = async () => {
-    // 1) Build line items
+    // 1) Build line items matching single-brace tags in template
     const products = items.map((i, idx) => ({
       sr: idx + 1,
       description: i.productName,
-      brand: i.brand,
-      qty: i.quantity,
+      hsn: i.hsnCode || "",
       packSize: i.packSize,
+      qty: i.quantity,
       price: i.price,
       discount: i.discount,
       gst: i.gst,
-      hsn: i.hsnCode || "",
       total: i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100),
     }))
 
-    // 2) Compute grand total (sum of line totals + transport)
-    const sumOfLines = products.reduce((sum, p) => sum + p.total, 0)
-    const grandTotal = sumOfLines + transport
+    // 2) Totals for document
+    const grandTotal = total // (= subtotal + gstTotal + transport)
 
-    // 3) DOCX payload
+    // 3) DOCX payload (keys must match {client}, {transport}, {#products}…)
     const payload = {
       client: clientName || "Client Name",
+      clientEmail,
       date: new Date().toLocaleDateString(),
       products,
       transport,
+      subtotal,
+      gstTotal,
       grandTotal,
     }
 
@@ -340,9 +340,8 @@ function QuotationBuilderInner() {
           clientEmail: clientEmail || null,
           status: "DRAFT",
           currency: "INR",
-          totalsJson: { subtotal, gstTotal, transport, total }, // total = subtotal + gst + transport
+          totalsJson: { subtotal, gstTotal, transport, total },
           dataJson: { items, transport },
-          // docxUrl: null, // optional if you upload the file to storage later
         }),
       })
       if (!saveRes.ok) {
@@ -353,7 +352,7 @@ function QuotationBuilderInner() {
       console.error("Save quotation failed:", e)
     }
 
-    // 4) Generate DOCX (existing flow)
+    // 4) Generate DOCX
     const res = await fetch("/api/generate-quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -362,7 +361,7 @@ function QuotationBuilderInner() {
     const blob = await res.blob()
     const link = document.createElement("a")
     link.href = window.URL.createObjectURL(blob)
-    link.download = "Quotation.docx"
+    link.download = `Quotation-${(clientName || "Client").replace(/\s+/g, "_")}.docx`
     link.click()
   }
 
@@ -419,9 +418,7 @@ function QuotationBuilderInner() {
                       }}
                     >
                       <span className="font-medium">{p.productName}</span>{" "}
-                      <span className="text-xs text-muted-foreground">
-                        [Size: {p.packSize}] • [Code: {p.code}]
-                      </span>
+                      <span className="text-xs text-muted-foreground">[Size: {p.packSize}] • [Code: {p.code}]</span>
                     </div>
                   ))}
                 </div>
@@ -498,9 +495,7 @@ function QuotationBuilderInner() {
                       <td className="text-center">{i.discount}%</td>
                       <td className="text-center">{i.gst}%</td>
                       <td className="text-center">{i.hsnCode || "—"}</td>
-                      <td className="text-center">
-                        ₹{(i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100)).toFixed(2)}
-                      </td>
+                      <td className="text-center">₹{(i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100)).toFixed(2)}</td>
                       <td className="text-right">
                         <Button variant="ghost" size="sm" onClick={() => removeItem(i.id)}>Remove</Button>
                       </td>
