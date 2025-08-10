@@ -180,24 +180,112 @@ function QuotationBuilderInner() {
       })
     }
 
-    // HiMedia
-    if (Array.isArray(himediaData)) {
-      ;(himediaData as any[]).forEach((g: any) => {
-        ;(g.variants || []).forEach((v: any) => {
-          const desc = g.product || g.title || ""
-          const size = v.packing || v["Pack Size"] || v.size || ""
-          const name = size ? `${desc} (${size})` : desc
-          all.push({
-            productName: name,
-            code: v.code || v["Product Code"] || "",
-            brand: "HiMedia",
-            packSize: size,
-            price: parseFloat(v.rate || v.price) || 0,
-            hsnCode: v.hsn || v["HSN Code"] || "",
-          })
-        })
-      })
-    }
+    // HiMedia — handle grouped or flat shapes, and many key spellings
+try {
+  const asAny: any = himediaData;
+
+  // Case A: grouped array [{ product, variants: [...] }, ...]
+  if (Array.isArray(asAny)) {
+    asAny.forEach((g: any) => {
+      const groupName = g.product || g.title || g.name || "";
+      const variants = Array.isArray(g.variants) ? g.variants : [];
+      variants.forEach((v: any) => {
+        const code =
+          v.code ||
+          v["Product Code"] ||
+          v["Cat No"] ||
+          v["CatNo"] ||
+          v["Catalogue No"] ||
+          v["Catalogue No."] ||
+          "";
+        const size =
+          v.packing ||
+          v["Pack Size"] ||
+          v["Pack\nSize"] ||
+          v.Packing ||
+          v.size ||
+          "";
+        const desc = groupName || v.Description || v.name || v.title || "";
+        const name = size ? `${desc} (${size})` : desc;
+        const price =
+          parseFloat(
+            (v.rate ?? v.price ?? v["List Price"] ?? v["MRP"] ?? "").toString()
+          ) || 0;
+        const hsn = v.hsn || v["HSN"] || v["HSN Code"] || "";
+
+        all.push({
+          productName: name,
+          code,
+          brand: "HiMedia",
+          packSize: size,
+          price,
+          hsnCode: hsn,
+        });
+      });
+    });
+  }
+  // Case B: flat array of products (no variants)
+  else if (Array.isArray(asAny?.items)) {
+    asAny.items.forEach((v: any) => {
+      const code =
+        v.code ||
+        v["Product Code"] ||
+        v["Cat No"] ||
+        v["Catalogue No"] ||
+        "";
+      const size =
+        v.packing ||
+        v["Pack Size"] ||
+        v["Pack\nSize"] ||
+        v.Packing ||
+        v.size ||
+        "";
+      const desc = v.product || v.title || v.name || v.Description || "";
+      const name = size ? `${desc} (${size})` : desc;
+      const price =
+        parseFloat(
+          (v.rate ?? v.price ?? v["List Price"] ?? v["MRP"] ?? "").toString()
+        ) || 0;
+      const hsn = v.hsn || v["HSN"] || v["HSN Code"] || "";
+
+      all.push({
+        productName: name,
+        code,
+        brand: "HiMedia",
+        packSize: size,
+        price,
+        hsnCode: hsn,
+      });
+    });
+  }
+  // Fallback: unknown shape — try to read as a single group with variants
+  else if (Array.isArray(asAny?.variants)) {
+    const groupName = asAny.product || asAny.title || asAny.name || "HiMedia";
+    asAny.variants.forEach((v: any) => {
+      const code = v.code || v["Product Code"] || "";
+      const size =
+        v.packing || v["Pack Size"] || v["Pack\nSize"] || v.Packing || v.size || "";
+      const desc = groupName || v.Description || v.name || v.title || "";
+      const name = size ? `${desc} (${size})` : desc;
+      const price =
+        parseFloat(
+          (v.rate ?? v.price ?? v["List Price"] ?? v["MRP"] ?? "").toString()
+        ) || 0;
+      const hsn = v.hsn || v["HSN"] || v["HSN Code"] || "";
+      all.push({
+        productName: name,
+        code,
+        brand: "HiMedia",
+        packSize: size,
+        price,
+        hsnCode: hsn,
+      });
+    });
+  }
+} catch (e) {
+  console.warn("HiMedia parse error:", e);
+}
+
 
     // Bulk Commercial
     if (Array.isArray(bulkProducts)) {
