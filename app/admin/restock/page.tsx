@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/app/context/auth-context";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { AccessDenied } from "@/components/access-denied";
 import { Header } from "@/components/header";
-import { getAllProducts, ProductEntry } from "@/lib/get-all-products";
+import { getAllProducts } from "@/lib/get-all-products";
+import ProductSearchInput from "@/components/product-search-input";
 
 interface RestockItem {
   id: number;
@@ -22,9 +23,10 @@ interface RestockItem {
 
 export default function RestockPage() {
   const { role, loading } = useAuth();
-  if (!loading && role !== "admin") {
-    return <AccessDenied />;
-  }
+  if (!loading && role !== "admin") return <AccessDenied />;
+
+  // Load once; shape should be compatible with ProductSearchInput's SearchProduct
+  const allProducts = useMemo(() => getAllProducts(), []);
 
   const [items, setItems] = useState<RestockItem[]>([]);
   const [form, setForm] = useState({
@@ -35,27 +37,12 @@ export default function RestockPage() {
     quantity: "",
     price: "",
   });
-  const [filtered, setFiltered] = useState<ProductEntry[]>([]);
-  const allProducts = useMemo(() => getAllProducts(), []);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside (like quotations page)
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setFiltered([]);
-      }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, []);
 
   useEffect(() => {
-    // Quick sanity log, like you had
     console.log(
-      "Loaded products:",
+      "Loaded products (restock):",
       allProducts.length,
-      Array.from(new Set(allProducts.map((p) => p.brand)))
+      Array.from(new Set(allProducts.map((p: any) => p.brand)))
     );
   }, [allProducts]);
 
@@ -108,7 +95,7 @@ export default function RestockPage() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-8" ref={containerRef}>
+      <div className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
           <p className="text-gray-500">Restock Dashboard</p>
@@ -118,53 +105,26 @@ export default function RestockPage() {
           <CardHeader>
             <CardTitle>Add Product to Restock</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4 relative">
-            {/* Search */}
-            <div className="relative md:col-span-3">
+          <CardContent className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            {/* Search (reusable, with arrow keys + enter) */}
+            <div className="md:col-span-3">
               <Label>Search Product</Label>
-              <Input
+              <ProductSearchInput
+                products={allProducts as any}
                 value={form.productName}
-                onChange={(e) => {
-                  const q = e.target.value;
-                  const lower = q.toLowerCase();
-                  setForm((f) => ({ ...f, productName: q }));
-                  if (!q) {
-                    setFiltered([]);
-                    return;
-                  }
-                  setFiltered(
-                    allProducts.filter((p) =>
-                      `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(lower)
-                    )
-                  );
+                onChange={(text) => setForm((f) => ({ ...f, productName: text }))}
+                onSelect={(p) => {
+                  setForm({
+                    productName: `${p.productName} [${p.code}]`,
+                    code: p.code,
+                    brand: p.brand,
+                    packSize: p.packSize,
+                    quantity: "",
+                    price: p.price ? String(p.price) : "",
+                  });
                 }}
+                placeholder="Search products…"
               />
-              {filtered.length > 0 && (
-                <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
-                  {filtered.slice(0, 50).map((p, idx) => (
-                    <div
-                      key={idx}
-                      className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        setForm({
-                          productName: `${p.productName} [${p.code}]`,
-                          code: p.code,
-                          brand: p.brand,
-                          packSize: p.packSize,
-                          quantity: "",
-                          price: p.price ? String(p.price) : "",
-                        });
-                        setFiltered([]); // ✅ close dropdown
-                      }}
-                    >
-                      <span className="font-medium">{p.productName}</span>{" "}
-                      <span className="text-xs text-muted-foreground">
-                        [Code: {p.code}] • [Size: {p.packSize}]
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div>
