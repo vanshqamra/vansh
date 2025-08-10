@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { AccessDenied } from "@/components/access-denied"
 import { Header } from "@/components/header"
+import ProductSearchInput from "@/components/product-search-input"
 
 // Brand data imports
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
@@ -410,27 +411,27 @@ function QuotationBuilderInner() {
             {/* Search */}
             <div className="md:col-span-3">
               <Label>Search Product</Label>
-              <Input value={form.productName} onChange={(e) => handleSearch(e.target.value)} />
-              {filtered.length > 0 && (
-                <div className="absolute z-10 bg-white shadow border mt-1 w-full max-h-64 overflow-y-auto text-sm">
-                  {filtered.slice(0, 50).map((p, idx) => (
-                    <div
-                      key={idx}
-                      className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        setForm({
-                          productName: `${p.productName} [${p.code}]`,
-                          productCode: p.code,
-                          brand: p.brand,
-                          packSize: p.packSize,
-                          quantity: "",
-                          price: p.price.toString(),
-                          discount: "",
-                          gst: "",
-                        })
-                        setFiltered([])
-                      }}
-                    >
+              <ProductSearchInput
+                products={allProducts as any}
+                value={form.productName}
+                onChange={(text) => setForm((f) => ({ ...f, productName: text }))}
+                onSelect={(p) => {
+                  // When user picks with Enter/Click:
+                  setForm({
+                    productName: `${p.productName} [${p.code}]`,
+                    productCode: p.code,
+                    brand: p.brand,
+                    packSize: p.packSize,
+                    quantity: "",
+                    price: p.price ? String(p.price) : "",
+                    discount: "",
+                    gst: "",
+                  })
+                 }}
+                 placeholder="Search product…"
+               />
+             </div>
+            
                       <span className="font-medium">{p.productName}</span>{" "}
                       <span className="text-xs text-muted-foreground">[Size: {p.packSize}] • [Code: {p.code}]</span>
                     </div>
