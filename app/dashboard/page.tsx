@@ -216,7 +216,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Button variant="destructive" asChild>
-                <Link href="/dashboard/admin">Client Approvals</Link>
+                <Link href="/admin/review">Client Approvals</Link>
               </Button>
               <Button variant="destructive" asChild>
                 <Link href="/admin/restock">Restock Panel</Link>
