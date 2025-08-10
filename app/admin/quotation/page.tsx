@@ -259,17 +259,26 @@ function QuotationBuilderInner() {
   // — Add item to quotation —
   const handleAdd = () => {
     if (!form.productName || !form.quantity || !form.price) return
-    const match = allProducts.find((x) => x.code === form.productCode)
+
+    // Try to find a matching product by code first, then by name (supports "Name [CODE]" too)
+    const matchByCode = allProducts.find((x) => x.code === form.productCode)
+    const matchByName =
+      allProducts.find((x) => x.productName === form.productName) ||
+      allProducts.find((x) => `${x.productName} [${x.code}]` === form.productName)
+
+    const match = matchByCode || matchByName
+
     const hsn = match?.hsnCode || ""
-    const brand = form.brand || match?.brand || "" // ← fallback ensures brand is set
+    const brand = form.brand || match?.brand || "Unknown" // safe fallback
+
     setItems((prev) => [
       ...prev,
       {
         id: Date.now(),
-        productCode: form.productCode,
-        productName: form.productName,
-        brand, // ← use safe brand
-        packSize: form.packSize,
+        productCode: form.productCode || match?.code || "",
+        productName: form.productName || match?.productName || "",
+        brand,
+        packSize: form.packSize || match?.packSize || "",
         quantity: +form.quantity,
         price: +form.price,
         discount: +form.discount,
@@ -277,6 +286,7 @@ function QuotationBuilderInner() {
         hsnCode: hsn,
       },
     ])
+
     setForm({
       productName: "",
       productCode: "",
@@ -325,7 +335,7 @@ function QuotationBuilderInner() {
       date: new Date().toLocaleDateString(),
       products,
       transport,            // lowercase
-      Transport: transport, // Capital T to match {Transport}
+      Transport: transport, // Capital T for {Transport}
       TransportDisplay: transport > 0 ? `₹${transport.toFixed(2)}` : "",
       subtotal,
       gstTotal,
@@ -374,6 +384,7 @@ function QuotationBuilderInner() {
       <div className="container mx-auto px-4 py-8" ref={containerRef}>
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
+          <p className="text-gray-500">Quotation Builder</p>
         </div>
 
         {/* Client Details */}
