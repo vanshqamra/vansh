@@ -1,6 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+export const dynamic = "force-dynamic"
+
+import { Suspense, useEffect, useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@supabase/supabase-js"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -91,20 +93,19 @@ async function setOrderStatus(orderId: string, status: Order["status"]) {
   if (error) throw error
 }
 
-// ---------- PAGE ----------
-export default function AdminReviewPage() {
+// ---------- INNER PAGE (uses useSearchParams) ----------
+function AdminReviewInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   // Tab state (URL-driven)
   const initialTab = (() => {
     const t = (searchParams.get("tab") || "").toLowerCase()
-    if (t === "orders" || t === "clients" || t === "accounts") return t === "clients" ? "accounts" : t
-    // if orderId is present but no tab, default to orders
+    if (t === "orders" || t === "clients" || t === "accounts") return t === "clients" ? "accounts" : (t as "orders" | "accounts")
     return searchParams.get("orderId") ? "orders" : "accounts"
   })()
 
-  const [tab, setTab] = useState<"accounts" | "orders">(initialTab as any)
+  const [tab, setTab] = useState<"accounts" | "orders">(initialTab)
   const [loading, setLoading] = useState(false)
 
   // Accounts state
@@ -128,7 +129,6 @@ export default function AdminReviewPage() {
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString())
     params.set("tab", tab === "accounts" ? "clients" : "orders")
-    // preserve any existing orderId when on orders tab; drop it on accounts tab
     if (tab === "orders") {
       if (openOrderId) params.set("orderId", openOrderId)
     } else {
@@ -168,14 +168,12 @@ export default function AdminReviewPage() {
   useEffect(() => {
     const channel = supabase
       .channel("admin-review")
-      // profiles
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, (payload) =>
         setAccounts((prev) => [payload.new as Profile, ...prev])
       )
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, (payload) =>
         setAccounts((prev) => prev.map((p) => (p.id === (payload.new as any).id ? (payload.new as Profile) : p)))
       )
-      // orders
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) =>
         setOrders((prev) => [payload.new as Order, ...prev])
       )
@@ -189,12 +187,11 @@ export default function AdminReviewPage() {
     }
   }, [])
 
-  // If URL has orderId, auto-open on load and when params change
+  // If URL has orderId, auto-open
   useEffect(() => {
     const id = searchParams.get("orderId")
     if (id) {
       setTab("orders")
-      // Preload both sections
       viewItems(id, { pushUrl: false })
       viewOrderDetails(id, { pushUrl: false })
     }
@@ -216,9 +213,7 @@ export default function AdminReviewPage() {
     const q = orderQ.trim().toLowerCase()
     if (!q) return orders
     return orders.filter((o) =>
-      [o.id, o.status]
-        .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(q))
+      [o.id, o.status].filter(Boolean).some((v) => String(v).toLowerCase().includes(q))
     )
   }, [orders, orderQ])
 
@@ -243,7 +238,7 @@ export default function AdminReviewPage() {
     }
   }
 
-  // View order details (buyer/contact/shipping/payment/snapshot)
+  // View order details
   async function viewOrderDetails(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
     setDetailsLoading(true)
     setOrderDetails(null)
@@ -285,12 +280,7 @@ export default function AdminReviewPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>New & Pending Accounts</CardTitle>
               <div className="flex gap-2">
-                <Input
-                  placeholder="Search name/email/company/GSTIN…"
-                  value={acctQ}
-                  onChange={(e) => setAcctQ(e.target.value)}
-                  className="w-72"
-                />
+                <Input placeholder="Search name/email/company/GSTIN…" value={acctQ} onChange={(e) => setAcctQ(e.target.value)} className="w-72" />
               </div>
             </CardHeader>
             <CardContent>
@@ -318,9 +308,7 @@ export default function AdminReviewPage() {
                         <td className="py-2 pr-4">{a.phone || "—"}</td>
                         <td className="py-2 pr-4">{a.gstin || "—"}</td>
                         <td className="py-2 pr-4">
-                          <Badge variant={a.role === "pending" ? "secondary" : a.role === "client" ? "default" : "destructive"}>
-                            {a.role}
-                          </Badge>
+                          <Badge variant={a.role === "pending" ? "secondary" : a.role === "client" ? "default" : "destructive"}>{a.role}</Badge>
                         </td>
                         <td className="py-2 pr-4">
                           <div className="flex gap-2">
@@ -354,12 +342,7 @@ export default function AdminReviewPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Latest Orders</CardTitle>
               <div className="flex gap-2">
-                <Input
-                  placeholder="Search by ID/status…"
-                  value={orderQ}
-                  onChange={(e) => setOrderQ(e.target.value)}
-                  className="w-64"
-                />
+                <Input placeholder="Search by ID/status…" value={orderQ} onChange={(e) => setOrderQ(e.target.value)} className="w-64" />
               </div>
             </CardHeader>
             <CardContent>
@@ -579,5 +562,24 @@ export default function AdminReviewPage() {
         </TabsContent>
       </Tabs>
     </div>
+  )
+}
+
+// ---------- DEFAULT EXPORT WRAPPED IN SUSPENSE ----------
+export default function AdminReviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 w-64 rounded bg-gray-200" />
+            <div className="h-10 w-40 rounded bg-gray-200" />
+            <div className="h-64 w-full rounded bg-gray-200" />
+          </div>
+        </div>
+      }
+    >
+      <AdminReviewInner />
+    </Suspense>
   )
 }
