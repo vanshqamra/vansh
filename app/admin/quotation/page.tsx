@@ -55,7 +55,8 @@ function QuotationBuilderInner() {
   const [clientEmail, setClientEmail] = useState("")
 
   const [items, setItems] = useState<QuotationItem[]>([])
-  const [transport, setTransport] = useState(0)
+  const [transport, setTransport] = useState("")
+  const transport = Number(transportStr) || 0;
   const [form, setForm] = useState({
     productName: "",
     productCode: "",
@@ -317,7 +318,7 @@ function QuotationBuilderInner() {
     // 2) Totals for document
     const grandTotal = total // (= subtotal + gstTotal + transport)
 
-    // 3) DOCX payload (keys must match {client}, {transport}, {#products}…)
+    // 3) DOCX payload (keys must match {client}, {Transport}, {#products}…)
     const payload = {
       client: clientName || "Client Name",
       clientEmail,
