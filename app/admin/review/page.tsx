@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@supabase/supabase-js"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,11 +32,11 @@ type Order = {
   created_at: string
   user_id: string
   status: "pending" | "confirmed" | "fulfilled" | "cancelled"
-  subtotal: number
-  tax: number
-  shipping: number
-  discount: number
-  grand_total: number
+  subtotal: number | null
+  tax: number | null
+  shipping: number | null
+  discount: number | null
+  grand_total: number | null
 }
 
 type OrderItem = {
@@ -74,6 +75,9 @@ type OrderDetails = {
 const currency = (n: number | null | undefined) =>
   typeof n === "number" ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "—"
 
+const formatIST = (iso: string) =>
+  new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+
 async function approveUser(userId: string) {
   const { error } = await supabase.from("profiles").update({ role: "client" }).eq("id", userId)
   if (error) throw error
@@ -89,7 +93,18 @@ async function setOrderStatus(orderId: string, status: Order["status"]) {
 
 // ---------- PAGE ----------
 export default function AdminReviewPage() {
-  const [tab, setTab] = useState("accounts")
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Tab state (URL-driven)
+  const initialTab = (() => {
+    const t = (searchParams.get("tab") || "").toLowerCase()
+    if (t === "orders" || t === "clients" || t === "accounts") return t === "clients" ? "accounts" : t
+    // if orderId is present but no tab, default to orders
+    return searchParams.get("orderId") ? "orders" : "accounts"
+  })()
+
+  const [tab, setTab] = useState<"accounts" | "orders">(initialTab as any)
   const [loading, setLoading] = useState(false)
 
   // Accounts state
@@ -108,6 +123,20 @@ export default function AdminReviewPage() {
   // Details viewer state
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
   const [detailsLoading, setDetailsLoading] = useState(false)
+
+  // Keep URL in sync when tab changes
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", tab === "accounts" ? "clients" : "orders")
+    // preserve any existing orderId when on orders tab; drop it on accounts tab
+    if (tab === "orders") {
+      if (openOrderId) params.set("orderId", openOrderId)
+    } else {
+      params.delete("orderId")
+    }
+    router.replace(`/admin/review?${params.toString()}`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab])
 
   // Initial fetch
   useEffect(() => {
@@ -132,6 +161,7 @@ export default function AdminReviewPage() {
       }
     }
     init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Realtime subscriptions
@@ -159,23 +189,41 @@ export default function AdminReviewPage() {
     }
   }, [])
 
+  // If URL has orderId, auto-open on load and when params change
+  useEffect(() => {
+    const id = searchParams.get("orderId")
+    if (id) {
+      setTab("orders")
+      // Preload both sections
+      viewItems(id, { pushUrl: false })
+      viewOrderDetails(id, { pushUrl: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
+
   // Search filters
   const filteredAccounts = useMemo(() => {
     const q = acctQ.trim().toLowerCase()
     if (!q) return accounts
     return accounts.filter((a) =>
-      [a.email, a.full_name, a.company, a.phone, a.gstin, a.role].filter(Boolean).some((v) => String(v).toLowerCase().includes(q))
+      [a.email, a.full_name, a.company, a.phone, a.gstin, a.role]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q))
     )
   }, [accounts, acctQ])
 
   const filteredOrders = useMemo(() => {
     const q = orderQ.trim().toLowerCase()
     if (!q) return orders
-    return orders.filter((o) => [o.id, o.status].some((v) => String(v).toLowerCase().includes(q)))
+    return orders.filter((o) =>
+      [o.id, o.status]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q))
+    )
   }, [orders, orderQ])
 
   // View order items
-  async function viewItems(orderId: string) {
+  async function viewItems(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
     setOpenOrderId(orderId)
     setItems([])
     setItemsLoading(true)
@@ -186,10 +234,17 @@ export default function AdminReviewPage() {
       .order("created_at", { ascending: true })
     setItemsLoading(false)
     if (!error) setItems((data || []) as OrderItem[])
+
+    if (opts.pushUrl) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("tab", "orders")
+      params.set("orderId", orderId)
+      router.replace(`/admin/review?${params.toString()}`)
+    }
   }
 
   // View order details (buyer/contact/shipping/payment/snapshot)
-  async function viewOrderDetails(orderId: string) {
+  async function viewOrderDetails(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
     setDetailsLoading(true)
     setOrderDetails(null)
     const { data, error } = await supabase
@@ -199,6 +254,13 @@ export default function AdminReviewPage() {
       .single()
     setDetailsLoading(false)
     if (!error) setOrderDetails(data as OrderDetails)
+
+    if (opts.pushUrl) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("tab", "orders")
+      params.set("orderId", orderId)
+      router.replace(`/admin/review?${params.toString()}`)
+    }
   }
 
   // ---------- UI ----------
@@ -211,7 +273,7 @@ export default function AdminReviewPage() {
         </Button>
       </div>
 
-      <Tabs value={tab} onValueChange={setTab} className="w-full">
+      <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
         <TabsList>
           <TabsTrigger value="accounts">Accounts</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
@@ -223,7 +285,12 @@ export default function AdminReviewPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>New & Pending Accounts</CardTitle>
               <div className="flex gap-2">
-                <Input placeholder="Search name/email/company/GSTIN…" value={acctQ} onChange={(e) => setAcctQ(e.target.value)} className="w-72" />
+                <Input
+                  placeholder="Search name/email/company/GSTIN…"
+                  value={acctQ}
+                  onChange={(e) => setAcctQ(e.target.value)}
+                  className="w-72"
+                />
               </div>
             </CardHeader>
             <CardContent>
@@ -244,14 +311,16 @@ export default function AdminReviewPage() {
                   <tbody>
                     {filteredAccounts.map((a) => (
                       <tr key={a.id} className="border-b last:border-none">
-                        <td className="py-2 pr-4">{new Date(a.created_at).toLocaleString()}</td>
+                        <td className="py-2 pr-4">{formatIST(a.created_at)}</td>
                         <td className="py-2 pr-4">{a.full_name || "—"}</td>
                         <td className="py-2 pr-4">{a.email}</td>
                         <td className="py-2 pr-4">{a.company || "—"}</td>
                         <td className="py-2 pr-4">{a.phone || "—"}</td>
                         <td className="py-2 pr-4">{a.gstin || "—"}</td>
                         <td className="py-2 pr-4">
-                          <Badge variant={a.role === "pending" ? "secondary" : a.role === "client" ? "default" : "destructive"}>{a.role}</Badge>
+                          <Badge variant={a.role === "pending" ? "secondary" : a.role === "client" ? "default" : "destructive"}>
+                            {a.role}
+                          </Badge>
                         </td>
                         <td className="py-2 pr-4">
                           <div className="flex gap-2">
@@ -285,7 +354,12 @@ export default function AdminReviewPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Latest Orders</CardTitle>
               <div className="flex gap-2">
-                <Input placeholder="Search by ID/status…" value={orderQ} onChange={(e) => setOrderQ(e.target.value)} className="w-64" />
+                <Input
+                  placeholder="Search by ID/status…"
+                  value={orderQ}
+                  onChange={(e) => setOrderQ(e.target.value)}
+                  className="w-64"
+                />
               </div>
             </CardHeader>
             <CardContent>
@@ -307,7 +381,7 @@ export default function AdminReviewPage() {
                   <tbody>
                     {filteredOrders.map((o) => (
                       <tr key={o.id} className="border-b last:border-none">
-                        <td className="py-2 pr-4">{new Date(o.created_at).toLocaleString()}</td>
+                        <td className="py-2 pr-4">{formatIST(o.created_at)}</td>
                         <td className="py-2 pr-4 font-mono">{o.id}</td>
                         <td className="py-2 pr-4">
                           <Badge
@@ -331,10 +405,24 @@ export default function AdminReviewPage() {
                         <td className="py-2 pr-4 font-semibold">{currency(o.grand_total)}</td>
                         <td className="py-2 pr-4">
                           <div className="flex gap-2">
-                            <Button size="sm" variant="outline" onClick={() => viewItems(o.id)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setTab("orders")
+                                viewItems(o.id)
+                              }}
+                            >
                               View
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => viewOrderDetails(o.id)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setTab("orders")
+                                viewOrderDetails(o.id)
+                              }}
+                            >
                               Details
                             </Button>
                             <Button size="sm" variant="default" onClick={() => setOrderStatus(o.id, "confirmed")}>
@@ -366,7 +454,17 @@ export default function AdminReviewPage() {
                 <div className="mt-4 rounded-xl border p-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">Items for Order {openOrderId}</h3>
-                    <Button variant="ghost" size="sm" onClick={() => setOpenOrderId(null)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setOpenOrderId(null)
+                        setItems([])
+                        const params = new URLSearchParams(searchParams.toString())
+                        params.delete("orderId")
+                        router.replace(`/admin/review?${params.toString()}`)
+                      }}
+                    >
                       Close
                     </Button>
                   </div>
@@ -411,7 +509,16 @@ export default function AdminReviewPage() {
                 <div className="mt-4 rounded-xl border p-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">Order Details — {orderDetails.id}</h3>
-                    <Button variant="ghost" size="sm" onClick={() => setOrderDetails(null)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setOrderDetails(null)
+                        const params = new URLSearchParams(searchParams.toString())
+                        params.delete("orderId")
+                        router.replace(`/admin/review?${params.toString()}`)
+                      }}
+                    >
                       Close
                     </Button>
                   </div>
@@ -434,7 +541,12 @@ export default function AdminReviewPage() {
                         <div className="font-semibold">Shipping</div>
                         {orderDetails.shipping_address ? (
                           <div className="whitespace-pre-wrap break-words">
-                            {[orderDetails.shipping_address.address, orderDetails.shipping_address.city, orderDetails.shipping_address.state, orderDetails.shipping_address.pincode]
+                            {[
+                              orderDetails.shipping_address.address,
+                              orderDetails.shipping_address.city,
+                              orderDetails.shipping_address.state,
+                              orderDetails.shipping_address.pincode,
+                            ]
                               .filter(Boolean)
                               .join(", ")}
                           </div>
