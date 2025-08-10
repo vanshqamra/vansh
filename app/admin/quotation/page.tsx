@@ -382,7 +382,7 @@ function QuotationBuilderInner() {
 
   return (
     <>
-      <Header/>
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
@@ -408,7 +408,7 @@ function QuotationBuilderInner() {
         <Card className="mb-6">
           <CardHeader><CardTitle>Add Product to Quotation</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-7 gap-4 relative">
-            {/* Search */}
+            {/* Search (reusable component with arrow keys) */}
             <div className="md:col-span-3">
               <Label>Search Product</Label>
               <ProductSearchInput
@@ -416,7 +416,6 @@ function QuotationBuilderInner() {
                 value={form.productName}
                 onChange={(text) => setForm((f) => ({ ...f, productName: text }))}
                 onSelect={(p) => {
-                  // When user picks with Enter/Click:
                   setForm({
                     productName: `${p.productName} [${p.code}]`,
                     productCode: p.code,
@@ -427,17 +426,9 @@ function QuotationBuilderInner() {
                     discount: "",
                     gst: "",
                   })
-                 }}
-                 placeholder="Search product…"
-               />
-             </div>
-            
-                      <span className="font-medium">{p.productName}</span>{" "}
-                      <span className="text-xs text-muted-foreground">[Size: {p.packSize}] • [Code: {p.code}]</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                }}
+                placeholder="Search product…"
+              />
             </div>
 
             <div>
@@ -469,6 +460,7 @@ function QuotationBuilderInner() {
             </div>
           </CardContent>
         </Card>
+
 
         {/* Preview */}
         {items.length > 0 && (
