@@ -180,111 +180,60 @@ function QuotationBuilderInner() {
       })
     }
 
-    // HiMedia — handle grouped or flat shapes, and many key spellings
+    // HiMedia — groups with { sub_section, products: [...] }
 try {
-  const asAny: any = himediaData;
+  const src: any = (himediaData as any)?.default ?? himediaData;
 
-  // Case A: grouped array [{ product, variants: [...] }, ...]
-  if (Array.isArray(asAny)) {
-    asAny.forEach((g: any) => {
-      const groupName = g.product || g.title || g.name || "";
-      const variants = Array.isArray(g.variants) ? g.variants : [];
-      variants.forEach((v: any) => {
+  const clean = (s: any) =>
+    (typeof s === "string" ? s.replace(/\u2028|\u2029/g, "").trim() : s ?? "");
+
+  if (Array.isArray(src)) {
+    src.forEach((grp: any) => {
+      const groupName =
+        clean(grp?.sub_section) ||
+        clean(grp?.section) ||
+        clean(grp?.title) ||
+        clean(grp?.name) ||
+        "HiMedia";
+
+      const products = Array.isArray(grp?.products) ? grp.products : [];
+      products.forEach((v: any) => {
         const code =
-          v.code ||
-          v["Product Code"] ||
-          v["Cat No"] ||
-          v["CatNo"] ||
-          v["Catalogue No"] ||
-          v["Catalogue No."] ||
+          clean(v.code) ||
+          clean(v["Product Code"]) ||
+          clean(v["Cat No"]) ||
+          clean(v["Catalogue No"]) ||
           "";
+
         const size =
-          v.packing ||
-          v["Pack Size"] ||
-          v["Pack\nSize"] ||
-          v.Packing ||
-          v.size ||
+          clean(v.packing) ||
+          clean(v["Pack Size"]) ||
+          clean(v["Pack\nSize"]) ||
+          clean(v.Packing) ||
+          clean(v.size) ||
           "";
-        const desc = groupName || v.Description || v.name || v.title || "";
+
+        const desc = clean(v.name) || groupName;
         const name = size ? `${desc} (${size})` : desc;
-        const price =
-          parseFloat(
-            (v.rate ?? v.price ?? v["List Price"] ?? v["MRP"] ?? "").toString()
-          ) || 0;
-        const hsn = v.hsn || v["HSN"] || v["HSN Code"] || "";
+
+        const priceNum = parseFloat(String(v.rate ?? v.price ?? v.Price ?? 0)) || 0;
+        const hsn = clean(v.hsn) || clean(v["HSN Code"]) || "";
 
         all.push({
           productName: name,
           code,
           brand: "HiMedia",
           packSize: size,
-          price,
+          price: priceNum,
           hsnCode: hsn,
         });
-      });
-    });
-  }
-  // Case B: flat array of products (no variants)
-  else if (Array.isArray(asAny?.items)) {
-    asAny.items.forEach((v: any) => {
-      const code =
-        v.code ||
-        v["Product Code"] ||
-        v["Cat No"] ||
-        v["Catalogue No"] ||
-        "";
-      const size =
-        v.packing ||
-        v["Pack Size"] ||
-        v["Pack\nSize"] ||
-        v.Packing ||
-        v.size ||
-        "";
-      const desc = v.product || v.title || v.name || v.Description || "";
-      const name = size ? `${desc} (${size})` : desc;
-      const price =
-        parseFloat(
-          (v.rate ?? v.price ?? v["List Price"] ?? v["MRP"] ?? "").toString()
-        ) || 0;
-      const hsn = v.hsn || v["HSN"] || v["HSN Code"] || "";
-
-      all.push({
-        productName: name,
-        code,
-        brand: "HiMedia",
-        packSize: size,
-        price,
-        hsnCode: hsn,
-      });
-    });
-  }
-  // Fallback: unknown shape — try to read as a single group with variants
-  else if (Array.isArray(asAny?.variants)) {
-    const groupName = asAny.product || asAny.title || asAny.name || "HiMedia";
-    asAny.variants.forEach((v: any) => {
-      const code = v.code || v["Product Code"] || "";
-      const size =
-        v.packing || v["Pack Size"] || v["Pack\nSize"] || v.Packing || v.size || "";
-      const desc = groupName || v.Description || v.name || v.title || "";
-      const name = size ? `${desc} (${size})` : desc;
-      const price =
-        parseFloat(
-          (v.rate ?? v.price ?? v["List Price"] ?? v["MRP"] ?? "").toString()
-        ) || 0;
-      const hsn = v.hsn || v["HSN"] || v["HSN Code"] || "";
-      all.push({
-        productName: name,
-        code,
-        brand: "HiMedia",
-        packSize: size,
-        price,
-        hsnCode: hsn,
       });
     });
   }
 } catch (e) {
   console.warn("HiMedia parse error:", e);
 }
+
 
 
     // Bulk Commercial
