@@ -53,6 +53,23 @@ type OrderItem = {
   line_total: number
 }
 
+type OrderDetails = {
+  id: string
+  buyer_first_name: string | null
+  buyer_last_name: string | null
+  company_name: string | null
+  buyer_phone: string | null
+  shipping_address: {
+    address?: string
+    city?: string
+    state?: string
+    pincode?: string
+    [k: string]: any
+  } | null
+  payment_method: string | null
+  checkout_snapshot: any | null
+}
+
 // ---------- HELPERS ----------
 const currency = (n: number | null | undefined) =>
   typeof n === "number" ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "—"
@@ -87,6 +104,10 @@ export default function AdminReviewPage() {
   const [openOrderId, setOpenOrderId] = useState<string | null>(null)
   const [items, setItems] = useState<OrderItem[]>([])
   const [itemsLoading, setItemsLoading] = useState(false)
+
+  // Details viewer state
+  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
+  const [detailsLoading, setDetailsLoading] = useState(false)
 
   // Initial fetch
   useEffect(() => {
@@ -167,6 +188,20 @@ export default function AdminReviewPage() {
     if (!error) setItems((data || []) as OrderItem[])
   }
 
+  // View order details (buyer/contact/shipping/payment/snapshot)
+  async function viewOrderDetails(orderId: string) {
+    setDetailsLoading(true)
+    setOrderDetails(null)
+    const { data, error } = await supabase
+      .from("orders")
+      .select("id, buyer_first_name, buyer_last_name, company_name, buyer_phone, shipping_address, payment_method, checkout_snapshot")
+      .eq("id", orderId)
+      .single()
+    setDetailsLoading(false)
+    if (!error) setOrderDetails(data as OrderDetails)
+  }
+
+  // ---------- UI ----------
   return (
     <div className="container mx-auto py-8">
       <div className="mb-6 flex items-center justify-between gap-2">
@@ -299,6 +334,9 @@ export default function AdminReviewPage() {
                             <Button size="sm" variant="outline" onClick={() => viewItems(o.id)}>
                               View
                             </Button>
+                            <Button size="sm" variant="outline" onClick={() => viewOrderDetails(o.id)}>
+                              Details
+                            </Button>
                             <Button size="sm" variant="default" onClick={() => setOrderStatus(o.id, "confirmed")}>
                               <CheckCircle2 className="mr-2 h-4 w-4" /> Confirm
                             </Button>
@@ -363,6 +401,63 @@ export default function AdminReviewPage() {
                           ))}
                         </tbody>
                       </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Details panel */}
+              {orderDetails && (
+                <div className="mt-4 rounded-xl border p-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Order Details — {orderDetails.id}</h3>
+                    <Button variant="ghost" size="sm" onClick={() => setOrderDetails(null)}>
+                      Close
+                    </Button>
+                  </div>
+
+                  {detailsLoading ? (
+                    <div className="text-sm text-muted-foreground mt-2">Loading details…</div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 text-sm">
+                      <div className="space-y-1">
+                        <div className="font-semibold">Buyer</div>
+                        <div>
+                          {(orderDetails.buyer_first_name || "—")}{" "}
+                          {(orderDetails.buyer_last_name || "")}
+                        </div>
+                        <div>{orderDetails.company_name || "—"}</div>
+                        <div>{orderDetails.buyer_phone || "—"}</div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="font-semibold">Shipping</div>
+                        {orderDetails.shipping_address ? (
+                          <div className="whitespace-pre-wrap break-words">
+                            {[orderDetails.shipping_address.address, orderDetails.shipping_address.city, orderDetails.shipping_address.state, orderDetails.shipping_address.pincode]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </div>
+                        ) : (
+                          <div>—</div>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="font-semibold">Payment</div>
+                        <div>Method: {orderDetails.payment_method || "—"}</div>
+                      </div>
+
+                      <div className="space-y-1 md:col-span-3">
+                        <details className="mt-2">
+                          <summary className="cursor-pointer">Raw checkout snapshot</summary>
+                          <pre className="mt-2 whitespace-pre-wrap break-words">
+                            {orderDetails.checkout_snapshot
+                              ? JSON.stringify(orderDetails.checkout_snapshot, null, 2)
+                              : "—"}
+                          </pre>
+                        </details>
+                      </div>
                     </div>
                   )}
                 </div>
