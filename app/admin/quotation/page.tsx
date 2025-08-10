@@ -261,13 +261,14 @@ function QuotationBuilderInner() {
     if (!form.productName || !form.quantity || !form.price) return
     const match = allProducts.find((x) => x.code === form.productCode)
     const hsn = match?.hsnCode || ""
+    const brand = form.brand || match?.brand || "" // ← fallback ensures brand is set
     setItems((prev) => [
       ...prev,
       {
         id: Date.now(),
         productCode: form.productCode,
         productName: form.productName,
-        brand: form.brand,
+        brand, // ← use safe brand
         packSize: form.packSize,
         quantity: +form.quantity,
         price: +form.price,
@@ -323,10 +324,9 @@ function QuotationBuilderInner() {
       clientEmail,
       date: new Date().toLocaleDateString(),
       products,
-      transport,                            // lowercase (if your API/template uses it)
-      Transport: transport,                 // Capital T to match {Transport} in DOCX
-      TransportDisplay:                      // optional pretty string if you switch template to {TransportDisplay}
-        transport > 0 ? `₹${transport.toFixed(2)}` : "",
+      transport,            // lowercase
+      Transport: transport, // Capital T to match {Transport}
+      TransportDisplay: transport > 0 ? `₹${transport.toFixed(2)}` : "",
       subtotal,
       gstTotal,
       grandTotal,
@@ -374,7 +374,6 @@ function QuotationBuilderInner() {
       <div className="container mx-auto px-4 py-8" ref={containerRef}>
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
-          <p className="text-gray-500">Quotation Builder</p>
         </div>
 
         {/* Client Details */}
@@ -491,7 +490,7 @@ function QuotationBuilderInner() {
                   {items.map((i) => (
                     <tr key={i.id} className="border-b">
                       <td>{i.productName}</td>
-                      <td className="text-center">{i.brand}</td>
+                      <td className="text-center">{i.brand || "—"}</td>
                       <td className="text-center">{i.packSize}</td>
                       <td className="text-center">{i.quantity}</td>
                       <td className="text-center">₹{i.price.toFixed(2)}</td>
