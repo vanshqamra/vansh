@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Header } from "@/components/header"
 
 type QuotationRow = {
   id: string
   created_at: string
-  // title removed from the UI, but it's fine if your API still sends it
   title?: string | null
   client_name: string | null
-  client_email: string | null   // ← add this
+  client_email: string | null
   status: string | null
   currency: string | null
   totals_json: { total?: number } | null
@@ -24,7 +24,7 @@ export default function PastQuotationsPage() {
   const [rows, setRows] = useState<QuotationRow[]>([])
   const [loading, setLoading] = useState(false)
   const [statusMsg, setStatusMsg] = useState<string>("")
-  const [raw, setRaw] = useState<any>(null) // debug: raw API payload
+  const [raw, setRaw] = useState<any>(null)
   const router = useRouter()
 
   async function load() {
@@ -66,23 +66,13 @@ export default function PastQuotationsPage() {
         body: JSON.stringify({
           title: `Test Quote ${new Date().toLocaleString()}`,
           clientName: "Test Client",
-          clientEmail: "buyer@test.com", // set one so you can see it render
+          clientEmail: "buyer@test.com",
           status: "DRAFT",
           currency: "INR",
           totalsJson: { subtotal: 100, gstTotal: 18, transport: 0, total: 118 },
           dataJson: {
             items: [
-              {
-                productCode: "TST-001",
-                productName: "Test Product",
-                brand: "Demo",
-                packSize: "1 pc",
-                quantity: 1,
-                price: 100,
-                discount: 0,
-                gst: 18,
-                hsnCode: "0000",
-              },
+              { productCode: "TST-001", productName: "Test Product", brand: "Demo", packSize: "1 pc", quantity: 1, price: 100, discount: 0, gst: 18, hsnCode: "0000" },
             ],
             transport: 0,
           },
@@ -101,71 +91,69 @@ export default function PastQuotationsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Input
-          placeholder="Search client/email/status"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="w-64"
-        />
-        <Button onClick={load} disabled={loading}>
-          {loading ? "Loading…" : "Search"}
-        </Button>
-        <Button variant="secondary" onClick={createTestQuotation}>
-          Create test quotation
-        </Button>
-        <span className="text-sm text-muted-foreground">{statusMsg}</span>
-      </div>
+    <>
+      <Header />
+      <div className="container mx-auto px-4 py-8 space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            placeholder="Search client/email/status"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="w-64"
+          />
+          <Button onClick={load} disabled={loading}>
+            {loading ? "Loading…" : "Search"}
+          </Button>
+          <Button variant="secondary" onClick={createTestQuotation}>
+            Create test quotation
+          </Button>
+          <span className="text-sm text-muted-foreground">{statusMsg}</span>
+        </div>
 
-      {raw && (
-        <details className="text-xs text-muted-foreground">
-          <summary>Show raw API response</summary>
-          <pre className="whitespace-pre-wrap break-all">{JSON.stringify(raw, null, 2)}</pre>
-        </details>
-      )}
+        {raw && (
+          <details className="text-xs text-muted-foreground">
+            <summary>Show raw API response</summary>
+            <pre className="whitespace-pre-wrap break-all">{JSON.stringify(raw, null, 2)}</pre>
+          </details>
+        )}
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="grid grid-cols-6 gap-2 px-4 py-3 font-medium border-b">
-            <div>Date</div>
-            <div>Client</div>
-            <div>Email</div>     {/* ← changed from Title */}
-            <div>Status</div>
-            <div>Total</div>
-            <div>Actions</div>
-          </div>
-
-          {rows.map((row) => (
-            <div key={row.id} className="grid grid-cols-6 gap-2 px-4 py-3 border-b items-center">
-              <div>{row.created_at ? new Date(row.created_at).toLocaleDateString() : ""}</div>
-              <div>{row.client_name || ""}</div>
-              <div className="truncate">{row.client_email || ""}</div> {/* ← email, empty if none */}
-              <div>{row.status || ""}</div>
-              <div>
-                {row.totals_json?.total ?? ""} {row.currency || ""}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => router.push(`/admin/quotation?quoteId=${row.id}`)}
-                >
-                  Open in Builder
-                </Button>
-                {row.docx_url ? (
-                  <a href={row.docx_url} target="_blank" rel="noreferrer">
-                    <Button size="sm" variant="secondary">Download DOCX</Button>
-                  </a>
-                ) : null}
-              </div>
+        <Card>
+          <CardContent className="p-0">
+            <div className="grid grid-cols-6 gap-2 px-4 py-3 font-medium border-b">
+              <div>Date</div>
+              <div>Client</div>
+              <div>Email</div>
+              <div>Status</div>
+              <div>Total</div>
+              <div>Actions</div>
             </div>
-          ))}
 
-          {rows.length === 0 && (
-            <div className="px-4 py-6 text-sm text-muted-foreground">No quotations yet.</div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            {rows.map((row) => (
+              <div key={row.id} className="grid grid-cols-6 gap-2 px-4 py-3 border-b items-center">
+                <div>{row.created_at ? new Date(row.created_at).toLocaleDateString() : ""}</div>
+                <div>{row.client_name || ""}</div>
+                <div className="truncate">{row.client_email || ""}</div>
+                <div>{row.status || ""}</div>
+                <div>{row.totals_json?.total ?? ""} {row.currency || ""}</div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => router.push(`/admin/quotation?quoteId=${row.id}`)}>
+                    Open in Builder
+                  </Button>
+                  {row.docx_url ? (
+                    <a href={row.docx_url} target="_blank" rel="noreferrer">
+                      <Button size="sm" variant="secondary">Download DOCX</Button>
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+
+            {rows.length === 0 && (
+              <div className="px-4 py-6 text-sm text-muted-foreground">No quotations yet.</div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </>
   )
 }
