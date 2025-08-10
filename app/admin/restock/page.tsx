@@ -18,6 +18,7 @@ interface RestockItem {
   packSize: string;
   quantity: number;
   price: number;
+  setFiltered([]); // ✅ hides the dropdown
 }
 
 export default function RestockPage() {
