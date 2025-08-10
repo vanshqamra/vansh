@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,58 +10,86 @@ import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client"
 
+type OrderRow = {
+  id: string
+  created_at: string
+  status: "pending" | "confirmed" | "fulfilled" | "cancelled"
+  grand_total: number
+}
+
+type QuoteRow = {
+  id: string
+  created_at: string
+  title: string | null
+  status: string | null
+  client_email: string | null
+}
+
 export default function Dashboard() {
   const { user } = useAuth()
   const { state } = useCart()
   const supabase = createSupabaseBrowserClient()
+
   const [mounted, setMounted] = useState(false)
   const [role, setRole] = useState<string | null>(null)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    const fetchRole = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-
-      if (!session?.user) return
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", session.user.id)
-        .single()
-
-      if (!error && data) {
-        setRole(data.role)
-      }
-    }
-
-    fetchRole()
-  }, [])
-
-  if (!mounted) {
-    return <div>Loading...</div>
-  }
+  const [orders, setOrders] = useState<OrderRow[]>([])
+  const [ordersCount, setOrdersCount] = useState<number>(0)
+  const [quotes, setQuotes] = useState<QuoteRow[]>([])
 
   const cartItems = state?.items || []
   const cartTotal = state?.total || 0
   const cartItemCount = state?.itemCount || 0
 
-  const recentOrders = [
-    { id: "ORD-001", date: "2024-01-15", status: "Delivered", total: 15750, items: 3 },
-    { id: "ORD-002", date: "2024-01-10", status: "Processing", total: 8900, items: 2 },
-    { id: "ORD-003", date: "2024-01-05", status: "Shipped", total: 22300, items: 5 },
-  ]
+  useEffect(() => setMounted(true), [])
 
-  const stats = [
-    { title: "Total Orders", value: "12", icon: Package, description: "All time orders" },
-    { title: "Cart Items", value: cartItemCount.toString(), icon: ShoppingCart, description: "Items in current cart" },
+  useEffect(() => {
+    if (!mounted) return
+    ;(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      const uid = session?.user?.id
+      if (!uid) return
+
+      // role
+      const { data: prof } = await supabase.from("profiles").select("role").eq("id", uid).single()
+      setRole(prof?.role ?? null)
+
+      // REAL recent orders for this user
+      const { data: ord } = await supabase
+        .from("orders")
+        .select("id, created_at, status, grand_total", { count: "exact", head: false })
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+        .limit(5)
+      setOrders(ord || [])
+
+      // total orders count (for stat card)
+      const { count } = await supabase
+        .from("orders")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", uid)
+      setOrdersCount(count ?? 0)
+
+      // REAL quotations created by this user
+      // If your quotations table links by email, keep this. If you store user_id, change to .eq("user_id", uid)
+      if (session?.user?.email) {
+        const { data: q } = await supabase
+          .from("quotations")
+          .select("id, created_at, title, status, client_email")
+          .eq("client_email", session.user.email)
+          .order("created_at", { ascending: false })
+          .limit(5)
+        setQuotes(q || [])
+      }
+    })()
+  }, [mounted])
+
+  const stats = useMemo(() => ([
+    { title: "Total Orders", value: String(ordersCount), icon: Package, description: "All time orders" },
+    { title: "Cart Items", value: String(cartItemCount), icon: ShoppingCart, description: "Items in current cart" },
     { title: "Cart Value", value: `₹${cartTotal.toLocaleString()}`, icon: TrendingUp, description: "Current cart total" },
-  ]
+  ]), [ordersCount, cartItemCount, cartTotal])
+
+  if (!mounted) return <div className="p-8">Loading…</div>
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,6 +98,20 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
           <p className="text-gray-600">Welcome back, {user?.email?.split("@")[0] || "User"}!</p>
         </div>
+
+        {/* If admin, nudge them to the admin dashboard instead */}
+        {role === "admin" && (
+          <Card className="mb-8">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">You are an admin. Go to the admin dashboard.</p>
+                <Button asChild variant="destructive" size="sm">
+                  <Link href="/dashboard/admin">Open Admin Dashboard</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -88,7 +130,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Orders */}
+          {/* REAL Recent Orders */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -98,33 +140,38 @@ export default function Dashboard() {
               <CardDescription>Your latest order history</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{order.id}</p>
-                      <p className="text-sm text-gray-500">{order.date}</p>
-                      <p className="text-sm text-gray-500">{order.items} items</p>
+              {orders.length === 0 ? (
+                <div className="text-sm text-muted-foreground">No orders yet.</div>
+              ) : (
+                <div className="space-y-4">
+                  {orders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <p className="font-medium">{order.id}</p>
+                        <p className="text-sm text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">₹{Number(order.grand_total || 0).toLocaleString()}</p>
+                        <Badge
+                          variant={
+                            order.status === "fulfilled"
+                              ? "default"
+                              : order.status === "pending"
+                              ? "secondary"
+                              : order.status === "confirmed"
+                              ? "outline"
+                              : "destructive"
+                          }
+                        >
+                          {order.status === "fulfilled" && <CheckCircle className="h-3 w-3 mr-1" />}
+                          {order.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
+                          {order.status}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold">₹{order.total.toLocaleString()}</p>
-                      <Badge
-                        variant={
-                          order.status === "Delivered"
-                            ? "default"
-                            : order.status === "Processing"
-                            ? "secondary"
-                            : "outline"
-                        }
-                      >
-                        {order.status === "Delivered" && <CheckCircle className="h-3 w-3 mr-1" />}
-                        {order.status === "Processing" && <Clock className="h-3 w-3 mr-1" />}
-                        {order.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
               <Button variant="outline" className="w-full mt-4 bg-transparent" asChild>
                 <Link href="/dashboard/history">View All Orders</Link>
               </Button>
@@ -143,7 +190,7 @@ export default function Dashboard() {
             <CardContent>
               {cartItems.length > 0 ? (
                 <div className="space-y-4">
-                  {cartItems.slice(0, 3).map((item) => (
+                  {cartItems.slice(0, 3).map((item: any) => (
                     <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <p className="font-medium text-sm">{item.name}</p>
@@ -183,48 +230,21 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quotations (REAL) */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Frequently used features</CardDescription>
+            <CardTitle>Your Quotation Requests</CardTitle>
+            <CardDescription>Recent RFQs you submitted</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button variant="outline" asChild>
-                <Link href="/products/bulk-chemicals">Browse Products</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/history">Order History</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/upload">Upload Quote</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/contact">Contact Support</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Admin Tools */}
-        {role === "admin" && (
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Admin Tools</CardTitle>
-              <CardDescription>Only visible to admins</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button variant="destructive" asChild>
-                <Link href="/admin/review">Client Approvals</Link>
-              </Button>
-              <Button variant="destructive" asChild>
-                <Link href="/admin/restock">Restock Panel</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </div>
-  )
-}
+            {quotes.length === 0 ? (
+              <div className="text-sm text-muted-foreground">No quotations yet.</div>
+            ) : (
+              <div className="space-y-3">
+                {quotes.map((q) => (
+                  <div key={q.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium text-sm">{q.title || q.id}</p>
+                      <p className="text-xs text-gray-500">{new Date(q.created_at).toLocaleString()}</p>
+                    </div>
+                    <
