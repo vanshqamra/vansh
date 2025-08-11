@@ -84,7 +84,7 @@ export default function HomePage() {
   </div>
 
   {/* Glow rim for hero card */}
-  <div className="absolute inset-x-6 md:inset-x-12 top-[12%] h-40 rounded-[28px] blur-3xl opacity-40 bg-gradient-to-r from-cyan-400/30 via-sky-400/25 to-teal-400/30 pointer-events-none" />
+  <div className="absolute inset-x-6 md:inset-x-12 top-[12%] h-56 rounded-[32px] blur-2xl opacity-70 bg-gradient-to-r from-cyan-400/45 via-sky-400/35 to-teal-400/45 pointer-events-none" />
 
   {/* Hero content ABOVE FX */}
   <div className="relative z-20 text-center text-white px-4 max-w-4xl mx-auto fx-reveal" style={{ animationDelay: "80ms" }}>
@@ -93,7 +93,7 @@ export default function HomePage() {
       Advanced Laboratory Solutions
     </Badge>
 
-    <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+    <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-6">
       Chemical Corporation
     </h1>
 
