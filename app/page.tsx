@@ -160,45 +160,55 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8"> <Card className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal" style={{ animationDelay: "60ms" }}>
-            <div className="fx-card-glow" />
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <FlaskConical className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-slate-900">Premium Chemicals</h3>
-              <p className="text-slate-600 leading-relaxed">
-                High-purity laboratory chemicals from trusted global manufacturers, ensuring consistent results in your research.
-              </p>
-            </CardContent
-              </Card>
+          <div className="grid md:grid-cols-3 gap-8">
+  <Card
+    className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
+    style={{ animationDelay: "60ms" }}
+  >
+    <div className="fx-card-glow" />
+    <CardContent className="p-8 text-center">
+      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+        <FlaskConical className="h-8 w-8 text-white" />
+      </div>
+      <h3 className="text-xl font-semibold mb-4 text-slate-900">Premium Chemicals</h3>
+      <p className="text-slate-600 leading-relaxed">
+        High-purity laboratory chemicals from trusted global manufacturers, ensuring consistent results in your research.
+      </p>
+    </CardContent>
+  </Card>
 
-            <Card className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal" style={{ animationDelay: "120ms" }}>
-              <div className="fx-card-glow" />
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                  <Microscope className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4 text-slate-900">Advanced Instruments</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  State-of-the-art scientific instruments and equipment for precise measurements and analysis.
-                </p>
-              </CardContent>
-            </Card>
+  <Card
+    className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
+    style={{ animationDelay: "120ms" }}
+  >
+    <div className="fx-card-glow" />
+    <CardContent className="p-8 text-center">
+      <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+        <Microscope className="h-8 w-8 text-white" />
+      </div>
+      <h3 className="text-xl font-semibold mb-4 text-slate-900">Advanced Instruments</h3>
+      <p className="text-slate-600 leading-relaxed">
+        State-of-the-art scientific instruments and equipment for precise measurements and analysis.
+      </p>
+    </CardContent>
+  </Card>
 
-            <Card className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal" style={{ animationDelay: "180ms" }}>
-              <div className="fx-card-glow" />
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                  <TestTube className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4 text-slate-900">Laboratory Supplies</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Complete range of laboratory supplies and consumables for all your research needs.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+  <Card
+    className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
+    style={{ animationDelay: "180ms" }}
+  >
+    <div className="fx-card-glow" />
+    <CardContent className="p-8 text-center">
+      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+        <TestTube className="h-8 w-8 text-white" />
+      </div>
+      <h3 className="text-xl font-semibold mb-4 text-slate-900">Laboratory Supplies</h3>
+      <p className="text-slate-600 leading-relaxed">
+        Complete range of laboratory supplies and consumables for all your research needs.
+      </p>
+    </CardContent>
+  </Card>
+</div>
         </div>
       </section>
 
