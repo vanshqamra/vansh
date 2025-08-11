@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import {
   Menu,
   ShoppingCart,
@@ -28,7 +28,7 @@ import {
   FlaskConical,
   ClipboardList,
   FileText,
-  History, // ← added
+  History,
 } from "lucide-react"
 import { useAuth } from "@/app/context/auth-context"
 import { useCart } from "@/app/context/CartContext"
@@ -48,7 +48,7 @@ export function Header() {
 
   const totalItems = mounted ? state?.itemCount || 0 : 0
 
-  // —— Role-aware dashboard target (admins → /dashboard/admin, others → /dashboard)
+  // Role-aware dashboard target (admins → /dashboard/admin, others → /dashboard)
   const dashboardHref = role === "admin" ? "/dashboard/admin" : "/dashboard"
 
   const handleHeaderSearch = (e: React.FormEvent) => {
@@ -258,7 +258,7 @@ export function Header() {
               </div>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button + Sidebar */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="md:hidden h-8 w-8 p-0">
@@ -266,7 +266,156 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-80 z-[70]">
-                {/* TODO: Add mobile version of admin links here if needed */}
+                {/* Mobile search */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    if (searchQuery.trim()) {
+                      router.push(`/products/search?q=${encodeURIComponent(searchQuery)}`)
+                    }
+                  }}
+                  className="mt-2 flex items-center gap-2"
+                >
+                  <Input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-9 text-sm"
+                  />
+                  <Button type="submit" size="icon" variant="ghost" className="h-9 w-9">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </form>
+
+                {/* Mobile nav links */}
+                <nav className="mt-4 grid gap-1">
+                  <SheetClose asChild>
+                    <Link href="/" className="rounded px-3 py-2 text-sm hover:bg-gray-100">
+                      Home
+                    </Link>
+                  </SheetClose>
+
+                  <div className="px-3 pt-3 text-xs font-semibold uppercase text-gray-500">Products</div>
+                  <SheetClose asChild>
+                    <Link href="/products/bulk-chemicals" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <TestTube className="h-4 w-4" /> Bulk Chemicals
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/products/laboratory-supplies" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <Microscope className="h-4 w-4" /> Laboratory Supplies
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/products/scientific-instruments" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <FlaskConical className="h-4 w-4" /> Scientific Instruments
+                    </Link>
+                  </SheetClose>
+
+                  <div className="px-3 pt-3 text-xs font-semibold uppercase text-gray-500">Brands</div>
+                  <SheetClose asChild>
+                    <Link href="/brand/borosil" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <Image src="/images/logo-borosil.png" alt="Borosil" width={18} height={18} /> Borosil
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/brand/whatman" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <Image src="/images/logo-whatman.png" alt="Whatman" width={18} height={18} /> Whatman
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/brand/qualigens" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <Image src="/images/logo-qualigens.png" alt="Qualigens" width={18} height={18} /> Qualigens
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/brand/avarice" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <Image src="/images/logo-avarice.png" alt="Avarice" width={18} height={18} /> Avarice
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/brand/rankem" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <Image src="/images/logo-rankem.png" alt="Rankem" width={18} height={18} /> Rankem
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/brand/HiMedia" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                      <Image src="/images/logo-himedia.png" alt="HiMedia" width={18} height={18} /> HiMedia
+                    </Link>
+                  </SheetClose>
+
+                  <div className="px-3 pt-3 text-xs font-semibold uppercase text-gray-500">Company</div>
+                  <SheetClose asChild>
+                    <Link href="/about" className="rounded px-3 py-2 text-sm hover:bg-gray-100">
+                      About
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/contact" className="rounded px-3 py-2 text-sm hover:bg-gray-100">
+                      Contact
+                    </Link>
+                  </SheetClose>
+
+                  <div className="px-3 pt-3 text-xs font-semibold uppercase text-gray-500">Account</div>
+                  {user ? (
+                    <>
+                      <SheetClose asChild>
+                        <Link href={dashboardHref} prefetch={false} className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                          <LayoutDashboard className="h-4 w-4" /> Dashboard
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link href="/dashboard/quote-cart" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                          <Package className="h-4 w-4" /> My Orders
+                        </Link>
+                      </SheetClose>
+
+                      {role === "admin" && (
+                        <>
+                          <div className="px-3 pt-3 text-xs font-semibold uppercase text-gray-500">Admin</div>
+                          <SheetClose asChild>
+                            <Link href="/admin/restock" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                              <ClipboardList className="h-4 w-4" /> Restock Dashboard
+                            </Link>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Link href="/admin/quotation" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                              <FileText className="h-4 w-4" /> Quotation Builder
+                            </Link>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Link href="/admin/past-quotations" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                              <History className="h-4 w-4" /> Past Quotations
+                            </Link>
+                          </SheetClose>
+                        </>
+                      )}
+
+                      <div className="px-3">
+                        <SheetClose asChild>
+                          <Button onClick={signOut} variant="ghost" className="mt-2 w-full justify-start text-red-600">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Sign Out
+                          </Button>
+                        </SheetClose>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="px-3 grid gap-2">
+                      <SheetClose asChild>
+                        <Link href="/login" className="rounded px-3 py-2 text-sm hover:bg-gray-100">
+                          Login
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link href="/register" className="rounded px-3 py-2 text-sm hover:bg-gray-100">
+                          Register
+                        </Link>
+                      </SheetClose>
+                    </div>
+                  )}
+                </nav>
               </SheetContent>
             </Sheet>
           </div>
