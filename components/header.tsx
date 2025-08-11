@@ -47,8 +47,6 @@ export function Header() {
   }, [])
 
   const totalItems = mounted ? state?.itemCount || 0 : 0
-
-  // Role-aware dashboard target (admins → /dashboard/admin, others → /dashboard)
   const dashboardHref = role === "admin" ? "/dashboard/admin" : "/dashboard"
 
   const handleHeaderSearch = (e: React.FormEvent) => {
@@ -211,12 +209,17 @@ export function Header() {
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/quote-cart" className="flex items-center">
-                      <Package className="mr-2 h-4 w-4" />
-                      My Orders
-                    </Link>
-                  </DropdownMenuItem>
+
+                  {/* Hide My Orders for admins */}
+                  {role !== "admin" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/quote-cart" className="flex items-center">
+                        <Package className="mr-2 h-4 w-4" />
+                        My Orders
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
                   {role === "admin" && (
                     <>
                       <DropdownMenuSeparator />
@@ -365,11 +368,15 @@ export function Header() {
                           <LayoutDashboard className="h-4 w-4" /> Dashboard
                         </Link>
                       </SheetClose>
-                      <SheetClose asChild>
-                        <Link href="/dashboard/quote-cart" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
-                          <Package className="h-4 w-4" /> My Orders
-                        </Link>
-                      </SheetClose>
+
+                      {/* Hide My Orders for admins */}
+                      {role !== "admin" && (
+                        <SheetClose asChild>
+                          <Link href="/dashboard/quote-cart" className="rounded px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                            <Package className="h-4 w-4" /> My Orders
+                          </Link>
+                        </SheetClose>
+                      )}
 
                       {role === "admin" && (
                         <>
