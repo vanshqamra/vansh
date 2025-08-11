@@ -47,163 +47,173 @@ function getField(variant, keys) {
   return "";
 }
 
-// --- Preprocess Borosil products
-const normalizedBorosil = borosilProducts.map((group) => {
-  const specs_headers =
-    Array.isArray(group.specs_headers) && group.specs_headers.length > 0
-      ? group.specs_headers.map((h) => h.trim())
-      : Object.keys(group.variants?.[0] || {});
+// --- Borosil ---
+if (brandKey === "borosil") {
+  const flat: Array<{ variant: any; groupMeta: any }> = []
+  normalizedBorosil.forEach((group, idx) => {
+    const { specs_headers, variants } = group
+    const resolvedTitle =
+      group.product?.trim() ||
+      group.title?.trim() ||
+      group.category?.trim() ||
+      group.description?.split("\n")[0]?.trim() ||
+      `Group ${idx + 1}`
 
-  const variants = (group.variants || []).map((rawV) => {
-    const v = { ...rawV };
-    // normalize keys also
-    for (const [k, val] of Object.entries(rawV)) {
-      v[normalizeKey(k)] = val;
+    const resolvedCategory =
+      group.category?.trim() || group.product?.trim() || resolvedTitle
+
+    const baseMeta = {
+      ...group,
+      title: group.title?.toLowerCase().startsWith("untitled group")
+        ? resolvedTitle
+        : group.title || resolvedTitle,
+      category: group.category?.toLowerCase().startsWith("untitled group")
+        ? resolvedCategory
+        : group.category || resolvedCategory,
+      specs_headers,
+      description: group.description || "",
     }
-    // robust price extraction
-    v.price = Number(
-      getField(rawV, priceKeys()).toString().replace(/,/g, "")
-    ) || 0;
-    v.code = getField(rawV, codeKeys());
-    return v;
-  });
 
-  return { ...group, specs_headers, variants };
-});
+    variants.forEach((variant) => {
+      flat.push({ variant, groupMeta: baseMeta })
+    })
+  })
 
-export default function BrandPage({ params }) {
-  const brandKey = params.brandName;
-  const brand = labSupplyBrands[brandKey];
-  if (!brand) notFound();
+  const safeStr = (v: unknown) =>
+    typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : ""
 
-  const { addItem, isLoaded } = useCart();
-  const { toast } = useToast();
-  const { searchQuery, setSearchQuery } = useSearch();
+  const hasText = (v: unknown) => typeof v === "string" && v.trim().length > 0
+  const isNum = (v: unknown) => typeof v === "number" && Number.isFinite(v)
 
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const initialPage = Number(searchParams.get("page") || "1");
-  const [page, setPage] = useState(initialPage);
-  const productsPerPage = 50;
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    params.set("page", page.toString());
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [page, router, pathname]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [searchQuery]);
-
-  let grouped = [];
-
-  // --- Borosil ---
-  if (brandKey === "borosil") {
-    const flat = [];
-    normalizedBorosil.forEach((group, idx) => {
-      const { specs_headers, variants } = group;
-      const resolvedTitle =
-        group.product?.trim() ||
-        group.title?.trim() ||
-        group.category?.trim() ||
-        group.description?.split("\n")[0]?.trim() ||
-        `Group ${idx + 1}`;
-      const resolvedCategory =
-        group.category?.trim() || group.product?.trim() || resolvedTitle;
-
-      const baseMeta = {
-        ...group,
-        title: group.title?.toLowerCase().startsWith("untitled group")
-          ? resolvedTitle
-          : group.title || resolvedTitle,
-        category: group.category?.toLowerCase().startsWith("untitled group")
-          ? resolvedCategory
-          : group.category || resolvedCategory,
-        specs_headers,
-        description: group.description || "",
-      };
-
-      variants.forEach((variant) => {
-        flat.push({ variant, groupMeta: baseMeta });
-      });
-    });
-
-    const filtered = flat.filter(({ variant, groupMeta }) => {
-      const q = searchQuery.toLowerCase();
-      return (
-        Object.values(variant).some((v) =>
-          String(v).toLowerCase().includes(q)
-        ) ||
-        groupMeta.title.toLowerCase().includes(q) ||
-        groupMeta.category.toLowerCase().includes(q) ||
-        groupMeta.description.toLowerCase().includes(q)
-      );
-    });
-
-    const paginated = filtered.slice(
-      (page - 1) * productsPerPage,
-      page * productsPerPage
-    );
-
-    // ——— Determine which fields are present at least once for this page
-    const displaySpecs = new Set();
-    paginated.forEach(({ variant, groupMeta }) => {
-      groupMeta.specs_headers.forEach((header) => {
-        // Exclude code and price fields; handled separately
-        const nk = normalizeKey(header);
-        if (
-          codeKeys().some((k) => nk === normalizeKey(k)) ||
-          priceKeys().some((k) => nk === normalizeKey(k))
-        )
-          return;
-        // If value present for any variant, include
-        const val =
-          variant[header] ||
-          variant[nk] ||
-          (header in variant ? variant[header] : "");
-        if (val && val !== "—") displaySpecs.add(header);
-      });
-    });
-
-    // Always show "Product Code" and "Price" if present for any variant
-    const showCode = paginated.some(({ variant }) => getField(variant, codeKeys()));
-    const showPrice = paginated.some(({ variant }) => Number(getField(variant, priceKeys())) > 0);
-
-    const map = {};
-    paginated.forEach(({ variant, groupMeta }) => {
-      const key = `${groupMeta.category}-${groupMeta.title}`;
-      if (!map[key]) map[key] = { ...groupMeta, variants: [] };
-
-      const row = {};
-      // Code column
-      if (showCode) row["Product Code"] = getField(variant, codeKeys());
-      // Data columns
-      [...displaySpecs].forEach((header) => {
-        const nk = normalizeKey(header);
-        row[header] =
-          variant[header] ||
-          variant[nk] ||
-          (header in variant ? variant[header] : "") ||
-          "—";
-      });
-      // Price column
-      if (showPrice) row["Price"] = getField(variant, priceKeys());
-
-      map[key].variants.push(row);
-    });
-
-    grouped = Object.values(map);
-    // Set columns for table header
-    grouped.forEach((group) => {
-      const baseHeaders = [];
-      if (showCode) baseHeaders.push("Product Code");
-      baseHeaders.push(...[...displaySpecs]);
-      if (showPrice) baseHeaders.push("Price");
-      group._tableHeaders = baseHeaders;
-    });
+  const getCode = (v: any) => getField(v, codeKeys())
+  const getPriceNum = (v: any) => {
+    const raw = getField(v, priceKeys())
+    if (raw === null || raw === undefined || raw === "") return null
+    const n = Number(String(raw).replace(/[^\d.]/g, ""))
+    return Number.isFinite(n) ? n : null
   }
+
+  const q = (searchQuery || "").toLowerCase()
+  const filtered = flat.filter(({ variant, groupMeta }) => {
+    if (!q) return true
+    const hay =
+      Object.values(variant).map((v) => String(v).toLowerCase()).join(" ") +
+      " " +
+      groupMeta.title.toLowerCase() +
+      " " +
+      groupMeta.category.toLowerCase() +
+      " " +
+      (groupMeta.description || "").toLowerCase()
+    return hay.includes(q)
+  })
+
+  const paginated = filtered.slice(
+    (page - 1) * productsPerPage,
+    page * productsPerPage
+  )
+
+  // Determine which spec columns have at least one real value on this page
+  const displaySpecs = new Set<string>()
+  paginated.forEach(({ variant, groupMeta }) => {
+    groupMeta.specs_headers.forEach((header: string) => {
+      const nk = normalizeKey(header)
+      // skip code/price columns (handled separately)
+      if (
+        codeKeys().some((k) => nk === normalizeKey(k)) ||
+        priceKeys().some((k) => nk === normalizeKey(k))
+      )
+        return
+      const val =
+        variant[header] ??
+        variant[nk] ??
+        (header in variant ? variant[header] : undefined)
+      if (isNum(val) || hasText(val)) {
+        displaySpecs.add(header)
+      }
+    })
+  })
+
+  // Show columns only if at least one row has a value
+  const showCode = paginated.some(({ variant }) => hasText(getCode(variant)))
+  // Treat price "present" when a finite number >= 0 exists; render only > 0
+  const showPrice = paginated.some(
+    ({ variant }) => getPriceNum(variant) !== null
+  )
+
+  // Build grouped map
+  const map: Record<string, any> = {}
+  paginated.forEach(({ variant, groupMeta }) => {
+    const key = `${groupMeta.category}-${groupMeta.title}`
+    if (!map[key]) map[key] = { ...groupMeta, variants: [] }
+
+    const row: Record<string, any> = {}
+
+    if (showCode) {
+      const codeVal = getCode(variant)
+      row["Product Code"] = hasText(codeVal) ? codeVal : "—"
+    }
+
+    ;[...displaySpecs].forEach((header) => {
+      const nk = normalizeKey(header)
+      const v =
+        variant[header] ??
+        variant[nk] ??
+        (header in variant ? variant[header] : undefined)
+      // keep numeric 0, trim strings, fallback to "—"
+      row[header] = isNum(v) ? v : hasText(v) ? safeStr(v) : "—"
+    })
+
+    if (showPrice) {
+      const priceVal = getPriceNum(variant)
+      // render only when > 0, else show "—"
+      row["Price"] = priceVal !== null && priceVal > 0 ? priceVal : "—"
+    }
+
+    map[key].variants.push(row)
+  })
+
+  // Post-process: drop empty rows and empty sections, prune dead headers
+  grouped = Object.values(map)
+    .map((group: any) => {
+      // headers *before* pruning-by-rows
+      const initialHeaders: string[] = []
+      if (showCode) initialHeaders.push("Product Code")
+      initialHeaders.push(...[...displaySpecs])
+      if (showPrice) initialHeaders.push("Price")
+
+      // keep a row if ANY header has a real value (number OR non-empty string != "—")
+      const rows = (group.variants || []).filter((r: Record<string, any>) =>
+        initialHeaders.some((h) => {
+          const v = r[h]
+          if (v === null || v === undefined) return false
+          if (typeof v === "number") return Number.isFinite(v) && v > 0
+          const s = String(v).trim()
+          return s.length > 0 && s !== "—"
+        })
+      )
+
+      // if no rows remain, this section is empty
+      if (rows.length === 0) return null
+
+      // prune headers that are completely empty across remaining rows
+      const prunedHeaders = initialHeaders.filter((h) =>
+        rows.some((r) => {
+          const v = r[h]
+          if (v === null || v === undefined) return false
+          if (typeof v === "number") return Number.isFinite(v) && (h === "Price" ? v > 0 : true)
+          const s = String(v).trim()
+          return s.length > 0 && s !== "—"
+        })
+      )
+
+      // if headers vanish entirely, drop the section
+      if (prunedHeaders.length === 0) return null
+
+      return { ...group, variants: rows, _tableHeaders: prunedHeaders }
+    })
+    .filter(Boolean) as any[]
+}
+
 
   // --- Qualigens ---
   else if (brandKey === "qualigens") {
