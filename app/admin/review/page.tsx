@@ -80,7 +80,7 @@ const currency = (n: number | null | undefined) =>
 const formatIST = (iso: string) =>
   new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
 
-// display fallbacks for different column names that might exist
+// Fallback resolvers for code/pack (in case columns differ)
 const val = (v: any) => (v === null || v === undefined || v === "" ? undefined : v)
 const displayCode = (it: any): string =>
   val(it.product_code) ??
@@ -112,18 +112,20 @@ async function setOrderStatus(orderId: string, status: Order["status"]) {
   if (error) throw error
 }
 
-// ---------- INNER PAGE (uses useSearchParams) ----------
+// ---------- INNER PAGE ----------
 function AdminReviewInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Deep-link focus mode: hide headings/table if orderId is present
+  const tabParam = (searchParams.get("tab") || "").toLowerCase()
   const focusedOrderId = searchParams.get("orderId")
-  const focusMode = Boolean(focusedOrderId)
+  const focusMode = Boolean(focusedOrderId) // when deep-linking to an order
+  const clientApprovalsOnly = tabParam === "clients" && !focusedOrderId // when coming from Client Approvals button
 
   // Tab state (URL-driven)
   const initialTab = (() => {
-    const t = (searchParams.get("tab") || "").toLowerCase()
+    if (clientApprovalsOnly) return "accounts"
+    const t = tabParam
     if (t === "orders" || t === "clients" || t === "accounts") return t === "clients" ? "accounts" : (t as "orders" | "accounts")
     return focusedOrderId ? "orders" : "accounts"
   })()
@@ -148,8 +150,9 @@ function AdminReviewInner() {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
   const [detailsLoading, setDetailsLoading] = useState(false)
 
-  // Keep URL in sync when tab changes
+  // Sync URL when tab changes (only when both tabs are visible)
   useEffect(() => {
+    if (clientApprovalsOnly) return
     const params = new URLSearchParams(searchParams.toString())
     params.set("tab", tab === "accounts" ? "clients" : "orders")
     if (tab === "orders") {
@@ -166,6 +169,7 @@ function AdminReviewInner() {
     const init = async () => {
       setLoading(true)
       try {
+        // Always fetch accounts for the clients tab
         const { data: acc, error: accErr } = await supabase
           .from("profiles")
           .select("id,email,full_name,company,phone,gstin,role,created_at")
@@ -173,42 +177,50 @@ function AdminReviewInner() {
         if (accErr) throw accErr
         setAccounts((acc || []) as Profile[])
 
-        const { data: ord, error: ordErr } = await supabase
-          .from("orders")
-          .select("id,created_at,user_id,status,subtotal,tax,shipping,discount,grand_total")
-          .order("created_at", { ascending: false })
-        if (ordErr) throw ordErr
-        setOrders((ord || []) as Order[])
+        // Only fetch orders if we're not in client-approvals-only mode
+        if (!clientApprovalsOnly) {
+          const { data: ord, error: ordErr } = await supabase
+            .from("orders")
+            .select("id,created_at,user_id,status,subtotal,tax,shipping,discount,grand_total")
+            .order("created_at", { ascending: false })
+          if (ordErr) throw ordErr
+          setOrders((ord || []) as Order[])
+        }
       } finally {
         setLoading(false)
       }
     }
     init()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [clientApprovalsOnly])
 
-  // Realtime subscriptions
+  // Realtime subscriptions (orders only when visible)
   useEffect(() => {
     const channel = supabase
       .channel("admin-review")
+      // profiles
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, (payload) =>
         setAccounts((prev) => [payload.new as Profile, ...prev])
       )
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, (payload) =>
         setAccounts((prev) => prev.map((p) => (p.id === (payload.new as any).id ? (payload.new as Profile) : p)))
       )
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) =>
-        setOrders((prev) => [payload.new as Order, ...prev])
-      )
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, (payload) =>
-        setOrders((prev) => prev.map((o) => (o.id === (payload.new as any).id ? (payload.new as Order) : o)))
-      )
-      .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
+    if (!clientApprovalsOnly) {
+      channel
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) =>
+          setOrders((prev) => [payload.new as Order, ...prev])
+        )
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, (payload) =>
+          setOrders((prev) => prev.map((o) => (o.id === (payload.new as any).id ? (payload.new as Order) : o)))
+        )
     }
-  }, [])
+
+    const sub = channel.subscribe()
+    return () => {
+      supabase.removeChannel(sub)
+    }
+  }, [clientApprovalsOnly])
 
   // If URL has orderId, auto-open
   useEffect(() => {
@@ -268,7 +280,7 @@ function AdminReviewInner() {
     setItems(rows)
     setItemsLoading(false)
 
-    if (opts.pushUrl) {
+    if (opts.pushUrl && !clientApprovalsOnly) {
       const params = new URLSearchParams(searchParams.toString())
       params.set("tab", "orders")
       params.set("orderId", orderId)
@@ -304,7 +316,7 @@ function AdminReviewInner() {
     setOrderDetails(details)
     setDetailsLoading(false)
 
-    if (opts.pushUrl) {
+    if (opts.pushUrl && !clientApprovalsOnly) {
       const params = new URLSearchParams(searchParams.toString())
       params.set("tab", "orders")
       params.set("orderId", orderId)
@@ -326,22 +338,31 @@ function AdminReviewInner() {
       )}
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
-        {/* Hide the tabs switcher in focus mode */}
-        {!focusMode && (
+        {/* Tabs selector:
+            - hidden in focusMode
+            - hidden in clientApprovalsOnly (so no Orders tab there) */}
+        {!focusMode && !clientApprovalsOnly && (
           <TabsList>
             <TabsTrigger value="accounts">Accounts</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
           </TabsList>
         )}
 
-        {/* ACCOUNTS — completely hide in focus mode */}
-        {!focusMode && (
+        {/* ACCOUNTS — shown when:
+            - normal usage & tab=accounts, or
+            - clientApprovalsOnly mode */}
+        {(tab === "accounts" || clientApprovalsOnly) && (
           <TabsContent value="accounts">
             <Card className="mt-4">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>New & Pending Accounts</CardTitle>
                 <div className="flex gap-2">
-                  <Input placeholder="Search name/email/company/GSTIN…" value={acctQ} onChange={(e) => setAcctQ(e.target.value)} className="w-72" />
+                  <Input
+                    placeholder="Search name/email/company/GSTIN…"
+                    value={acctQ}
+                    onChange={(e) => setAcctQ(e.target.value)}
+                    className="w-72"
+                  />
                 </div>
               </CardHeader>
               <CardContent>
@@ -369,7 +390,9 @@ function AdminReviewInner() {
                           <td className="py-2 pr-4">{a.phone || "—"}</td>
                           <td className="py-2 pr-4">{a.gstin || "—"}</td>
                           <td className="py-2 pr-4">
-                            <Badge variant={a.role === "pending" ? "secondary" : a.role === "client" ? "default" : "destructive"}>{a.role}</Badge>
+                            <Badge variant={a.role === "pending" ? "secondary" : a.role === "client" ? "default" : "destructive"}>
+                              {a.role}
+                            </Badge>
                           </td>
                           <td className="py-2 pr-4">
                             <div className="flex gap-2">
@@ -398,222 +421,203 @@ function AdminReviewInner() {
           </TabsContent>
         )}
 
-        {/* ORDERS */}
-        <TabsContent value="orders">
-          <Card className="mt-4">
-            {/* Hide the "Latest Orders" header in focus mode */}
-            {!focusMode && (
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Latest Orders</CardTitle>
-                <div className="flex gap-2">
-                  <Input placeholder="Search by ID/status…" value={orderQ} onChange={(e) => setOrderQ(e.target.value)} className="w-64" />
-                </div>
-              </CardHeader>
-            )}
-            <CardContent>
-              {/* Hide the big orders table in focus mode */}
+        {/* ORDERS — completely hidden in clientApprovalsOnly; focused when deep-linking */}
+        {!clientApprovalsOnly && (
+          <TabsContent value="orders">
+            <Card className="mt-4">
+              {/* Hide the "Latest Orders" header/search/table in focus mode */}
               {!focusMode && (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-left border-b">
-                        <th className="py-2 pr-4">Placed</th>
-                        <th className="py-2 pr-4">Order ID</th>
-                        <th className="py-2 pr-4">Status</th>
-                        <th className="py-2 pr-4">Subtotal</th>
-                        <th className="py-2 pr-4">Tax</th>
-                        <th className="py-2 pr-4">Shipping</th>
-                        <th className="py-2 pr-4">Discount</th>
-                        <th className="py-2 pr-4">Grand Total</th>
-                        <th className="py-2 pr-4">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredOrders.map((o) => (
-                        <tr key={o.id} className="border-b last:border-none">
-                          <td className="py-2 pr-4">{formatIST(o.created_at)}</td>
-                          <td className="py-2 pr-4 font-mono">{o.id}</td>
-                          <td className="py-2 pr-4">
-                            <Badge
-                              variant={
-                                o.status === "pending"
-                                  ? "secondary"
-                                  : o.status === "confirmed"
-                                  ? "default"
-                                  : o.status === "fulfilled"
-                                  ? "outline"
-                                  : "destructive"
-                              }
-                            >
-                              {o.status}
-                            </Badge>
-                          </td>
-                          <td className="py-2 pr-4">{currency(o.subtotal)}</td>
-                          <td className="py-2 pr-4">{currency(o.tax)}</td>
-                          <td className="py-2 pr-4">{currency(o.shipping)}</td>
-                          <td className="py-2 pr-4">{currency(o.discount)}</td>
-                          <td className="py-2 pr-4 font-semibold">{currency(o.grand_total)}</td>
-                          <td className="py-2 pr-4">
-                            <div className="flex gap-2">
-                              <Button size="sm" variant="outline" onClick={() => { setTab("orders"); viewItems(o.id) }}>
-                                View
-                              </Button>
-                              <Button size="sm" variant="outline" onClick={() => { setTab("orders"); viewOrderDetails(o.id) }}>
-                                Details
-                              </Button>
-                              <Button size="sm" variant="default" onClick={() => setOrderStatus(o.id, "confirmed")}>
-                                <CheckCircle2 className="mr-2 h-4 w-4" /> Confirm
-                              </Button>
-                              <Button size="sm" variant="secondary" onClick={() => setOrderStatus(o.id, "fulfilled")}>
-                                <ChevronDown className="mr-2 h-4 w-4" /> Fulfil
-                              </Button>
-                              <Button size="sm" variant="destructive" onClick={() => setOrderStatus(o.id, "cancelled")}>
-                                <XCircle className="mr-2 h-4 w-4" /> Cancel
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                      {filteredOrders.length === 0 && (
-                        <tr>
-                          <td className="py-6 text-center text-muted-foreground" colSpan={9}>
-                            {loading ? "Loading…" : "No orders found"}
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {/* Items panel */}
-              {openOrderId && (
-                <div className="mt-4 rounded-xl border p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">Items for Order {openOrderId}</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setOpenOrderId(null)
-                        setItems([])
-                        const params = new URLSearchParams(searchParams.toString())
-                        params.delete("orderId")
-                        router.replace(`/admin/review?${params.toString()}`)
-                      }}
-                    >
-                      Close
-                    </Button>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Latest Orders</CardTitle>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Search by ID/status…"
+                      value={orderQ}
+                      onChange={(e) => setOrderQ(e.target.value)}
+                      className="w-64"
+                    />
                   </div>
-
-                  {itemsLoading ? (
-                    <div className="text-sm text-muted-foreground mt-2">Loading items…</div>
-                  ) : items.length === 0 ? (
-                    <div className="text-sm text-muted-foreground mt-2">No items found</div>
-                  ) : (
-                    <div className="overflow-x-auto mt-3">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="text-left border-b">
-                            <th className="py-2 pr-4">Product</th>
-                            <th className="py-2 pr-4">Code</th>
-                            <th className="py-2 pr-4">Pack</th>
-                            <th className="py-2 pr-4">Qty</th>
-                            <th className="py-2 pr-4">Unit</th>
-                            <th className="py-2 pr-4">Line Total</th>
+                </CardHeader>
+              )}
+              <CardContent>
+                {!focusMode && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-left border-b">
+                          <th className="py-2 pr-4">Placed</th>
+                          <th className="py-2 pr-4">Order ID</th>
+                          <th className="py-2 pr-4">Status</th>
+                          <th className="py-2 pr-4">Subtotal</th>
+                          <th className="py-2 pr-4">Tax</th>
+                          <th className="py-2 pr-4">Shipping</th>
+                          <th className="py-2 pr-4">Discount</th>
+                          <th className="py-2 pr-4">Grand Total</th>
+                          <th className="py-2 pr-4">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredOrders.map((o) => (
+                          <tr key={o.id} className="border-b last:border-none">
+                            <td className="py-2 pr-4">{formatIST(o.created_at)}</td>
+                            <td className="py-2 pr-4 font-mono">{o.id}</td>
+                            <td className="py-2 pr-4">
+                              <Badge
+                                variant={
+                                  o.status === "pending"
+                                    ? "secondary"
+                                    : o.status === "confirmed"
+                                    ? "default"
+                                    : o.status === "fulfilled"
+                                    ? "outline"
+                                    : "destructive"
+                                }
+                              >
+                                {o.status}
+                              </Badge>
+                            </td>
+                            <td className="py-2 pr-4">{currency(o.subtotal)}</td>
+                            <td className="py-2 pr-4">{currency(o.tax)}</td>
+                            <td className="py-2 pr-4">{currency(o.shipping)}</td>
+                            <td className="py-2 pr-4">{currency(o.discount)}</td>
+                            <td className="py-2 pr-4 font-semibold">{currency(o.grand_total)}</td>
+                            <td className="py-2 pr-4">
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline" onClick={() => { setTab("orders"); viewItems(o.id) }}>
+                                  View
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => { setTab("orders"); viewOrderDetails(o.id) }}>
+                                  Details
+                                </Button>
+                                <Button size="sm" variant="default" onClick={() => setOrderStatus(o.id, "confirmed")}>
+                                  <CheckCircle2 className="mr-2 h-4 w-4" /> Confirm
+                                </Button>
+                                <Button size="sm" variant="secondary" onClick={() => setOrderStatus(o.id, "fulfilled")}>
+                                  <ChevronDown className="mr-2 h-4 w-4" /> Fulfil
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={() => setOrderStatus(o.id, "cancelled")}>
+                                  <XCircle className="mr-2 h-4 w-4" /> Cancel
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {items.map((it) => (
-                            <tr key={it.id} className="border-b last:border-none">
-                              <td className="py-2 pr-4">{it.product_name}</td>
-                              <td className="py-2 pr-4">{displayCode(it)}</td>
-                              <td className="py-2 pr-4">{displayPack(it)}</td>
-                              <td className="py-2 pr-4">{it.quantity}</td>
-                              <td className="py-2 pr-4">{currency(it.unit_price)}</td>
-                              <td className="py-2 pr-4">{currency(it.line_total)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Details panel */}
-              {orderDetails && (
-                <div className="mt-4 rounded-xl border p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">Order Details — {orderDetails.id}</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setOrderDetails(null)
-                        const params = new URLSearchParams(searchParams.toString())
-                        params.delete("orderId")
-                        router.replace(`/admin/review?${params.toString()}`)
-                      }}
-                    >
-                      Close
-                    </Button>
-                  </div>
-
-                  {detailsLoading ? (
-                    <div className="text-sm text-muted-foreground mt-2">Loading details…</div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 text-sm">
-                      <div className="space-y-1">
-                        <div className="font-semibold">Buyer</div>
-                        <div>
-                          {(orderDetails.buyer_first_name || "—")}{" "}
-                          {(orderDetails.buyer_last_name || "")}
-                        </div>
-                        <div>{orderDetails.company_name || "—"}</div>
-                        <div>{orderDetails.buyer_phone || "—"}</div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="font-semibold">Shipping</div>
-                        {orderDetails.shipping_address ? (
-                          <div className="whitespace-pre-wrap break-words">
-                            {[
-                              orderDetails.shipping_address.address,
-                              orderDetails.shipping_address.city,
-                              orderDetails.shipping_address.state,
-                              orderDetails.shipping_address.pincode,
-                            ]
-                              .filter(Boolean)
-                              .join(", ")}
-                          </div>
-                        ) : (
-                          <div>—</div>
+                        ))}
+                        {filteredOrders.length === 0 && (
+                          <tr>
+                            <td className="py-6 text-center text-muted-foreground" colSpan={9}>
+                              {loading ? "Loading…" : "No orders found"}
+                            </td>
+                          </tr>
                         )}
-                      </div>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
 
-                      <div className="space-y-1">
-                        <div className="font-semibold">Payment</div>
-                        <div>Method: {orderDetails.payment_method || "—"}</div>
-                      </div>
-
-                      <div className="space-y-1 md:col-span-3">
-                        <details className="mt-2">
-                          <summary className="cursor-pointer">Raw checkout snapshot</summary>
-                          <pre className="mt-2 whitespace-pre-wrap break-words">
-                            {orderDetails.checkout_snapshot
-                              ? JSON.stringify(orderDetails.checkout_snapshot, null, 2)
-                              : "—"}
-                          </pre>
-                        </details>
-                      </div>
+                {/* Items panel — no Close button */}
+                {openOrderId && (
+                  <div className="mt-4 rounded-xl border p-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Items for Order {openOrderId}</h3>
                     </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+
+                    {itemsLoading ? (
+                      <div className="text-sm text-muted-foreground mt-2">Loading items…</div>
+                    ) : items.length === 0 ? (
+                      <div className="text-sm text-muted-foreground mt-2">No items found</div>
+                    ) : (
+                      <div className="overflow-x-auto mt-3">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-left border-b">
+                              <th className="py-2 pr-4">Product</th>
+                              <th className="py-2 pr-4">Code</th>
+                              <th className="py-2 pr-4">Pack</th>
+                              <th className="py-2 pr-4">Qty</th>
+                              <th className="py-2 pr-4">Unit</th>
+                              <th className="py-2 pr-4">Line Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {items.map((it) => (
+                              <tr key={it.id} className="border-b last:border-none">
+                                <td className="py-2 pr-4">{it.product_name}</td>
+                                <td className="py-2 pr-4">{displayCode(it)}</td>
+                                <td className="py-2 pr-4">{displayPack(it)}</td>
+                                <td className="py-2 pr-4">{it.quantity}</td>
+                                <td className="py-2 pr-4">{currency(it.unit_price)}</td>
+                                <td className="py-2 pr-4">{currency(it.line_total)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Details panel — no Close button */}
+                {orderDetails && (
+                  <div className="mt-4 rounded-xl border p-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Order Details — {orderDetails.id}</h3>
+                    </div>
+
+                    {detailsLoading ? (
+                      <div className="text-sm text-muted-foreground mt-2">Loading details…</div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 text-sm">
+                        <div className="space-y-1">
+                          <div className="font-semibold">Buyer</div>
+                          <div>
+                            {(orderDetails.buyer_first_name || "—")}{" "}
+                            {(orderDetails.buyer_last_name || "")}
+                          </div>
+                          <div>{orderDetails.company_name || "—"}</div>
+                          <div>{orderDetails.buyer_phone || "—"}</div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="font-semibold">Shipping</div>
+                          {orderDetails.shipping_address ? (
+                            <div className="whitespace-pre-wrap break-words">
+                              {[
+                                orderDetails.shipping_address.address,
+                                orderDetails.shipping_address.city,
+                                orderDetails.shipping_address.state,
+                                orderDetails.shipping_address.pincode,
+                              ]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </div>
+                          ) : (
+                            <div>—</div>
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="font-semibold">Payment</div>
+                          <div>Method: {orderDetails.payment_method || "—"}</div>
+                        </div>
+
+                        <div className="space-y-1 md:col-span-3">
+                          <details className="mt-2">
+                            <summary className="cursor-pointer">Raw checkout snapshot</summary>
+                            <pre className="mt-2 whitespace-pre-wrap break-words">
+                              {orderDetails.checkout_snapshot
+                                ? JSON.stringify(orderDetails.checkout_snapshot, null, 2)
+                                : "—"}
+                            </pre>
+                          </details>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   )
