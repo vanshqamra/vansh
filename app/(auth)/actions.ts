@@ -1,51 +1,63 @@
 "use server"
 
-import { createSupabaseServerClient } from "@/lib/supabase/server-client"
+import { getServerSupabase } from "@/lib/supabase/server-client"
 
-export async function signup(_: any, formData: FormData) {
-  const supabase = createSupabaseServerClient()
+type ActionState =
+  | { success: string; error?: undefined }
+  | { error: string; success?: undefined }
+  | undefined
 
-  const name = formData.get("name") as string
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
-  const company = formData.get("company") as string
-  const gst = formData.get("gst") as string
-  const phone = formData.get("phone") as string
-  const address = formData.get("address") as string
+export async function signup(_: ActionState, formData: FormData): Promise<ActionState> {
+  const supabase = getServerSupabase()
+  if (!supabase) return { error: "Supabase not configured." }
 
-  // 1. Sign up the user in Supabase Auth
-  const {
-    data: authData,
-    error: authError
-  } = await supabase.auth.signUp({
+  const name = String(formData.get("name") || "").trim()
+  const email = String(formData.get("email") || "").trim().toLowerCase()
+  const password = String(formData.get("password") || "")
+  const company = String(formData.get("company") || "").trim()
+  const gstin = String(formData.get("gstin") || "").trim()
+  const phone = String(formData.get("phone") || "").trim()
+  const address = String(formData.get("address") || "").trim()
+
+  if (!name || !email || !password || !company || !gstin || !phone) {
+    return { error: "Please fill all required fields." }
+  }
+
+  // 1) Create auth user
+  const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
-    password
+    password,
   })
-
-  if (authError || !authData.user) {
+  if (authError || !authData?.user) {
     return { error: authError?.message || "Signup failed." }
   }
 
   const user = authData.user
 
-  // 2. Insert user profile into "profiles" table
-  const { error: profileError } = await supabase.from("profiles").insert({
+  // 2) Insert profile with the column names your admin pages expect
+  //    role must be one of: 'pending' | 'client' | 'admin' | 'rejected'
+  const payload: Record<string, any> = {
     id: user.id,
     email,
     full_name: name,
-    company_name: company,
-    gst_no: gst,
-    contact_number: phone,
-    address,
-    role: "user",
-    approved: false
-  })
+    company,   // ✅ matches admin pages
+    gstin,     // ✅ matches admin pages
+    phone,     // ✅ matches admin pages
+    role: "pending",
+  }
+  // If your table has an 'address' column, include it; otherwise omit it
+  if (address) payload.address = address
+
+  const { error: profileError } = await supabase.from("profiles").insert(payload)
 
   if (profileError) {
-    return { error: "Signup succeeded, but profile creation failed." }
+    // Roll back auth user if you want (optional)
+    // await supabase.auth.admin.deleteUser(user.id)  <-- requires service role; skip here
+    return { error: `Signup succeeded, but profile creation failed: ${profileError.message}` }
   }
 
   return {
-    success: "Thank you! Please check your email to verify. Your registration will be approved soon."
+    success:
+      "Registration submitted. Please verify your email if prompted; an admin will approve your account shortly.",
   }
 }
