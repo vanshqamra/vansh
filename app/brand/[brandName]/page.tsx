@@ -348,94 +348,59 @@ if (brandKey === "borosil") {
   const totalPages = Math.ceil(totalVariants / productsPerPage);
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-6">{brand.name} Products</h1>
-      <Input
-        type="text"
-        placeholder="Search products..."
-        className="mb-8 max-w-md"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      {grouped.map((group, gi) => (
-        <div key={`group-${gi}-${group.title}`} className="mb-12">
-          <h3 className="text-md uppercase tracking-wider text-gray-500 mb-1">
-            {group.category}
-          </h3>
-          <h2 className="text-xl font-bold text-blue-700 mb-2">
-            {group.title}
-          </h2>
-          {group.description && (
-            <p className="text-sm text-gray-600 whitespace-pre-line mb-4">
-              {group.description}
-            </p>
-          )}
-          {group.variants.length > 0 && (
-            <div className="overflow-auto border rounded mb-4">
-              <table className="min-w-full text-sm text-left text-gray-700">
-                <thead className="bg-gray-100 text-xs uppercase font-semibold">
-                  <tr>
-                    {group._tableHeaders.map((h, i) => (
-                      <th key={i} className="px-3 py-2">
-                        {h}
-                      </th>
-                    ))}
-                    <th className="px-3 py-2"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {group.variants.map((row, ri) => (
-                    <tr key={`row-${gi}-${ri}`} className="border-t">
-                      {group._tableHeaders.map((h, ci) => (
-                        <td key={ci} className="px-3 py-2">
-                          {row[h] || "—"}
-                        </td>
-                      ))}
-                      <td className="px-3 py-2">
-                        <Button
-                          size="xs"
-                          onClick={() => handleAdd(row, group)}
-                          disabled={!isLoaded}
-                        >
-                          Add to Cart
-                        </Button>
-                      </td>
-                    </tr>
+    type GroupRow = Record<string, any>
+type GroupBlock = { title: string; category?: string; variants: GroupRow[]; _tableHeaders: string[] }
+
+const groups: GroupBlock[] = (Array.isArray(grouped) ? grouped : []) as any[]
+
+return (
+  <div className="container mx-auto py-8">
+    {groups.length === 0 ? (
+      <div className="text-center py-12">
+        <p className="text-sm text-muted-foreground">No products found matching your search.</p>
+      </div>
+    ) : (
+      groups.map((group, gi) => (
+        <section
+          key={`${group.category ?? ""}-${group.title}-${gi}`}
+          className="mb-10"
+        >
+          <h2 className="text-lg font-semibold mb-3">{group.title}</h2>
+
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left border-b">
+                  {group._tableHeaders.map((h) => (
+                    <th key={h} className="py-2 px-3">
+                      {h}
+                    </th>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      ))}
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
-          <Button
-            variant="outline"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            Prev
-          </Button>
-          <span className="px-4 py-2 text-sm">
-            Page {page} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-          >
-            Next
-          </Button>
-        </div>
-      )}
-      {grouped.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">
-            No products found matching your search.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
+                </tr>
+              </thead>
+              <tbody>
+                {group.variants.map((row, ri) => (
+                  <tr key={ri} className="border-b last:border-none">
+                    {group._tableHeaders.map((h) => (
+                      <td key={`${ri}-${h}`} className="py-2 px-3">
+                        {typeof row[h] === "number"
+                          ? h === "Price"
+                            ? (row[h] as number).toLocaleString("en-IN", {
+                                style: "currency",
+                                currency: "INR",
+                              })
+                            : row[h]
+                          : row[h] ?? "—"}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))
+    )}
+  </div>
+)
+// <-- keep ONE closing brace after this to end the BrandPage function
