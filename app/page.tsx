@@ -51,73 +51,107 @@ export default function HomePage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <ParallaxBackground />
+<section className="relative h-screen flex items-center justify-center overflow-hidden">
+  <ParallaxBackground />
 
-        {/* Glow rim for hero card */}
-        <div className="absolute inset-x-6 md:inset-x-12 top-[12%] h-40 rounded-[28px] blur-3xl opacity-40 bg-gradient-to-r from-cyan-400/30 via-sky-400/25 to-teal-400/30 pointer-events-none" />
+  {/* FX overlay above Parallax, below text */}
+  <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+    <div className="fx-mesh absolute -inset-40 opacity-60 animate-mesh" />
+    <div className="fx-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)] animate-grid" />
+    {/* Floating molecules */}
+    <svg className="absolute inset-0 w-full h-full opacity-50 text-slate-800/25">
+      <defs>
+        <g id="mol">
+          <circle r="2" fill="currentColor" />
+          <circle cx="10" r="2" fill="currentColor" />
+          <circle cx="5" cy="6" r="2" fill="currentColor" />
+          <line x1="0" y1="0" x2="10" y2="0" stroke="currentColor" strokeWidth=".75" />
+          <line x1="5" y1="6" x2="10" y2="0" stroke="currentColor" strokeWidth=".75" />
+        </g>
+      </defs>
+      <g>
+        <use href="#mol">
+          <animateMotion dur="26s" repeatCount="indefinite" path="M 10,80 C 200,30 400,130 580,80 S 900,110 1100,60" />
+        </use>
+        <use href="#mol">
+          <animateMotion dur="32s" repeatCount="indefinite" path="M 0,200 C 260,160 420,260 700,200 S 900,260 1200,220" />
+        </use>
+        <use href="#mol">
+          <animateMotion dur="28s" repeatCount="indefinite" path="M 50,350 C 300,390 520,330 800,370 S 980,330 1150,360" />
+        </use>
+      </g>
+    </svg>
+  </div>
 
-        <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto fx-reveal" style={{ animationDelay: "80ms" }}>
-          <Badge className="mb-6 bg-blue-600/20 text-blue-200 border-blue-400/30 hover:bg-blue-600/30 backdrop-blur">
-            <Zap className="w-4 h-4 mr-2" />
-            Advanced Laboratory Solutions
-          </Badge>
+  {/* Glow rim for hero card */}
+  <div className="absolute inset-x-6 md:inset-x-12 top-[12%] h-40 rounded-[28px] blur-3xl opacity-40 bg-gradient-to-r from-cyan-400/30 via-sky-400/25 to-teal-400/30 pointer-events-none" />
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
-            Chemical Corporation
-          </h1>
+  {/* Hero content */}
+  <div
+    className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto fx-reveal"
+    style={{ animationDelay: "80ms" }}
+  >
+    <Badge className="mb-6 bg-blue-600/20 text-blue-200 border-blue-400/30 hover:bg-blue-600/30 backdrop-blur">
+      <Zap className="w-4 h-4 mr-2" />
+      Advanced Laboratory Solutions
+    </Badge>
 
-          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Pioneering the future of laboratory science with premium chemicals, cutting-edge instruments, and innovative
-            solutions for research excellence.
-          </p>
+    <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+      Chemical Corporation
+    </h1>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              asChild
-              size="lg"
-              className="button-magnetic bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg shadow-[0_1px_1px_rgba(2,6,23,.08),0_16px_30px_rgba(2,6,23,.18)]"
-            >
-              <Link href="/products">
-                Explore Products
-                <ChevronRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+    <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto leading-relaxed">
+      Pioneering the future of laboratory science with premium chemicals, cutting-edge instruments, and innovative
+      solutions for research excellence.
+    </p>
 
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-blue-300 text-blue-100 hover:bg-blue-600/20 px-8 py-3 text-lg bg-transparent backdrop-blur"
-            >
-              <Link href="/contact">Get Quote</Link>
-            </Button>
-          </div>
+    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <Button
+        asChild
+        size="lg"
+        className="button-magnetic bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg shadow-[0_1px_1px_rgba(2,6,23,.08),0_16px_30px_rgba(2,6,23,.18)]"
+      >
+        <Link href="/products">
+          Explore Products
+          <ChevronRight className="ml-2 h-5 w-5" />
+        </Link>
+      </Button>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
-            <div className="text-center fx-reveal" style={{ animationDelay: "120ms" }}>
-              <div className="text-3xl font-bold text-blue-200 tracking-tight">10K+</div>
-              <div className="text-sm text-blue-300">Products</div>
-            </div>
-            <div className="text-center fx-reveal" style={{ animationDelay: "180ms" }}>
-              <div className="text-3xl font-bold text-blue-200 tracking-tight">500+</div>
-              <div className="text-sm text-blue-300">Clients</div>
-            </div>
-            <div className="text-center fx-reveal" style={{ animationDelay: "240ms" }}>
-              <div className="text-3xl font-bold text-blue-200 tracking-tight">77+</div>
-              <div className="text-sm text-blue-300">Years</div>
-            </div>
-          </div>
-        </div>
+      <Button
+        asChild
+        variant="outline"
+        size="lg"
+        className="border-blue-300 text-blue-100 hover:bg-blue-600/20 px-8 py-3 text-lg bg-transparent backdrop-blur"
+      >
+        <Link href="/contact">Get Quote</Link>
+      </Button>
+    </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 motion-safe:animate-bounce">
-          <div className="w-6 h-10 border-2 border-blue-300 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-blue-300 rounded-full mt-2 motion-safe:animate-pulse"></div>
-          </div>
-        </div>
-      </section>
+    {/* Stats */}
+    <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
+      <div className="text-center fx-reveal" style={{ animationDelay: "120ms" }}>
+        <div className="text-3xl font-bold text-blue-200 tracking-tight">10K+</div>
+        <div className="text-sm text-blue-300">Products</div>
+      </div>
+      <div className="text-center fx-reveal" style={{ animationDelay: "180ms" }}>
+        <div className="text-3xl font-bold text-blue-200 tracking-tight">500+</div>
+        <div className="text-sm text-blue-300">Clients</div>
+      </div>
+      <div className="text-center fx-reveal" style={{ animationDelay: "240ms" }}>
+        <div className="text-3xl font-bold text-blue-200 tracking-tight">77+</div>
+        <div className="text-sm text-blue-300">Years</div>
+      </div>
+    </div>
+  </div>
+
+  {/* Scroll Indicator */}
+  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+    <div className="w-6 h-10 border-2 border-blue-300 rounded-full flex justify-center">
+      <div className="w-1 h-3 bg-blue-300 rounded-full mt-2 animate-pulse" />
+    </div>
+  </div>
+</section>
+
 
       {/* Features Section */}
       <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
