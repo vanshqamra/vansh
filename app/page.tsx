@@ -54,19 +54,19 @@ export default function HomePage() {
 <section className="relative h-screen flex items-center justify-center overflow-hidden">
   <ParallaxBackground />
 
-  {/* FX overlay above Parallax, below text */}
-  <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-    <div className="fx-mesh absolute -inset-40 opacity-60 animate-mesh" />
+  {/* FX overlay ABOVE Parallax, BELOW text */}
+  <div aria-hidden className="pointer-events-none absolute inset-0 z-10">
+    <div className="fx-mesh absolute -inset-40 opacity-80 animate-mesh" />
     <div className="fx-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)] animate-grid" />
-    {/* Floating molecules */}
-    <svg className="absolute inset-0 w-full h-full opacity-50 text-slate-800/25">
+    {/* Floating molecules (more visible) */}
+    <svg className="absolute inset-0 w-full h-full opacity-60 text-white/30 mix-blend-overlay" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,.15))" }}>
       <defs>
         <g id="mol">
-          <circle r="2" fill="currentColor" />
-          <circle cx="10" r="2" fill="currentColor" />
-          <circle cx="5" cy="6" r="2" fill="currentColor" />
-          <line x1="0" y1="0" x2="10" y2="0" stroke="currentColor" strokeWidth=".75" />
-          <line x1="5" y1="6" x2="10" y2="0" stroke="currentColor" strokeWidth=".75" />
+          <circle r="2.2" fill="currentColor" />
+          <circle cx="11" r="2.2" fill="currentColor" />
+          <circle cx="5.5" cy="6" r="2.2" fill="currentColor" />
+          <line x1="0" y1="0" x2="11" y2="0" stroke="currentColor" strokeWidth="1.25" />
+          <line x1="5.5" y1="6" x2="11" y2="0" stroke="currentColor" strokeWidth="1.25" />
         </g>
       </defs>
       <g>
@@ -86,11 +86,8 @@ export default function HomePage() {
   {/* Glow rim for hero card */}
   <div className="absolute inset-x-6 md:inset-x-12 top-[12%] h-40 rounded-[28px] blur-3xl opacity-40 bg-gradient-to-r from-cyan-400/30 via-sky-400/25 to-teal-400/30 pointer-events-none" />
 
-  {/* Hero content */}
-  <div
-    className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto fx-reveal"
-    style={{ animationDelay: "80ms" }}
-  >
+  {/* Hero content ABOVE FX */}
+  <div className="relative z-20 text-center text-white px-4 max-w-4xl mx-auto fx-reveal" style={{ animationDelay: "80ms" }}>
     <Badge className="mb-6 bg-blue-600/20 text-blue-200 border-blue-400/30 hover:bg-blue-600/30 backdrop-blur">
       <Zap className="w-4 h-4 mr-2" />
       Advanced Laboratory Solutions
@@ -151,32 +148,30 @@ export default function HomePage() {
     </div>
   </div>
 </section>
-
-
+      
       {/* Features Section */}
       <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
             <Badge className="mb-4 bg-blue-100 text-blue-800 border-blue-200">Why Choose Us</Badge>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Laboratory Excellence Redefined</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight fx-reveal">Laboratory Excellence Redefined</h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
               Experience unparalleled quality and innovation in every product we deliver
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal" style={{ animationDelay: "60ms" }}>
-              <div className="fx-card-glow" />
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                  <FlaskConical className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4 text-slate-900">Premium Chemicals</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  High-purity laboratory chemicals from trusted global manufacturers, ensuring consistent results in your research.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid md:grid-cols-3 gap-8"> <Card className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal" style={{ animationDelay: "60ms" }}>
+            <div className="fx-card-glow" />
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                <FlaskConical className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4 text-slate-900">Premium Chemicals</h3>
+              <p className="text-slate-600 leading-relaxed">
+                High-purity laboratory chemicals from trusted global manufacturers, ensuring consistent results in your research.
+              </p>
+            </CardContent
+              </Card>
 
             <Card className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal" style={{ animationDelay: "120ms" }}>
               <div className="fx-card-glow" />
