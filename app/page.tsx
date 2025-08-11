@@ -1,4 +1,7 @@
+'use client'
+
 // app/page.tsx (or wherever your homepage lives)
+import { useEffect } from "react";
 import { ParallaxBackground } from "@/components/parallax-background";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,12 +11,21 @@ import { Shield, Truck, Award, Globe, Zap, ChevronRight } from "lucide-react";
 
 
 export default function HomePage() {
+  useEffect(() => {
+    if (!document.getElementById("fx-bg")) {
+      document.body.classList.add("fx-fallback")
+    } else {
+      document.body.classList.remove("fx-fallback")
+    }
+  }, [])
+
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <div className="fixed inset-0 -z-10 pointer-events-none">
+      {/* FX BG (single instance) */}
+      <div id="fx-bg" className="fixed inset-0 -z-10 pointer-events-none">
         <div className="site-bg absolute inset-0" />
         <div className="fx-mesh absolute inset-0 animate-mesh opacity-60" />
-        <div className="fx-grid absolute inset-0 animate-grid opacity-35 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)]" />
+        <div className="fx-grid absolute inset-0 animate-grid opacity-35 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)]" />
       </div>
 
       {/* Hero Section */}
