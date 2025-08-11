@@ -86,14 +86,14 @@ export default async function AdminDashboardPage() {
         <p className="text-muted-foreground">Everything you need at a glance.</p>
       </div>
 
-      {/* Quick Links */}
+      {/* Quick Links (trimmed) */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Admin Quick Links</CardTitle>
           <CardDescription>Jump straight into common workflows</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Button asChild variant="default" className="justify-start">
               <Link href="/admin/quotation">
                 <ClipboardList className="mr-2 h-4 w-4" />
@@ -106,22 +106,6 @@ export default async function AdminDashboardPage() {
                 Restock Page
               </Link>
             </Button>
-
-            {/* Split actions via tabs on the same page */}
-            <Button asChild variant="destructive" className="justify-start">
-              <Link href="/admin/review?tab=clients">
-                <Users className="mr-2 h-4 w-4" />
-                Client Approvals
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="justify-start">
-              <Link href="/admin/review?tab=orders">
-                <Package className="mr-2 h-4 w-4" />
-                Order Reviews
-              </Link>
-            </Button>
-
-            {/* (Optional) Keep uploads link if you use it elsewhere */}
             <Button asChild variant="outline" className="justify-start sm:col-span-2 lg:col-span-1">
               <Link href="/dashboard/upload">
                 <ClipboardList className="mr-2 h-4 w-4" />
@@ -179,7 +163,6 @@ export default async function AdminDashboardPage() {
                       </td>
                       <td className="py-2 pr-4">
                         <div className="flex gap-2">
-                          {/* Deep link with tab + orderId so Review page can fetch & render details */}
                           <Button asChild size="sm" variant="outline">
                             <Link href={`/admin/review?tab=orders&orderId=${o.id}`}>Open in Review</Link>
                           </Button>
@@ -296,12 +279,10 @@ export default async function AdminDashboardPage() {
             </table>
           </div>
 
-          <div className="mt-4 flex gap-2">
+          {/* Keep only Client Approvals button; removed "Open Order Reviews" */}
+          <div className="mt-4">
             <Button asChild>
               <Link href="/admin/review?tab=clients">Open Client Approvals</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/admin/review?tab=orders">Open Order Reviews</Link>
             </Button>
           </div>
         </CardContent>
