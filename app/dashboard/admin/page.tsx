@@ -30,7 +30,17 @@ type ProfileRow = {
   id: string
   email: string | null
   full_name: string | null
-  company: string | null
+
+  // new schema (optional)
+  company?: string | null
+  phone?: string | null
+  gstin?: string | null
+
+  // legacy schema (optional)
+  company_name?: string | null
+  contact_number?: string | null
+  gst_no?: string | null
+
   role: "pending" | "client" | "admin" | "rejected" | null
   created_at: string
 }
@@ -55,23 +65,28 @@ export default async function AdminDashboardPage() {
   if (profile?.role !== "admin") redirect("/dashboard")
 
   const [{ data: orders }, { data: quotes }, { data: pending }] = await Promise.all([
-    supabase
-      .from("orders")
-      .select("id, created_at, status, grand_total, user_id")
-      .order("created_at", { ascending: false })
-      .limit(50),
-    supabase
-      .from("quotations")
-      .select("id, created_at, title, status, client_email")
-      .order("created_at", { ascending: false })
-      .limit(50),
-    supabase
-      .from("profiles")
-      .select("id, email, full_name, company, role, created_at")
-      .eq("role", "pending")
-      .order("created_at", { ascending: false })
-      .limit(10),
-  ])
+  supabase
+    .from("orders")
+    .select("id, created_at, status, grand_total, user_id")
+    .order("created_at", { ascending: false })
+    .limit(50),
+
+  supabase
+    .from("quotations")
+    .select("id, created_at, title, status, client_email")
+    .order("created_at", { ascending: false })
+    .limit(50),
+
+  supabase
+    .from("profiles")
+    .select(
+      "id, email, full_name, company, company_name, phone, contact_number, gstin, gst_no, role, created_at"
+    )
+    .eq("role", "pending")
+    .order("created_at", { ascending: false })
+    .limit(10),
+])
+
 
   const formatIST = (iso: string) =>
     new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
@@ -257,10 +272,10 @@ export default async function AdminDashboardPage() {
               <tbody>
                 {(pending || []).map((p: ProfileRow) => (
                   <tr key={p.id} className="border-b last:border-none">
-                    <td className="py-2 pr-4">{formatIST(p.created_at)}</td>
                     <td className="py-2 pr-4">{p.full_name || "—"}</td>
                     <td className="py-2 pr-4">{p.email || "—"}</td>
-                    <td className="py-2 pr-4">{p.company || "—"}</td>
+                    <td className="py-2 pr-4">{p.company ?? (p as any).company_name ?? "—"}</td>
+                    <td className="py-2 pr-4">{(p as any).phone ?? (p as any).contact_number ?? "—"}</td>
                     <td className="py-2 pr-4">
                       <Badge variant={p.role === "pending" ? "secondary" : p.role === "client" ? "default" : "destructive"}>
                         {p.role || "—"}
