@@ -54,7 +54,7 @@ export default function LoginPage() {
     if (profileError || !profile) {
       router.push("/dashboard")
     } else if (profile.role === "admin") {
-      router.push("/admin/restock")
+      router.push("/dashboard/admin")
     } else {
       router.push("/dashboard")
     }
