@@ -207,3 +207,19 @@
   .animate-mesh, .animate-grid { animation: none !important; }
   .fx-reveal { animation: none !important; opacity: 1; transform: none; }
 }
+
+/* Full-page deep blue background + subtle grid overlay */
+.site-bg{
+  background:
+    radial-gradient(1200px 800px at 50% -10%, #0b3a7e 0%, #0a2c63 35%, #082752 60%, #071f42 100%);
+}
+.site-bg::after{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 80px 80px;
+  opacity:.35;
+  pointer-events:none;
+}
