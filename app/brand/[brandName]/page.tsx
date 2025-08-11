@@ -10,6 +10,7 @@ import qualigensProductsRaw from "@/lib/qualigens-products.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import { useSearch } from "@/app/context/search-context"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
 
 // ---------------- Helpers ----------------
 function normalizeKey(str: string) {
@@ -101,6 +102,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   }, [searchQuery])
 
   let grouped: any[] = []
+  let pageCount = 1 // will set per brand below
 
   // ---------------- Borosil ----------------
   if (brandKey === "borosil") {
@@ -163,6 +165,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
     })
 
     // pagination
+    pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
 
     // which spec columns have real data (exclude code/price)
@@ -264,6 +267,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
     const filtered = qualigensProducts.filter((p) =>
       Object.values(p).some((v) => String(v).toLowerCase().includes(String(searchQuery).toLowerCase()))
     )
+    pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
 
     grouped = [
@@ -296,6 +300,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
         Object.values(variant).some((v) => String(v).toLowerCase().includes(String(searchQuery).toLowerCase())) ||
         String(groupMeta.title).toLowerCase().includes(String(searchQuery).toLowerCase())
     )
+    pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
     const map: Record<string, any> = {}
     paginated.forEach(({ variant, groupMeta }) => {
@@ -311,13 +316,21 @@ export default function BrandPage({ params }: { params: { brandName: string } })
     })
   }
 
-  // ---------------- (Optional) Add-to-cart helper (kept for parity) ----------------
+  // ---------------- Add-to-cart helper ----------------
   const handleAdd = (row: any, group: any) => {
-    if (!isLoaded)
-      return toast({ title: "Loading...", description: "Please wait", variant: "destructive" })
-    const price = Number(row["Price"])
-    if (typeof price !== "number" || !(price > 0))
-      return toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" })
+    if (!isLoaded) {
+      toast({ title: "Loading...", description: "Please wait", variant: "destructive" })
+      return
+    }
+    // robust numeric parse for any brand
+    const priceRaw = row["Price"]
+    const priceNum =
+      typeof priceRaw === "number" ? priceRaw : Number(String(priceRaw).replace(/[^\d.]/g, ""))
+    if (!(priceNum > 0)) {
+      toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" })
+      return
+    }
+
     const name = row["Product Name"] || group.title
     const catNo = row["Product Code"] || row.Code || ""
     addItem({
@@ -330,7 +343,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       packSize: row["Pack Size"] || "",
       packing: row.Packing || "",
       hsn: row["HSN Code"] || "",
-      price,
+      price: priceNum,
       quantity: 1,
       brand: brand.name,
       category: group.category,
@@ -338,17 +351,6 @@ export default function BrandPage({ params }: { params: { brandName: string } })
     })
     toast({ title: "Added to Cart", description: `${name} added.`, variant: "default" })
   }
-
-  // ---------------- Totals (if you use pagination UI elsewhere) ----------------
-  const totalVariants =
-    brandKey === "borosil"
-      ? normalizedBorosil.reduce((sum, g) => sum + (g.variants?.length || 0), 0)
-      : brandKey === "qualigens"
-      ? (((qualigensProductsRaw as any).default || qualigensProductsRaw).data?.length || 0)
-      : brandKey === "rankem"
-      ? (rankemProducts as any[]).reduce((sum, g: any) => sum + (g.variants?.length || 0), 0)
-      : 0
-  const totalPages = Math.ceil((totalVariants || 1) / productsPerPage) // not rendered here, but available
 
   // ---------------- Render ----------------
   const groups = Array.isArray(grouped) ? (grouped as any[]) : []
@@ -373,29 +375,68 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                         {h}
                       </th>
                     ))}
+                    <th className="py-2 px-3">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {group.variants.map((row: any, ri: number) => (
-                    <tr key={ri} className="border-b last:border-none">
-                      {group._tableHeaders.map((h: string) => (
-                        <td key={`${ri}-${h}`} className="py-2 px-3">
-                          {typeof row[h] === "number"
-                            ? h === "Price"
-                              ? (row[h] as number).toLocaleString("en-IN", { style: "currency", currency: "INR" })
-                              : (row[h] as number)
-                            : (row[h] ?? "—")}
+                  {group.variants.map((row: any, ri: number) => {
+                    const priceRaw = row["Price"]
+                    const priceNum =
+                      typeof priceRaw === "number"
+                        ? priceRaw
+                        : Number(String(priceRaw).replace(/[^\d.]/g, ""))
+                    const canAdd = priceNum > 0
+
+                    return (
+                      <tr key={ri} className="border-b last:border-none">
+                        {group._tableHeaders.map((h: string) => (
+                          <td key={`${ri}-${h}`} className="py-2 px-3">
+                            {typeof row[h] === "number"
+                              ? h === "Price"
+                                ? (row[h] as number).toLocaleString("en-IN", { style: "currency", currency: "INR" })
+                                : (row[h] as number)
+                              : (row[h] ?? "—")}
+                          </td>
+                        ))}
+                        <td className="py-2 px-3">
+                          <Button
+                            size="sm"
+                            disabled={!canAdd}
+                            onClick={() => handleAdd(row, group)}
+                          >
+                            Add
+                          </Button>
                         </td>
-                      ))}
-                    </tr>
-                  ))}
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
           </section>
         ))
       )}
+
+      {/* Pagination */}
+      <div className="mt-6 flex items-center justify-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page <= 1}
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+        >
+          Prev
+        </Button>
+        <span className="text-sm">Page {page} of {pageCount}</span>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page >= pageCount}
+          onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   )
 }
-
