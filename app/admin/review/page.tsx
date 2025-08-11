@@ -218,45 +218,75 @@ function AdminReviewInner() {
   }, [orders, orderQ])
 
   // View order items
-  async function viewItems(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
-    setOpenOrderId(orderId)
-    setItems([])
-    setItemsLoading(true)
+async function viewItems(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
+  setOpenOrderId(orderId)
+  setItems([])
+  setItemsLoading(true)
+
+  let rows: any[] = []
+  {
     const { data, error } = await supabase
       .from("order_items")
       .select("*")
       .eq("order_id", orderId)
       .order("created_at", { ascending: true })
-    setItemsLoading(false)
-    if (!error) setItems((data || []) as OrderItem[])
+    if (!error && data) rows = data as any[]
+  }
 
-    if (opts.pushUrl) {
-      const params = new URLSearchParams(searchParams.toString())
-      params.set("tab", "orders")
-      params.set("orderId", orderId)
-      router.replace(`/admin/review?${params.toString()}`)
+  // Fallback to server API if no rows (likely RLS)
+  if (rows.length === 0) {
+    const res = await fetch(`/api/admin/orders/${orderId}`, { cache: "no-store" })
+    if (res.ok) {
+      const json = await res.json()
+      rows = json.items || []
     }
   }
 
-  // View order details
-  async function viewOrderDetails(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
-    setDetailsLoading(true)
-    setOrderDetails(null)
+  setItems(rows)
+  setItemsLoading(false)
+
+  if (opts.pushUrl) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", "orders")
+    params.set("orderId", orderId)
+    router.replace(`/admin/review?${params.toString()}`)
+  }
+}
+  // View order details (buyer/contact/shipping/payment/snapshot)
+async function viewOrderDetails(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
+  setDetailsLoading(true)
+  setOrderDetails(null)
+
+  // Try client-side first
+  let details: any | null = null
+  {
     const { data, error } = await supabase
       .from("orders")
-      .select("id, buyer_first_name, buyer_last_name, company_name, buyer_phone, shipping_address, payment_method, checkout_snapshot")
+      .select("*") // grab everything; avoids missing-column issues
       .eq("id", orderId)
       .single()
-    setDetailsLoading(false)
-    if (!error) setOrderDetails(data as OrderDetails)
+    if (!error) details = data as any
+  }
 
-    if (opts.pushUrl) {
-      const params = new URLSearchParams(searchParams.toString())
-      params.set("tab", "orders")
-      params.set("orderId", orderId)
-      router.replace(`/admin/review?${params.toString()}`)
+  // Fallback to server API if nothing came back (RLS or null)
+  if (!details) {
+    const res = await fetch(`/api/admin/orders/${orderId}`, { cache: "no-store" })
+    if (res.ok) {
+      const json = await res.json()
+      details = json.order
     }
   }
+
+  setOrderDetails(details)
+  setDetailsLoading(false)
+
+  if (opts.pushUrl) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", "orders")
+    params.set("orderId", orderId)
+    router.replace(`/admin/review?${params.toString()}`)
+  }
+}
 
   // ---------- UI ----------
   return (
