@@ -1,9 +1,9 @@
 // app/page.tsx (or wherever your homepage lives)
-import { ParallaxBackground } from "@/components/parallax-background"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+import { ParallaxBackground } from "@/components/parallax-background";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import {
   FlaskConical,
   Microscope,
@@ -14,7 +14,7 @@ import {
   Globe,
   Zap,
   ChevronRight,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -22,9 +22,9 @@ export default function HomePage() {
       {/* --- Global FX (decorative only) --- */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         {/* Animated gradient mesh */}
-        <div className="fx-mesh absolute -inset-40 opacity-60 motion-safe:animate-mesh" />
+        <div className="fx-mesh absolute -inset-40 opacity-60 animate-mesh" />
         {/* Subtle animated grid */}
-        <div className="fx-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)] motion-safe:animate-grid" />
+        <div className="fx-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)] animate-grid" />
         {/* Floating molecules */}
         <svg className="absolute inset-0 w-full h-full opacity-50 text-slate-800/25 dark:text-slate-200/20">
           <defs>
