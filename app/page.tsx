@@ -19,6 +19,7 @@ import {
 export default function HomePage() {
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <div aria-hidden className="site-bg fixed inset-0 -z-10" />
       {/* --- Global FX (decorative only) --- */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         {/* Animated gradient mesh */}
@@ -150,19 +151,19 @@ export default function HomePage() {
 </section>
       
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
+      <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
             <Badge className="mb-4 bg-blue-100 text-blue-800 border-blue-200">Why Choose Us</Badge>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight fx-reveal">Laboratory Excellence Redefined</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-white mb-4 tracking-tight fx-reveal">Laboratory Excellence Redefined</h2>
+            <p className="text-xl text-slate-200 max-w-3xl mx-auto">
               Experience unparalleled quality and innovation in every product we deliver
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
   <Card
-    className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
+    className="relative group border border-white/10 bg-white/5 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
     style={{ animationDelay: "60ms" }}
   >
     <div className="fx-card-glow" />
@@ -170,15 +171,15 @@ export default function HomePage() {
       <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
         <FlaskConical className="h-8 w-8 text-white" />
       </div>
-      <h3 className="text-xl font-semibold mb-4 text-slate-900">Premium Chemicals</h3>
-      <p className="text-slate-600 leading-relaxed">
+      <h3 className="text-xl font-semibold mb-4 text-white">Premium Chemicals</h3>
+      <p className="text-slate-200 leading-relaxed">
         High-purity laboratory chemicals from trusted global manufacturers, ensuring consistent results in your research.
       </p>
     </CardContent>
   </Card>
 
   <Card
-    className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
+    className="relative group border border-white/10 bg-white/5 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
     style={{ animationDelay: "120ms" }}
   >
     <div className="fx-card-glow" />
@@ -186,15 +187,15 @@ export default function HomePage() {
       <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
         <Microscope className="h-8 w-8 text-white" />
       </div>
-      <h3 className="text-xl font-semibold mb-4 text-slate-900">Advanced Instruments</h3>
-      <p className="text-slate-600 leading-relaxed">
+      <h3 className="text-xl font-semibold mb-4 text-white">Advanced Instruments</h3>
+      <p className="text-slate-200 leading-relaxed">
         State-of-the-art scientific instruments and equipment for precise measurements and analysis.
       </p>
     </CardContent>
   </Card>
 
   <Card
-    className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
+    className="relative group border border-white/10 bg-white/5 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
     style={{ animationDelay: "180ms" }}
   >
     <div className="fx-card-glow" />
@@ -202,8 +203,8 @@ export default function HomePage() {
       <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
         <TestTube className="h-8 w-8 text-white" />
       </div>
-      <h3 className="text-xl font-semibold mb-4 text-slate-900">Laboratory Supplies</h3>
-      <p className="text-slate-600 leading-relaxed">
+      <h3 className="text-xl font-semibold mb-4 text-white">Laboratory Supplies</h3>
+      <p className="text-slate-200 leading-relaxed">
         Complete range of laboratory supplies and consumables for all your research needs.
       </p>
     </CardContent>
@@ -213,61 +214,61 @@ export default function HomePage() {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
             <Badge className="mb-4 bg-green-100 text-green-800 border-green-200">FEATURED BRANDS</Badge>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Comprehensive Laboratory Solutions</h2>
+            <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">Comprehensive Laboratory Solutions</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "40ms" }}>
+            <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "40ms" }}>
               <CardContent className="p-6">
                 <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(59,130,246,.12),transparent_60%)]">
                   <FlaskConical className="h-16 w-16 text-blue-600 group-hover:scale-110 transition-transform" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Qualigens Chemicals</h3>
-                <p className="text-gray-600 text-sm mb-4">High-purity laboratory chemicals</p>
-                <Button asChild variant="outline" className="w-full bg-transparent">
+                <h3 className="font-semibold text-lg mb-2 text-white">Qualigens Chemicals</h3>
+                <p className="text-slate-200 text-sm mb-4">High-purity laboratory chemicals</p>
+                <Button asChild variant="outline" className="w-full bg-transparent border-white text-white hover:bg-white/10">
                   <Link href="/brand/qualigens">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "80ms" }}>
+            <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "80ms" }}>
               <CardContent className="p-6">
                 <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(16,185,129,.12),transparent_60%)]">
                   <TestTube className="h-16 w-16 text-green-600 group-hover:scale-110 transition-transform" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Borosil Glassware</h3>
-                <p className="text-gray-600 text-sm mb-4">Premium laboratory glassware</p>
-                <Button asChild variant="outline" className="w-full bg-transparent">
+                <h3 className="font-semibold text-lg mb-2 text-white">Borosil Glassware</h3>
+                <p className="text-slate-200 text-sm mb-4">Premium laboratory glassware</p>
+                <Button asChild variant="outline" className="w-full bg-transparent border-white text-white hover:bg-white/10">
                   <Link href="/brand/borosil">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "120ms" }}>
+            <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "120ms" }}>
               <CardContent className="p-6">
                 <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(124,58,237,.12),transparent_60%)]">
                   <Microscope className="h-16 w-16 text-purple-600 group-hover:scale-110 transition-transform" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Scientific Instruments</h3>
-                <p className="text-gray-600 text-sm mb-4">Advanced analytical equipment</p>
-                <Button asChild variant="outline" className="w-full bg-transparent">
+                <h3 className="font-semibold text-lg mb-2 text-white">Scientific Instruments</h3>
+                <p className="text-slate-200 text-sm mb-4">Advanced analytical equipment</p>
+                <Button asChild variant="outline" className="w-full bg-transparent border-white text-white hover:bg-white/10">
                   <Link href="/products/scientific-instruments">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "160ms" }}>
+            <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "160ms" }}>
               <CardContent className="p-6">
                 <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(249,115,22,.12),transparent_60%)]">
                   <Shield className="h-16 w-16 text-orange-600 group-hover:scale-110 transition-transform" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Whatman Filter Paper</h3>
-                <p className="text-gray-600 text-sm mb-4">Laboratory filteration solutions</p>
-                <Button asChild variant="outline" className="w-full bg-transparent">
+                <h3 className="font-semibold text-lg mb-2 text-white">Whatman Filter Paper</h3>
+                <p className="text-slate-200 text-sm mb-4">Laboratory filteration solutions</p>
+                <Button asChild variant="outline" className="w-full bg-transparent border-white text-white hover:bg-white/10">
                   <Link href="/brand/whatman">Buy Now</Link>
                 </Button>
               </CardContent>
@@ -277,43 +278,43 @@ export default function HomePage() {
       </section>
 
       {/* Trust Indicators */}
-      <section className="py-20 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "40ms" }}>
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
                 <Shield className="h-8 w-8 text-white" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Quality Assured</h3>
-              <p className="text-slate-600 text-sm">ISO certified products with rigorous quality control</p>
+              <h3 className="font-semibold text-white mb-2">Quality Assured</h3>
+              <p className="text-slate-200 text-sm">ISO certified products with rigorous quality control</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "100ms" }}>
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
                 <Truck className="h-8 w-8 text-white" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Fast Delivery</h3>
-              <p className="text-slate-600 text-sm">Quick and secure shipping worldwide</p>
+              <h3 className="font-semibold text-white mb-2">Fast Delivery</h3>
+              <p className="text-slate-200 text-sm">Quick and secure shipping worldwide</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "160ms" }}>
               <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
                 <Award className="h-8 w-8 text-white" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Expert Support</h3>
-              <p className="text-slate-600 text-sm">Technical assistance from qualified professionals</p>
+              <h3 className="font-semibold text-white mb-2">Expert Support</h3>
+              <p className="text-slate-200 text-sm">Technical assistance from qualified professionals</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "220ms" }}>
               <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
                 <Globe className="h-8 w-8 text-white" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Global Reach</h3>
-              <p className="text-slate-600 text-sm">Serving 500+ clients worldwide</p>
+              <h3 className="font-semibold text-white mb-2">Global Reach</h3>
+              <p className="text-slate-200 text-sm">Serving 500+ clients worldwide</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+      <section className="py-20 bg-transparent text-white">
         <div className="container mx-auto px-4 text-center fx-reveal">
           <h2 className="text-4xl font-bold mb-6 tracking-tight">Ready to Advance Your Research?</h2>
           <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
