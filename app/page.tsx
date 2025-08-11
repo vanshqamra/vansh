@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import Image from "@/components/ImageSafe";
+import Image from "next/image";
 import {
   FlaskConical,
   Microscope,
@@ -17,15 +17,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const homeImgs = {
-  premiumChemicals: "https://source.unsplash.com/1200x900/?laboratory,chemicals,beakers",
-  advancedInstruments: "https://source.unsplash.com/1200x900/?lab,instruments,HPLC",
-  laboratorySupplies: "https://source.unsplash.com/1200x900/?lab,supplies,pipette,rack",
-  qualigens: "https://source.unsplash.com/1200x900/?reagent,bottles,chemistry",
-  borosil: "https://source.unsplash.com/1200x900/?glassware,beaker,flask,laboratory",
-  scientificInstruments: "https://source.unsplash.com/1200x900/?microscope,laboratory,bench",
-  whatman: "https://source.unsplash.com/1200x900/?filter,paper,lab,membrane",
-};
 
 export default function HomePage() {
   return (
@@ -181,11 +172,11 @@ export default function HomePage() {
     <CardContent className="p-8 text-center">
       <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
         <Image
-          src={homeImgs.premiumChemicals}
-          alt="Premium laboratory chemicals – beakers and reagents"
+          src="/image1.jpg"
+          alt="Premium laboratory chemicals"
           fill
           className="object-cover"
-          sizes="(min-width: 1024px) 33vw, 90vw"
+          sizes="(min-width: 768px) 33vw, 90vw"
           priority
         />
       </div>
@@ -204,11 +195,11 @@ export default function HomePage() {
     <CardContent className="p-8 text-center">
       <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
         <Image
-          src={homeImgs.advancedInstruments}
-          alt="Advanced scientific instruments – HPLC / analytical equipment"
+          src="/image2.jpg"
+          alt="Advanced scientific instruments"
           fill
           className="object-cover"
-          sizes="(min-width: 1024px) 33vw, 90vw"
+          sizes="(min-width: 768px) 33vw, 90vw"
           loading="lazy"
         />
       </div>
@@ -227,11 +218,11 @@ export default function HomePage() {
     <CardContent className="p-8 text-center">
       <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
         <Image
-          src={homeImgs.laboratorySupplies}
-          alt="Laboratory supplies – pipettes, racks, consumables"
+          src="/image3.jpg"
+          alt="Laboratory supplies and consumables"
           fill
           className="object-cover"
-          sizes="(min-width: 1024px) 33vw, 90vw"
+          sizes="(min-width: 768px) 33vw, 90vw"
           loading="lazy"
         />
       </div>
@@ -258,8 +249,8 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
                   <Image
-                    src={homeImgs.qualigens}
-                    alt="Qualigens reagents – high-purity chemical bottles"
+                    src="/image4.jpg"
+                    alt="Qualigens reagents"
                     fill
                     className="object-cover"
                     sizes="(min-width: 1024px) 25vw, 90vw"
@@ -278,8 +269,8 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
                   <Image
-                    src={homeImgs.borosil}
-                    alt="Borosil laboratory glassware – beakers and flasks"
+                    src="/image5.jpg"
+                    alt="Borosil laboratory glassware"
                     fill
                     className="object-cover"
                     sizes="(min-width: 1024px) 25vw, 90vw"
@@ -298,8 +289,8 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
                   <Image
-                    src={homeImgs.scientificInstruments}
-                    alt="Scientific instruments – microscopes on laboratory bench"
+                    src="/image6.jpg"
+                    alt="Scientific instruments"
                     fill
                     className="object-cover"
                     sizes="(min-width: 1024px) 25vw, 90vw"
@@ -318,8 +309,8 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
                   <Image
-                    src={homeImgs.whatman}
-                    alt="Whatman filter paper – filtration products in lab"
+                    src="/image7.jpg"
+                    alt="Whatman filter paper"
                     fill
                     className="object-cover"
                     sizes="(min-width: 1024px) 25vw, 90vw"
