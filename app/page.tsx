@@ -4,57 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import {
-  FlaskConical,
-  Microscope,
-  TestTube,
-  Shield,
-  Truck,
-  Award,
-  Globe,
-  Zap,
-  ChevronRight,
-} from "lucide-react";
+import { Shield, Truck, Award, Globe, Zap, ChevronRight } from "lucide-react";
 
 
 export default function HomePage() {
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <div aria-hidden className="site-bg fixed inset-0 -z-10" />
-      {/* --- Global FX (decorative only) --- */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        {/* Animated gradient mesh */}
-        <div className="fx-mesh absolute -inset-40 opacity-60 animate-mesh" />
-        {/* Subtle animated grid */}
-        <div className="fx-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)] animate-grid" />
-        {/* Floating molecules */}
-        <svg className="absolute inset-0 w-full h-full opacity-50 text-slate-800/25 dark:text-slate-200/20">
-          <defs>
-            <g id="mol">
-              <circle r="2" fill="currentColor" />
-              <circle cx="10" r="2" fill="currentColor" />
-              <circle cx="5" cy="6" r="2" fill="currentColor" />
-              <line x1="0" y1="0" x2="10" y2="0" stroke="currentColor" strokeWidth=".75" />
-              <line x1="5" y1="6" x2="10" y2="0" stroke="currentColor" strokeWidth=".75" />
-            </g>
-          </defs>
-          <g>
-            <use href="#mol">
-              <animateMotion dur="26s" repeatCount="indefinite" path="M 10,80 C 200,30 400,130 580,80 S 900,110 1100,60" />
-            </use>
-            <use href="#mol">
-              <animateMotion dur="32s" repeatCount="indefinite" path="M 0,200 C 260,160 420,260 700,200 S 900,260 1200,220" />
-            </use>
-            <use href="#mol">
-              <animateMotion dur="28s" repeatCount="indefinite" path="M 50,350 C 300,390 520,330 800,370 S 980,330 1150,360" />
-            </use>
-          </g>
-        </svg>
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="site-bg absolute inset-0" />
+        <div className="fx-mesh absolute inset-0 animate-mesh opacity-60" />
+        <div className="fx-grid absolute inset-0 animate-grid opacity-35 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)]" />
       </div>
 
       {/* Hero Section */}
-<section className="relative h-screen flex items-center justify-center overflow-hidden">
-  <ParallaxBackground />
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <ParallaxBackground />
 
   {/* FX overlay ABOVE Parallax, BELOW text */}
   <div aria-hidden className="pointer-events-none absolute inset-0 z-10">
@@ -149,7 +113,7 @@ export default function HomePage() {
       <div className="w-1 h-3 bg-blue-300 rounded-full mt-2 animate-pulse" />
     </div>
   </div>
-</section>
+      </section>
       
       {/* Features Section */}
       <section className="py-20 bg-transparent">
@@ -171,7 +135,7 @@ export default function HomePage() {
     <CardContent className="p-8 text-center">
       <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
         <img
-          src="/image1.jpg"
+          src="/image1.jpeg"
           alt="Premium laboratory chemicals"
           loading="lazy"
           decoding="async"
@@ -193,7 +157,7 @@ export default function HomePage() {
     <CardContent className="p-8 text-center">
       <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
         <img
-          src="/image2.jpg"
+          src="/image2.jpeg"
           alt="Advanced scientific instruments"
           loading="lazy"
           decoding="async"
@@ -215,7 +179,7 @@ export default function HomePage() {
     <CardContent className="p-8 text-center">
       <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
         <img
-          src="/image3.jpg"
+          src="/image3.jpeg"
           alt="Laboratory supplies and consumables"
           loading="lazy"
           decoding="async"
@@ -245,7 +209,7 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
                   <img
-                    src="/image4.jpg"
+                    src="/image4.jpeg"
                     alt="Qualigens reagents and bottles"
                     loading="lazy"
                     decoding="async"
@@ -264,7 +228,7 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
                   <img
-                    src="/image5.jpg"
+                    src="/image5.jpeg"
                     alt="Borosil laboratory glassware"
                     loading="lazy"
                     decoding="async"
@@ -283,7 +247,7 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
                   <img
-                    src="/image6.jpg"
+                    src="/image6.jpeg"
                     alt="Scientific instruments and microscopes"
                     loading="lazy"
                     decoding="async"
@@ -302,7 +266,7 @@ export default function HomePage() {
               <CardContent className="p-6">
                 <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
                   <img
-                    src="/image7.jpg"
+                    src="/image7.jpeg"
                     alt="Whatman filter paper products"
                     loading="lazy"
                     decoding="async"
@@ -381,59 +345,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Local CSS for animations (no extra deps) */}
-      <style>{`
-        @keyframes mesh {
-          0% { transform: translate3d(0,0,0) scale(1); }
-          50% { transform: translate3d(0,-2%,0) scale(1.02); }
-          100% { transform: translate3d(0,0,0) scale(1); }
-        }
-        @keyframes gridSlide {
-          from { background-position: 0 0, 0 0; }
-          to   { background-position: 80px 80px, 80px 80px; }
-        }
-        @keyframes reveal {
-          0% { opacity: 0; transform: translate3d(0, 12px, 0) scale(.98); }
-          100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-        }
-        .fx-mesh {
-          background:
-            radial-gradient(1000px 400px at 80% -10%, rgba(20,184,166,.12), transparent 60%),
-            radial-gradient(800px 300px at -10% 20%, rgba(14,165,233,.12), transparent 60%),
-            radial-gradient(700px 280px at 40% 90%, rgba(14,165,233,.08), transparent 60%);
-        }
-        .fx-grid {
-          background:
-            linear-gradient(to right, rgba(226,232,240,.5) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(226,232,240,.5) 1px, transparent 1px);
-          background-size: 80px 80px, 80px 80px;
-        }
-        .animate-mesh { animation: mesh 22s linear infinite; }
-        .animate-grid { animation: gridSlide 24s linear infinite; }
-        .fx-reveal { animation: reveal .7s cubic-bezier(.16,1,.3,1) both; }
-        .fx-card-glow {
-          position: absolute; inset: -1px; border-radius: 16px;
-          background: radial-gradient(120px 60px at 20% 0%, rgba(56,189,248,.15), transparent 70%),
-                      radial-gradient(120px 60px at 90% 20%, rgba(16,185,129,.12), transparent 70%);
-          opacity: .6; pointer-events: none; filter: blur(14px);
-          transition: opacity .3s ease;
-        }
-        .group:hover .fx-card-glow { opacity: .9; }
-        /* Magnetic highlight for CTAs (no JS) */
-        .button-magnetic { position: relative; overflow: hidden; }
-        .button-magnetic::after{
-          content:""; position:absolute; inset:-120% -40%;
-          background: radial-gradient(circle at center, rgba(255,255,255,.35), transparent 40%);
-          transform: translate3d(0,0,0) scale(0);
-          transition: transform .25s ease;
-        }
-        .button-magnetic:hover::after{ transform: translate3d(0,0,0) scale(1); }
-        /* Respect reduced-motion */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-mesh, .animate-grid, svg animateMotion { animation: none !important; display: none !important; }
-          .fx-reveal { animation: none !important; opacity: 1; transform: none; }
-        }
-      `}</style>
     </div>
   )
 }
