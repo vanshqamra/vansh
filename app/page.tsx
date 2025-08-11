@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import Image from "next/image";
 import {
   FlaskConical,
   Microscope,
@@ -15,6 +16,16 @@ import {
   Zap,
   ChevronRight,
 } from "lucide-react";
+
+const homeImgs = {
+  premiumChemicals: "https://source.unsplash.com/1200x900/?laboratory,chemicals,beakers",
+  advancedInstruments: "https://source.unsplash.com/1200x900/?lab,instruments,HPLC",
+  laboratorySupplies: "https://source.unsplash.com/1200x900/?lab,supplies,pipette,rack",
+  qualigens: "https://source.unsplash.com/1200x900/?reagent,bottles,chemistry",
+  borosil: "https://source.unsplash.com/1200x900/?glassware,beaker,flask,laboratory",
+  scientificInstruments: "https://source.unsplash.com/1200x900/?microscope,laboratory,bench",
+  whatman: "https://source.unsplash.com/1200x900/?filter,paper,lab,membrane",
+};
 
 export default function HomePage() {
   return (
@@ -168,8 +179,15 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-        <FlaskConical className="h-8 w-8 text-white" />
+      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
+        <Image
+          src={homeImgs.premiumChemicals}
+          alt="Premium laboratory chemicals – beakers and reagents"
+          fill
+          className="object-cover"
+          sizes="(min-width: 1024px) 33vw, 90vw"
+          priority
+        />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Premium Chemicals</h3>
       <p className="text-slate-200 leading-relaxed">
@@ -184,8 +202,15 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-        <Microscope className="h-8 w-8 text-white" />
+      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
+        <Image
+          src={homeImgs.advancedInstruments}
+          alt="Advanced scientific instruments – HPLC / analytical equipment"
+          fill
+          className="object-cover"
+          sizes="(min-width: 1024px) 33vw, 90vw"
+          loading="lazy"
+        />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Advanced Instruments</h3>
       <p className="text-slate-200 leading-relaxed">
@@ -200,8 +225,15 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-        <TestTube className="h-8 w-8 text-white" />
+      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
+        <Image
+          src={homeImgs.laboratorySupplies}
+          alt="Laboratory supplies – pipettes, racks, consumables"
+          fill
+          className="object-cover"
+          sizes="(min-width: 1024px) 33vw, 90vw"
+          loading="lazy"
+        />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Laboratory Supplies</h3>
       <p className="text-slate-200 leading-relaxed">
@@ -224,8 +256,15 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "40ms" }}>
               <CardContent className="p-6">
-                <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(59,130,246,.12),transparent_60%)]">
-                  <FlaskConical className="h-16 w-16 text-blue-600 group-hover:scale-110 transition-transform" />
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                  <Image
+                    src={homeImgs.qualigens}
+                    alt="Qualigens reagents – high-purity chemical bottles"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    loading="lazy"
+                  />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Qualigens Chemicals</h3>
                 <p className="text-slate-200 text-sm mb-4">High-purity laboratory chemicals</p>
@@ -237,8 +276,15 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "80ms" }}>
               <CardContent className="p-6">
-                <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(16,185,129,.12),transparent_60%)]">
-                  <TestTube className="h-16 w-16 text-green-600 group-hover:scale-110 transition-transform" />
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                  <Image
+                    src={homeImgs.borosil}
+                    alt="Borosil laboratory glassware – beakers and flasks"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    loading="lazy"
+                  />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Borosil Glassware</h3>
                 <p className="text-slate-200 text-sm mb-4">Premium laboratory glassware</p>
@@ -250,8 +296,15 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "120ms" }}>
               <CardContent className="p-6">
-                <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(124,58,237,.12),transparent_60%)]">
-                  <Microscope className="h-16 w-16 text-purple-600 group-hover:scale-110 transition-transform" />
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                  <Image
+                    src={homeImgs.scientificInstruments}
+                    alt="Scientific instruments – microscopes on laboratory bench"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    loading="lazy"
+                  />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Scientific Instruments</h3>
                 <p className="text-slate-200 text-sm mb-4">Advanced analytical equipment</p>
@@ -263,8 +316,15 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "160ms" }}>
               <CardContent className="p-6">
-                <div className="h-48 rounded-lg flex items-center justify-center mb-4 bg-[radial-gradient(60%_60%_at_50%_40%,rgba(249,115,22,.12),transparent_60%)]">
-                  <Shield className="h-16 w-16 text-orange-600 group-hover:scale-110 transition-transform" />
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                  <Image
+                    src={homeImgs.whatman}
+                    alt="Whatman filter paper – filtration products in lab"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    loading="lazy"
+                  />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Whatman Filter Paper</h3>
                 <p className="text-slate-200 text-sm mb-4">Laboratory filteration solutions</p>
