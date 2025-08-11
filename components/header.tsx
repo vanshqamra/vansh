@@ -48,6 +48,9 @@ export function Header() {
 
   const totalItems = mounted ? state?.itemCount || 0 : 0
 
+  // —— Role-aware dashboard target (admins → /dashboard/admin, others → /dashboard)
+  const dashboardHref = role === "admin" ? "/dashboard/admin" : "/dashboard"
+
   const handleHeaderSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -203,7 +206,7 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 z-[100]" align="end">
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="flex items-center">
+                    <Link href={dashboardHref} prefetch={false} className="flex items-center">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </Link>
