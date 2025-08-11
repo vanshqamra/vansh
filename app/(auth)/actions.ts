@@ -37,20 +37,51 @@ export async function signup(_: ActionState, formData: FormData): Promise<Action
   if (!serviceKey) return { error: "Server missing SUPABASE_SERVICE_ROLE_KEY." }
   const admin = createClient(url, serviceKey)
 
-  // 3) If a row already exists for this id, don't insert again
-  const { data: existing } = await admin
-    .from("profiles")
-    .select("id, role")
-    .eq("id", user.id)
-    .maybeSingle()
+  // 3) If a row already exists for this id, update it to pending + refresh fields
+const { data: existing } = await admin
+  .from("profiles")
+  .select("id, role")
+  .eq("id", user.id)
+  .maybeSingle()
 
-  if (existing?.id) {
-    // It's already there (from a previous attempt). We're done.
-    return {
-      success:
-        "Registration submitted already. If you just re-signed up, your account is still pending admin approval.",
-    }
+if (existing?.id) {
+  // Try legacy column names first; if they don't exist, fall back to new names.
+  const legacyUpdate: Record<string, any> = {
+    role: "pending",
+    full_name: name,
+    email,
+    company_name: company,
+    gst_no: gstin,
+    contact_number: phone,
   }
+  if (address) legacyUpdate.address = address
+
+  let { error: upd1 } = await admin.from("profiles").update(legacyUpdate).eq("id", user.id)
+
+  if (upd1 && /column .* does not exist|schema cache/i.test(upd1.message)) {
+    const newUpdate: Record<string, any> = {
+      role: "pending",
+      full_name: name,
+      email,
+      company,
+      gstin,
+      phone,
+    }
+    if (address) newUpdate.address = address
+
+    const { error: upd2 } = await admin.from("profiles").update(newUpdate).eq("id", user.id)
+    if (upd2) {
+      return { error: `Profile update failed: ${upd2.message}` }
+    }
+  } else if (upd1) {
+    return { error: `Profile update failed: ${upd1.message}` }
+  }
+
+  return {
+    success:
+      "Registration updated. Your account is pending admin approval.",
+  }
+}
 
   // 4) Build payloads for legacy/new schemas
   const base = { id: user.id, email, full_name: name, role: "pending" as const }
