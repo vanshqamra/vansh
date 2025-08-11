@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import Image from "next/image";
 import {
   FlaskConical,
   Microscope,
@@ -170,14 +169,13 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
-        <Image
+      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+        <img
           src="/image1.jpg"
           alt="Premium laboratory chemicals"
-          fill
-          className="object-cover"
-          sizes="(min-width: 768px) 33vw, 90vw"
-          priority
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover select-none"
         />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Premium Chemicals</h3>
@@ -193,14 +191,13 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
-        <Image
+      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+        <img
           src="/image2.jpg"
           alt="Advanced scientific instruments"
-          fill
-          className="object-cover"
-          sizes="(min-width: 768px) 33vw, 90vw"
           loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover select-none"
         />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Advanced Instruments</h3>
@@ -216,14 +213,13 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
-        <Image
+      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+        <img
           src="/image3.jpg"
           alt="Laboratory supplies and consumables"
-          fill
-          className="object-cover"
-          sizes="(min-width: 768px) 33vw, 90vw"
           loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover select-none"
         />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Laboratory Supplies</h3>
@@ -247,14 +243,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "40ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
-                  <Image
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
+                  <img
                     src="/image4.jpg"
-                    alt="Qualigens reagents"
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    alt="Qualigens reagents and bottles"
                     loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover select-none"
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Qualigens Chemicals</h3>
@@ -267,14 +262,13 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "80ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
-                  <Image
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
+                  <img
                     src="/image5.jpg"
                     alt="Borosil laboratory glassware"
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
                     loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover select-none"
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Borosil Glassware</h3>
@@ -287,14 +281,13 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "120ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
-                  <Image
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
+                  <img
                     src="/image6.jpg"
-                    alt="Scientific instruments"
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    alt="Scientific instruments and microscopes"
                     loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover select-none"
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Scientific Instruments</h3>
@@ -307,14 +300,13 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "160ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
-                  <Image
+                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
+                  <img
                     src="/image7.jpg"
-                    alt="Whatman filter paper"
-                    fill
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    alt="Whatman filter paper products"
                     loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover select-none"
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Whatman Filter Paper</h3>
