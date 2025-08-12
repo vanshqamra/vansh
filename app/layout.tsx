@@ -18,21 +18,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      {/* IMPORTANT: body must be relative so the background layer can sit behind it */}
-      <body className={`relative min-h-screen ${inter.className}`}>
-        {/* 🔵 Global animated blue background for the entire site */}
-        <div id="fx-bg" className="fixed inset-0 z-0 pointer-events-none">
-          <div className="site-bg absolute inset-0" />
-          <div className="fx-mesh absolute inset-0 animate-mesh opacity-60" />
-          <div className="fx-grid absolute inset-0 animate-grid opacity-35 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_10%,black_85%,transparent)]" />
+      <body className={`${inter.className} site-bg`}>
+        {/* Global animated FX background (site-wide) */}
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+          <div className="fx-mesh absolute -inset-40 opacity-60 animate-mesh" />
+          <div className="fx-grid absolute inset-0 opacity-35 animate-grid" />
         </div>
 
         {/* App content ABOVE the background */}
-        <div className="relative z-10">
-          <ClientProviders>
-            <SiteShell>{children}</SiteShell>
-          </ClientProviders>
-        </div>
+        <ClientProviders>
+          <SiteShell>{children}</SiteShell>
+        </ClientProviders>
       </body>
     </html>
   );

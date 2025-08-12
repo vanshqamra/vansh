@@ -19,7 +19,7 @@ import {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-transparent">
       {/* ===== HERO ===== */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <ParallaxBackground />

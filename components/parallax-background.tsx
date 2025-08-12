@@ -20,7 +20,7 @@ export function ParallaxBackground() {
   }, [])
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
       <div ref={containerRef} className="absolute inset-0 w-full h-[120%]">
         {/* Laboratory Grid Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
