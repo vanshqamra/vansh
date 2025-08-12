@@ -95,10 +95,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
             <Badge className="mb-4 bg-blue-100 text-blue-900 border-blue-200">Why Choose Us</Badge>
-            <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
               Laboratory Excellence Redefined
             </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
               Experience unparalleled quality and innovation in every product we deliver
             </p>
           </div>
@@ -176,7 +176,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
             <Badge className="mb-4 bg-green-100 text-green-900 border-green-200">FEATURED BRANDS</Badge>
-            <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">Comprehensive Laboratory Solutions</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Comprehensive Laboratory Solutions</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -273,41 +273,41 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "40ms" }}>
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                <Shield className="h-8 w-8 text-white" />
+                <Shield className="h-8 w-8 text-slate-50" />
               </div>
-              <h3 className="font-semibold text-white mb-2">Quality Assured</h3>
-              <p className="text-blue-100 text-sm">ISO certified products with rigorous quality control</p>
+              <h3 className="font-semibold text-slate-900 mb-2">Quality Assured</h3>
+              <p className="text-slate-600 text-sm">ISO certified products with rigorous quality control</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "100ms" }}>
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                <Truck className="h-8 w-8 text-white" />
+                <Truck className="h-8 w-8 text-slate-50" />
               </div>
-              <h3 className="font-semibold text-white mb-2">Fast Delivery</h3>
-              <p className="text-blue-100 text-sm">Quick and secure shipping worldwide</p>
+              <h3 className="font-semibold text-slate-900 mb-2">Fast Delivery</h3>
+              <p className="text-slate-600 text-sm">Quick and secure shipping worldwide</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "160ms" }}>
               <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                <Award className="h-8 w-8 text-white" />
+                <Award className="h-8 w-8 text-slate-50" />
               </div>
-              <h3 className="font-semibold text-white mb-2">Expert Support</h3>
-              <p className="text-blue-100 text-sm">Technical assistance from qualified professionals</p>
+              <h3 className="font-semibold text-slate-900 mb-2">Expert Support</h3>
+              <p className="text-slate-600 text-sm">Technical assistance from qualified professionals</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "220ms" }}>
               <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                <Globe className="h-8 w-8 text-white" />
+                <Globe className="h-8 w-8 text-slate-50" />
               </div>
-              <h3 className="font-semibold text-white mb-2">Global Reach</h3>
-              <p className="text-blue-100 text-sm">Serving 500+ clients worldwide</p>
+              <h3 className="font-semibold text-slate-900 mb-2">Global Reach</h3>
+              <p className="text-slate-600 text-sm">Serving 500+ clients worldwide</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="py-20 bg-transparent text-white">
+      <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4 text-center fx-reveal">
-          <h2 className="text-4xl font-bold mb-6 tracking-tight">Ready to Advance Your Research?</h2>
-          <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">Ready to Advance Your Research?</h2>
+          <p className="text-xl mb-8 text-slate-700 max-w-2xl mx-auto">
             Join thousands of researchers who trust Chemical Corporation for their laboratory needs.
           </p>
 
@@ -315,7 +315,12 @@ export default function HomePage() {
             <Button asChild size="lg" className="button-magnetic bg-white text-blue-600 hover:bg-blue-50 px-8 py-3">
               <Link href="/products">Browse Catalog</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/10 px-8 py-3 bg-transparent">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 bg-transparent"
+            >
               <Link href="/contact">Contact Sales</Link>
             </Button>
           </div>

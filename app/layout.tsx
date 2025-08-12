@@ -1,3 +1,4 @@
+// app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -18,17 +19,19 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      {/* Do NOT hard-paint background here */}
       <body className={inter.className}>
         <ClientProviders>
           <SiteShell>{children}</SiteShell>
         </ClientProviders>
 
         {/* Global FX overlay (top-most, non-blocking) */}
-        <div aria-hidden className="pointer-events-none fixed inset-0 z-[60]">
-          <div className="fx-mesh absolute -inset-40 opacity-[0.08] animate-mesh" />
-          <div className="fx-grid absolute inset-0 opacity-[0.06] animate-grid" />
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-[80]">
+          <div className="fx-mesh absolute -inset-40 opacity-[0.10] animate-mesh" />
+          <div className="fx-grid absolute inset-0 opacity-[0.08] animate-grid" />
         </div>
       </body>
     </html>
   );
 }
+
