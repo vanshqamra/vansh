@@ -62,67 +62,6 @@
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-10px); }
   }
-
-  /* ---------- New: Homepage FX (visual only, no markup changes) ---------- */
-
-  /* Background mesh + grid */
-  .fx-mesh {
-    background:
-      radial-gradient(1000px 400px at 80% -10%, rgba(20,184,166,.12), transparent 60%),
-      radial-gradient(800px 300px at -10% 20%, rgba(14,165,233,.12), transparent 60%),
-      radial-gradient(700px 280px at 40% 90%, rgba(14,165,233,.08), transparent 60%);
-  }
-  .fx-grid {
-    background:
-      linear-gradient(to right, rgba(226,232,240,.5) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(226,232,240,.5) 1px, transparent 1px);
-    background-size: 80px 80px, 80px 80px;
-  }
-
-  /* Animations */
-  @keyframes mesh {
-    0%   { transform: translate3d(0,0,0) scale(1); }
-    50%  { transform: translate3d(0,-2%,0) scale(1.02); }
-    100% { transform: translate3d(0,0,0) scale(1); }
-  }
-  @keyframes gridSlide {
-    from { background-position: 0 0, 0 0; }
-    to   { background-position: 80px 80px, 80px 80px; }
-  }
-  @keyframes reveal {
-    0%   { opacity: 0; transform: translate3d(0,12px,0) scale(.98); }
-    100% { opacity: 1; transform: translate3d(0,0,0) scale(1); }
-  }
-
-  .animate-mesh { animation: mesh 22s linear infinite; }
-  .animate-grid { animation: gridSlide 24s linear infinite; }
-  .fx-reveal    { animation: reveal .7s cubic-bezier(.16,1,.3,1) both; }
-
-  /* Card glow layer (position as a child of .group) */
-  .fx-card-glow {
-    position: absolute; inset: -1px; border-radius: 16px;
-    background:
-      radial-gradient(120px 60px at 20% 0%, rgba(56,189,248,.15), transparent 70%),
-      radial-gradient(120px 60px at 90% 20%, rgba(16,185,129,.12), transparent 70%);
-    opacity: .6; pointer-events: none; filter: blur(14px);
-    transition: opacity .3s ease;
-  }
-  .group:hover .fx-card-glow { opacity: .9; }
-
-  /* Magnetic CTA sheen (no JS) */
-  .button-magnetic { position: relative; overflow: hidden; }
-  .button-magnetic::after{
-    content:""; position:absolute; inset:-120% -40%;
-    background: radial-gradient(circle at center, rgba(255,255,255,.35), transparent 40%);
-    transform: translate3d(0,0,0) scale(0);
-    transition: transform .25s ease;
-  }
-  .button-magnetic:hover::after{ transform: translate3d(0,0,0) scale(1); }
-
-  /* Respect reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .animate-mesh, .animate-grid, .fx-reveal { animation: none !important; }
-  }
 }
 
 /* ===================== */
@@ -144,35 +83,11 @@
   text-shadow: 0 10px 30px rgba(59,130,246,.35);
 }
 
-/* Animated mesh + grid (FX utilities) */
-@keyframes mesh {
-  0% { transform: translate3d(0,0,0) scale(1); }
-  50% { transform: translate3d(0,-2%,0) scale(1.02); }
-  100% { transform: translate3d(0,0,0) scale(1); }
-}
-@keyframes gridSlide {
-  from { background-position: 0 0, 0 0; }
-  to   { background-position: 80px 80px, 80px 80px; }
-}
 @keyframes reveal {
   0% { opacity: 0; transform: translate3d(0, 12px, 0) scale(.98); }
   100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
-.fx-mesh {
-  background:
-    radial-gradient(1000px 400px at 80% -10%, rgba(20,184,166,.12), transparent 60%),
-    radial-gradient(800px 300px at -10% 20%, rgba(14,165,233,.12), transparent 60%),
-    radial-gradient(700px 280px at 40% 90%, rgba(14,165,233,.08), transparent 60%);
-}
-.fx-grid {
-  background:
-    linear-gradient(to right, rgba(226,232,240,.5) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(226,232,240,.5) 1px, transparent 1px);
-  background-size: 80px 80px, 80px 80px;
-}
-.animate-mesh { animation: mesh 22s linear infinite; }
-.animate-grid { animation: gridSlide 24s linear infinite; }
 .fx-reveal    { animation: reveal .7s cubic-bezier(.16,1,.3,1) both; }
 
 /* Card glow helper (works on desktop hover) */
@@ -202,47 +117,12 @@
 }
 .button-magnetic:hover::after{ transform: translate3d(0,0,0) scale(1); }
 
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .animate-mesh, .animate-grid { animation: none !important; }
   .fx-reveal { animation: none !important; opacity: 1; transform: none; }
 }
 
 /* Ensure page can show a fixed full-viewport background */
 html, body { min-height: 100%; }
-
-/* Animated soft blobs + sliding grid */
-.fx-mesh {
-  background:
-    radial-gradient(1000px 400px at 80% -10%, rgba(20,184,166,.35), transparent 60%),
-    radial-gradient(800px 300px at -10% 20%, rgba(14,165,233,.30), transparent 60%),
-    radial-gradient(700px 280px at 40% 90%, rgba(14,165,233,.18), transparent 60%);
-  animation: mesh 22s linear infinite;
-  will-change: transform;
-}
-.fx-grid {
-  background:
-    linear-gradient(to right, rgba(2,6,23,.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(2,6,23,.08) 1px, transparent 1px);
-  background-size: 80px 80px, 80px 80px;
-  animation: gridSlide 24s linear infinite;
-  will-change: background-position;
-}
-
-/* Keyframes */
-@keyframes mesh {
-  0% { transform: translate3d(0,0,0) scale(1); }
-  50% { transform: translate3d(0,-2%,0) scale(1.02); }
-  100% { transform: translate3d(0,0,0) scale(1); }
-}
-@keyframes gridSlide {
-  from { background-position: 0 0, 0 0; }
-  to   { background-position: 80px 80px, 80px 80px; }
-}
-
-/* Animators */
-.animate-mesh { animation: mesh 22s linear infinite; }
-.animate-grid { animation: gridSlide 24s linear infinite; }
 
 /* Fallback: if the FX container didn't render, paint on body */
 body.fx-fallback::before,
@@ -261,8 +141,38 @@ body.fx-fallback::after  {
   animation: gridSlide 24s linear infinite;
 }
 
-/* Respect reduced motion */
+/* === FX: ONE canonical copy only === */
+@keyframes mesh {
+  0% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(0,-2%,0) scale(1.02); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+@keyframes gridSlide {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 80px 80px, 80px 80px; }
+}
+
+.fx-mesh {
+  background:
+    radial-gradient(1000px 400px at 80% -10%, rgba(20,184,166,.35), transparent 60%),
+    radial-gradient(800px 300px at -10% 20%, rgba(14,165,233,.30), transparent 60%),
+    radial-gradient(700px 280px at 40% 90%, rgba(14,165,233,.18), transparent 60%);
+}
+.fx-grid {
+  background:
+    linear-gradient(to right, rgba(2,6,23,.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(2,6,23,.08) 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px;
+}
+
+.animate-mesh { animation: mesh 22s linear infinite; }
+.animate-grid { animation: gridSlide 24s linear infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .fx-mesh, .fx-grid, .animate-mesh, .animate-grid,
+  .animate-mesh, .animate-grid { animation: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
   body.fx-fallback::after { animation: none !important; }
 }
+
