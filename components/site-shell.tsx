@@ -5,13 +5,12 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const hide = pathname.startsWith("/admin")
   return (
-    <div className="flex min-h-screen flex-col">
-      {!hide && <Header />}
-      <main className="flex-1">{children}</main>
-      {!hide && <Footer />}
+    <div className="min-h-screen flex flex-col bg-transparent">
+      {/* header */}
+      {/* if Header has bg-white, keep it (headers are fine), but main must be transparent */}
+      <main className="flex-1 bg-transparent">{children}</main>
+      {/* footer */}
     </div>
-  )
+  );
 }
