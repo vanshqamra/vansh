@@ -20,7 +20,7 @@ import {
 export default function HomePage() {
   return (
     <div className="min-h-screen">
-      {/* ======================= HERO ======================= */}
+      {/* ===== HERO ===== */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <ParallaxBackground />
 
@@ -68,21 +68,15 @@ export default function HomePage() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
             <div className="text-center fx-reveal" style={{ animationDelay: "120ms" }}>
-              <div className="text-3xl font-bold text-blue-200 tracking-tight">
-                10K+
-              </div>
+              <div className="text-3xl font-bold text-blue-200 tracking-tight">10K+</div>
               <div className="text-sm text-blue-300">Products</div>
             </div>
             <div className="text-center fx-reveal" style={{ animationDelay: "180ms" }}>
-              <div className="text-3xl font-bold text-blue-200 tracking-tight">
-                500+
-              </div>
+              <div className="text-3xl font-bold text-blue-200 tracking-tight">500+</div>
               <div className="text-sm text-blue-300">Clients</div>
             </div>
             <div className="text-center fx-reveal" style={{ animationDelay: "240ms" }}>
-              <div className="text-3xl font-bold text-blue-200 tracking-tight">
-                77+
-              </div>
+              <div className="text-3xl font-bold text-blue-200 tracking-tight">77+</div>
               <div className="text-sm text-blue-300">Years</div>
             </div>
           </div>
@@ -96,101 +90,80 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ======================= FEATURES (3) ======================= */}
+      {/* ===== FEATURES (3) ===== */}
       <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
-            <Badge className="mb-4 bg-blue-100 text-blue-900 border-blue-200">
-              Why Choose Us
-            </Badge>
+            <Badge className="mb-4 bg-blue-100 text-blue-900 border-blue-200">Why Choose Us</Badge>
             <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">
               Laboratory Excellence Redefined
             </h2>
             <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              Experience unparalleled quality and innovation in every product we
-              deliver
+              Experience unparalleled quality and innovation in every product we deliver
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Premium Chemicals — /public/image1.jpeg */}
-            <Card
-              className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
-              style={{ animationDelay: "60ms" }}
-            >
-              <span className="fx-card-glow" />
+            <Card className="relative group border-0 shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "60ms" }}>
+              <div className="fx-card-glow" />
               <CardContent className="p-8 text-center">
-                <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
+                <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-6">
                   <Image
                     src="/image1.jpeg"
                     alt="Premium laboratory chemicals"
                     fill
                     unoptimized
-                    className="object-cover select-none"
-                    sizes="(min-width: 1024px) 33vw, 90vw"
+                    className="object-cover"
+                    sizes="(min-width:1024px) 33vw, 90vw"
                     priority
                   />
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-white">
-                  Premium Chemicals
-                </h3>
-                <p className="text-blue-100 leading-relaxed">
-                  High-purity laboratory chemicals from trusted global
-                  manufacturers, ensuring consistent results in your research.
+                <h3 className="text-xl font-semibold mb-2">Premium Chemicals</h3>
+                <p className="text-slate-600">
+                  High-purity laboratory chemicals from trusted global manufacturers, ensuring consistent results in your research.
                 </p>
               </CardContent>
             </Card>
 
             {/* Advanced Instruments — /public/image2.jpeg */}
-            <Card
-              className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
-              style={{ animationDelay: "120ms" }}
-            >
-              <span className="fx-card-glow" />
+            <Card className="relative group border-0 shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "120ms" }}>
+              <div className="fx-card-glow" />
               <CardContent className="p-8 text-center">
-                <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
+                <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-6">
                   <Image
                     src="/image2.jpeg"
                     alt="Advanced scientific instruments"
                     fill
                     unoptimized
-                    className="object-cover select-none"
-                    sizes="(min-width: 1024px) 33vw, 90vw"
+                    className="object-cover"
+                    sizes="(min-width:1024px) 33vw, 90vw"
                   />
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-white">
-                  Advanced Instruments
-                </h3>
-                <p className="text-blue-100 leading-relaxed">
-                  State-of-the-art scientific instruments and equipment for
-                  precise measurements and analysis.
+                <h3 className="text-xl font-semibold mb-2">Advanced Instruments</h3>
+                <p className="text-slate-600">
+                  State-of-the-art scientific instruments and equipment for precise measurements and analysis.
                 </p>
               </CardContent>
             </Card>
 
             {/* Laboratory Supplies — /public/image3.jpeg */}
-            <Card
-              className="relative group border-0 shadow-lg hover:shadow-xl transition-all duration-300 fx-reveal"
-              style={{ animationDelay: "180ms" }}
-            >
-              <span className="fx-card-glow" />
+            <Card className="relative group border-0 shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "180ms" }}>
+              <div className="fx-card-glow" />
               <CardContent className="p-8 text-center">
-                <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-6">
+                <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-6">
                   <Image
                     src="/image3.jpeg"
                     alt="Laboratory supplies and consumables"
                     fill
                     unoptimized
-                    className="object-cover select-none"
-                    sizes="(min-width: 1024px) 33vw, 90vw"
+                    className="object-cover"
+                    sizes="(min-width:1024px) 33vw, 90vw"
                   />
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-white">
-                  Laboratory Supplies
-                </h3>
-                <p className="text-blue-100 leading-relaxed">
-                  Complete range of laboratory supplies and consumables for all
-                  your research needs.
+                <h3 className="text-xl font-semibold mb-2">Laboratory Supplies</h3>
+                <p className="text-slate-600">
+                  Complete range of laboratory supplies and consumables for all your research needs.
                 </p>
               </CardContent>
             </Card>
@@ -198,130 +171,94 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ======================= FEATURED BRANDS (4) ======================= */}
+      {/* ===== FEATURED BRANDS (4) ===== */}
       <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
-            <Badge className="mb-4 bg-green-100 text-green-900 border-green-200">
-              FEATURED BRANDS
-            </Badge>
-            <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">
-              Comprehensive Laboratory Solutions
-            </h2>
+            <Badge className="mb-4 bg-green-100 text-green-900 border-green-200">FEATURED BRANDS</Badge>
+            <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">Comprehensive Laboratory Solutions</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Qualigens — /public/image4.jpeg */}
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "40ms" }}>
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "40ms" }}>
               <CardContent className="p-6">
-                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image4.jpeg"
                     alt="Qualigens reagents and bottles"
                     fill
                     unoptimized
-                    className="object-cover select-none"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
                   />
                 </div>
-                <h3 className="font-semibold text-lg mb-2 text-white">
-                  Qualigens Chemicals
-                </h3>
-                <p className="text-blue-100 text-sm mb-4">
-                  High-purity laboratory chemicals
-                </p>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full bg-transparent text-white border-white/50 hover:bg-white/10"
-                >
+                <h3 className="font-semibold text-lg mb-2">Qualigens Chemicals</h3>
+                <p className="text-slate-600 text-sm mb-4">High-purity laboratory chemicals</p>
+                <Button asChild variant="outline" className="w-full">
                   <Link href="/brand/qualigens">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Borosil — /public/image5.jpeg */}
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "80ms" }}>
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "80ms" }}>
               <CardContent className="p-6">
-                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image5.jpeg"
                     alt="Borosil laboratory glassware"
                     fill
                     unoptimized
-                    className="object-cover select-none"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
                   />
                 </div>
-                <h3 className="font-semibold text-lg mb-2 text-white">
-                  Borosil Glassware
-                </h3>
-                <p className="text-blue-100 text-sm mb-4">
-                  Premium laboratory glassware
-                </p>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full bg-transparent text-white border-white/50 hover:bg-white/10"
-                >
+                <h3 className="font-semibold text-lg mb-2">Borosil Glassware</h3>
+                <p className="text-slate-600 text-sm mb-4">Premium laboratory glassware</p>
+                <Button asChild variant="outline" className="w-full">
                   <Link href="/brand/borosil">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Scientific Instruments — /public/image6.jpeg */}
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "120ms" }}>
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "120ms" }}>
               <CardContent className="p-6">
-                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image6.jpeg"
                     alt="Scientific instruments and microscopes"
                     fill
                     unoptimized
-                    className="object-cover select-none"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
                   />
                 </div>
-                <h3 className="font-semibold text-lg mb-2 text-white">
-                  Scientific Instruments
-                </h3>
-                <p className="text-blue-100 text-sm mb-4">
-                  Advanced analytical equipment
-                </p>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full bg-transparent text-white border-white/50 hover:bg-white/10"
-                >
+                <h3 className="font-semibold text-lg mb-2">Scientific Instruments</h3>
+                <p className="text-slate-600 text-sm mb-4">Advanced analytical equipment</p>
+                <Button asChild variant="outline" className="w-full">
                   <Link href="/products/scientific-instruments">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Whatman — /public/image7.jpeg */}
-            <Card className="group hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "160ms" }}>
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "160ms" }}>
               <CardContent className="p-6">
-                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/5 mb-4">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image7.jpeg"
                     alt="Whatman filter paper products"
                     fill
                     unoptimized
-                    className="object-cover select-none"
-                    sizes="(min-width: 1024px) 25vw, 90vw"
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
                   />
                 </div>
-                <h3 className="font-semibold text-lg mb-2 text-white">
-                  Whatman Filter Paper
-                </h3>
-                <p className="text-blue-100 text-sm mb-4">
-                  Laboratory filteration solutions
-                </p>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full bg-transparent text-white border-white/50 hover:bg-white/10"
-                >
+                <h3 className="font-semibold text-lg mb-2">Whatman Filter Paper</h3>
+                <p className="text-slate-600 text-sm mb-4">Laboratory filtration solutions</p>
+                <Button asChild variant="outline" className="w-full">
                   <Link href="/brand/whatman">Buy Now</Link>
                 </Button>
               </CardContent>
@@ -330,7 +267,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ======================= TRUST ======================= */}
+      {/* ===== TRUST ===== */}
       <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
@@ -339,27 +276,21 @@ export default function HomePage() {
                 <Shield className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-white mb-2">Quality Assured</h3>
-              <p className="text-blue-100 text-sm">
-                ISO certified products with rigorous quality control
-              </p>
+              <p className="text-blue-100 text-sm">ISO certified products with rigorous quality control</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "100ms" }}>
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
                 <Truck className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-white mb-2">Fast Delivery</h3>
-              <p className="text-blue-100 text-sm">
-                Quick and secure shipping worldwide
-              </p>
+              <p className="text-blue-100 text-sm">Quick and secure shipping worldwide</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "160ms" }}>
               <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
                 <Award className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-white mb-2">Expert Support</h3>
-              <p className="text-blue-100 text-sm">
-                Technical assistance from qualified professionals
-              </p>
+              <p className="text-blue-100 text-sm">Technical assistance from qualified professionals</p>
             </div>
             <div className="flex flex-col items-center fx-reveal" style={{ animationDelay: "220ms" }}>
               <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
@@ -372,32 +303,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ======================= CTA ======================= */}
+      {/* ===== CTA ===== */}
       <section className="py-20 bg-transparent text-white">
         <div className="container mx-auto px-4 text-center fx-reveal">
-          <h2 className="text-4xl font-bold mb-6 tracking-tight">
-            Ready to Advance Your Research?
-          </h2>
+          <h2 className="text-4xl font-bold mb-6 tracking-tight">Ready to Advance Your Research?</h2>
           <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
-            Join thousands of researchers who trust Chemical Corporation for
-            their laboratory needs.
+            Join thousands of researchers who trust Chemical Corporation for their laboratory needs.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              asChild
-              size="lg"
-              className="button-magnetic bg-white text-blue-600 hover:bg-blue-50 px-8 py-3"
-            >
+            <Button asChild size="lg" className="button-magnetic bg-white text-blue-600 hover:bg-blue-50 px-8 py-3">
               <Link href="/products">Browse Catalog</Link>
             </Button>
-
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-white text-white hover:bg-white/10 px-8 py-3 bg-transparent"
-            >
+            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/10 px-8 py-3 bg-transparent">
               <Link href="/contact">Contact Sales</Link>
             </Button>
           </div>
@@ -406,4 +324,3 @@ export default function HomePage() {
     </div>
   );
 }
-
