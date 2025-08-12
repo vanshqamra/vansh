@@ -449,13 +449,7 @@ useEffect(() => {
   }
 
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">Chemical Corporation, Ludhiana</h1>
-          <p className="text-gray-500">Quotation Builder</p>
-        </div>
-
+    <div className="container mx-auto px-4 py-8">
         {/* Client Details */}
         <Card className="mb-6">
           <CardHeader><CardTitle>Client Details</CardTitle></CardHeader>
@@ -587,8 +581,7 @@ useEffect(() => {
           </Card>
         )}
       </div>
-    </>
-  )
+  );
 }
 
 export default function QuotationBuilderPage() {
@@ -596,5 +589,5 @@ export default function QuotationBuilderPage() {
     <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading quotation…</div>}>
       <QuotationBuilderInner />
     </Suspense>
-  )
+  );
 }
