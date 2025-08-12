@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { AccessDenied } from "@/components/access-denied";
-import { Header } from "@/components/header";
 import { getAllProducts } from "@/lib/get-all-products";
 import ProductSearchInput from "@/components/product-search-input";
 
