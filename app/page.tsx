@@ -93,12 +93,12 @@ export default function HomePage() {
       {/* ===== FEATURES (3) ===== */}
       <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 fx-reveal">
-            <Badge className="mb-4 bg-blue-100 text-blue-900 border-blue-200">Why Choose Us</Badge>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-blue-100 text-blue-900 border-blue-200 fx-reveal">Why Choose Us</Badge>
+            <h2 className="fx-reveal text-4xl font-bold text-slate-900 mb-4 tracking-tight">
               Laboratory Excellence Redefined
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <p className="fx-reveal text-xl text-slate-600 max-w-3xl mx-auto">
               Experience unparalleled quality and innovation in every product we deliver
             </p>
           </div>
@@ -305,9 +305,9 @@ export default function HomePage() {
 
       {/* ===== CTA ===== */}
       <section className="py-20 bg-transparent">
-        <div className="container mx-auto px-4 text-center fx-reveal">
-          <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">Ready to Advance Your Research?</h2>
-          <p className="text-xl mb-8 text-slate-700 max-w-2xl mx-auto">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="fx-reveal text-4xl font-bold text-slate-900 mb-6 tracking-tight">Ready to Advance Your Research?</h2>
+          <p className="fx-reveal text-xl mb-8 text-slate-700 max-w-2xl mx-auto">
             Join thousands of researchers who trust Chemical Corporation for their laboratory needs.
           </p>
 

@@ -84,7 +84,7 @@ export default function LaboratorySuppliesPage() {
             return (
               <Card
                 key={brand.name}
-                className="hover:shadow-lg transition-shadow duration-300 bg-white/80 backdrop-blur-sm"
+                className="fx-reveal hover:shadow-lg transition-shadow duration-300 bg-white/80 backdrop-blur-sm"
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-2">
@@ -125,7 +125,7 @@ export default function LaboratorySuppliesPage() {
 
         {/* Categories Section */}
         <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 shadow-lg">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Product Categories</h2>
+          <h2 className="fx-reveal text-2xl font-bold text-slate-900 mb-6 text-center">Product Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               "Analytical Reagents",
@@ -139,7 +139,7 @@ export default function LaboratorySuppliesPage() {
             ].map((category) => (
               <div
                 key={category}
-                className="text-center p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+                className="fx-reveal text-center p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
               >
                 <p className="font-medium text-slate-700">{category}</p>
               </div>
