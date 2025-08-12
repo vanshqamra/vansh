@@ -208,46 +208,6 @@
   .fx-reveal { animation: none !important; opacity: 1; transform: none; }
 }
 
-/* Deep blue base behind the whole page */
-.site-bg{
-  background:
-    radial-gradient(1200px 800px at 50% -10%, #0b3a7e 0%, #0a2c63 35%, #082752 60%, #071f42 100%);
-}
-
-/* Soft animated blobs + sliding grid overlay */
-.fx-mesh{
-  background:
-    radial-gradient(1000px 400px at 80% -10%, rgba(20,184,166,.12), transparent 60%),
-    radial-gradient(800px 300px at -10% 20%, rgba(14,165,233,.12), transparent 60%),
-    radial-gradient(700px 280px at 40% 90%, rgba(14,165,233,.08), transparent 60%);
-}
-.fx-grid{
-  background:
-    linear-gradient(to right, rgba(226,232,240,.38) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(226,232,240,.38) 1px, transparent 1px);
-  background-size: 80px 80px, 80px 80px;
-}
-
-/* Keyframes */
-@keyframes mesh {
-  0% { transform: translate3d(0,0,0) scale(1); }
-  50% { transform: translate3d(0,-2%,0) scale(1.02); }
-  100% { transform: translate3d(0,0,0) scale(1); }
-}
-@keyframes gridSlide {
-  from { background-position: 0 0, 0 0; }
-  to   { background-position: 80px 80px, 80px 80px; }
-}
-
-/* Animators */
-.animate-mesh { animation: mesh 22s linear infinite; }
-.animate-grid { animation: gridSlide 24s linear infinite; }
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .animate-mesh, .animate-grid { animation: none !important; }
-}
-
 /* Ensure page can show a fixed full-viewport background */
 html, body { min-height: 100%; }
 
