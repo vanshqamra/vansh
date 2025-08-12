@@ -18,17 +18,21 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} site-bg`}>
-        {/* Global animated FX background (site-wide) */}
-        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-          <div className="fx-mesh absolute -inset-40 opacity-60 animate-mesh" />
-          <div className="fx-grid absolute inset-0 opacity-35 animate-grid" />
-        </div>
-
-        {/* App content ABOVE the background */}
+      <body className={`${inter.className} bg-white`}>
         <ClientProviders>
           <SiteShell>{children}</SiteShell>
         </ClientProviders>
+
+        {/* Global animated FX overlay (site-wide) */}
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-[60] mix-blend-normal"
+        >
+          {/* Subtle animated mesh */}
+          <div className="fx-mesh absolute -inset-40 opacity-[0.09] animate-mesh" />
+          {/* Sliding grid */}
+          <div className="fx-grid absolute inset-0 opacity-[0.06] animate-grid" />
+        </div>
       </body>
     </html>
   );
