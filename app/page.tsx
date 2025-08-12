@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import Image from "next/image";
 import { Shield, Truck, Award, Globe, Zap, ChevronRight } from "lucide-react";
 
 
@@ -21,7 +22,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* FX BG (single instance) */}
+      {/* FX BG (single instance, behind all content) */}
       <div id="fx-bg" className="fixed inset-0 -z-10 pointer-events-none">
         <div className="site-bg absolute inset-0" />
         <div className="fx-mesh absolute inset-0 animate-mesh opacity-60" />
@@ -145,13 +146,15 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
-        <img
+      <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+        <Image
           src="/image1.jpeg"
           alt="Premium laboratory chemicals"
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover select-none"
+          unoptimized
+          fill
+          className="object-cover select-none"
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw"
+          priority
         />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Premium Chemicals</h3>
@@ -167,13 +170,15 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
-        <img
+      <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+        <Image
           src="/image2.jpeg"
           alt="Advanced scientific instruments"
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover select-none"
+          unoptimized
+          fill
+          className="object-cover select-none"
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw"
+          priority={false}
         />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Advanced Instruments</h3>
@@ -189,13 +194,15 @@ export default function HomePage() {
   >
     <div className="fx-card-glow" />
     <CardContent className="p-8 text-center">
-      <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
-        <img
+      <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+        <Image
           src="/image3.jpeg"
           alt="Laboratory supplies and consumables"
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover select-none"
+          unoptimized
+          fill
+          className="object-cover select-none"
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw"
+          priority={false}
         />
       </div>
       <h3 className="text-xl font-semibold mb-4 text-white">Laboratory Supplies</h3>
@@ -219,13 +226,15 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "40ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
-                  <img
+                <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+                  <Image
                     src="/image4.jpeg"
                     alt="Qualigens reagents and bottles"
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover select-none"
+                    unoptimized
+                    fill
+                    className="object-cover select-none"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw"
+                    priority={false}
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Qualigens Chemicals</h3>
@@ -238,13 +247,15 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "80ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
-                  <img
+                <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+                  <Image
                     src="/image5.jpeg"
                     alt="Borosil laboratory glassware"
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover select-none"
+                    unoptimized
+                    fill
+                    className="object-cover select-none"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw"
+                    priority={false}
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Borosil Glassware</h3>
@@ -257,13 +268,15 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "120ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
-                  <img
+                <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+                  <Image
                     src="/image6.jpeg"
                     alt="Scientific instruments and microscopes"
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover select-none"
+                    unoptimized
+                    fill
+                    className="object-cover select-none"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw"
+                    priority={false}
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Scientific Instruments</h3>
@@ -276,13 +289,15 @@ export default function HomePage() {
 
             <Card className="relative group border border-white/10 bg-white/5 backdrop-blur-md hover:shadow-lg transition-shadow fx-reveal" style={{ animationDelay: "160ms" }}>
               <CardContent className="p-6">
-                <div className="relative h-48 w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-4">
-                  <img
+                <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-white/5 mb-6">
+                  <Image
                     src="/image7.jpeg"
                     alt="Whatman filter paper products"
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover select-none"
+                    unoptimized
+                    fill
+                    className="object-cover select-none"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 45vw, 90vw"
+                    priority={false}
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-white">Whatman Filter Paper</h3>
