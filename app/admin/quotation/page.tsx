@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { AccessDenied } from "@/components/access-denied"
-import { Header } from "@/components/header"
 import ProductSearchInput from "@/components/product-search-input"
 
 // Brand data imports
