@@ -8,46 +8,42 @@ export default function GlobalFxOverlay() {
     // =========================
     // TUNABLES (safe to tweak)
     // =========================
-    const BUBBLE_COUNT = 16;     // how many soft bubbles
-    const MOLECULE_OPACITY = 0.28; // SVG molecule layer opacity
-    const MESH_OPACITY_1 = 0.18; // main color blobs
-    const MESH_OPACITY_2 = 0.12; // secondary blobs
-    const GRID_OPACITY_1 = 0.14; // main grid
-    const GRID_OPACITY_2 = 0.08; // diagonal grid
-    const BEAMS_OPACITY   = 0.18; // sweeping light beams
-    // Switch to deep-blue backdrop vibe? set TRUE
-    const DEEP_BLUE_MODE  = false;
+    const BUBBLE_COUNT = 28;       // more = busier
+    const MOLECULE_OPACITY = 0.38; // 0..1
+    const MESH_OPACITY_1 = 0.30;   // main blobs
+    const MESH_OPACITY_2 = 0.22;   // secondary blobs
+    const GRID_OPACITY_1 = 0.22;   // main grid
+    const GRID_OPACITY_2 = 0.12;   // diagonal grid
+    const BEAMS_OPACITY   = 0.28;  // sweeping light beams
+    // Turn on the deep-blue base (site-wide)
+    const DEEP_BLUE_MODE  = true;
 
-    // 1) Inject CSS (self-contained; no globals required)
+    // 1) Inject CSS (self-contained; avoids conflicts/purge)
     const style = document.createElement("style");
-    style.setAttribute("data-fx", "global-v2");
+    style.setAttribute("data-fx", "global-v3");
     style.textContent = `
 :root{ --fx-mx:0; --fx-my:0; } /* mouse parallax */
 
-@keyframes fx_mesh {
+@keyframes __v3_mesh {
   0% { transform: translate3d(0,0,0) scale(1); }
   50% { transform: translate3d(0,-2%,0) scale(1.03); }
   100% { transform: translate3d(0,0,0) scale(1); }
 }
-@keyframes fx_gridSlide {
+@keyframes __v3_gridSlide {
   from { background-position: 0 0, 0 0; }
   to   { background-position: 120px 120px, 120px 120px; }
 }
-@keyframes fx_rotate {
-  from { transform: rotate(0deg) }
-  to   { transform: rotate(360deg) }
-}
-@keyframes fx_floatUp {
+@keyframes __v3_floatUp {
   0%   { transform: translateY(20px) scale(var(--s,1)); opacity: 0; }
-  10%  { opacity: .5; }
-  90%  { opacity: .5; }
+  10%  { opacity: .55; }
+  90%  { opacity: .55; }
   100% { transform: translateY(-120vh) scale(var(--s,1)); opacity: 0; }
 }
-@keyframes fx_beamSweep {
-  0%   { transform: translateX(-20%) rotate(12deg); opacity: 0; }
-  20%  { opacity: ${BEAMS_OPACITY}; }
-  80%  { opacity: ${BEAMS_OPACITY}; }
-  100% { transform: translateX(20%)  rotate(12deg); opacity: 0; }
+@keyframes __v3_beamSweep {
+  0%   { transform: translateX(-25%) rotate(12deg); opacity: 0; }
+  18%  { opacity: ${BEAMS_OPACITY}; }
+  82%  { opacity: ${BEAMS_OPACITY}; }
+  100% { transform: translateX(25%) rotate(12deg); opacity: 0; }
 }
 
 /* Root wrapper (never blocks clicks) */
@@ -57,7 +53,7 @@ export default function GlobalFxOverlay() {
   z-index: 2147483647;
 }
 
-/* Optional deep-blue base behind everything for stronger look */
+/* Deep blue base for the entire site */
 .__fxBackdrop {
   position: absolute; inset: 0;
   background:
@@ -65,26 +61,28 @@ export default function GlobalFxOverlay() {
   opacity: ${DEEP_BLUE_MODE ? 1 : 0};
 }
 
-/* Color “blobs” (two layers, different speeds) */
+/* Color blobs (two layers, parallax) */
 .__mesh1, .__mesh2 {
   position:absolute; inset:-40px; will-change: transform;
   filter: saturate(115%);
 }
 .__mesh1 {
   opacity: ${MESH_OPACITY_1};
+  /* cyan/teal/blue glow */
   background:
-    radial-gradient(900px 380px at 80% -10%, rgba(14,165,233,.40), transparent 60%),
-    radial-gradient(700px 300px at -10% 20%, rgba(20,184,166,.32), transparent 60%),
-    radial-gradient(600px 260px at 40% 90%, rgba(59,130,246,.22), transparent 60%);
-  animation: fx_mesh 18s ease-in-out infinite;
+    radial-gradient(900px 380px at 80% -10%, rgba(34,211,238,.42), transparent 60%),
+    radial-gradient(720px 320px at -10% 20%, rgba(20,184,166,.32), transparent 60%),
+    radial-gradient(640px 280px at 40% 90%, rgba(96,165,250,.22), transparent 60%);
+  animation: __v3_mesh 18s ease-in-out infinite;
   transform: translate3d(calc(var(--fx-mx)*6px), calc(var(--fx-my)*4px), 0);
 }
 .__mesh2 {
   opacity: ${MESH_OPACITY_2};
+  /* indigo/violet accent */
   background:
-    radial-gradient(900px 400px at 20% 10%, rgba(59,130,246,.35), transparent 60%),
-    radial-gradient(700px 300px at 110% 40%, rgba(14,165,233,.30), transparent 60%);
-  animation: fx_mesh 28s ease-in-out infinite reverse;
+    radial-gradient(900px 400px at 20% 10%, rgba(129,140,248,.30), transparent 60%),
+    radial-gradient(720px 300px at 110% 40%, rgba(59,130,246,.28), transparent 60%);
+  animation: __v3_mesh 28s ease-in-out infinite reverse;
   transform: translate3d(calc(var(--fx-mx)*-4px), calc(var(--fx-my)*-3px), 0);
 }
 
@@ -92,56 +90,56 @@ export default function GlobalFxOverlay() {
 .__grid1, .__grid2 {
   position:absolute; inset:0; will-change: background-position, transform;
   background-size: 120px 120px, 120px 120px;
-  animation: fx_gridSlide 30s linear infinite;
 }
 .__grid1 {
   opacity: ${GRID_OPACITY_1};
   background:
-    linear-gradient(to right, rgba(2,6,23,.12) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(2,6,23,.12) 1px, transparent 1px);
+    linear-gradient(to right, rgba(226,232,240,.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226,232,240,.28) 1px, transparent 1px);
+  animation: __v3_gridSlide 30s linear infinite;
   transform: translate3d(calc(var(--fx-mx)*2px), calc(var(--fx-my)*1px), 0);
 }
 .__grid2 {
   opacity: ${GRID_OPACITY_2};
   background:
-    linear-gradient(to right, rgba(2,6,23,.10) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(2,6,23,.10) 1px, transparent 1px);
+    linear-gradient(to right, rgba(148,163,184,.20) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148,163,184,.20) 1px, transparent 1px);
   transform-origin: center;
   transform: rotate(15deg) translate3d(calc(var(--fx-mx)*-3px), calc(var(--fx-my)*2px), 0);
-  animation-duration: 42s;
+  animation: __v3_gridSlide 42s linear infinite;
 }
 
-/* Sweeping beams */
+/* Sweeping light beams */
 .__beams {
-  position:absolute; inset:-10% 0;
+  position:absolute; inset:-12% -6%;
   background:
-    linear-gradient(115deg, transparent 35%, rgba(255,255,255,.45) 50%, transparent 65%),
-    linear-gradient(115deg, transparent 55%, rgba(255,255,255,.25) 68%, transparent 80%);
+    linear-gradient(115deg, transparent 30%, rgba(255,255,255,.45) 48%, transparent 66%),
+    linear-gradient(115deg, transparent 52%, rgba(255,255,255,.28) 66%, transparent 80%);
   mix-blend-mode: overlay;
-  animation: fx_beamSweep 6.5s ease-in-out infinite;
+  animation: __v3_beamSweep 7s ease-in-out infinite;
 }
 
-/* Molecules (SVG paths drifting) */
+/* Molecules (SVG) */
 .__mol {
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  color:#1e293b; opacity:${MOLECULE_OPACITY};
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,.12));
+  position:absolute; inset:0; width:100%; height:100%;
+  color:#e5f1ff; opacity:${MOLECULE_OPACITY};
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.14));
   transform: translate3d(calc(var(--fx-mx)*1px), calc(var(--fx-my)*1px), 0);
 }
 
-/* Soft bubbles (cheap) */
+/* Soft bubbles (cheap, layered depth) */
 .__bubbles { position:absolute; inset:-10% -5% 0 -5%; overflow:hidden; }
 .__bubble {
-  position:absolute; bottom:-10vh;
+  position:absolute; bottom:-12vh;
   width:12px; height:12px; border-radius:50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.35) 60%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,.38) 60%, rgba(255,255,255,0) 70%);
   filter: blur(.2px);
-  animation: fx_floatUp var(--d,12s) linear infinite;
+  animation: __v3_floatUp var(--d,14s) linear infinite;
   left: var(--x, 50%);
   transform: translateX(-50%) scale(var(--s,1));
 }
 
+/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .__mesh1, .__mesh2, .__grid1, .__grid2, .__beams, .__mol, .__bubble { animation: none !important; }
 }
@@ -200,9 +198,9 @@ export default function GlobalFxOverlay() {
     for (let i = 0; i < BUBBLE_COUNT; i++) {
       const b = document.createElement("div");
       b.className = "__bubble";
-      const x = Math.round(Math.random() * 100);      // 0–100 vw
-      const d = 12 + Math.random() * 12;              // 12–24s
-      const s = 0.8 + Math.random() * 1.6;            // 0.8–2.4 scale
+      const x = Math.round(Math.random() * 100);   // 0–100 vw
+      const d = 12 + Math.random() * 14;           // 12–26s
+      const s = 0.8 + Math.random() * 1.8;         // 0.8–2.6 scale
       b.style.setProperty("--x", `${x}vw`);
       b.style.setProperty("--d", `${d}s`);
       b.style.setProperty("--s", `${s}`);
@@ -221,7 +219,7 @@ export default function GlobalFxOverlay() {
 
     document.body.appendChild(root);
 
-    // 4) Lightweight parallax (mouse moves)
+    // 4) Lightweight parallax (mouse move)
     const onMove = (e: MouseEvent) => {
       const mx = (e.clientX / window.innerWidth) * 2 - 1;  // -1..1
       const my = (e.clientY / window.innerHeight) * 2 - 1; // -1..1
