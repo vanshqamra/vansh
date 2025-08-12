@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ClientProviders from "./providers";
 import { SiteShell } from "@/components/site-shell";
+import GlobalFxOverlay from "@/components/GlobalFxOverlay";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,17 +20,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      {/* Do NOT hard-paint background here */}
+      {/* Do NOT add bg-* here; let CSS tokens handle base */}
       <body className={inter.className}>
         <ClientProviders>
           <SiteShell>{children}</SiteShell>
         </ClientProviders>
 
-        {/* Global FX overlay (top-most, non-blocking) */}
-        <div aria-hidden className="pointer-events-none fixed inset-0 z-[80]">
-          <div className="fx-mesh absolute -inset-40 opacity-[0.10] animate-mesh" />
-          <div className="fx-grid absolute inset-0 opacity-[0.08] animate-grid" />
-        </div>
+        {/* Always-on global FX mounted as a portal */}
+        <GlobalFxOverlay />
       </body>
     </html>
   );
