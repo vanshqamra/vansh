@@ -1,158 +1,84 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useEffect } from "react";
 
-type QuotationRow = {
-  id: string
-  created_at: string
-  title?: string | null
-  client_name: string | null
-  client_email: string | null
-  status: string | null
-  currency: string | null
-  totals_json: { total?: number } | null
-  docx_url?: string | null
-}
+const FX_LEVEL = (process.env.NEXT_PUBLIC_FX_LEVEL || "low").toLowerCase(); // off | low | high
 
-export default function PastQuotationsPage() {
-  const [q, setQ] = useState("")
-  const [rows, setRows] = useState<QuotationRow[]>([])
-  const [loading, setLoading] = useState(false)
-  const [statusMsg, setStatusMsg] = useState<string>("")
-  const [raw, setRaw] = useState<any>(null)
-  const router = useRouter()
-
-  async function load() {
-    setLoading(true)
-    setStatusMsg("Loading…")
-    try {
-      const res = await fetch(`/api/quotations${q ? `?q=${encodeURIComponent(q)}` : ""}`, {
-        cache: "no-store",
-      })
-      const json = await res.json()
-      setRaw(json)
-      if (!res.ok) {
-        setStatusMsg(`API error: ${json?.error || res.status}`)
-        setRows([])
-      } else {
-        const list = Array.isArray(json) ? json : []
-        setStatusMsg(`Found ${list.length} quotation${list.length === 1 ? "" : "s"}`)
-        setRows(list)
-      }
-    } catch (e: any) {
-      setStatusMsg(`Network error: ${e?.message || e}`)
-      setRows([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
+export default function GlobalFxOverlay() {
   useEffect(() => {
-    load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // Respect reduced motion
+    const prefersReduce = typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  async function createTestQuotation() {
-    setStatusMsg("Creating test quotation…")
-    try {
-      const res = await fetch("/api/quotations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: `Test Quote ${new Date().toLocaleString()}`,
-          clientName: "Test Client",
-          clientEmail: "buyer@test.com",
-          status: "DRAFT",
-          currency: "INR",
-          totalsJson: { subtotal: 100, gstTotal: 18, transport: 0, total: 118 },
-          dataJson: {
-            items: [
-              { productCode: "TST-001", productName: "Test Product", brand: "Demo", packSize: "1 pc", quantity: 1, price: 100, discount: 0, gst: 18, hsnCode: "0000" },
-            ],
-            transport: 0,
-          },
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok) {
-        setStatusMsg(`Create failed: ${json?.error || res.status}`)
-      } else {
-        setStatusMsg("Created test quotation ✓")
-        await load()
-      }
-    } catch (e: any) {
-      setStatusMsg(`Create failed (network): ${e?.message || e}`)
-    }
-  }
+    if (prefersReduce || FX_LEVEL === "off") return;
 
-  return (
-    <>
-      <Header />
-      <div className="container mx-auto px-4 py-8 space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Input
-            placeholder="Search client/email/status"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            className="w-64"
-          />
-          <Button onClick={load} disabled={loading}>
-            {loading ? "Loading…" : "Search"}
-          </Button>
-          <Button variant="secondary" onClick={createTestQuotation}>
-            Create test quotation
-          </Button>
-          <span className="text-sm text-muted-foreground">{statusMsg}</span>
-        </div>
+    let disposed = false;
 
-        {raw && (
-          <details className="text-xs text-muted-foreground">
-            <summary>Show raw API response</summary>
-            <pre className="whitespace-pre-wrap break-all">{JSON.stringify(raw, null, 2)}</pre>
-          </details>
-        )}
+    const mount = () => {
+      if (disposed) return;
 
-        <Card>
-          <CardContent className="p-0">
-            <div className="grid grid-cols-6 gap-2 px-4 py-3 font-medium border-b">
-              <div>Date</div>
-              <div>Client</div>
-              <div>Email</div>
-              <div>Status</div>
-              <div>Total</div>
-              <div>Actions</div>
-            </div>
+      const el = document.createElement("div");
+      el.setAttribute("aria-hidden", "true");
+      // Above page content but below modals/menus (adjust if needed)
+      el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:80";
 
-            {rows.map((row) => (
-              <div key={row.id} className="grid grid-cols-6 gap-2 px-4 py-3 border-b items-center">
-                <div>{row.created_at ? new Date(row.created_at).toLocaleDateString() : ""}</div>
-                <div>{row.client_name || ""}</div>
-                <div className="truncate">{row.client_email || ""}</div>
-                <div>{row.status || ""}</div>
-                <div>{row.totals_json?.total ?? ""} {row.currency || ""}</div>
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={() => router.push(`/admin/quotation?quoteId=${row.id}`)}>
-                    Open in Builder
-                  </Button>
-                  {row.docx_url ? (
-                    <a href={row.docx_url} target="_blank" rel="noreferrer">
-                      <Button size="sm" variant="secondary">Download DOCX</Button>
-                    </a>
-                  ) : null}
-                </div>
-              </div>
-            ))}
+      // Tunables
+      const meshOpacity = FX_LEVEL === "high" ? 0.12 : 0.08;
+      const gridOpacity = FX_LEVEL === "high" ? 0.12 : 0.08;
+      const meshClass = "fx-mesh animate-mesh";
+      const gridClass = "fx-grid animate-grid";
 
-            {rows.length === 0 && (
-              <div className="px-4 py-6 text-sm text-muted-foreground">No quotations yet.</div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </>
-  )
+      el.innerHTML = `
+        <div class="${meshClass}" style="position:absolute;inset:-40px;opacity:${meshOpacity}"></div>
+        <div class="${gridClass}" style="position:absolute;inset:0;opacity:${gridOpacity}"></div>
+      `;
+
+      document.body.appendChild(el);
+
+      const onVisibility = () => {
+        const running = document.visibilityState === "visible";
+        // Pause animations by toggling classes (CSS keeps it cheap)
+        const mesh = el.firstElementChild as HTMLElement | null;
+        const grid = el.lastElementChild as HTMLElement | null;
+        if (mesh && grid) {
+          mesh.style.animationPlayState = running ? "running" : "paused";
+          grid.style.animationPlayState = running ? "running" : "paused";
+        }
+      };
+
+      document.addEventListener("visibilitychange", onVisibility);
+      onVisibility();
+
+      const onResize = () => {
+        // noop hook (reserved for density changes if needed)
+      };
+      window.addEventListener("resize", onResize, { passive: true });
+
+      return () => {
+        document.removeEventListener("visibilitychange", onVisibility);
+        window.removeEventListener("resize", onResize);
+        try {
+          document.body.removeChild(el);
+        } catch {}
+      };
+    };
+
+    // Idle-mount: avoid blocking hydration
+    const idle =
+      (window as any).requestIdleCallback ||
+      ((cb: Function) => setTimeout(cb as any, 120));
+
+    const cancelIdle =
+      (window as any).cancelIdleCallback || ((id: any) => clearTimeout(id));
+
+    const id = idle(() => !disposed && mount());
+
+    return () => {
+      disposed = true;
+      cancelIdle(id);
+    };
+  }, []);
+
+  return null;
 }
