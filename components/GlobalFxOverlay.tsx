@@ -5,217 +5,155 @@ import { useEffect } from "react";
 
 export default function GlobalFxOverlay() {
   useEffect(() => {
-    // ========= TUNABLES =========
-    const BUBBLE_COUNT = 26;       // more = busier
-    const MOLECULE_OPACITY = 0.35; // 0..1
-    const MESH_OPACITY_1 = 0.28;   // main blobs
-    const MESH_OPACITY_2 = 0.20;   // secondary blobs
-    const GRID_OPACITY_1 = 0.20;   // main grid
-    const GRID_OPACITY_2 = 0.10;   // diagonal grid
-    const BEAMS_OPACITY   = 0.24;  // sweeping light beams
+    // Avoid double-mounts
+    if (document.getElementById("__fxRootV5")) return;
 
-    // 1) CSS (self-contained; no Tailwind needed)
+    // ---------- TUNABLES ----------
+    const GRID_OPACITY_MAIN = 0.12;
+    const GRID_OPACITY_DIAG = 0.07;
+    const LAB_OPACITY_1 = 0.23; // main lab pattern
+    const LAB_OPACITY_2 = 0.14; // secondary pattern (parallax feel)
+
+    // ---------- CSS (self-contained, no Tailwind) ----------
     const style = document.createElement("style");
-    style.setAttribute("data-fx", "global-v4");
+    style.id = "__fxStylesV5";
     style.textContent = `
-:root{ --fx-mx:0; --fx-my:0; } /* mouse parallax */
+:root{ --fx-mx:0; --fx-my:0; } /* kept if you want to add parallax later */
 
-@keyframes fx_mesh {
-  0% { transform: translate3d(0,0,0) scale(1); }
-  50% { transform: translate3d(0,-2%,0) scale(1.03); }
-  100% { transform: translate3d(0,0,0) scale(1); }
-}
 @keyframes fx_gridSlide {
   from { background-position: 0 0, 0 0; }
   to   { background-position: 120px 120px, 120px 120px; }
 }
-@keyframes fx_floatUp {
-  0%   { transform: translateY(20px) scale(var(--s,1)); opacity: 0; }
-  12%  { opacity: .5; }
-  88%  { opacity: .5; }
-  100% { transform: translateY(-120vh) scale(var(--s,1)); opacity: 0; }
-}
-@keyframes fx_beamSweep {
-  0%   { transform: translateX(-25%) rotate(12deg); opacity: 0; }
-  20%  { opacity: ${BEAMS_OPACITY}; }
-  80%  { opacity: ${BEAMS_OPACITY}; }
-  100% { transform: translateX(25%) rotate(12deg); opacity: 0; }
+
+@keyframes fx_drift_1 {
+  0%   { background-position: 0 0; }
+  100% { background-position: 360px 280px; }
 }
 
-/* Root overlay ABOVE content but non-blocking */
-.__fxRoot {
+@keyframes fx_drift_2 {
+  0%   { background-position: 90px 60px; }
+  100% { background-position: 450px 340px; }
+}
+
+/* Root overlay above content, never intercepts input */
+#__fxRootV5 {
   position: fixed; inset: 0;
   pointer-events: none;
   z-index: 2147483647;
 }
 
-/* Color blobs (use blend modes so text stays readable) */
-.__mesh1, .__mesh2 {
-  position:absolute; inset:-40px; will-change: transform;
-  filter: saturate(115%);
-  mix-blend-mode: overlay;
-}
-.__mesh1 {
-  opacity: ${MESH_OPACITY_1};
-  /* cyan/teal/blue glow */
-  background:
-    radial-gradient(900px 380px at 80% -10%, rgba(34,211,238,.42), transparent 60%),
-    radial-gradient(720px 320px at -10% 20%, rgba(20,184,166,.30), transparent 60%),
-    radial-gradient(640px 280px at 40% 90%, rgba(96,165,250,.22), transparent 60%);
-  animation: fx_mesh 18s ease-in-out infinite;
-  transform: translate3d(calc(var(--fx-mx)*6px), calc(var(--fx-my)*4px), 0);
-}
-.__mesh2 {
-  opacity: ${MESH_OPACITY_2};
-  /* indigo/violet accent */
-  background:
-    radial-gradient(900px 400px at 20% 10%, rgba(129,140,248,.28), transparent 60%),
-    radial-gradient(720px 300px at 110% 40%, rgba(59,130,246,.24), transparent 60%);
-  animation: fx_mesh 28s ease-in-out infinite reverse;
-  transform: translate3d(calc(var(--fx-mx)*-4px), calc(var(--fx-my)*-3px), 0);
-}
-
-/* Grids (subtle, blended) */
-.__grid1, .__grid2 {
-  position:absolute; inset:0; will-change: background-position, transform;
+/* Subtle grids (no blend modes; visible on white + dark) */
+.__gridMain, .__gridDiag {
+  position:absolute; inset:0;
+  will-change: background-position;
   background-size: 120px 120px, 120px 120px;
-  mix-blend-mode: overlay;
 }
-.__grid1 {
-  opacity: ${GRID_OPACITY_1};
+.__gridMain {
+  opacity: ${GRID_OPACITY_MAIN};
   background:
-    linear-gradient(to right, rgba(226,232,240,.26) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(226,232,240,.26) 1px, transparent 1px);
-  animation: fx_gridSlide 30s linear infinite;
-  transform: translate3d(calc(var(--fx-mx)*2px), calc(var(--fx-my)*1px), 0);
+    linear-gradient(to right, rgba(203,213,225,.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(203,213,225,.35) 1px, transparent 1px);
+  animation: fx_gridSlide 36s linear infinite;
 }
-.__grid2 {
-  opacity: ${GRID_OPACITY_2};
+.__gridDiag {
+  opacity: ${GRID_OPACITY_DIAG};
   background:
-    linear-gradient(to right, rgba(148,163,184,.18) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148,163,184,.18) 1px, transparent 1px);
+    linear-gradient(to right, rgba(148,163,184,.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148,163,184,.28) 1px, transparent 1px);
+  transform: rotate(12deg) scale(1.05);
   transform-origin: center;
-  transform: rotate(15deg) translate3d(calc(var(--fx-mx)*-3px), calc(var(--fx-my)*2px), 0);
-  animation: fx_gridSlide 42s linear infinite;
+  animation: fx_gridSlide 48s linear infinite reverse;
 }
 
-/* Sweeping beams (soft-light so they don’t wash text) */
-.__beams {
-  position:absolute; inset:-12% -6%;
-  background:
-    linear-gradient(115deg, transparent 30%, rgba(255,255,255,.55) 48%, transparent 66%),
-    linear-gradient(115deg, transparent 52%, rgba(255,255,255,.35) 66%, transparent 80%);
-  mix-blend-mode: soft-light;
-  animation: fx_beamSweep 7s ease-in-out infinite;
+/* Lab icons pattern layers (test tubes, flasks, beakers) */
+.__lab1, .__lab2 {
+  position:absolute; inset:-8% -4% 0 -4%;
+  background-repeat: repeat;
+  will-change: background-position;
+  filter: saturate(115%);
 }
 
-/* Molecules (screen blend so lines glow but don’t cover text) */
-.__mol {
-  position:absolute; inset:0; width:100%; height:100%;
-  color:#e5f1ff; opacity:${MOLECULE_OPACITY};
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,.12));
-  transform: translate3d(calc(var(--fx-mx)*1px), calc(var(--fx-my)*1px), 0);
-}
-
-/* Soft bubbles */
-.__bubbles { position:absolute; inset:-10% -5% 0 -5%; overflow:hidden; }
-.__bubble {
-  position:absolute; bottom:-12vh;
-  width:12px; height:12px; border-radius:50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,.38) 60%, rgba(255,255,255,0) 70%);
-  filter: blur(.2px);
-  animation: fx_floatUp var(--d,14s) linear infinite;
-  left: var(--x, 50%);
-  transform: translateX(-50%) scale(var(--s,1));
-  mix-blend-mode: screen;
-}
+/* Speeds and opacities tuned for smoothness */
+.__lab1 { opacity: ${LAB_OPACITY_1}; animation: fx_drift_1 60s linear infinite; }
+.__lab2 { opacity: ${LAB_OPACITY_2}; animation: fx_drift_2 90s linear infinite reverse; }
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .__mesh1, .__mesh2, .__grid1, .__grid2, .__beams, .__mol, .__bubble { animation: none !important; }
+  .__gridMain, .__gridDiag, .__lab1, .__lab2 { animation: none !important; }
 }
 `;
     document.head.appendChild(style);
 
-    // 2) Build overlay (no opaque backdrop!)
+    // ---------- Build SVG pattern tiles ----------
+    // Tile 1 (cool blue/cyan)
+    const svg1 = `
+<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'>
+  <g fill='none' stroke='#5aa7ff' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round' opacity='0.75'>
+    <!-- Erlenmeyer flask -->
+    <path d='M30 20 h30 v8 l-8 14 v34 l15 26 h-44 l15-26 v-34 l-8-14 z'/>
+    <circle cx='45' cy='78' r='3'/>
+    <!-- Test tube -->
+    <rect x='100' y='12' width='14' height='64' rx='7'/>
+    <line x1='100' y1='60' x2='114' y2='60'/>
+    <!-- Round flask -->
+    <circle cx='170' cy='70' r='20'/><rect x='166' y='15' width='8' height='30' rx='4'/>
+    <!-- Beaker -->
+    <path d='M20 120 h45 l5 10 v46 h-55 v-46 z'/>
+    <!-- Mortar & pestle-ish -->
+    <path d='M120 120 q15 8 30 0 v18 q-15 12 -30 0 z'/>
+  </g>
+</svg>`.trim();
+
+    // Tile 2 (teal/indigo accent)
+    const svg2 = `
+<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'>
+  <g fill='none' stroke='#22c3a6' stroke-width='1.15' stroke-linecap='round' stroke-linejoin='round' opacity='0.65'>
+    <!-- Tall test tube rack -->
+    <rect x='24' y='20' width='14' height='70' rx='7'/>
+    <rect x='44' y='20' width='14' height='70' rx='7'/>
+    <rect x='64' y='20' width='14' height='70' rx='7'/>
+    <line x1='20' y1='92' x2='84' y2='92'/>
+    <!-- Volumetric flask -->
+    <circle cx='150' cy='68' r='22'/><rect x='146' y='18' width='8' height='28' rx='4'/>
+    <!-- Beaker angled -->
+    <path d='M26 130 h55 l6 10 v52 h-67 v-52 z'/>
+    <!-- Microscope minimalist -->
+    <path d='M140 130 l12 -12 l12 12 v28 h-24 z'/>
+  </g>
+</svg>`.trim();
+
+    const url1 = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg1)}")`;
+    const url2 = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg2)}")`;
+
+    // ---------- Build DOM ----------
     const root = document.createElement("div");
-    root.className = "__fxRoot";
-    root.setAttribute("aria-hidden", "true");
+    root.id = "__fxRootV5";
 
-    const mesh1 = document.createElement("div");
-    mesh1.className = "__mesh1";
+    const gridMain = document.createElement("div");
+    gridMain.className = "__gridMain";
 
-    const mesh2 = document.createElement("div");
-    mesh2.className = "__mesh2";
+    const gridDiag = document.createElement("div");
+    gridDiag.className = "__gridDiag";
 
-    const grid1 = document.createElement("div");
-    grid1.className = "__grid1";
+    const lab1 = document.createElement("div");
+    lab1.className = "__lab1";
+    lab1.style.backgroundImage = url1;
+    lab1.style.backgroundSize = "220px 220px";
 
-    const grid2 = document.createElement("div");
-    grid2.className = "__grid2";
+    const lab2 = document.createElement("div");
+    lab2.className = "__lab2";
+    lab2.style.backgroundImage = url2;
+    lab2.style.backgroundSize = "260px 260px";
 
-    const beams = document.createElement("div");
-    beams.className = "__beams";
-
-    const mol = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    mol.setAttribute("viewBox", "0 0 1200 400");
-    mol.setAttribute("class", "__mol");
-    mol.innerHTML = `
-      <defs>
-        <g id="molNode">
-          <circle r="2.2" fill="currentColor" />
-          <circle cx="11" r="2.2" fill="currentColor" />
-          <circle cx="5.5" cy="6" r="2.2" fill="currentColor" />
-          <line x1="0" y1="0" x2="11" y2="0" stroke="currentColor" stroke-width="1.25" />
-          <line x1="5.5" y1="6" x2="11" y2="0" stroke="currentColor" stroke-width="1.25" />
-        </g>
-      </defs>
-      <g>
-        <use href="#molNode"><animateMotion dur="22s" repeatCount="indefinite" path="M 10,80 C 200,30 400,130 580,80 S 900,110 1100,60" /></use>
-        <use href="#molNode"><animateMotion dur="28s" repeatCount="indefinite" path="M 0,200 C 260,160 420,260 700,200 S 900,260 1200,220" /></use>
-        <use href="#molNode"><animateMotion dur="24s" repeatCount="indefinite" path="M 50,350 C 300,390 520,330 800,370 S 980,330 1150,360" /></use>
-        <use href="#molNode"><animateMotion dur="30s" repeatCount="indefinite" path="M 0,120 C 180,60 420,160 600,120 S 880,160 1200,140" /></use>
-        <use href="#molNode"><animateMotion dur="26s" repeatCount="indefinite" path="M 60,40 C 260,100 420,60 700,90 S 980,60 1150,80" /></use>
-      </g>
-    `;
-
-    const bubbles = document.createElement("div");
-    bubbles.className = "__bubbles";
-    for (let i = 0; i < BUBBLE_COUNT; i++) {
-      const b = document.createElement("div");
-      b.className = "__bubble";
-      const x = Math.round(Math.random() * 100);
-      const d = 12 + Math.random() * 14;
-      const s = 0.8 + Math.random() * 1.8;
-      b.style.setProperty("--x", `${x}vw`);
-      b.style.setProperty("--d", `${d}s`);
-      b.style.setProperty("--s", `${s}`);
-      bubbles.appendChild(b);
-    }
-
-    root.appendChild(mesh1);
-    root.appendChild(mesh2);
-    root.appendChild(grid1);
-    root.appendChild(grid2);
-    root.appendChild(beams);
-    root.appendChild(mol);
-    root.appendChild(bubbles);
+    root.appendChild(gridMain);
+    root.appendChild(gridDiag);
+    root.appendChild(lab1);
+    root.appendChild(lab2);
 
     document.body.appendChild(root);
 
-    // 3) Lightweight parallax (mouse)
-    const onMove = (e: MouseEvent) => {
-      const mx = (e.clientX / window.innerWidth) * 2 - 1;
-      const my = (e.clientY / window.innerHeight) * 2 - 1;
-      document.documentElement.style.setProperty("--fx-mx", mx.toFixed(3));
-      document.documentElement.style.setProperty("--fx-my", my.toFixed(3));
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
-
-    // Cleanup
+    // ---------- Cleanup ----------
     return () => {
-      try { window.removeEventListener("mousemove", onMove); } catch {}
       try { document.body.removeChild(root); } catch {}
       try { document.head.removeChild(style); } catch {}
     };
