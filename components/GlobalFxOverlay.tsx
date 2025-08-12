@@ -6,20 +6,36 @@ export default function GlobalFxOverlay() {
   useEffect(() => {
     const el = document.createElement("div");
     el.setAttribute("aria-hidden", "true");
-    // Max z-index so nothing beats it; never blocks clicks
+    // sits above absolutely everything, never blocks clicks
     el.style.cssText =
       "position:fixed;inset:0;pointer-events:none;z-index:2147483647";
 
+    // NOTE: add BOTH the animate-* classes AND inline animation fallback
     el.innerHTML = `
-      <div class="fx-mesh" style="position:absolute;inset:-40px;opacity:.12"></div>
-      <div class="fx-grid" style="position:absolute;inset:0;opacity:.10"></div>
+      <div
+        class="fx-mesh animate-mesh"
+        style="
+          position:absolute;
+          inset:-40px;
+          opacity:.16;
+          animation: mesh 22s linear infinite;
+        "
+      ></div>
+
+      <div
+        class="fx-grid animate-grid"
+        style="
+          position:absolute;
+          inset:0;
+          opacity:.12;
+          animation: gridSlide 24s linear infinite;
+        "
+      ></div>
     `;
 
     document.body.appendChild(el);
     return () => {
-      try {
-        document.body.removeChild(el);
-      } catch {}
+      try { document.body.removeChild(el); } catch {}
     };
   }, []);
 
