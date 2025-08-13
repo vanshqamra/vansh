@@ -12,13 +12,13 @@ import { useSearch } from "@/app/context/search-context"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 
-// ---------------- Helpers ----------------
+/* ---------------- Helpers ---------------- */
 function normalizeKey(str: string) {
   return String(str).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_")
 }
 
 function codeKeys() {
-  return ["code", "product_code", "Product Code"]
+  return ["code", "product_code", "Product Code", "cat_no", "cat_no.", "cat_no_", "cat_no__", "catno", "catalog_no", "catalog_number", "catalogue_no", "catalogue_number", "cat_no_."]
 }
 
 function priceKeys() {
@@ -30,19 +30,68 @@ function priceKeys() {
     "Price /Piece",
     "Price/ Piece",
     "Price/ Each",
+    "list_price",
+    "offer_price",
+    "price_each",
+    "price_rs",
+    "price_(rs.)",
   ]
+}
+
+function nameKeys() {
+  return [
+    "Product Name",
+    "product_name",
+    "name",
+    "item",
+    "title",
+    "description",
+    "product",
+  ]
+}
+
+function packKeys() {
+  return ["Pack Size", "pack_size", "pack", "packing", "package", "Packsize"]
+}
+
+function casKeys() {
+  return ["CAS No", "cas_no", "cas", "cas_number"]
+}
+
+function hsnKeys() {
+  return ["HSN Code", "hsn_code", "hsn"]
 }
 
 function getField(variant: any, keys: string[]) {
   for (const k of keys) {
-    if (variant[k] !== undefined && variant[k] !== "") return variant[k]
+    if (variant?.[k] !== undefined && variant?.[k] !== "") return variant[k]
     const nk = normalizeKey(k)
-    if (variant[nk] !== undefined && variant[nk] !== "") return variant[nk]
+    if (variant?.[nk] !== undefined && variant?.[nk] !== "") return variant[nk]
   }
   return ""
 }
 
-// ---------------- Preprocess Borosil ----------------
+function firstNonEmpty(obj: Record<string, any>, keys: string[]) {
+  for (const k of keys) {
+    const nk = normalizeKey(k)
+    if (obj?.[k] !== undefined && obj?.[k] !== "") return obj[k]
+    if (obj?.[nk] !== undefined && obj?.[nk] !== "") return obj[nk]
+  }
+  return ""
+}
+
+function parsePriceToNumber(v: any): number {
+  if (typeof v === "number") return Number.isFinite(v) ? v : 0
+  if (v === null || v === undefined) return 0
+  const n = Number(String(v).replace(/[^\d.]/g, ""))
+  return Number.isFinite(n) ? n : 0
+}
+
+function inr(n: number) {
+  return n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
+}
+
+/* ---------------- Preprocess Borosil ---------------- */
 const normalizedBorosil: any[] = (Array.isArray(borosilProducts) ? borosilProducts : [])?.map(
   (group: any) => {
     const specs_headers =
@@ -71,7 +120,7 @@ const normalizedBorosil: any[] = (Array.isArray(borosilProducts) ? borosilProduc
   }
 )
 
-// ---------------- Page ----------------
+/* ---------------- Page ---------------- */
 export default function BrandPage({ params }: { params: { brandName: string } }) {
   const brandKey = params.brandName
   const brand = (labSupplyBrands as any)[brandKey]
@@ -104,7 +153,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   let grouped: any[] = []
   let pageCount = 1 // will set per brand below
 
-  // ---------------- Borosil ----------------
+  /* ---------------- Borosil ---------------- */
   if (brandKey === "borosil") {
     // flatten groups → variants with resolved titles/categories
     const flat: Array<{ variant: any; groupMeta: any }> = []
@@ -254,7 +303,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       })
       .filter(Boolean) as any[]
   }
-  // ---------------- Qualigens ----------------
+  /* ---------------- Qualigens ---------------- */
   else if (brandKey === "qualigens") {
     let qualigensProducts: any[] = []
     try {
@@ -288,7 +337,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       },
     ]
   }
-  // ---------------- Rankem ----------------
+  /* ---------------- Rankem ---------------- */
   else if (brandKey === "rankem") {
     const flat: any[] = []
     ;(rankemProducts as any[]).forEach((group: any) => {
@@ -316,43 +365,55 @@ export default function BrandPage({ params }: { params: { brandName: string } })
     })
   }
 
-  // ---------------- Add-to-cart helper ----------------
+  /* ---------------- Add-to-cart helper ---------------- */
   const handleAdd = (row: any, group: any) => {
     if (!isLoaded) {
-      toast({ title: "Loading...", description: "Please wait", variant: "destructive" })
-      return
-    }
-    // robust numeric parse for any brand
-    const priceRaw = row["Price"]
-    const priceNum =
-      typeof priceRaw === "number" ? priceRaw : Number(String(priceRaw).replace(/[^\d.]/g, ""))
-    if (!(priceNum > 0)) {
-      toast({ title: "Invalid Price", description: "Cannot add invalid price.", variant: "destructive" })
+      toast({ title: "Loading…", description: "Please wait a moment.", variant: "destructive" })
       return
     }
 
-    const name = row["Product Name"] || group.title
-    const catNo = row["Product Code"] || row.Code || ""
+    // Resolve values regardless of brand/key casing
+    const codeVal = String(firstNonEmpty(row, codeKeys())).trim()
+    const nameVal = String(firstNonEmpty(row, nameKeys()) || group?.title || "Item").trim()
+    const packVal = String(firstNonEmpty(row, packKeys()) || "").trim()
+    const casVal = String(firstNonEmpty(row, casKeys()) || "").trim()
+    const hsnVal = String(firstNonEmpty(row, hsnKeys()) || "").trim()
+    const priceRaw = firstNonEmpty(row, priceKeys())
+    const priceNum = parsePriceToNumber(priceRaw) // allow 0 (quote-first)
+
+    // Ensure at least a name or code exists to add
+    if (!nameVal && !codeVal) {
+      toast({ title: "Cannot add item", description: "Missing product name/code.", variant: "destructive" })
+      return
+    }
+
+    // Build a stable id
+    const safeNameKey = normalizeKey(nameVal).slice(0, 32)
+    const id = `${brandKey}-${codeVal || safeNameKey || "item"}`
+
     addItem({
-      id: `${brandKey}-${catNo}`,
-      name,
-      productName: name,
-      catNo,
-      productCode: catNo,
-      casNo: row["CAS No"] || "",
-      packSize: row["Pack Size"] || "",
-      packing: row.Packing || "",
-      hsn: row["HSN Code"] || "",
-      price: priceNum,
+      id,
+      name: nameVal,
+      productName: nameVal,
+      code: codeVal,           // <- important for checkout/history
+      productCode: codeVal,
+      catNo: codeVal,
+      casNo: casVal,
+      packSize: packVal,
+      packing: row.Packing ?? "", // keep original field if present
+      hsn: hsnVal,
+      price: priceNum,         // 0 is allowed
       quantity: 1,
       brand: brand.name,
       category: group.category,
       image: null,
     })
-    toast({ title: "Added to Cart", description: `${name} added.`, variant: "default" })
+
+    const priceMsg = priceNum > 0 ? inr(priceNum) : "Price on request"
+    toast({ title: "Added to Cart", description: `${nameVal} (${codeVal || "no code"}) • ${priceMsg}` })
   }
 
-  // ---------------- Render ----------------
+  /* ---------------- Render ---------------- */
   const groups = Array.isArray(grouped) ? (grouped as any[]) : []
 
   return (
@@ -380,32 +441,32 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                 </thead>
                 <tbody>
                   {group.variants.map((row: any, ri: number) => {
-                    const priceRaw = row["Price"]
-                    const priceNum =
-                      typeof priceRaw === "number"
-                        ? priceRaw
-                        : Number(String(priceRaw).replace(/[^\d.]/g, ""))
-                    const canAdd = priceNum > 0
+                    const priceNum = parsePriceToNumber(firstNonEmpty(row, priceKeys()))
+                    const displayPrice =
+                      priceNum > 0 ? inr(priceNum) : (row["Price"] ?? row["price"] ?? "—")
 
                     return (
                       <tr key={ri} className="border-b last:border-none">
                         {group._tableHeaders.map((h: string) => (
                           <td key={`${ri}-${h}`} className="py-2 px-3">
                             {typeof row[h] === "number"
-                              ? h === "Price"
-                                ? (row[h] as number).toLocaleString("en-IN", { style: "currency", currency: "INR" })
+                              ? h.toLowerCase().includes("price")
+                                ? inr(row[h] as number)
                                 : (row[h] as number)
                               : (row[h] ?? "—")}
                           </td>
                         ))}
                         <td className="py-2 px-3">
-                          <Button
-                            size="sm"
-                            disabled={!canAdd}
-                            onClick={() => handleAdd(row, group)}
-                          >
-                            Add
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-slate-500">{displayPrice}</span>
+                            <Button
+                              size="sm"
+                              onClick={() => handleAdd(row, group)}
+                              // Always allow adding (price can be 0 for quotes)
+                            >
+                              Add
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     )
