@@ -27,14 +27,11 @@ function statusBadge(status: string | null | undefined) {
   return <Badge className={color[s] || "bg-gray-100 text-gray-800"}>{s}</Badge>
 }
 
-// ---------- JSON & Item helpers ----------
+/* -------------------- Item extraction (robust) -------------------- */
+
 function coerceJSON(v: any): any {
   if (typeof v === "string") {
-    try {
-      return JSON.parse(v)
-    } catch {
-      return v
-    }
+    try { return JSON.parse(v) } catch { return v }
   }
   return v
 }
@@ -81,7 +78,13 @@ function normalizeItem(it: any) {
     (typeof it === "number" ? it : undefined)
 
   return {
-    name: it?.name ?? it?.product_name ?? it?.productName ?? it?.title ?? it?.description ?? (typeof it === "string" ? it : "Item"),
+    name:
+      it?.name ??
+      it?.product_name ??
+      it?.productName ??
+      it?.title ??
+      it?.description ??
+      (typeof it === "string" ? it : "Item"),
     sku:
       it?.sku ??
       it?.code ??
@@ -95,18 +98,34 @@ function normalizeItem(it: any) {
   }
 }
 
+/** Try common fast paths including camelCase “order summary” on the right panel */
 function fastExtractItems(snapshot: any): any[] {
   if (!snapshot) return []
   const s = coerceJSON(snapshot)
   const candidates = [
+    // Preferred canonical
     s?.items,
     s?.products,
+
+    // camelCase order summary variants (right panel)
+    s?.orderSummary?.items,
+    s?.orderSummary?.products,
+    s?.summaryRight?.items,
+    s?.summaryRight?.products,
+    s?.rightPanel?.summary?.items,
+    s?.rightPanel?.summary?.products,
+    s?.sidebar?.orderSummary?.items,
+    s?.sidebar?.orderSummary?.products,
+
+    // snake_case/order/checkout
     s?.order_summary?.items,
     s?.order_summary?.products,
     s?.summary?.items,
     s?.summary?.products,
     s?.checkout?.summary?.items,
     s?.checkout?.summary?.products,
+
+    // other common nests
     s?.cart?.items,
     s?.cart?.products,
     s?.order?.items,
@@ -126,38 +145,40 @@ function fastExtractItems(snapshot: any): any[] {
   return []
 }
 
+/** If fast paths fail, deep-scan nodes whose key names smell like “summary/order/cart/quote” */
 function deepExtractItems(snapshot: any): any[] {
   const root = coerceJSON(snapshot)
   if (!root || typeof root !== "object") return []
 
-  // 1) Fast path first
   const fast = fastExtractItems(root)
   if (fast.length) return fast
 
-  // 2) Deep scan BFS
+  const NAME_HINT = /summary|order|cart|quote|right|sidebar/i
   const results: any[] = []
-  const q: any[] = [root]
+  const q: Array<{ node: any; key?: string }> = [{ node: root }]
   const seen = new Set<any>()
 
   while (q.length) {
-    const node = q.shift()
+    const { node, key } = q.shift()!
     if (!node || typeof node !== "object" || seen.has(node)) continue
     seen.add(node)
 
     if (Array.isArray(node)) {
       if (looksLikeItems(node)) results.push(...node)
-      for (const el of node) if (el && typeof el === "object") q.push(el)
+      for (const el of node) if (el && typeof el === "object") q.push({ node: el })
       continue
     }
 
-    for (const v of Object.values(node)) {
+    for (const [k, v] of Object.entries(node)) {
       const vv = coerceJSON(v)
       if (!vv) continue
+
       if (Array.isArray(vv)) {
-        if (looksLikeItems(vv)) results.push(...vv)
-        for (const el of vv) if (el && typeof el === "object") q.push(el)
+        // Prefer arrays under keys that match our hints
+        if (NAME_HINT.test(k) && looksLikeItems(vv)) results.push(...vv)
+        for (const el of vv) if (el && typeof el === "object") q.push({ node: el })
       } else if (typeof vv === "object") {
-        q.push(vv)
+        q.push({ node: vv, key: k })
       }
     }
   }
@@ -165,11 +186,13 @@ function deepExtractItems(snapshot: any): any[] {
   return results
 }
 
-function extractItems(snapshot: any) {
+function extractItems(snapshot: any): Array<{ name: string; sku: string; qty: number }> {
   const raw = fastExtractItems(snapshot)
   const arr = raw.length ? raw : deepExtractItems(snapshot)
   return arr.map(normalizeItem)
 }
+
+/* -------------------- Address formatter -------------------- */
 
 function formatAddress(a: any) {
   if (!a) return "—"
@@ -186,7 +209,8 @@ function formatAddress(a: any) {
   return parts.join("\n")
 }
 
-// ---------- Page ----------
+/* -------------------- Page -------------------- */
+
 export default function HistoryPage() {
   const supabase = useMemo(() => createClient(), [])
   const [orders, setOrders] = useState<OrderRow[]>([])
@@ -218,9 +242,7 @@ export default function HistoryPage() {
       }
     }
     load()
-    return () => {
-      if (unsub) unsub()
-    }
+    return () => { if (unsub) unsub() }
   }, [supabase])
 
   return (
