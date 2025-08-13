@@ -16,7 +16,7 @@ type OrderRow = {
   grand_total: number | null
   checkout_snapshot: any | null
   company_name?: string | null
-  // If your table happens to have a top-level items column in some rows:
+  // if you ever add a top-level items column:
   items?: any[] | null
 }
 
@@ -28,57 +28,109 @@ function normalizeStatus(raw: string | null | undefined) {
   if (s === "processing") return "approved"
   return s || "pending"
 }
+
 function statusClass(status: string | null | undefined) {
   const s = normalizeStatus(status)
   switch (s) {
-    case "approved": return "bg-green-100 text-green-800"
-    case "pending": return "bg-yellow-100 text-yellow-800"
-    case "dispatched": return "bg-blue-100 text-blue-800"
-    case "rejected": return "bg-red-100 text-red-800"
+    case "approved":
+      return "bg-green-100 text-green-800"
+    case "pending":
+      return "bg-yellow-100 text-yellow-800"
+    case "dispatched":
+      return "bg-blue-100 text-blue-800"
+    case "rejected":
+      return "bg-red-100 text-red-800"
     case "paid":
-    case "fulfilled": return "bg-emerald-100 text-emerald-800"
-    default: return "bg-gray-100 text-gray-800"
+    case "fulfilled":
+      return "bg-emerald-100 text-emerald-800"
+    default:
+      return "bg-gray-100 text-gray-800"
   }
 }
 
-function extractRawItems(row: OrderRow): any[] {
+/** Accept arrays, objects, or stringified JSON; prefer `products` but check many paths. */
+function extractRawItems(row: { checkout_snapshot: any; items?: any[] | null }): any[] {
   const s = row.checkout_snapshot
-  const cand = [
-    row.items,                           // top-level column (if present)
+
+  const toArray = (val: any): any[] => {
+    if (!val) return []
+    if (typeof val === "string") {
+      try {
+        const parsed = JSON.parse(val)
+        return toArray(parsed)
+      } catch {
+        return []
+      }
+    }
+    if (Array.isArray(val)) return val
+    if (typeof val === "object") {
+      const out: any[] = []
+      for (const [k, v] of Object.entries(val)) {
+        if (v && typeof v === "object") {
+          out.push({ sku: k, ...(v as any) })
+        } else {
+          out.push({ sku: k, qty: typeof v === "number" ? v : 1, name: typeof v === "string" ? v : "Item" })
+        }
+      }
+      return out
+    }
+    return []
+  }
+
+  const candidates = [
+    s?.products,
     s?.items,
+    s?.cart?.products,
     s?.cart?.items,
+    s?.order?.products,
     s?.order?.items,
+    s?.quote?.products,
     s?.quote?.items,
     s?.line_items,
-    s?.products,
-    s?.request?.items,
+    s?.payload?.products,
     s?.payload?.items,
+    s?.request?.products,
+    s?.request?.items,
+    row.items,
   ]
-  for (const c of cand) if (Array.isArray(c)) return c
+
+  for (const c of candidates) {
+    const arr = toArray(c)
+    if (arr.length) return arr
+  }
   return []
 }
+
+/** Normalize each record to a consistent { name, sku, qty } shape for rendering. */
 function normalizeItem(it: any): NormalizedItem {
-  return {
-    name:
-      it?.name ??
-      it?.title ??
-      it?.product_name ??
-      it?.description ??
-      "Item",
-    sku:
-      it?.sku ??
-      it?.code ??
-      it?.product_code ??
-      it?.id ??
-      it?.part_no ??
-      "",
-    qty:
-      (typeof it?.qty === "number" ? it.qty : undefined) ??
-      (typeof it?.quantity === "number" ? it.quantity : undefined) ??
-      (typeof it?.count === "number" ? it.count : undefined) ??
-      (typeof it?.qty_requested === "number" ? it.qty_requested : undefined) ??
-      1,
-  }
+  const rawQty =
+    (typeof it?.qty === "number" ? it.qty : undefined) ??
+    (typeof it?.quantity === "number" ? it.quantity : undefined) ??
+    (typeof it?.count === "number" ? it.count : undefined) ??
+    (typeof it?.qty_requested === "number" ? it.qty_requested : undefined) ??
+    (typeof it === "number" ? it : undefined)
+
+  const qty = Number.isFinite(rawQty) ? Number(rawQty) : 1
+
+  const name =
+    it?.name ??
+    it?.product_name ??
+    it?.productName ??
+    it?.title ??
+    it?.description ??
+    (typeof it === "string" ? it : "Item")
+
+  const sku =
+    it?.sku ??
+    it?.code ??
+    it?.product_code ??
+    it?.productCode ??
+    it?.id ??
+    it?.part_no ??
+    (typeof it === "string" ? it : "") ??
+    (typeof it?.sku === "number" ? String(it.sku) : "")
+
+  return { name, sku, qty }
 }
 
 export default function HistoryPage() {
@@ -89,6 +141,7 @@ export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [openId, setOpenId] = useState<string | null>(null)
 
+  // Fetch via server API (uses auth cookies) + subscribe to realtime.
   useEffect(() => {
     let unsub: (() => void) | undefined
 
@@ -125,7 +178,9 @@ export default function HistoryPage() {
     }
 
     load()
-    return () => { if (unsub) unsub() }
+    return () => {
+      if (unsub) unsub()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -135,8 +190,7 @@ export default function HistoryPage() {
     return orders.filter((o) => {
       const idHit = o.id.toLowerCase().includes(q)
       const statusHit = normalizeStatus(o.status).includes(q)
-      const items = extractRawItems(o)
-      const anyItemHit = items.some((it) =>
+      const anyItemHit = extractRawItems(o).some((it) =>
         [
           String(it?.name ?? it?.title ?? it?.product_name ?? "").toLowerCase(),
           String(it?.sku ?? it?.code ?? it?.product_code ?? "").toLowerCase(),
@@ -151,7 +205,9 @@ export default function HistoryPage() {
     <div className="container mx-auto py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-4">Quote / Order History</h1>
-        <p className="text-slate-600">View your submitted quotes and track their status. Click <b>View</b> to expand details.</p>
+        <p className="text-slate-600">
+          View your submitted quotes and track their status. Click <b>View</b> to expand details.
+        </p>
       </div>
 
       <Card className="bg-white/80 backdrop-blur-md">
@@ -204,8 +260,7 @@ export default function HistoryPage() {
                 </TableHeader>
                 <TableBody>
                   {filtered.map((o) => {
-                    const rawItems = extractRawItems(o)
-                    const items: NormalizedItem[] = rawItems.map(normalizeItem)
+                    const items = extractRawItems(o).map(normalizeItem)
                     const itemsCount = items.length
                     const total = Number(o.grand_total || 0)
                     const status = normalizeStatus(o.status)
@@ -230,7 +285,17 @@ export default function HistoryPage() {
                                 size="sm"
                                 onClick={() => setOpenId(isOpen ? null : o.id)}
                               >
-                                {isOpen ? (<><EyeOff className="h-4 w-4 mr-1" />Hide</>) : (<><Eye className="h-4 w-4 mr-1" />View</>)}
+                                {isOpen ? (
+                                  <>
+                                    <EyeOff className="h-4 w-4 mr-1" />
+                                    Hide
+                                  </>
+                                ) : (
+                                  <>
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    View
+                                  </>
+                                )}
                               </Button>
                             </div>
                           </TableCell>
@@ -252,8 +317,13 @@ export default function HistoryPage() {
                                     <div className="text-slate-500">Customer</div>
                                     <div className="font-medium">
                                       {o.checkout_snapshot?.customer?.name ||
-                                        [o.checkout_snapshot?.customer?.first_name, o.checkout_snapshot?.customer?.last_name].filter(Boolean).join(" ") || "—"}
-                                      {o.company_name ? <span className="text-slate-600"> — {o.company_name}</span> : null}
+                                        [o.checkout_snapshot?.customer?.first_name, o.checkout_snapshot?.customer?.last_name]
+                                          .filter(Boolean)
+                                          .join(" ") ||
+                                        "—"}
+                                      {o.company_name ? (
+                                        <span className="text-slate-600"> — {o.company_name}</span>
+                                      ) : null}
                                     </div>
                                     {o.checkout_snapshot?.customer?.phone ? (
                                       <div className="text-slate-600">{o.checkout_snapshot.customer.phone}</div>
