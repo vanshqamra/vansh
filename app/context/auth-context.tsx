@@ -4,6 +4,7 @@ import type React from "react"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client"
 import type { User } from "@supabase/supabase-js"
+import { useRouter } from "next/navigation"
 
 interface AuthContextType {
   user: User | null
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return null
   })
   const supabase = useMemo(() => createSupabaseBrowserClient(), [])
+  const router = useRouter()
 
   useEffect(() => {
     const getInitialSession = async () => {
@@ -83,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setRole(null)
         localStorage.removeItem("user_role")
       }
+      router.refresh()
     })
 
     return () => subscription.unsubscribe()

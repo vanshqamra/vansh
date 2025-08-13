@@ -15,6 +15,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import AddressSelector from "@/components/address-selector"
 
 type QuoteItem = {
   code: string
@@ -45,6 +48,8 @@ export default function QuoteCartPage() {
   const [ordersLoading, setOrdersLoading] = useState(true)
   const [openOrderId, setOpenOrderId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [shippingAddress, setShippingAddress] = useState<any | null>(null)
+  const [saveAddress, setSaveAddress] = useState(false)
 
   useEffect(() => setMounted(true), [])
 
@@ -135,8 +140,8 @@ export default function QuoteCartPage() {
         .eq("id", auth.user.id) // profiles.id = auth.uid()
         .maybeSingle()
 
-      // Build payload for your /api/orders (supports lite payload as implemented)
-      const payload = {
+      // Build payload for /api/orders
+      const payload: any = {
         items: items.map((i: QuoteItem) => ({
           sku: i.code,
           name: i.name,
@@ -151,6 +156,15 @@ export default function QuoteCartPage() {
           email: profile?.email || auth.user.email || null,
         },
         source: "quote-cart",
+      }
+      if (shippingAddress) payload.shipping_address = shippingAddress
+
+      if (saveAddress && shippingAddress && !shippingAddress.id) {
+        await fetch("/api/me/addresses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(shippingAddress),
+        }).catch(() => {})
       }
 
       const res = await fetch("/api/orders", {
@@ -248,11 +262,25 @@ export default function QuoteCartPage() {
                 </TableBody>
               </Table>
 
-              <div className="flex justify-between mt-6">
-                <Button variant="outline" onClick={() => clearQuote()}>Clear</Button>
-                <Button size="lg" onClick={handleSubmitQuote} disabled={submitting}>
-                  {submitting ? "Submitting..." : "Submit Quote Request"}
-                </Button>
+              <div className="mt-6 space-y-4">
+                <div>
+                  <h4 className="font-medium mb-2">Shipping Address</h4>
+                  <AddressSelector value={shippingAddress} onChange={setShippingAddress} />
+                  <div className="flex items-center gap-2 mt-2">
+                    <Checkbox
+                      id="save-address"
+                      checked={saveAddress}
+                      onCheckedChange={(v) => setSaveAddress(!!v)}
+                    />
+                    <Label htmlFor="save-address">Save this address</Label>
+                  </div>
+                </div>
+                <div className="flex justify-between">
+                  <Button variant="outline" onClick={() => clearQuote()}>Clear</Button>
+                  <Button size="lg" onClick={handleSubmitQuote} disabled={submitting}>
+                    {submitting ? "Submitting..." : "Submit Quote Request"}
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
