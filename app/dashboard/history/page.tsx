@@ -1,92 +1,135 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Download, Eye, Calendar } from "lucide-react"
+import { Search, Eye, EyeOff, Calendar } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
-// Mock data for quote history
-const mockQuoteHistory = [
-  {
-    id: "QR-2024-001",
-    date: "2024-01-15",
-    items: 12,
-    status: "Completed",
-    total: "₹45,670",
-    type: "Manual Request",
-  },
-  {
-    id: "QR-2024-002",
-    date: "2024-01-18",
-    items: 8,
-    status: "Pending",
-    total: "₹28,450",
-    type: "File Upload",
-  },
-  {
-    id: "QR-2024-003",
-    date: "2024-01-22",
-    items: 25,
-    status: "In Progress",
-    total: "₹89,320",
-    type: "Manual Request",
-  },
-  {
-    id: "QR-2024-004",
-    date: "2024-01-25",
-    items: 6,
-    status: "Completed",
-    total: "₹15,890",
-    type: "File Upload",
-  },
-  {
-    id: "QR-2024-005",
-    date: "2024-01-28",
-    items: 18,
-    status: "Rejected",
-    total: "₹52,340",
-    type: "Manual Request",
-  },
-]
+type OrderRow = {
+  id: string
+  created_at: string
+  status: string | null
+  grand_total: number | null
+  checkout_snapshot: any | null
+  company_name?: string | null
+}
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Completed":
+function normalizeStatus(raw: string | null | undefined) {
+  const s = (raw || "").toLowerCase()
+  if (s === "awaiting_approval") return "pending"
+  if (s === "processing") return "approved" // optional mapping if you used it earlier
+  return s || "pending"
+}
+
+function statusClass(status: string | null | undefined) {
+  const s = normalizeStatus(status)
+  switch (s) {
+    case "approved":
       return "bg-green-100 text-green-800"
-    case "Pending":
+    case "pending":
       return "bg-yellow-100 text-yellow-800"
-    case "In Progress":
+    case "dispatched":
       return "bg-blue-100 text-blue-800"
-    case "Rejected":
+    case "rejected":
       return "bg-red-100 text-red-800"
+    case "paid":
+    case "fulfilled":
+      return "bg-emerald-100 text-emerald-800"
     default:
       return "bg-gray-100 text-gray-800"
   }
 }
 
-export default function HistoryPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filteredHistory, setFilteredHistory] = useState(mockQuoteHistory)
+function extractItems(snapshot: any): Array<{ name?: string; title?: string; sku?: string; qty?: number; quantity?: number }> {
+  if (!snapshot) return []
+  if (Array.isArray(snapshot.items)) return snapshot.items
+  if (snapshot.cart && Array.isArray(snapshot.cart.items)) return snapshot.cart.items
+  return []
+}
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term)
-    const filtered = mockQuoteHistory.filter(
-      (quote) =>
-        quote.id.toLowerCase().includes(term.toLowerCase()) ||
-        quote.status.toLowerCase().includes(term.toLowerCase()) ||
-        quote.type.toLowerCase().includes(term.toLowerCase()),
-    )
-    setFilteredHistory(filtered)
-  }
+export default function HistoryPage() {
+  const supabase = useMemo(() => createClient(), [])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [orders, setOrders] = useState<OrderRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [openId, setOpenId] = useState<string | null>(null)
+
+  // Load orders for the signed-in user + subscribe to realtime
+  useEffect(() => {
+    let unsub: (() => void) | undefined
+
+    const run = async () => {
+      setLoading(true)
+
+      const { data: auth } = await supabase.auth.getUser()
+      const uid = auth.user?.id
+      if (!uid) {
+        setOrders([])
+        setLoading(false)
+        return
+      }
+
+      const load = async () => {
+        const { data, error } = await supabase
+          .from("orders")
+          .select("id, created_at, status, grand_total, checkout_snapshot, company_name")
+          .eq("user_id", uid)
+          .order("created_at", { ascending: false })
+        if (error) {
+          console.error("orders fetch error:", error)
+          setOrders([])
+        } else {
+          setOrders(data ?? [])
+        }
+      }
+
+      await load()
+      setLoading(false)
+
+      const channel = supabase
+        .channel("orders-history-inline")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "orders", filter: `user_id=eq.${uid}` },
+          load
+        )
+        .subscribe()
+
+      unsub = () => supabase.removeChannel(channel)
+    }
+
+    run()
+    return () => { if (unsub) unsub() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const filtered = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase()
+    if (!q) return orders
+    return orders.filter((o) => {
+      const idHit = o.id.toLowerCase().includes(q)
+      const statusHit = normalizeStatus(o.status).includes(q)
+      const items = extractItems(o.checkout_snapshot)
+      const anyItemHit = items.some((it) =>
+        [
+          (it.name || it.title || "").toString().toLowerCase(),
+          (it.sku || "").toString().toLowerCase(),
+        ].some((s) => s.includes(q))
+      )
+      const companyHit = (o.company_name || "").toLowerCase().includes(q)
+      return idHit || statusHit || anyItemHit || companyHit
+    })
+  }, [orders, searchTerm])
 
   return (
     <div className="container mx-auto py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-4">Quote Request History</h1>
-        <p className="text-slate-600">View and manage all your previous quote requests and their current status.</p>
+        <h1 className="text-3xl font-bold text-slate-900 mb-4">Quote / Order History</h1>
+        <p className="text-slate-600">View your submitted quotes and track their status. Click <b>View</b> to expand details.</p>
       </div>
 
       <Card className="bg-white/80 backdrop-blur-md">
@@ -95,75 +138,175 @@ export default function HistoryPage() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Request History
+                Recent Orders
               </CardTitle>
-              <CardDescription>Track the status of your quote requests and download completed quotes.</CardDescription>
+              <CardDescription>Search by Order ID, status, item code/name, or company.</CardDescription>
             </div>
             <div className="relative max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
               <Input
-                placeholder="Search requests..."
+                placeholder="Search orders..."
                 value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Request ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredHistory.map((quote) => (
-                  <TableRow key={quote.id}>
-                    <TableCell className="font-medium">{quote.id}</TableCell>
-                    <TableCell>{new Date(quote.date).toLocaleDateString()}</TableCell>
-                    <TableCell>{quote.items} items</TableCell>
-                    <TableCell>{quote.type}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(quote.status)}>{quote.status}</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">{quote.total}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                        {quote.status === "Completed" && (
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-1" />
-                            Download
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
 
-          {filteredHistory.length === 0 && (
+        <CardContent>
+          {loading ? (
+            <div className="text-sm text-slate-600">Loading your orders…</div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-slate-400 mb-2">
                 <Calendar className="h-12 w-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-slate-900 mb-2">No requests found</h3>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">No orders found</h3>
               <p className="text-slate-600">
-                {searchTerm ? "Try adjusting your search terms." : "You haven't made any quote requests yet."}
+                {searchTerm ? "Try adjusting your search terms." : "You haven't submitted any quotes yet."}
               </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Order ID</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Items</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((o) => {
+                    const items = extractItems(o.checkout_snapshot)
+                    const itemsCount = items.length
+                    const total = Number(o.grand_total || 0)
+                    const status = normalizeStatus(o.status)
+                    const isOpen = openId === o.id
+
+                    return (
+                      <>
+                        <TableRow key={o.id}>
+                          <TableCell className="font-medium">{o.id.slice(0, 8)}…</TableCell>
+                          <TableCell>{new Date(o.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>{itemsCount} items</TableCell>
+                          <TableCell>
+                            <Badge className={statusClass(o.status)}>{status}</Badge>
+                          </TableCell>
+                          <TableCell className="font-medium text-right">
+                            {total > 0 ? `₹${total.toFixed(2)}` : "—"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center gap-2 justify-end">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setOpenId(isOpen ? null : o.id)}
+                              >
+                                {isOpen ? (
+                                  <>
+                                    <EyeOff className="h-4 w-4 mr-1" />
+                                    Hide
+                                  </>
+                                ) : (
+                                  <>
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    View
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+
+                        {isOpen && (
+                          <TableRow key={`${o.id}-details`}>
+                            <TableCell colSpan={6}>
+                              <div className="rounded-md border p-4 bg-white space-y-6">
+                                {/* Summary */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <div className="text-slate-500">Placed</div>
+                                    <div className="font-medium">
+                                      {new Date(o.created_at).toLocaleString()}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div className="text-slate-500">Customer</div>
+                                    <div className="font-medium">
+                                      {o.checkout_snapshot?.customer?.name ||
+                                        [o.checkout_snapshot?.customer?.first_name, o.checkout_snapshot?.customer?.last_name]
+                                          .filter(Boolean)
+                                          .join(" ") ||
+                                        "—"}
+                                      {o.company_name ? (
+                                        <span className="text-slate-600"> — {o.company_name}</span>
+                                      ) : null}
+                                    </div>
+                                    {o.checkout_snapshot?.customer?.phone ? (
+                                      <div className="text-slate-600">{o.checkout_snapshot.customer.phone}</div>
+                                    ) : null}
+                                    {o.checkout_snapshot?.customer?.email ? (
+                                      <div className="text-slate-600">{o.checkout_snapshot.customer.email}</div>
+                                    ) : null}
+                                  </div>
+                                  <div>
+                                    <div className="text-slate-500">Total</div>
+                                    <div className="font-medium">
+                                      {total > 0 ? `₹${total.toFixed(2)}` : "—"}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Items */}
+                                <div>
+                                  <div className="text-sm mb-2 text-slate-600">Items</div>
+                                  {items.length === 0 ? (
+                                    <div className="text-sm text-slate-600">No line items stored.</div>
+                                  ) : (
+                                    <Table>
+                                      <TableHeader>
+                                        <TableRow>
+                                          <TableHead>Item</TableHead>
+                                          <TableHead>Code</TableHead>
+                                          <TableHead className="text-right">Qty</TableHead>
+                                        </TableRow>
+                                      </TableHeader>
+                                      <TableBody>
+                                        {items.map((it: any, idx: number) => (
+                                          <TableRow key={idx}>
+                                            <TableCell className="font-medium">{it.name || it.title || "Item"}</TableCell>
+                                            <TableCell>{it.sku || "—"}</TableCell>
+                                            <TableCell className="text-right">{it.qty ?? it.quantity ?? 1}</TableCell>
+                                          </TableRow>
+                                        ))}
+                                      </TableBody>
+                                    </Table>
+                                  )}
+                                </div>
+
+                                {/* Shipping (raw JSON shown for now) */}
+                                {o.checkout_snapshot?.shipping_address ? (
+                                  <div>
+                                    <div className="text-sm mb-1 text-slate-600">Shipping Address</div>
+                                    <pre className="text-xs bg-slate-50 border rounded p-3 overflow-x-auto">
+                                      {JSON.stringify(o.checkout_snapshot.shipping_address, null, 2)}
+                                    </pre>
+                                  </div>
+                                ) : null}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    )
+                  })}
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>
