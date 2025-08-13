@@ -17,14 +17,6 @@ type OrderRow = {
   grand_total: number | null
 }
 
-type QuoteRow = {
-  id: string
-  created_at: string
-  title: string | null
-  status: string | null
-  client_email: string | null
-}
-
 export default function Dashboard() {
   const { user } = useAuth()
   const { state } = useCart()
@@ -34,7 +26,6 @@ export default function Dashboard() {
   const [role, setRole] = useState<string | null>(null)
   const [orders, setOrders] = useState<OrderRow[]>([])
   const [ordersCount, setOrdersCount] = useState<number>(0)
-  const [quotes, setQuotes] = useState<QuoteRow[]>([])
 
   const cartItems = state?.items || []
   const cartTotal = state?.total || 0
@@ -68,18 +59,6 @@ export default function Dashboard() {
         .select("*", { count: "exact", head: true })
         .eq("user_id", uid)
       setOrdersCount(count ?? 0)
-
-      // REAL quotations created by this user
-      // If your quotations table stores user_id, switch filter to .eq("user_id", uid)
-      if (session?.user?.email) {
-        const { data: q } = await supabase
-          .from("quotations")
-          .select("id, created_at, title, status, client_email")
-          .eq("client_email", session.user.email)
-          .order("created_at", { ascending: false })
-          .limit(5)
-        setQuotes(q || [])
-      }
     })()
   }, [mounted, supabase])
 
@@ -88,6 +67,8 @@ export default function Dashboard() {
     { title: "Cart Items", value: String(cartItemCount), icon: ShoppingCart, description: "Items in current cart" },
     { title: "Cart Value", value: `₹${cartTotal.toLocaleString()}`, icon: TrendingUp, description: "Current cart total" },
   ]), [ordersCount, cartItemCount, cartTotal])
+
+  const displayStatus = (s: OrderRow["status"]) => (s === "pending" ? "pending for approval" : s)
 
   if (!mounted) return <div className="p-8">Loading…</div>
 
@@ -165,7 +146,7 @@ export default function Dashboard() {
                         >
                           {order.status === "fulfilled" && <CheckCircle className="h-3 w-3 mr-1" />}
                           {order.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
-                          {order.status}
+                          {displayStatus(order.status)}
                         </Badge>
                       </div>
                     </div>
@@ -230,39 +211,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Quotations (REAL) */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Your Quotation Requests</CardTitle>
-            <CardDescription>Recent RFQs you submitted</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {quotes.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No quotations yet.</div>
-            ) : (
-              <div className="space-y-3">
-                {quotes.map((q) => (
-                  <div key={q.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium text-sm">{q.title || q.id}</p>
-                      <p className="text-xs text-gray-500">{new Date(q.created_at).toLocaleString()}</p>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant={q.status === "APPROVED" ? "default" : q.status === "REJECTED" ? "destructive" : "secondary"}>
-                        {q.status || "PENDING"}
-                      </Badge>
-                      <div className="mt-2">
-                        <Button asChild size="sm" variant="outline">
-                          <Link href={`/quotations/${q.id}`}>Open</Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* RFQ section removed as requested */}
       </div>
     </div>
   )
