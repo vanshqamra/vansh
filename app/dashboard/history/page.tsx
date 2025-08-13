@@ -21,7 +21,7 @@ type OrderRow = {
 function normalizeStatus(raw: string | null | undefined) {
   const s = (raw || "").toLowerCase()
   if (s === "awaiting_approval") return "pending"
-  if (s === "processing") return "approved" // optional mapping if you used it earlier
+  if (s === "processing") return "approved" // if you used it earlier
   return s || "pending"
 }
 
@@ -53,56 +53,52 @@ function extractItems(snapshot: any): Array<{ name?: string; title?: string; sku
 
 export default function HistoryPage() {
   const supabase = useMemo(() => createClient(), [])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [orders, setOrders] = useState<OrderRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [orders, setOrders] = useState<OrderRow[]>([])
+  const [uid, setUid] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
   const [openId, setOpenId] = useState<string | null>(null)
 
-  // Load orders for the signed-in user + subscribe to realtime
+  // Fetch via SERVER API (auth cookie) so it works even if client has no session
   useEffect(() => {
     let unsub: (() => void) | undefined
 
-    const run = async () => {
+    const load = async () => {
       setLoading(true)
-
-      const { data: auth } = await supabase.auth.getUser()
-      const uid = auth.user?.id
-      if (!uid) {
+      const res = await fetch("/api/me/orders", { cache: "no-store" })
+      if (!res.ok) {
         setOrders([])
+        setUid(null)
         setLoading(false)
         return
       }
-
-      const load = async () => {
-        const { data, error } = await supabase
-          .from("orders")
-          .select("id, created_at, status, grand_total, checkout_snapshot, company_name")
-          .eq("user_id", uid)
-          .order("created_at", { ascending: false })
-        if (error) {
-          console.error("orders fetch error:", error)
-          setOrders([])
-        } else {
-          setOrders(data ?? [])
-        }
-      }
-
-      await load()
+      const json = await res.json()
+      setOrders(json.orders ?? [])
+      setUid(json.uid ?? null)
       setLoading(false)
 
-      const channel = supabase
-        .channel("orders-history-inline")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "orders", filter: `user_id=eq.${uid}` },
-          load
-        )
-        .subscribe()
+      // Realtime: subscribe after we know uid
+      if (json.uid) {
+        const channel = supabase
+          .channel("orders-history-inline")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "orders", filter: `user_id=eq.${json.uid}` },
+            () => {
+              // Re-fetch from server so RLS/session is always correct
+              fetch("/api/me/orders", { cache: "no-store" })
+                .then((r) => r.json())
+                .then((j) => setOrders(j.orders ?? []))
+                .catch(() => {})
+            }
+          )
+          .subscribe()
 
-      unsub = () => supabase.removeChannel(channel)
+        unsub = () => supabase.removeChannel(channel)
+      }
     }
 
-    run()
+    load()
     return () => { if (unsub) unsub() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -227,7 +223,6 @@ export default function HistoryPage() {
                           <TableRow key={`${o.id}-details`}>
                             <TableCell colSpan={6}>
                               <div className="rounded-md border p-4 bg-white space-y-6">
-                                {/* Summary */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                   <div>
                                     <div className="text-slate-500">Placed</div>
@@ -262,7 +257,6 @@ export default function HistoryPage() {
                                   </div>
                                 </div>
 
-                                {/* Items */}
                                 <div>
                                   <div className="text-sm mb-2 text-slate-600">Items</div>
                                   {items.length === 0 ? (
@@ -289,7 +283,6 @@ export default function HistoryPage() {
                                   )}
                                 </div>
 
-                                {/* Shipping (raw JSON shown for now) */}
                                 {o.checkout_snapshot?.shipping_address ? (
                                   <div>
                                     <div className="text-sm mb-1 text-slate-600">Shipping Address</div>
