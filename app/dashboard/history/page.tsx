@@ -16,39 +16,69 @@ type OrderRow = {
   grand_total: number | null
   checkout_snapshot: any | null
   company_name?: string | null
+  // If your table happens to have a top-level items column in some rows:
+  items?: any[] | null
 }
+
+type NormalizedItem = { name: string; sku: string; qty: number }
 
 function normalizeStatus(raw: string | null | undefined) {
   const s = (raw || "").toLowerCase()
   if (s === "awaiting_approval") return "pending"
-  if (s === "processing") return "approved" // if you used it earlier
+  if (s === "processing") return "approved"
   return s || "pending"
 }
-
 function statusClass(status: string | null | undefined) {
   const s = normalizeStatus(status)
   switch (s) {
-    case "approved":
-      return "bg-green-100 text-green-800"
-    case "pending":
-      return "bg-yellow-100 text-yellow-800"
-    case "dispatched":
-      return "bg-blue-100 text-blue-800"
-    case "rejected":
-      return "bg-red-100 text-red-800"
+    case "approved": return "bg-green-100 text-green-800"
+    case "pending": return "bg-yellow-100 text-yellow-800"
+    case "dispatched": return "bg-blue-100 text-blue-800"
+    case "rejected": return "bg-red-100 text-red-800"
     case "paid":
-    case "fulfilled":
-      return "bg-emerald-100 text-emerald-800"
-    default:
-      return "bg-gray-100 text-gray-800"
+    case "fulfilled": return "bg-emerald-100 text-emerald-800"
+    default: return "bg-gray-100 text-gray-800"
   }
 }
 
-function extractItems(snapshot: any): Array<{ name?: string; title?: string; sku?: string; qty?: number; quantity?: number }> {
-  if (!snapshot) return []
-  if (Array.isArray(snapshot.items)) return snapshot.items
-  if (snapshot.cart && Array.isArray(snapshot.cart.items)) return snapshot.cart.items
+function extractRawItems(row: OrderRow): any[] {
+  const s = row.checkout_snapshot
+  const cand = [
+    row.items,                           // top-level column (if present)
+    s?.items,
+    s?.cart?.items,
+    s?.order?.items,
+    s?.quote?.items,
+    s?.line_items,
+    s?.products,
+    s?.request?.items,
+    s?.payload?.items,
+  ]
+  for (const c of cand) if (Array.isArray(c)) return c
   return []
+}
+function normalizeItem(it: any): NormalizedItem {
+  return {
+    name:
+      it?.name ??
+      it?.title ??
+      it?.product_name ??
+      it?.description ??
+      "Item",
+    sku:
+      it?.sku ??
+      it?.code ??
+      it?.product_code ??
+      it?.id ??
+      it?.part_no ??
+      "",
+    qty:
+      (typeof it?.qty === "number" ? it.qty : undefined) ??
+      (typeof it?.quantity === "number" ? it.quantity : undefined) ??
+      (typeof it?.count === "number" ? it.count : undefined) ??
+      (typeof it?.qty_requested === "number" ? it.qty_requested : undefined) ??
+      1,
+  }
 }
 
 export default function HistoryPage() {
@@ -59,7 +89,6 @@ export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [openId, setOpenId] = useState<string | null>(null)
 
-  // Fetch via SERVER API (auth cookie) so it works even if client has no session
   useEffect(() => {
     let unsub: (() => void) | undefined
 
@@ -77,7 +106,6 @@ export default function HistoryPage() {
       setUid(json.uid ?? null)
       setLoading(false)
 
-      // Realtime: subscribe after we know uid
       if (json.uid) {
         const channel = supabase
           .channel("orders-history-inline")
@@ -85,7 +113,6 @@ export default function HistoryPage() {
             "postgres_changes",
             { event: "*", schema: "public", table: "orders", filter: `user_id=eq.${json.uid}` },
             () => {
-              // Re-fetch from server so RLS/session is always correct
               fetch("/api/me/orders", { cache: "no-store" })
                 .then((r) => r.json())
                 .then((j) => setOrders(j.orders ?? []))
@@ -93,7 +120,6 @@ export default function HistoryPage() {
             }
           )
           .subscribe()
-
         unsub = () => supabase.removeChannel(channel)
       }
     }
@@ -109,11 +135,11 @@ export default function HistoryPage() {
     return orders.filter((o) => {
       const idHit = o.id.toLowerCase().includes(q)
       const statusHit = normalizeStatus(o.status).includes(q)
-      const items = extractItems(o.checkout_snapshot)
+      const items = extractRawItems(o)
       const anyItemHit = items.some((it) =>
         [
-          (it.name || it.title || "").toString().toLowerCase(),
-          (it.sku || "").toString().toLowerCase(),
+          String(it?.name ?? it?.title ?? it?.product_name ?? "").toLowerCase(),
+          String(it?.sku ?? it?.code ?? it?.product_code ?? "").toLowerCase(),
         ].some((s) => s.includes(q))
       )
       const companyHit = (o.company_name || "").toLowerCase().includes(q)
@@ -178,7 +204,8 @@ export default function HistoryPage() {
                 </TableHeader>
                 <TableBody>
                   {filtered.map((o) => {
-                    const items = extractItems(o.checkout_snapshot)
+                    const rawItems = extractRawItems(o)
+                    const items: NormalizedItem[] = rawItems.map(normalizeItem)
                     const itemsCount = items.length
                     const total = Number(o.grand_total || 0)
                     const status = normalizeStatus(o.status)
@@ -203,17 +230,7 @@ export default function HistoryPage() {
                                 size="sm"
                                 onClick={() => setOpenId(isOpen ? null : o.id)}
                               >
-                                {isOpen ? (
-                                  <>
-                                    <EyeOff className="h-4 w-4 mr-1" />
-                                    Hide
-                                  </>
-                                ) : (
-                                  <>
-                                    <Eye className="h-4 w-4 mr-1" />
-                                    View
-                                  </>
-                                )}
+                                {isOpen ? (<><EyeOff className="h-4 w-4 mr-1" />Hide</>) : (<><Eye className="h-4 w-4 mr-1" />View</>)}
                               </Button>
                             </div>
                           </TableCell>
@@ -223,6 +240,7 @@ export default function HistoryPage() {
                           <TableRow key={`${o.id}-details`}>
                             <TableCell colSpan={6}>
                               <div className="rounded-md border p-4 bg-white space-y-6">
+                                {/* Summary */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                   <div>
                                     <div className="text-slate-500">Placed</div>
@@ -234,13 +252,8 @@ export default function HistoryPage() {
                                     <div className="text-slate-500">Customer</div>
                                     <div className="font-medium">
                                       {o.checkout_snapshot?.customer?.name ||
-                                        [o.checkout_snapshot?.customer?.first_name, o.checkout_snapshot?.customer?.last_name]
-                                          .filter(Boolean)
-                                          .join(" ") ||
-                                        "—"}
-                                      {o.company_name ? (
-                                        <span className="text-slate-600"> — {o.company_name}</span>
-                                      ) : null}
+                                        [o.checkout_snapshot?.customer?.first_name, o.checkout_snapshot?.customer?.last_name].filter(Boolean).join(" ") || "—"}
+                                      {o.company_name ? <span className="text-slate-600"> — {o.company_name}</span> : null}
                                     </div>
                                     {o.checkout_snapshot?.customer?.phone ? (
                                       <div className="text-slate-600">{o.checkout_snapshot.customer.phone}</div>
@@ -257,6 +270,7 @@ export default function HistoryPage() {
                                   </div>
                                 </div>
 
+                                {/* Items */}
                                 <div>
                                   <div className="text-sm mb-2 text-slate-600">Items</div>
                                   {items.length === 0 ? (
@@ -271,11 +285,11 @@ export default function HistoryPage() {
                                         </TableRow>
                                       </TableHeader>
                                       <TableBody>
-                                        {items.map((it: any, idx: number) => (
+                                        {items.map((it, idx) => (
                                           <TableRow key={idx}>
-                                            <TableCell className="font-medium">{it.name || it.title || "Item"}</TableCell>
+                                            <TableCell className="font-medium">{it.name}</TableCell>
                                             <TableCell>{it.sku || "—"}</TableCell>
-                                            <TableCell className="text-right">{it.qty ?? it.quantity ?? 1}</TableCell>
+                                            <TableCell className="text-right">{it.qty}</TableCell>
                                           </TableRow>
                                         ))}
                                       </TableBody>
@@ -283,6 +297,7 @@ export default function HistoryPage() {
                                   )}
                                 </div>
 
+                                {/* Shipping (if present) */}
                                 {o.checkout_snapshot?.shipping_address ? (
                                   <div>
                                     <div className="text-sm mb-1 text-slate-600">Shipping Address</div>
