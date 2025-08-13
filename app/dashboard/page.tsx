@@ -203,7 +203,7 @@ export default function Dashboard() {
                   <ShoppingCart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500 mb-4">Your cart is empty</p>
                   <Button asChild>
-                    <Link href="/products/bulk-chemicals">Start Shopping</Link>
+                    <Link href="/products/laboratory-supplies">Start Shopping</Link>
                   </Button>
                 </div>
               )}
