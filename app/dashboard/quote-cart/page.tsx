@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation"
 import { Trash2, ChevronDown, ChevronUp } from "lucide-react"
 
 import { useQuote } from "@/app/context/quote-context"
-import { createClient } from "@/utils/supabase/client"
 import { useToast } from "@/hooks/use-toast"
+
+// ⬇️ Uses your existing Supabase client helper (client-side)
+import { createClient } from "@/lib/supabase/client"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,9 +25,9 @@ type QuoteItem = {
 type OrderRow = {
   id: string
   created_at: string
-  status: string
+  status: string | null
   grand_total: number | null
-  checkout_snapshot: any | null // will contain items & submitted details
+  checkout_snapshot: any | null
 }
 
 export default function QuoteCartPage() {
@@ -38,7 +40,7 @@ export default function QuoteCartPage() {
   const [mounted, setMounted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
-  // Orders section
+  // Orders from DB
   const [orders, setOrders] = useState<OrderRow[]>([])
   const [ordersLoading, setOrdersLoading] = useState(true)
   const [openOrderId, setOpenOrderId] = useState<string | null>(null)
@@ -49,7 +51,8 @@ export default function QuoteCartPage() {
   useEffect(() => {
     if (!mounted) return
     fetchOrders()
-    // subscribe to realtime status changes for this user
+
+    // Realtime: refresh orders list on any change to this user's orders
     supabase.auth.getUser().then(({ data }) => {
       const uid = data.user?.id
       if (!uid) return
@@ -61,6 +64,7 @@ export default function QuoteCartPage() {
           () => fetchOrders()
         )
         .subscribe()
+
       return () => {
         supabase.removeChannel(channel)
       }
@@ -70,6 +74,7 @@ export default function QuoteCartPage() {
 
   async function fetchOrders() {
     setOrdersLoading(true)
+
     const { data: auth } = await supabase.auth.getUser()
     const uid = auth.user?.id
     if (!uid) {
@@ -77,10 +82,11 @@ export default function QuoteCartPage() {
       setOrdersLoading(false)
       return
     }
+
     const { data, error } = await supabase
       .from("orders")
       .select("id, created_at, status, grand_total, checkout_snapshot")
-      .eq("user_id", uid)
+      .eq("user_id", uid) // user_id is now populated for all orders
       .order("created_at", { ascending: false })
 
     if (error) {
@@ -92,9 +98,16 @@ export default function QuoteCartPage() {
     setOrdersLoading(false)
   }
 
-  function statusBadge(s: string) {
-    const base =
-      "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border"
+  function normalizeStatus(raw: string | null | undefined) {
+    const s = (raw || "").toLowerCase()
+    if (s === "awaiting_approval") return "pending"
+    if (s === "processing") return "approved" // optional mapping if you used 'processing'
+    return s || "pending"
+  }
+
+  function statusBadge(raw: string | null | undefined) {
+    const s = normalizeStatus(raw)
+    const base = "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border"
     const map: Record<string, string> = {
       pending: "bg-yellow-50 text-yellow-800 border-yellow-200",
       approved: "bg-green-50 text-green-800 border-green-200",
@@ -105,34 +118,30 @@ export default function QuoteCartPage() {
   }
 
   async function handleSubmitQuote() {
-    // Requires user to be signed in so we can attach user_id to the order
     const { data: auth } = await supabase.auth.getUser()
     if (!auth.user) {
       toast({ title: "Please sign in", description: "Sign in to submit your quote request." })
       router.push("/login?next=/quote-cart")
       return
     }
-
     if (items.length === 0) return
 
     setSubmitting(true)
     try {
-      // fetch minimal profile to enrich the order (optional)
+      // Optional: enrich from profile if you store it
       const { data: profile } = await supabase
         .from("profiles")
         .select("first_name,last_name,company_name,gst,phone,email")
-        .eq("user_id", auth.user.id)
+        .eq("id", auth.user.id) // profiles.id = auth.uid()
         .maybeSingle()
 
-      // Build payload for your /api/orders endpoint.
-      // Server will store items inside `checkout_snapshot` and set status='pending'
+      // Build payload for your /api/orders (supports lite payload as implemented)
       const payload = {
         items: items.map((i: QuoteItem) => ({
           sku: i.code,
           name: i.name,
           qty: i.quantity,
         })),
-        // optional extras the server can persist inside checkout_snapshot
         customer: {
           first_name: profile?.first_name || null,
           last_name: profile?.last_name || null,
@@ -155,7 +164,6 @@ export default function QuoteCartPage() {
         throw new Error(msg || "Failed to submit quote")
       }
 
-      // Clear local draft and refresh orders table
       clearQuote()
       toast({
         title: "Quote submitted",
@@ -164,7 +172,11 @@ export default function QuoteCartPage() {
       await fetchOrders()
     } catch (e: any) {
       console.error(e)
-      toast({ title: "Error", description: e.message || "Could not submit quote", variant: "destructive" as any })
+      toast({
+        title: "Error",
+        description: e.message || "Could not submit quote",
+        variant: "destructive" as any,
+      })
     } finally {
       setSubmitting(false)
     }
@@ -193,7 +205,7 @@ export default function QuoteCartPage() {
 
   return (
     <div className="container mx-auto py-12 space-y-10">
-      {/* Draft Quote (local) */}
+      {/* Draft Quote (local cart) */}
       <Card className="bg-white/80 backdrop-blur-md">
         <CardHeader>
           <CardTitle>Your Quote Cart</CardTitle>
@@ -255,7 +267,7 @@ export default function QuoteCartPage() {
         </CardContent>
       </Card>
 
-      {/* Submitted Orders (from DB) */}
+      {/* Submitted Quotes / Orders */}
       <Card className="bg-white/80 backdrop-blur-md">
         <CardHeader>
           <CardTitle>Your Submitted Quotes / Orders</CardTitle>
@@ -291,7 +303,7 @@ export default function QuoteCartPage() {
                       <TableRow key={o.id}>
                         <TableCell>{new Date(o.created_at).toLocaleString()}</TableCell>
                         <TableCell className="font-medium">{o.id.slice(0, 8)}…</TableCell>
-                        <TableCell>{statusBadge(o.status ?? "pending")}</TableCell>
+                        <TableCell>{statusBadge(o.status)}</TableCell>
                         <TableCell className="text-right">{count}</TableCell>
                         <TableCell className="text-right">
                           {Number(total) > 0 ? `₹${Number(total).toFixed(2)}` : "—"}
