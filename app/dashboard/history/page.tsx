@@ -16,8 +16,6 @@ type OrderRow = {
   grand_total: number | null
   checkout_snapshot: any | null
   company_name?: string | null
-  // if you ever add a top-level items column:
-  items?: any[] | null
 }
 
 type NormalizedItem = { name: string; sku: string; qty: number }
@@ -32,73 +30,133 @@ function normalizeStatus(raw: string | null | undefined) {
 function statusClass(status: string | null | undefined) {
   const s = normalizeStatus(status)
   switch (s) {
-    case "approved":
-      return "bg-green-100 text-green-800"
-    case "pending":
-      return "bg-yellow-100 text-yellow-800"
-    case "dispatched":
-      return "bg-blue-100 text-blue-800"
-    case "rejected":
-      return "bg-red-100 text-red-800"
-    case "paid":
-    case "fulfilled":
-      return "bg-emerald-100 text-emerald-800"
-    default:
-      return "bg-gray-100 text-gray-800"
+    case "approved": return "bg-green-100 text-green-800"
+    case "pending": return "bg-yellow-100 text-yellow-800"
+    case "dispatched": return "bg-blue-100 text-blue-800"
+    case "rejected": return "bg-red-100 text-red-800"
+    default: return "bg-gray-100 text-gray-800"
   }
 }
 
-/** Accept arrays, objects, or stringified JSON; prefer `products` but check many paths. */
-function extractRawItems(row: { checkout_snapshot: any; items?: any[] | null }): any[] {
-  const s = row.checkout_snapshot
-
-  const toArray = (val: any): any[] => {
-    if (!val) return []
-    if (typeof val === "string") {
-      try {
-        const parsed = JSON.parse(val)
-        return toArray(parsed)
-      } catch {
-        return []
-      }
-    }
-    if (Array.isArray(val)) return val
-    if (typeof val === "object") {
-      const out: any[] = []
-      for (const [k, v] of Object.entries(val)) {
-        if (v && typeof v === "object") {
-          out.push({ sku: k, ...(v as any) })
-        } else {
-          out.push({ sku: k, qty: typeof v === "number" ? v : 1, name: typeof v === "string" ? v : "Item" })
-        }
-      }
-      return out
-    }
-    return []
+/** Parse stringified JSON -> JS, pass other values through */
+function coerceJSON(v: any): any {
+  if (typeof v === "string") {
+    try { return JSON.parse(v) } catch { return v }
   }
+  return v
+}
 
-  const candidates = [
-    s?.products,
-    s?.items,
-    s?.cart?.products,
-    s?.cart?.items,
-    s?.order?.products,
-    s?.order?.items,
-    s?.quote?.products,
-    s?.quote?.items,
-    s?.line_items,
-    s?.payload?.products,
-    s?.payload?.items,
-    s?.request?.products,
-    s?.request?.items,
-    row.items,
-  ]
-
-  for (const c of candidates) {
-    const arr = toArray(c)
-    if (arr.length) return arr
+/** Convert arrays/objects/strings into an array of "item-like" objects */
+function toArray(val: any): any[] {
+  const v = coerceJSON(val)
+  if (!v) return []
+  if (Array.isArray(v)) return v
+  if (typeof v === "object") {
+    const out: any[] = []
+    for (const [k, vv] of Object.entries(v)) {
+      const vvCoerced = coerceJSON(vv)
+      if (vvCoerced && typeof vvCoerced === "object" && !Array.isArray(vvCoerced)) {
+        out.push({ sku: k, ...(vvCoerced as any) })
+      } else if (typeof vvCoerced === "number") {
+        out.push({ sku: k, qty: vvCoerced })
+      } else if (typeof vvCoerced === "string") {
+        out.push({ sku: k, name: vvCoerced })
+      }
+    }
+    return out
   }
   return []
+}
+
+/** Heuristic: does this array look like line items? */
+function looksLikeItems(arr: any[]): boolean {
+  if (!Array.isArray(arr) || arr.length === 0) return false
+  // If objects with any of the common keys, it's likely items
+  const KEYS = ["name", "title", "product_name", "sku", "code", "product_code", "qty", "quantity", "count"]
+  let hits = 0
+  for (const el of arr) {
+    if (el && typeof el === "object" && !Array.isArray(el)) {
+      for (const k of Object.keys(el)) {
+        if (KEYS.includes(k)) { hits++; break }
+      }
+    } else if (typeof el === "string") {
+      // strings are okay if they look like codes/names
+      hits++
+    }
+    if (hits >= Math.min(2, arr.length)) break
+  }
+  return hits > 0
+}
+
+/** Deep search checkout_snapshot for arrays that look like items. Merge all matches. */
+function deepFindItems(snapshot: any, hardCandidatesFirst = true): any[] {
+  const s = coerceJSON(snapshot)
+  if (!s || typeof s !== "object") return []
+
+  const results: any[] = []
+
+  // 1) Try common shallow paths (fast path)
+  const candidates = hardCandidatesFirst ? [
+    s?.products, s?.items,
+    s?.cart?.products, s?.cart?.items,
+    s?.order?.products, s?.order?.items,
+    s?.quote?.products, s?.quote?.items,
+    s?.line_items, s?.payload?.products, s?.payload?.items,
+    s?.request?.products, s?.request?.items,
+  ] : []
+  for (const c of candidates) {
+    const arr = toArray(c)
+    if (looksLikeItems(arr)) {
+      results.push(...arr)
+    }
+  }
+  if (results.length) return results
+
+  // 2) Full deep scan (BFS)
+  const queue: any[] = [s]
+  const seen = new Set<any>()
+  while (queue.length) {
+    const node = queue.shift()
+    if (!node || typeof node !== "object" || seen.has(node)) continue
+    seen.add(node)
+
+    if (Array.isArray(node)) {
+      // arrays of objects might be items directly
+      if (looksLikeItems(node)) {
+        results.push(...node)
+        // don't early-return; collect all arrays that look like items
+        continue
+      }
+      // otherwise scan children
+      for (const el of node) if (el && typeof el === "object") queue.push(el)
+      continue
+    }
+
+    // object: check each value
+    for (const v of Object.values(node)) {
+      const vv = coerceJSON(v)
+      if (!vv) continue
+      if (Array.isArray(vv)) {
+        if (looksLikeItems(vv)) {
+          results.push(...vv)
+        } else {
+          for (const el of vv) if (el && typeof el === "object") queue.push(el)
+        }
+      } else if (typeof vv === "object") {
+        queue.push(vv)
+      } else if (typeof vv === "string") {
+        // try to parse stringified JSON arrays/objects
+        const parsed = coerceJSON(vv)
+        if (Array.isArray(parsed)) {
+          if (looksLikeItems(parsed)) results.push(...parsed)
+        } else if (parsed && typeof parsed === "object") {
+          queue.push(parsed)
+        }
+      }
+    }
+  }
+
+  return results
 }
 
 /** Normalize each record to a consistent { name, sku, qty } shape for rendering. */
@@ -140,8 +198,9 @@ export default function HistoryPage() {
   const [uid, setUid] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [openId, setOpenId] = useState<string | null>(null)
+  const [showRaw, setShowRaw] = useState<Record<string, boolean>>({})
 
-  // Fetch via server API (uses auth cookies) + subscribe to realtime.
+  // Fetch via server API (auth cookies) + subscribe to realtime.
   useEffect(() => {
     let unsub: (() => void) | undefined
 
@@ -178,9 +237,7 @@ export default function HistoryPage() {
     }
 
     load()
-    return () => {
-      if (unsub) unsub()
-    }
+    return () => { if (unsub) unsub() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -190,7 +247,7 @@ export default function HistoryPage() {
     return orders.filter((o) => {
       const idHit = o.id.toLowerCase().includes(q)
       const statusHit = normalizeStatus(o.status).includes(q)
-      const anyItemHit = extractRawItems(o).some((it) =>
+      const anyItemHit = deepFindItems(o.checkout_snapshot).some((it) =>
         [
           String(it?.name ?? it?.title ?? it?.product_name ?? "").toLowerCase(),
           String(it?.sku ?? it?.code ?? it?.product_code ?? "").toLowerCase(),
@@ -260,11 +317,13 @@ export default function HistoryPage() {
                 </TableHeader>
                 <TableBody>
                   {filtered.map((o) => {
-                    const items = extractRawItems(o).map(normalizeItem)
+                    const raw = deepFindItems(o.checkout_snapshot)
+                    const items = raw.map(normalizeItem)
                     const itemsCount = items.length
                     const total = Number(o.grand_total || 0)
                     const status = normalizeStatus(o.status)
                     const isOpen = openId === o.id
+                    const showRawThis = showRaw[o.id] === true
 
                     return (
                       <>
@@ -280,22 +339,8 @@ export default function HistoryPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center gap-2 justify-end">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setOpenId(isOpen ? null : o.id)}
-                              >
-                                {isOpen ? (
-                                  <>
-                                    <EyeOff className="h-4 w-4 mr-1" />
-                                    Hide
-                                  </>
-                                ) : (
-                                  <>
-                                    <Eye className="h-4 w-4 mr-1" />
-                                    View
-                                  </>
-                                )}
+                              <Button variant="outline" size="sm" onClick={() => setOpenId(isOpen ? null : o.id)}>
+                                {isOpen ? (<><EyeOff className="h-4 w-4 mr-1" />Hide</>) : (<><Eye className="h-4 w-4 mr-1" />View</>)}
                               </Button>
                             </div>
                           </TableCell>
@@ -309,21 +354,14 @@ export default function HistoryPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                   <div>
                                     <div className="text-slate-500">Placed</div>
-                                    <div className="font-medium">
-                                      {new Date(o.created_at).toLocaleString()}
-                                    </div>
+                                    <div className="font-medium">{new Date(o.created_at).toLocaleString()}</div>
                                   </div>
                                   <div>
                                     <div className="text-slate-500">Customer</div>
                                     <div className="font-medium">
                                       {o.checkout_snapshot?.customer?.name ||
-                                        [o.checkout_snapshot?.customer?.first_name, o.checkout_snapshot?.customer?.last_name]
-                                          .filter(Boolean)
-                                          .join(" ") ||
-                                        "—"}
-                                      {o.company_name ? (
-                                        <span className="text-slate-600"> — {o.company_name}</span>
-                                      ) : null}
+                                        [o.checkout_snapshot?.customer?.first_name, o.checkout_snapshot?.customer?.last_name].filter(Boolean).join(" ") || "—"}
+                                      {o.company_name ? <span className="text-slate-600"> — {o.company_name}</span> : null}
                                     </div>
                                     {o.checkout_snapshot?.customer?.phone ? (
                                       <div className="text-slate-600">{o.checkout_snapshot.customer.phone}</div>
@@ -334,17 +372,34 @@ export default function HistoryPage() {
                                   </div>
                                   <div>
                                     <div className="text-slate-500">Total</div>
-                                    <div className="font-medium">
-                                      {total > 0 ? `₹${total.toFixed(2)}` : "—"}
-                                    </div>
+                                    <div className="font-medium">{total > 0 ? `₹${total.toFixed(2)}` : "—"}</div>
                                   </div>
                                 </div>
 
                                 {/* Items */}
                                 <div>
-                                  <div className="text-sm mb-2 text-slate-600">Items</div>
+                                  <div className="flex items-center justify-between">
+                                    <div className="text-sm mb-2 text-slate-600">Items</div>
+                                    {items.length === 0 && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowRaw((m) => ({ ...m, [o.id]: !showRawThis }))}
+                                      >
+                                        {showRawThis ? "Hide raw snapshot" : "Show raw snapshot"}
+                                      </Button>
+                                    )}
+                                  </div>
+
                                   {items.length === 0 ? (
-                                    <div className="text-sm text-slate-600">No line items stored.</div>
+                                    <>
+                                      <div className="text-sm text-slate-600">No line items found.</div>
+                                      {showRawThis && (
+                                        <pre className="text-xs bg-slate-50 border rounded p-3 overflow-x-auto mt-2">
+                                          {JSON.stringify(o.checkout_snapshot, null, 2)}
+                                        </pre>
+                                      )}
+                                    </>
                                   ) : (
                                     <Table>
                                       <TableHeader>
