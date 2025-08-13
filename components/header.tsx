@@ -213,7 +213,7 @@ export function Header() {
                   {/* Hide My Orders for admins */}
                   {role !== "admin" && (
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/quote-cart" className="flex items-center">
+                      <Link href="/dashboard/history" className="flex items-center">
                         <Package className="mr-2 h-4 w-4" />
                         My Orders
                       </Link>
