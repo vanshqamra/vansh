@@ -1,168 +1,172 @@
-// app/api/orders/route.ts
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 import { NextResponse } from "next/server"
 import { getServerSupabase } from "@/lib/supabase/server-client"
 import { getSupabaseAdmin } from "@/lib/supabase/admin"
-import { CreateOrderSchema } from "@/lib/validation/order"
 import { sendAdminNewOrderEmail, sendOrderReceivedEmail } from "@/lib/mail"
 
-/** Normalize any item-like object into { sku, name, qty } */
-function normalizeItems(arr: any[]): Array<{ sku: string; name: string; qty: number }> {
-  return (arr || []).map((it: any) => ({
+type AnyObj = Record<string, any>
+
+function asNumber(v: any, d = 0) {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : d
+}
+
+function pickItems(json: AnyObj): Array<{ sku: string; name: string; qty: number }> {
+  // Accept many shapes: items, products, cart/items, order_summary/items, etc.
+  const candidates: any[] = []
+  const s = json || {}
+
+  const candPaths: any[] = [
+    s.items, s.products,
+    s.cart?.items, s.cart?.products,
+    s.order?.items, s.order?.products,
+    s.quote?.items, s.quote?.products,
+    s.order_summary?.items, s.order_summary?.products,
+    s.summary?.items, s.summary?.products,
+    s.checkout?.summary?.items, s.checkout?.summary?.products,
+    s.payload?.items, s.payload?.products,
+    s.request?.items, s.request?.products,
+  ]
+
+  for (const c of candPaths) if (Array.isArray(c)) candidates.push(c)
+  if (!candidates.length) return []
+
+  const first = candidates.find((a) => Array.isArray(a) && a.length) || candidates[0]
+
+  const norm = (it: any) => ({
     sku:
-      String(
-        it?.sku ??
-          it?.code ??
-          it?.product_code ??
-          it?.id ??
-          ""
-      ),
-    name: String(it?.name ?? it?.product_name ?? it?.title ?? "Item"),
-    qty: Number(
-      it?.qty ?? it?.quantity ?? it?.count ?? 1
-    ),
-  }))
+      it?.sku ??
+      it?.code ??
+      it?.product_code ??
+      it?.productCode ??
+      it?.id ??
+      it?.part_no ??
+      "",
+    name:
+      it?.name ??
+      it?.product_name ??
+      it?.productName ??
+      it?.title ??
+      it?.description ??
+      "Item",
+    qty: ((): number => {
+      const q = (typeof it?.qty === "number" && it.qty) ??
+                (typeof it?.quantity === "number" && it.quantity) ??
+                (typeof it?.count === "number" && it.count) ??
+                (typeof it?.qty_requested === "number" && it.qty_requested) ?? 1
+      return asNumber(q, 1)
+    })(),
+  })
+
+  return first.map(norm)
 }
 
 export async function POST(req: Request) {
-  const json = await req.json().catch(() => null)
-  if (!json) {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
-  }
-
-  const parsed = CreateOrderSchema.safeParse(json)
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
-  }
-  const data = parsed.data
-
   const server = getServerSupabase()
   const admin = getSupabaseAdmin()
   if (!server || !admin) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 500 })
   }
 
-  const { data: auth } = await server.auth.getUser()
-  const userId = auth.user?.id
-  const authedEmail = auth.user?.email ?? null
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const json = (await req.json().catch(() => null)) as AnyObj | null
+  if (!json) return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+
+  // Require auth — prevent anonymous empty orders
+  const {
+    data: { user },
+  } = await server.auth.getUser()
+  if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  // Normalize items (must exist)
+  const items = pickItems(json)
+  if (!items.length) {
+    return NextResponse.json(
+      { error: "No line items found in request (expected items/products array). Fix checkout submit." },
+      { status: 400 }
+    )
   }
 
-  const rawItems = Array.isArray(data.items)
-    ? data.items
-    : Array.isArray(data.products)
-    ? data.products
-    : []
-  const normalizedItems = normalizeItems(rawItems)
+  // Normalize customer + shipping
+  const customer = {
+    first_name: json.customer?.first_name ?? json.firstName ?? null,
+    last_name:  json.customer?.last_name  ?? json.lastName  ?? null,
+    email:      json.customer?.email      ?? null,
+    phone:      json.customer?.phone      ?? json.phone ?? null,
+    company:    json.customer?.company_name ?? json.company ?? null,
+    gst:        json.customer?.gst ?? null,
+  }
 
-  const checkout_snapshot: any = {
-    source: data.source ?? "web",
+  const shipping_address = json.shipping_address ?? {
+    firstName: json.firstName ?? null,
+    lastName:  json.lastName ?? null,
+    phone:     json.phone ?? null,
+    address:   json.address ?? null,
+    city:      json.city ?? null,
+    state:     json.state ?? null,
+    pincode:   json.pincode ?? null,
+    country:   json.country ?? "India",
+    notes:     json.notes ?? null,
+  }
+
+  const totals = {
+    subtotal:    asNumber(json.totals?.subtotal ?? json.subtotal),
+    tax:         asNumber(json.totals?.tax ?? json.tax),
+    shipping:    asNumber(json.totals?.shipping ?? json.shipping),
+    discount:    asNumber(json.totals?.discount ?? json.discount),
+    grand_total: asNumber(json.totals?.grand_total ?? json.total ?? json.grand_total),
+  }
+
+  // Build robust snapshot and also persist key fields into columns
+  const checkout_snapshot = {
+    source: json.source ?? "web",
     submitted_at: new Date().toISOString(),
-    customer: {
-      first_name: data.customer?.first_name ?? (data as any).firstName ?? null,
-      last_name: data.customer?.last_name ?? (data as any).lastName ?? null,
-      email: data.customer?.email ?? authedEmail ?? null,
-      phone: data.customer?.phone ?? (data as any).phone ?? null,
-      company: data.customer?.company_name ?? (data as any).company_name ?? (data as any).company ?? null,
-      gst: data.customer?.gst ?? null,
-    },
-    shipping_address:
-      data.shipping_address ?? {
-        firstName: (data as any).firstName ?? null,
-        lastName: (data as any).lastName ?? null,
-        phone: (data as any).phone ?? null,
-        address: (data as any).address ?? null,
-        city: (data as any).city ?? null,
-        state: (data as any).state ?? null,
-        pincode: (data as any).pincode ?? null,
-        country: (data as any).country ?? null,
-        notes: (data as any).notes ?? null,
-      },
-    totals: {
-      subtotal: data.totals?.subtotal ?? (data as any).subtotal ?? 0,
-      tax: data.totals?.tax ?? (data as any).tax ?? 0,
-      shipping: data.totals?.shipping ?? (data as any).shipping ?? 0,
-      discount: data.totals?.discount ?? (data as any).discount ?? 0,
-      grand_total:
-        data.totals?.grand_total ??
-        (data as any).total ??
-        (data as any).grand_total ??
-        0,
-    },
-    items: normalizedItems,
-    products: Array.isArray(data.products) ? data.products : undefined,
-    raw: json,
+    customer,
+    shipping_address,
+    totals,
+    items,                          // normalized for UI
+    products: json.products ?? undefined, // keep original if provided
+    raw: json, // (optional) remove in prod if sensitive
   }
 
-  const grand_total = checkout_snapshot.totals.grand_total
-  const shipping_address = checkout_snapshot.shipping_address
-
-  const email = checkout_snapshot.customer.email
-  const buyer_phone = checkout_snapshot.customer.phone
-  const company_name = checkout_snapshot.customer.company
-  const gst = checkout_snapshot.customer.gst
-
+  // Optional: upsert profile basics
   try {
-    if (email) {
-      await admin.from("profiles").upsert(
-        {
-          id: userId,
-          user_id: userId,
-          email,
-          company_name,
-          gst,
-          phone: buyer_phone,
-          status: "pending",
-        },
-        { onConflict: "id" }
-      )
-    }
+    await admin.from("profiles").upsert(
+      {
+        id: user.id,
+        email: user.email,
+        company_name: customer.company ?? null,
+        phone: customer.phone ?? null,
+        status: "pending",
+      },
+      { onConflict: "id" }
+    )
   } catch (e) {
     console.warn("[orders] profile upsert failed", e)
   }
 
-  const orderPayload: any = {
-    user_id: userId,
-    status: "pending",
-    subtotal: checkout_snapshot.totals.subtotal,
-    tax: checkout_snapshot.totals.tax,
-    shipping: checkout_snapshot.totals.shipping,
-    discount: checkout_snapshot.totals.discount,
-    grand_total,
-    buyer_first_name: checkout_snapshot.customer.first_name,
-    buyer_last_name: checkout_snapshot.customer.last_name,
-    company_name,
-    buyer_phone,
-    shipping_address,
-    payment_method: null,
-    checkout_snapshot,
-  }
-
+  // Insert order
   const { data: order, error } = await admin
     .from("orders")
-    .insert(orderPayload)
+    .insert({
+      user_id: user.id,
+      status: "pending",
+      grand_total: totals.grand_total,
+      shipping_address,
+      checkout_snapshot,
+    })
     .select("id, status")
     .single()
 
   if (error || !order) {
-    return NextResponse.json(
-      { error: error?.message || "Order creation failed" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error?.message || "Order creation failed" }, { status: 500 })
   }
 
-  if (email) {
-    await Promise.allSettled([
-      sendAdminNewOrderEmail(order.id, email),
-      sendOrderReceivedEmail(email, order.id),
-    ])
-  }
+  await Promise.allSettled([
+    sendAdminNewOrderEmail?.(order.id, user.email ?? ""),
+    sendOrderReceivedEmail?.(user.email ?? "", order.id),
+  ])
 
-  return NextResponse.json(
-    { orderId: order.id, status: order.status },
-    { status: 201 }
-  )
+  return NextResponse.json({ orderId: order.id, status: order.status }, { status: 201 })
 }
