@@ -16,51 +16,37 @@ import { Button } from "@/components/ui/button"
 function normalizeKey(str: string) {
   return String(str).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_")
 }
+function stripTablePrefix(s?: string | null) {
+  if (!s) return ""
+  // Remove "Table 10", "TABLE-3:", "Table 1 –", etc.
+  return String(s).replace(/^\s*table[\s-_]*\d+\s*[:–-]?\s*/i, "").trim()
+}
 
 function codeKeys() {
-  return ["code", "product_code", "Product Code", "cat_no", "cat_no.", "cat_no_", "cat_no__", "catno", "catalog_no", "catalog_number", "catalogue_no", "catalogue_number", "cat_no_."]
+  return [
+    "code", "product_code", "Product Code",
+    "cat_no", "cat no", "cat_no.", "cat_no_", "cat_no__", "catno",
+    "catalog_no", "catalog number", "catalogue_no", "catalogue_number", "cat_no_."
+  ]
 }
-
 function priceKeys() {
   return [
-    "price",
-    "Price",
-    "price_piece",
-    "price_/piece",
-    "Price /Piece",
-    "Price/ Piece",
-    "Price/ Each",
-    "list_price",
-    "offer_price",
-    "price_each",
-    "price_rs",
-    "price_(rs.)",
+    "price", "Price",
+    "price_piece", "price_/piece", "Price /Piece", "Price/ Piece", "Price/ Each",
+    "list_price", "offer_price", "price_each", "price_rs", "price_(rs.)"
   ]
 }
-
 function nameKeys() {
   return [
-    "Product Name",
-    "product_name",
-    "name",
-    "item",
-    "title",
-    "description",
-    "product",
+    "Product Name", "product_name", "name", "item", "title",
+    "description", "Description", "item_description",
+    "material_name", "chemical_name", "product", "product_title",
+    "material", "material description", "product_description"
   ]
 }
-
-function packKeys() {
-  return ["Pack Size", "pack_size", "pack", "packing", "package", "Packsize"]
-}
-
-function casKeys() {
-  return ["CAS No", "cas_no", "cas", "cas_number"]
-}
-
-function hsnKeys() {
-  return ["HSN Code", "hsn_code", "hsn"]
-}
+function packKeys() { return ["Pack Size", "pack_size", "pack", "packing", "package", "Packsize"] }
+function casKeys() { return ["CAS No", "cas_no", "cas", "cas_number"] }
+function hsnKeys() { return ["HSN Code", "hsn_code", "hsn"] }
 
 function getField(variant: any, keys: string[]) {
   for (const k of keys) {
@@ -70,7 +56,6 @@ function getField(variant: any, keys: string[]) {
   }
   return ""
 }
-
 function firstNonEmpty(obj: Record<string, any>, keys: string[]) {
   for (const k of keys) {
     const nk = normalizeKey(k)
@@ -79,16 +64,21 @@ function firstNonEmpty(obj: Record<string, any>, keys: string[]) {
   }
   return ""
 }
-
 function parsePriceToNumber(v: any): number {
   if (typeof v === "number") return Number.isFinite(v) ? v : 0
-  if (v === null || v === undefined) return 0
+  if (v == null) return 0
   const n = Number(String(v).replace(/[^\d.]/g, ""))
   return Number.isFinite(n) ? n : 0
 }
-
 function inr(n: number) {
   return n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
+}
+function makeFriendlyName(row: any, group: any, code: string) {
+  const fromRow = String(firstNonEmpty(row, nameKeys())).trim()
+  if (fromRow) return fromRow
+  const fallback = stripTablePrefix(group?.title) || stripTablePrefix(group?.category)
+  if (fallback) return code ? `${fallback} (${code})` : fallback
+  return code || "Rankem product"
 }
 
 /* ---------------- Preprocess Borosil ---------------- */
@@ -101,17 +91,9 @@ const normalizedBorosil: any[] = (Array.isArray(borosilProducts) ? borosilProduc
 
     const variants = (group.variants || []).map((rawV: any) => {
       const v: any = { ...rawV }
-      // normalize keys mirror
-      for (const [k, val] of Object.entries(rawV)) {
-        v[normalizeKey(k)] = val
-      }
-      // robust price extraction
+      for (const [k, val] of Object.entries(rawV)) v[normalizeKey(k)] = val
       const rawPrice = getField(rawV, priceKeys())
-      v.price =
-        rawPrice === "" || rawPrice === null || rawPrice === undefined
-          ? 0
-          : Number(String(rawPrice).replace(/[^\d.]/g, "")) || 0
-      // code mirror
+      v.price = rawPrice == null || rawPrice === "" ? 0 : Number(String(rawPrice).replace(/[^\d.]/g, "")) || 0
       v.code = getField(rawV, codeKeys())
       return v
     })
@@ -146,16 +128,13 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   }, [page, router, pathname])
 
   // reset to page 1 on new search
-  useEffect(() => {
-    setPage(1)
-  }, [searchQuery])
+  useEffect(() => { setPage(1) }, [searchQuery])
 
   let grouped: any[] = []
-  let pageCount = 1 // will set per brand below
+  let pageCount = 1
 
   /* ---------------- Borosil ---------------- */
   if (brandKey === "borosil") {
-    // flatten groups → variants with resolved titles/categories
     const flat: Array<{ variant: any; groupMeta: any }> = []
     normalizedBorosil.forEach((group: any, idx: number) => {
       const { specs_headers, variants } = group
@@ -170,102 +149,77 @@ export default function BrandPage({ params }: { params: { brandName: string } })
 
       const baseMeta = {
         ...group,
-        title: group.title?.toLowerCase?.().startsWith?.("untitled group")
-          ? resolvedTitle
-          : group.title || resolvedTitle,
-        category: group.category?.toLowerCase?.().startsWith?.("untitled group")
-          ? resolvedCategory
-          : group.category || resolvedCategory,
+        title: group.title?.toLowerCase?.().startsWith?.("untitled group") ? resolvedTitle : group.title || resolvedTitle,
+        category: group.category?.toLowerCase?.().startsWith?.("untitled group") ? resolvedCategory : group.category || resolvedCategory,
         specs_headers,
         description: group.description || "",
       }
 
-      ;(variants || []).forEach((variant: any) => {
-        flat.push({ variant, groupMeta: baseMeta })
-      })
+      ;(variants || []).forEach((variant: any) => flat.push({ variant, groupMeta: baseMeta }))
     })
 
-    const safeStr = (v: unknown) =>
-      typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : ""
+    const safeStr = (v: unknown) => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : "")
     const hasText = (v: unknown) => typeof v === "string" && v.trim().length > 0
     const isNum = (v: unknown) => typeof v === "number" && Number.isFinite(v)
 
     const getCode = (v: any) => getField(v, codeKeys())
     const getPriceNum = (v: any) => {
       const raw = getField(v, priceKeys())
-      if (raw === null || raw === undefined || raw === "") return null
+      if (raw == null || raw === "") return null
       const n = Number(String(raw).replace(/[^\d.]/g, ""))
       return Number.isFinite(n) ? n : null
     }
 
-    // filter by search
     const q = (searchQuery || "").toLowerCase()
     const filtered = flat.filter(({ variant, groupMeta }) => {
       if (!q) return true
       const hay =
         Object.values(variant).map((v) => String(v).toLowerCase()).join(" ") +
-        " " +
-        String(groupMeta.title).toLowerCase() +
-        " " +
-        String(groupMeta.category).toLowerCase() +
-        " " +
-        String(groupMeta.description || "").toLowerCase()
+        " " + String(groupMeta.title).toLowerCase() +
+        " " + String(groupMeta.category).toLowerCase() +
+        " " + String(groupMeta.description || "").toLowerCase()
       return hay.includes(q)
     })
 
-    // pagination
     pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
 
-    // which spec columns have real data (exclude code/price)
     const displaySpecs = new Set<string>()
     paginated.forEach(({ variant, groupMeta }) => {
       groupMeta.specs_headers.forEach((header: string) => {
         const nk = normalizeKey(header)
-        if (
-          codeKeys().some((k) => nk === normalizeKey(k)) ||
-          priceKeys().some((k) => nk === normalizeKey(k))
-        )
-          return
+        if (codeKeys().some((k) => nk === normalizeKey(k)) || priceKeys().some((k) => nk === normalizeKey(k))) return
         const val = variant[header] ?? variant[nk] ?? (header in variant ? variant[header] : undefined)
         if (isNum(val) || hasText(val)) displaySpecs.add(header)
       })
     })
 
-    // decide fixed columns
     const showCode = paginated.some(({ variant }) => hasText(getCode(variant)))
-    // show Price column if any parseable numeric price exists (incl. 0)
     const showPrice = paginated.some(({ variant }) => getPriceNum(variant) !== null)
 
-    // build grouped rows
     const map: Record<string, any> = {}
     paginated.forEach(({ variant, groupMeta }) => {
       const key = `${groupMeta.category}-${groupMeta.title}`
       if (!map[key]) map[key] = { ...groupMeta, variants: [] }
 
       const row: Record<string, any> = {}
-
       if (showCode) {
         const codeVal = getCode(variant)
         row["Product Code"] = hasText(codeVal) ? codeVal : "—"
       }
-
       ;[...displaySpecs].forEach((header) => {
         const nk = normalizeKey(header)
         const v = variant[header] ?? variant[nk] ?? (header in variant ? variant[header] : undefined)
         row[header] = isNum(v) ? v : hasText(v) ? safeStr(v) : "—"
       })
-
       if (showPrice) {
         const priceVal = getPriceNum(variant)
-        // render only when > 0, else show "—"
         row["Price"] = priceVal !== null && priceVal > 0 ? priceVal : "—"
       }
 
       map[key].variants.push(row)
     })
 
-    // drop empty rows/sections; prune all-empty headers
     grouped = Object.values(map)
       .map((group: any) => {
         const initialHeaders: string[] = []
@@ -273,30 +227,26 @@ export default function BrandPage({ params }: { params: { brandName: string } })
         initialHeaders.push(...[...displaySpecs])
         if (showPrice) initialHeaders.push("Price")
 
-        // keep a row if ANY header has a real value
         const rows = (group.variants || []).filter((r: Record<string, any>) =>
           initialHeaders.some((h) => {
             const v = r[h]
-            if (v === null || v === undefined) return false
+            if (v == null) return false
             if (typeof v === "number") return Number.isFinite(v) && (h === "Price" ? v > 0 : true)
             const s = String(v).trim()
             return s.length > 0 && s !== "—"
           })
         )
-
         if (rows.length === 0) return null
 
-        // prune headers that are empty across remaining rows
         const prunedHeaders = initialHeaders.filter((h) =>
           rows.some((r) => {
             const v = r[h]
-            if (v === null || v === undefined) return false
+            if (v == null) return false
             if (typeof v === "number") return Number.isFinite(v) && (h === "Price" ? v > 0 : true)
             const s = String(v).trim()
             return s.length > 0 && s !== "—"
           })
         )
-
         if (prunedHeaders.length === 0) return null
 
         return { ...group, variants: rows, _tableHeaders: prunedHeaders }
@@ -374,43 +324,36 @@ export default function BrandPage({ params }: { params: { brandName: string } })
 
     // Resolve values regardless of brand/key casing
     const codeVal = String(firstNonEmpty(row, codeKeys())).trim()
-    const nameVal = String(firstNonEmpty(row, nameKeys()) || group?.title || "Item").trim()
+    const friendlyName = makeFriendlyName(row, group, codeVal) // <- never "Table 10" / "Unnamed"
     const packVal = String(firstNonEmpty(row, packKeys()) || "").trim()
     const casVal = String(firstNonEmpty(row, casKeys()) || "").trim()
     const hsnVal = String(firstNonEmpty(row, hsnKeys()) || "").trim()
-    const priceRaw = firstNonEmpty(row, priceKeys())
-    const priceNum = parsePriceToNumber(priceRaw) // allow 0 (quote-first)
-
-    // Ensure at least a name or code exists to add
-    if (!nameVal && !codeVal) {
-      toast({ title: "Cannot add item", description: "Missing product name/code.", variant: "destructive" })
-      return
-    }
+    const priceNum = parsePriceToNumber(firstNonEmpty(row, priceKeys())) // allow 0 (quote-first)
 
     // Build a stable id
-    const safeNameKey = normalizeKey(nameVal).slice(0, 32)
+    const safeNameKey = normalizeKey(friendlyName).slice(0, 32)
     const id = `${brandKey}-${codeVal || safeNameKey || "item"}`
 
     addItem({
       id,
-      name: nameVal,
-      productName: nameVal,
-      code: codeVal,           // <- important for checkout/history
+      name: friendlyName,          // <- friendly human name
+      productName: friendlyName,
+      code: codeVal,
       productCode: codeVal,
       catNo: codeVal,
       casNo: casVal,
       packSize: packVal,
-      packing: row.Packing ?? "", // keep original field if present
+      packing: row.Packing ?? "",
       hsn: hsnVal,
-      price: priceNum,         // 0 is allowed
+      price: priceNum,             // 0 = price on request
       quantity: 1,
-      brand: brand.name,
-      category: group.category,
+      brand: (labSupplyBrands as any)[brandKey]?.name ?? "Rankem",
+      category: stripTablePrefix(group?.category || group?.title), // <- cleaned category
       image: null,
     })
 
     const priceMsg = priceNum > 0 ? inr(priceNum) : "Price on request"
-    toast({ title: "Added to Cart", description: `${nameVal} (${codeVal || "no code"}) • ${priceMsg}` })
+    toast({ title: "Added to Cart", description: `${friendlyName}${codeVal ? ` (${codeVal})` : ""} • ${priceMsg}` })
   }
 
   /* ---------------- Render ---------------- */
@@ -425,16 +368,14 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       ) : (
         groups.map((group: any, gi: number) => (
           <section key={`${group.category ?? ""}-${group.title}-${gi}`} className="mb-10">
-            <h2 className="text-lg font-semibold mb-3">{group.title}</h2>
+            <h2 className="text-lg font-semibold mb-3">{stripTablePrefix(group.title)}</h2>
 
             <div className="overflow-x-auto rounded-lg border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left border-b">
                     {group._tableHeaders.map((h: string) => (
-                      <th key={h} className="py-2 px-3">
-                        {h}
-                      </th>
+                      <th key={h} className="py-2 px-3">{h}</th>
                     ))}
                     <th className="py-2 px-3">Action</th>
                   </tr>
@@ -442,8 +383,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                 <tbody>
                   {group.variants.map((row: any, ri: number) => {
                     const priceNum = parsePriceToNumber(firstNonEmpty(row, priceKeys()))
-                    const displayPrice =
-                      priceNum > 0 ? inr(priceNum) : (row["Price"] ?? row["price"] ?? "—")
+                    const displayPrice = priceNum > 0 ? inr(priceNum) : (row["Price"] ?? row["price"] ?? "—")
 
                     return (
                       <tr key={ri} className="border-b last:border-none">
@@ -459,11 +399,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                         <td className="py-2 px-3">
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-slate-500">{displayPrice}</span>
-                            <Button
-                              size="sm"
-                              onClick={() => handleAdd(row, group)}
-                              // Always allow adding (price can be 0 for quotes)
-                            >
+                            <Button size="sm" onClick={() => handleAdd(row, group)}>
                               Add
                             </Button>
                           </div>
