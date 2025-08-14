@@ -63,24 +63,40 @@ export const chemicalCategories = ["All", "Acids", "Solvents", "Bases", "Salts",
 
 export const labSupplyBrands = {
   qualigens: {
+    key: "qualigens",
+    slug: "qualigens",
+    href: "/brands/qualigens",
+    family: "chemicals", // <— added
     name: "Qualigens",
     description: "High-quality laboratory chemicals and reagents",
     logo: "/images/logo-qualigens.png",
     categories: ["Analytical Reagents", "Solvents", "Acids & Bases", "Salts"],
   },
   borosil: {
+    key: "borosil",
+    slug: "borosil",
+    href: "/brands/borosil",
+    family: "laboratory-supplies", // <— added
     name: "Borosil",
     description: "Premium laboratory glassware and equipment",
     logo: "/images/logo-borosil.png",
     categories: ["Glassware", "Laboratory Equipment", "Measuring Instruments"],
   },
   whatman: {
+    key: "whatman",
+    slug: "whatman",
+    href: "/brands/whatman",
+    family: "laboratory-supplies", // <— added
     name: "Whatman",
     description: "Filtration and separation products",
     logo: "/images/logo-whatman.png",
     categories: ["Filter Papers", "Membranes", "Syringe Filters", "Separation Media"],
   },
   rankem: {
+    key: "rankem",
+    slug: "rankem",
+    href: "/brands/rankem",
+    family: "chemicals", // <— added
     name: "Rankem",
     description: "Analytical and laboratory chemicals",
     logo: "/images/logo-rankem.png",
@@ -88,26 +104,34 @@ export const labSupplyBrands = {
   },
   omsons: {
     key: "omsons",
-    name: "Omsons Glassware",
     slug: "omsons",
-    family: "laboratory-supplies",          // used for grouping on the Lab Supplies page
+    href: "/brands/omsons",
+    family: "laboratory-supplies", // used for grouping on the Lab Supplies page
+    name: "Omsons Glassware",
     description: "ISO/IEC certified lab glassware – Price List 2024–25",
-    logo: "/images/brands/omsons/logo.png", // add this image in /public/images/brands/omsons/
-    banner: "/images/brands/omsons/banner.jpg", // add this hero in /public/images/brands/omsons/
-    dataPath: "/data/omsons_glassware_2024-25.json", // the file you placed in 1.1
-    isNew: true, // lets us show a “New” badge in UI
+    logo: "/images/brands/omsons/logo.png",   // ensure these files exist
+    banner: "/images/brands/omsons/banner.jpg",
+    dataPath: "/data/omsons_glassware_2024-25.json",
+    isNew: true,
   },
   jtbaker: {
+    key: "jtbaker",
+    slug: "jtbaker",
+    href: "/brands/jtbaker",
+    family: "chemicals", // <— added
     name: "J.T. Baker",
     description: "High-purity chemicals and solvents",
     logo: "/images/logo-jtbaker.png",
     categories: ["HPLC Grade Solvents", "Analytical Reagents", "Acids", "Bases"],
   },
   himedia: {
+    key: "himedia",
+    slug: "himedia",
+    href: "/brands/himedia",
+    family: "laboratory-supplies", // <— added
     name: "HiMedia",
     description: "Trusted for microbiology, culture media, and diagnostics",
     logo: "/images/logo-himedia.png",
     categories: ["Culture Media", "Prepared Plates", "Microbiological Tools", "Cell Biology"],
   },
 }
-
