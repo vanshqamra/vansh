@@ -305,75 +305,114 @@ else if (brandKey === "omsons") {
   const sections: any[] = Array.isArray(raw?.catalog) ? raw.catalog : []
 
   const q = String(searchQuery ?? "").trim().toLowerCase()
+  const normKey = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim()
+  const hasVal = (row: any, k: string) => {
+    const v = row?.[k]
+    return v !== undefined && v !== null && String(v).trim() !== ""
+  }
   const parseNum = (v: any) => {
     if (typeof v === "number" && Number.isFinite(v)) return v
     if (v == null) return null
     const n = Number(String(v).replace(/[^\d.]/g, ""))
     return Number.isFinite(n) ? n : null
   }
-  const pick = (obj: any, ...keys: string[]) => {
-    for (const k of keys) {
-      const val = obj?.[k]
-      if (val !== undefined && val !== null && String(val).trim() !== "") return val
+
+  // case-insensitive key pick (exact-match by normalized label)
+  const pickCI = (obj: any, candidates: string[]) => {
+    for (const key of Object.keys(obj || {})) {
+      const k = normKey(key)
+      for (const c of candidates) {
+        if (k === normKey(c)) {
+          const v = obj[key]
+          if (v !== undefined && v !== null && String(v).trim() !== "") return v
+        }
+      }
     }
     return ""
   }
-  const hasVal = (row: any, k: string) => {
-    const v = row?.[k]
-    return v !== undefined && v !== null && String(v).trim() !== ""
-  }
 
-  // Build a grouped table for EACH section (category)
+  const codeKeys = [
+    "Product Code","Cat. No.","Cat No","Cat No.","Catalogue No","Catalog No","Order Code","Code","Cat No."
+  ]
+  const nameKeys = ["Product Name","Item","Description","Name","Product"]
+  const packKeys = ["Pack","Pack of","Pack Size","Qty/Pack","Quantity/Pack","Pkg","Packing"]
+  const specKeys = ["Spec","Specification","Type","Class","Grade","Material"]
+  const hsnKeys  = ["HSN Code","HSN"]
+
+  const priceFromHeaders = (headers: string[]) =>
+    headers.filter((h) => /price|rate/i.test(h))
+
   grouped = sections.map((sec: any, idx: number) => {
-    const baseTitle = sec?.title || sec?.category || `Section ${idx + 1}`
+    const sectionTitle =
+      sec?.product_name || sec?.title || sec?.category || `Section ${idx + 1}`
+    // Original table headers from JSON (may include “Price / Piece”, “Cat. No.”, etc.)
+    const origHeaders: string[] = Array.isArray(sec?.table_headers) ? sec.table_headers : []
     const variants = Array.isArray(sec?.variants) ? sec.variants : []
 
-    // Filter within this section for search
-    const rows = q
+    // Search inside this section
+    const pool = q
       ? variants.filter((v: any) =>
-          Object.values(v || {}).some((val) => String(val ?? "").toLowerCase().includes(q))
+          Object.values(v || {}).some((val) =>
+            String(val ?? "").toLowerCase().includes(q)
+          )
         )
       : variants
 
-    // Normalize to your renderer’s columns
-    const normalized = rows.map((p: any) => {
-      const priceNum = parseNum(p["Price List 2024-25"] ?? p["Price"] ?? p.price)
+    // Decide price keys dynamically from the section’s headers
+    const pKeys = priceFromHeaders(origHeaders)
+    const normalized = pool.map((row: any) => {
+      const rawPrice = pickCI(row, pKeys.length ? pKeys : ["Price","Price / Piece","Rate","Amount","Price (₹)"])
+      const priceNum = parseNum(rawPrice)
+
       return {
-        "Product Code": pick(p, "Product Code", "code"),
-        "Product Name": pick(p, "Product Name", "name") || baseTitle,
-        // Keep fine-grained size/type as spec or dedicated columns if present
-        "Spec": pick(p, "Spec", "spec"),
-        "Size/Dia (mm)": pick(p, "Size/Dia (mm)", "Size (mm)", "Dia (mm)"),
-        "Capacity (mL)": pick(p, "Capacity (mL)", "capacity_ml"),
-        "Length (mm)": pick(p, "Length (mm)", "length_mm"),
-        "Micro Rating (µm)": pick(p, "Micro Rating (µm)", "pore_size_um"),
-        Membrane: pick(p, "Membrane", "membrane"),
-        Pack: pick(p, "Pack", "Pack Size", "pack"),
-        "HSN Code": pick(p, "HSN Code", "hsn"),
-        Price: priceNum != null ? priceNum : pick(p, "Price Raw", "priceRaw", "Price") || "On request",
+        // Standardized keys your renderer & add-to-cart can rely on:
+        "Product Code": pickCI(row, codeKeys),
+        "Product Name": pickCI(row, nameKeys) || sectionTitle,
+        "Spec": pickCI(row, specKeys),
+        "Size/Dia (mm)": pickCI(row, ["Size/Dia (mm)","Dia (mm)","Size (mm)","Diameter (mm)"]),
+        "Capacity (mL)": pickCI(row, ["Capacity (mL)","Capacity ml","Capacity"]),
+        "Length (mm)": pickCI(row, ["Length (mm)","Length"]),
+        "Micro Rating (µm)": pickCI(row, ["Micro Rating (µm)","Pore Size (µm)","Pore Size (um)"]),
+        "Membrane": pickCI(row, ["Membrane"]),
+        "Pack": pickCI(row, packKeys),
+        "HSN Code": pickCI(row, hsnKeys) || sec?.hsn || "",
+        "Price": priceNum != null ? priceNum : (rawPrice || "On request"),
+
+        // Keep all original columns so nothing is lost:
+        ...row,
       }
     })
 
-    // Per-section headers: always the core columns, plus any extras that actually have values
-    const core = ["Product Code", "Product Name", "Spec"]
-    const extraCandidates = [
-      "Size/Dia (mm)", "Capacity (mL)", "Length (mm)", "Micro Rating (µm)", "Membrane", "Pack", "HSN Code"
-    ]
-    const extras = extraCandidates.filter((k) => normalized.some((r) => hasVal(r, k)))
-    const headers = [...core, ...extras, "Price"]
+    // Build per-section headers: core + useful extras + any other original headers that have data
+    const core = ["Product Code","Product Name","Spec"]
+    const extras = [
+      "Size/Dia (mm)","Capacity (mL)","Length (mm)","Micro Rating (µm)","Membrane","Pack","HSN Code"
+    ].filter((k) => normalized.some((r) => hasVal(r, k)))
+
+    // Include any original header that carries data and isn’t already in core/extras/Price
+    const others = origHeaders
+      .filter((h) => ![...core, ...extras, "Price"].some((k) => normKey(k) === normKey(h)))
+      .filter((h) => normalized.some((r) => hasVal(r, h)))
+
+    const headers = [...core, ...extras, ...others, "Price"]
+
+    // Prune rows to only render headers we decided to show
+    const rows = normalized.map((r) => {
+      const o: Record<string, any> = {}
+      for (const h of headers) o[h] = r[h] ?? ""
+      return o
+    })
 
     return {
-      category: sec?.category || baseTitle,
-      title: baseTitle,
-      description: sec?.description || "",
+      category: sectionTitle,
+      title: sectionTitle,
+      description: sec?.spec_header || "",
       _tableHeaders: headers,
-      variants: normalized,
+      variants: rows,
     }
   }).filter((g: any) => Array.isArray(g.variants) && g.variants.length > 0)
-
-  // Pagination across all visible rows (optional): you can keep your existing pagination,
-  // or omit it per section. If you paginate globally, you’ll need to flatten, slice, and re-group.
 }
+
 
   /* ---------------- Rankem ---------------- */
   else if (brandKey === "rankem") {
