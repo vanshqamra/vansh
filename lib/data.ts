@@ -86,6 +86,17 @@ export const labSupplyBrands = {
     logo: "/images/logo-rankem.png",
     categories: ["Analytical Reagents", "HPLC Solvents", "Buffer Solutions"],
   },
+  omsons: {
+    key: "omsons",
+    name: "Omsons Glassware",
+    slug: "omsons",
+    family: "laboratory-supplies",          // used for grouping on the Lab Supplies page
+    description: "ISO/IEC certified lab glassware – Price List 2024–25",
+    logo: "/images/brands/omsons/logo.png", // add this image in /public/images/brands/omsons/
+    banner: "/images/brands/omsons/banner.jpg", // add this hero in /public/images/brands/omsons/
+    dataPath: "/data/omsons_glassware_2024-25.json", // the file you placed in 1.1
+    isNew: true, // lets us show a “New” badge in UI
+  },
   jtbaker: {
     name: "J.T. Baker",
     description: "High-purity chemicals and solvents",
