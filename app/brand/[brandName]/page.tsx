@@ -8,6 +8,7 @@ import { labSupplyBrands } from "@/lib/data"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import qualigensProductsRaw from "@/lib/qualigens-products.json"
 import rankemProducts from "@/lib/rankem_products.json"
+import omsonsDataRaw from "@/lib/omsons_products.json"
 import { useSearch } from "@/app/context/search-context"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -297,6 +298,48 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       },
     ]
   }
+    /* ---------------- Omsons ---------------- */
+else if (brandKey === "omsons") {
+  // The file is either { products: [...] } or just [...]
+  const omsonsProducts: any[] =
+    Array.isArray((omsonsDataRaw as any)?.products)
+      ? (omsonsDataRaw as any).products
+      : Array.isArray(omsonsDataRaw)
+      ? (omsonsDataRaw as any)
+      : []
+
+  // Filter by search (reuse your existing searchQuery)
+  const filtered = omsonsProducts.filter((p) =>
+    Object.values(p || {}).some((v) =>
+      String(v ?? "").toLowerCase().includes(String(searchQuery ?? "").toLowerCase())
+    )
+  )
+
+  pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
+  const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
+
+  // Normalize to your table shape
+  grouped = [
+    {
+      category: "Omsons Glassware",
+      title: "Omsons Glassware (Price List 2024–25)",
+      description: "",
+      _tableHeaders: ["Product Code", "Product Name", "Spec", "Pack", "Price", "HSN Code"],
+      variants: paginated.map((p) => {
+        const priceNum = typeof p["Price List 2024-25"] === "number" ? p["Price List 2024-25"] : null
+        return {
+          "Product Code": p["Product Code"] ?? p.code ?? "",
+          "Product Name": p["Product Name"] ?? p.name ?? "",
+          "Spec": p["Spec"] ?? "",
+          "Pack": p["Pack"] ?? "",
+          // show INR if numeric; otherwise pass through raw
+          "Price": priceNum != null ? priceNum : (p["Price Raw"] ?? "On request"),
+          "HSN Code": p["HSN Code"] ?? p.hsn ?? "",
+        }
+      }),
+    },
+  ]
+}
   /* ---------------- Rankem ---------------- */
   else if (brandKey === "rankem") {
     const flat: any[] = []
