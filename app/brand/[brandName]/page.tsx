@@ -300,46 +300,96 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   }
     /* ---------------- Omsons ---------------- */
 else if (brandKey === "omsons") {
-  // The file is either { products: [...] } or just [...]
-  const omsonsProducts: any[] =
-    Array.isArray((omsonsDataRaw as any)?.products)
-      ? (omsonsDataRaw as any).products
-      : Array.isArray(omsonsDataRaw)
-      ? (omsonsDataRaw as any)
-      : []
+  // Accept several shapes: {products: [...]}, {data: [...]}, {items: [...]}, or raw array
+  const raw = omsonsDataRaw as any
+  const source: any[] = Array.isArray(raw?.products)
+    ? raw.products
+    : Array.isArray(raw?.data)
+    ? raw.data
+    : Array.isArray(raw?.items)
+    ? raw.items
+    : Array.isArray(raw)
+    ? raw
+    : []
 
-  // Filter by search (reuse your existing searchQuery)
-  const filtered = omsonsProducts.filter((p) =>
-    Object.values(p || {}).some((v) =>
-      String(v ?? "").toLowerCase().includes(String(searchQuery ?? "").toLowerCase())
+  // Search (empty query shows all)
+  const q = String(searchQuery ?? "").trim().toLowerCase()
+  const pool = q
+    ? source.filter((p: any) =>
+        Object.values(p || {}).some((v) =>
+          String(v ?? "").toLowerCase().includes(q),
+        ),
+      )
+    : source
+
+  // Pagination
+  pageCount = Math.max(1, Math.ceil(pool.length / productsPerPage))
+  const paginated = pool.slice((page - 1) * productsPerPage, page * productsPerPage)
+
+  // Helpers
+  const parseNum = (v: any) => {
+    if (typeof v === "number" && Number.isFinite(v)) return v
+    if (v == null) return null
+    const n = Number(String(v).replace(/[^\d.]/g, ""))
+    return Number.isFinite(n) ? n : null
+  }
+  const val = (obj: any, ...keys: string[]) => {
+    for (const k of keys) {
+      if (obj && obj[k] != null && String(obj[k]).trim() !== "") return obj[k]
+    }
+    return ""
+  }
+
+  // Normalize rows
+  const variants = paginated.map((p: any) => {
+    const priceNum = parseNum(
+      p["Price List 2024-25"] ?? p["Price"] ?? p.price ?? null,
     )
-  )
 
-  pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
-  const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
+    return {
+      "Product Code": val(p, "Product Code", "code"),
+      "Product Name": val(p, "Product Name", "name"),
+      "Spec": val(p, "Spec", "spec"),
+      "Pack": val(p, "Pack", "pack"),
+      "Capacity (mL)": val(p, "Capacity (mL)", "capacity_ml"),
+      "Diameter (mm)": val(p, "Diameter (mm)", "diameter_mm"),
+      "Length (mm)": val(p, "Length (mm)", "length_mm"),
+      "Neck (GL)": val(p, "Neck (GL)", "neck_gl"),
+      "Pore Size (µm)": val(p, "Pore Size (µm)", "pore_size_um"),
+      Membrane: val(p, "Membrane", "membrane"),
+      Price: priceNum != null ? priceNum : val(p, "Price Raw", "priceRaw", "Price"),
+      "HSN Code": val(p, "HSN Code", "hsn"),
+    }
+  })
 
-  // Normalize to your table shape
+  // Build headers: core + only the extra columns that actually have data
+  const core = ["Product Code", "Product Name", "Spec", "Pack", "Price", "HSN Code"]
+  const extras = [
+    "Capacity (mL)",
+    "Diameter (mm)",
+    "Length (mm)",
+    "Neck (GL)",
+    "Pore Size (µm)",
+    "Membrane",
+  ]
+  const hasValue = (row: any, key: string) => {
+    const v = row?.[key]
+    return v !== undefined && v !== null && String(v).trim() !== ""
+  }
+  const enabledExtras = extras.filter((k) => variants.some((r) => hasValue(r, k)))
+  const headers = [...core.slice(0, 3), ...enabledExtras, ...core.slice(3)]
+
   grouped = [
     {
       category: "Omsons Glassware",
       title: "Omsons Glassware (Price List 2024–25)",
       description: "",
-      _tableHeaders: ["Product Code", "Product Name", "Spec", "Pack", "Price", "HSN Code"],
-      variants: paginated.map((p) => {
-        const priceNum = typeof p["Price List 2024-25"] === "number" ? p["Price List 2024-25"] : null
-        return {
-          "Product Code": p["Product Code"] ?? p.code ?? "",
-          "Product Name": p["Product Name"] ?? p.name ?? "",
-          "Spec": p["Spec"] ?? "",
-          "Pack": p["Pack"] ?? "",
-          // show INR if numeric; otherwise pass through raw
-          "Price": priceNum != null ? priceNum : (p["Price Raw"] ?? "On request"),
-          "HSN Code": p["HSN Code"] ?? p.hsn ?? "",
-        }
-      }),
+      _tableHeaders: headers,
+      variants,
     },
   ]
 }
+
   /* ---------------- Rankem ---------------- */
   else if (brandKey === "rankem") {
     const flat: any[] = []
