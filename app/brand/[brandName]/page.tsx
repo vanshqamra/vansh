@@ -18,10 +18,8 @@ function normalizeKey(str: string) {
 }
 function stripTablePrefix(s?: string | null) {
   if (!s) return ""
-  // Remove "Table 10", "TABLE-3:", "Table 1 –", etc.
   return String(s).replace(/^\s*table[\s-_]*\d+\s*[:–-]?\s*/i, "").trim()
 }
-
 function codeKeys() {
   return [
     "code", "product_code", "Product Code",
@@ -79,6 +77,18 @@ function makeFriendlyName(row: any, group: any, code: string) {
   const fallback = stripTablePrefix(group?.title) || stripTablePrefix(group?.category)
   if (fallback) return code ? `${fallback} (${code})` : fallback
   return code || "Rankem product"
+}
+/** Guess a dynamic price column like “Price List 2025”, “PRICE 2025 (Rs.)”, etc. */
+function guessDynamicPriceKey(headers: string[]): string | null {
+  const cands = headers.filter((h) => /price|rate/i.test(h))
+  // prefer explicit year
+  const withYear = cands.find((h) => /2025|24-25|2024-25|fy\s*2025/i.test(h.toLowerCase()))
+  if (withYear) return withYear
+  const withList = cands.find((h) => /list/i.test(h))
+  if (withList) return withList
+  const withRs = cands.find((h) => /(rs|₹|inr|\(rs\))/i.test(h))
+  if (withRs) return withRs
+  return cands[0] ?? null
 }
 
 /* ---------------- Preprocess Borosil ---------------- */
@@ -294,25 +304,33 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       const variants = group.variants || []
       variants.forEach((v: any) => flat.push({ variant: v, groupMeta: group }))
     })
+
     const filtered = flat.filter(
       ({ variant, groupMeta }) =>
         Object.values(variant).some((v) => String(v).toLowerCase().includes(String(searchQuery).toLowerCase())) ||
         String(groupMeta.title).toLowerCase().includes(String(searchQuery).toLowerCase())
     )
+
     pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
+
+    // group by category-title and compute dynamic price key per group
     const map: Record<string, any> = {}
     paginated.forEach(({ variant, groupMeta }) => {
       const key = `${groupMeta.category}-${groupMeta.title}`
-      if (!map[key]) map[key] = { ...groupMeta, variants: [] }
+      if (!map[key]) {
+        const headers = Object.keys(variant || {})
+        map[key] = {
+          ...groupMeta,
+          variants: [],
+          _tableHeaders: headers,
+          _priceKey: guessDynamicPriceKey(headers), // <- e.g. "Price List 2025"
+        }
+      }
       map[key].variants.push(variant)
     })
+
     grouped = Object.values(map)
-    grouped.forEach((group: any) => {
-      if (group.variants.length) {
-        group._tableHeaders = Object.keys(group.variants[0])
-      }
-    })
   }
 
   /* ---------------- Add-to-cart helper ---------------- */
@@ -322,21 +340,24 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       return
     }
 
-    // Resolve values regardless of brand/key casing
     const codeVal = String(firstNonEmpty(row, codeKeys())).trim()
-    const friendlyName = makeFriendlyName(row, group, codeVal) // <- never "Table 10" / "Unnamed"
+    const friendlyName = makeFriendlyName(row, group, codeVal)
     const packVal = String(firstNonEmpty(row, packKeys()) || "").trim()
     const casVal = String(firstNonEmpty(row, casKeys()) || "").trim()
     const hsnVal = String(firstNonEmpty(row, hsnKeys()) || "").trim()
-    const priceNum = parsePriceToNumber(firstNonEmpty(row, priceKeys())) // allow 0 (quote-first)
 
-    // Build a stable id
+    // Prefer Rankem’s dynamic "Price List 2025" column if present
+    const dynPrice =
+      (group?._priceKey ? row[group._priceKey] : undefined)
+      ?? firstNonEmpty(row, priceKeys())
+    const priceNum = parsePriceToNumber(dynPrice) // allow 0 (quote-first)
+
     const safeNameKey = normalizeKey(friendlyName).slice(0, 32)
     const id = `${brandKey}-${codeVal || safeNameKey || "item"}`
 
     addItem({
       id,
-      name: friendlyName,          // <- friendly human name
+      name: friendlyName,
       productName: friendlyName,
       code: codeVal,
       productCode: codeVal,
@@ -345,10 +366,10 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       packSize: packVal,
       packing: row.Packing ?? "",
       hsn: hsnVal,
-      price: priceNum,             // 0 = price on request
+      price: priceNum,
       quantity: 1,
       brand: (labSupplyBrands as any)[brandKey]?.name ?? "Rankem",
-      category: stripTablePrefix(group?.category || group?.title), // <- cleaned category
+      category: stripTablePrefix(group?.category || group?.title),
       image: null,
     })
 
@@ -382,20 +403,30 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                 </thead>
                 <tbody>
                   {group.variants.map((row: any, ri: number) => {
-                    const priceNum = parsePriceToNumber(firstNonEmpty(row, priceKeys()))
-                    const displayPrice = priceNum > 0 ? inr(priceNum) : (row["Price"] ?? row["price"] ?? "—")
+                    // Compute price for display: prefer dynamic key for Rankem
+                    const rawForPrice = (group._priceKey ? row[group._priceKey] : undefined) ?? firstNonEmpty(row, priceKeys())
+                    const priceNum = parsePriceToNumber(rawForPrice)
+                    const displayPrice = priceNum > 0 ? inr(priceNum) : "Price on request"
 
                     return (
                       <tr key={ri} className="border-b last:border-none">
-                        {group._tableHeaders.map((h: string) => (
-                          <td key={`${ri}-${h}`} className="py-2 px-3">
-                            {typeof row[h] === "number"
-                              ? h.toLowerCase().includes("price")
-                                ? inr(row[h] as number)
-                                : (row[h] as number)
-                              : (row[h] ?? "—")}
-                          </td>
-                        ))}
+                        {group._tableHeaders.map((h: string) => {
+                          const cell = row[h]
+                          // If this column looks like a price/rate, format it nicely
+                          if (/price|rate/i.test(h)) {
+                            const n = parsePriceToNumber(cell)
+                            return (
+                              <td key={`${ri}-${h}`} className="py-2 px-3">
+                                {n > 0 ? inr(n) : (cell ?? "—")}
+                              </td>
+                            )
+                          }
+                          return (
+                            <td key={`${ri}-${h}`} className="py-2 px-3">
+                              {typeof cell === "number" ? cell : (cell ?? "—")}
+                            </td>
+                          )
+                        })}
                         <td className="py-2 px-3">
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-slate-500">{displayPrice}</span>
