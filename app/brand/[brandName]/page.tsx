@@ -298,7 +298,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       },
     ]
   }
-    /* ---------------- Omsons ---------------- */
+   /* ---------------- Omsons ---------------- */
 else if (brandKey === "omsons") {
   // import omsonsDataRaw from "@/lib/omsons_products.json"
 
@@ -312,7 +312,9 @@ else if (brandKey === "omsons") {
 
   const q = String(searchQuery ?? "").trim().toLowerCase()
   const pool = q
-    ? allRows.filter((row) => Object.values(row || {}).some((v) => String(v ?? "").toLowerCase().includes(q)))
+    ? allRows.filter((row) =>
+        Object.values(row || {}).some((v) => String(v ?? "").toLowerCase().includes(q))
+      )
     : allRows
 
   pageCount = Math.max(1, Math.ceil(pool.length / productsPerPage))
@@ -327,17 +329,27 @@ else if (brandKey === "omsons") {
   const pick = (obj: any, ...keys: string[]) => {
     for (const k of keys) {
       const val = obj?.[k]
-      if (val !== undefined && val !== null && String(val).trim() !== "") return val
+      if (val !== undefined && val !== null && String(val).trim() !== "") return String(val).trim()
     }
     return ""
   }
 
+  // Remove "table 1", "Table no. 2", "TAB-3", etc. from strings
+  const sanitize = (s: any) => {
+    if (s == null) return ""
+    let out = String(s)
+    out = out.replace(/\b(?:tab(?:le)?(?:\s*no\.?)?)\s*[-.:#]?\s*\d+\b/gi, "")
+    out = out.replace(/\(\s*\)/g, "")
+    out = out.replace(/\s{2,}/g, " ").replace(/\s*[-–—]\s*$/, "").trim()
+    return out
+  }
+
   const normalized = pageSlice.map((p: any) => {
     const priceNum = parseNum(p["Price List 2024-25"] ?? p["Price"] ?? p.price)
-    return {
+    const row: any = {
       "Product Code": pick(p, "Product Code", "code"),
       "Product Name": pick(p, "Product Name", "name") || pick(p, "__title", "__category"),
-      "Spec": pick(p, "Spec", "spec"),
+      "Spec": pick(p, "Spec", "spec", "Description", "desc"),
       "Pack": pick(p, "Pack", "Pack Size", "pack"),
       "Length (mm)": pick(p, "Length (mm)", "length_mm"),
       "Capacity (mL)": pick(p, "Capacity (mL)", "capacity_ml"),
@@ -345,22 +357,31 @@ else if (brandKey === "omsons") {
       "Pore Size (µm)": pick(p, "Pore Size (µm)", "pore_size_um"),
       Membrane: pick(p, "Membrane", "membrane"),
       "HSN Code": pick(p, "HSN Code", "hsn"),
-      Price: priceNum != null ? priceNum : (pick(p, "Price Raw", "priceRaw", "Price") || "On request"),
+      Price: priceNum != null ? priceNum : (p["Price Raw"] ?? p["priceRaw"] ?? "On request"),
     }
+    // scrub all string fields
+    for (const k of Object.keys(row)) {
+      if (k !== "Price" && typeof row[k] === "string") row[k] = sanitize(row[k])
+    }
+    return row
   })
+
+  // Build table headers: core + extras that actually have values
+  const base = ["Product Code", "Product Name", "Spec"]
+  const extras = ["Length (mm)", "Capacity (mL)", "Diameter (mm)", "Pore Size (µm)", "Membrane", "Pack", "HSN Code"]
+  const has = (k: string) => normalized.some((r) => String(r[k] ?? "").trim() !== "")
+  const headers = [...base, ...extras.filter(has), "Price"]
 
   grouped = [
     {
       category: "Omsons Glassware",
       title: "Omsons Glassware (Price List 2024–25)",
       description: "",
-      _asCards: true,          // <- tell the renderer to use cards instead of table
-      _tableHeaders: [],       // <- keep empty so nothing table-like leaks
-      variants: normalized,    // <- card items source
+      _tableHeaders: headers,
+      variants: normalized,
     },
   ]
 }
-
   /* ---------------- Rankem ---------------- */
   else if (brandKey === "rankem") {
     const flat: any[] = []
