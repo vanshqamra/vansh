@@ -317,7 +317,7 @@ else if (brandKey === "omsons") {
     return Number.isFinite(n) ? n : null
   }
 
-  // case-insensitive exact-key pick
+  // pick a value by case-insensitive exact label match
   const pickCI = (obj: any, candidates: string[]) => {
     for (const key of Object.keys(obj || {})) {
       const k = normKey(key)
@@ -331,10 +331,16 @@ else if (brandKey === "omsons") {
     return ""
   }
 
-  // treat all code-like labels as sources for "Cat. No."
-  const codeKeys = [
-    "Cat. No.","Cat No","Cat No.","Cat No .","Catalogue No","Catalog No",
-    "Order Code","Code","Product Code","Cat No."
+  // find the original header label (preserve exact casing)
+  const findHeader = (headers: string[] = [], candidates: string[]) => {
+    for (const h of headers) for (const c of candidates) {
+      if (normKey(h) === normKey(c)) return h
+    }
+    return null
+  }
+
+  const codeLikeLabels = [
+    "Cat. No.","Cat No","Cat No.","Catalogue No","Catalog No","Order Code","Code" // (no "Product Code" here)
   ]
   const nameKeys = ["Product Name","Item","Description","Name","Product"]
   const packKeys = ["Pack","Pack of","Pack Size","Qty/Pack","Quantity/Pack","Pkg","Packing"]
@@ -351,7 +357,10 @@ else if (brandKey === "omsons") {
     const origHeaders: string[] = Array.isArray(sec?.table_headers) ? sec.table_headers : []
     const variants = Array.isArray(sec?.variants) ? sec.variants : []
 
-    // filter within section by search
+    // choose the code header we’ll display (Cat. No./Catalogue No/etc.), never "Product Code"
+    const preferredCodeHeader = findHeader(origHeaders, codeLikeLabels)
+
+    // search within this section
     const pool = q
       ? variants.filter((v: any) =>
           Object.values(v || {}).some((val) =>
@@ -362,44 +371,54 @@ else if (brandKey === "omsons") {
 
     const pKeys = priceFromHeaders(origHeaders)
 
+    // normalize rows (we keep original columns too)
     const normalized = pool.map((row: any) => {
       const rawPrice = pickCI(row, pKeys.length ? pKeys : ["Price","Price / Piece","Rate","Amount","Price (₹)"])
       const priceNum = parseNum(rawPrice)
 
-      return {
-        // Use "Cat. No." as the only code column
-        "Cat. No.": pickCI(row, codeKeys),
-        "Product Name": pickCI(row, nameKeys) || sectionTitle,
-        "Spec": pickCI(row, specKeys),
-        "Size/Dia (mm)": pickCI(row, ["Size/Dia (mm)","Dia (mm)","Size (mm)","Diameter (mm)"]),
-        "Capacity (mL)": pickCI(row, ["Capacity (mL)","Capacity ml","Capacity"]),
-        "Length (mm)": pickCI(row, ["Length (mm)","Length"]),
-        "Micro Rating (µm)": pickCI(row, ["Micro Rating (µm)","Pore Size (µm)","Pore Size (um)"]),
-        "Membrane": pickCI(row, ["Membrane"]),
-        "Pack": pickCI(row, packKeys),
-        "HSN Code": pickCI(row, hsnKeys) || sec?.hsn || "",
-        "Price": priceNum != null ? priceNum : (rawPrice || "On request"),
+      const out: Record<string, any> = { ...row }
 
-        // keep original fields (won’t render unless included in headers below)
-        ...row,
-      }
+      // ensure Product Name / Spec / Pack / HSN are filled where possible
+      out["Product Name"] = pickCI(row, nameKeys) || sectionTitle
+      if (!hasVal(out, "Spec")) out["Spec"] = pickCI(row, specKeys)
+      if (!hasVal(out, "Pack")) out["Pack"] = pickCI(row, packKeys)
+      if (!hasVal(out, "HSN Code")) out["HSN Code"] = pickCI(row, hsnKeys) || sec?.hsn || ""
+
+      // computed unified price (original price column(s) remain in out)
+      out["Price"] = priceNum != null ? priceNum : (rawPrice || "On request")
+      return out
     })
 
-    // Core columns (no "Product Code", only "Cat. No.")
-    const core = ["Cat. No.","Product Name","Spec"]
-    const extras = [
-      "Size/Dia (mm)","Capacity (mL)","Length (mm)","Micro Rating (µm)","Membrane","Pack","HSN Code"
-    ].filter((k) => normalized.some((r) => hasVal(r, k)))
+    // CORE (no "Product Code"); put preferred code header first if present & has values
+    const core: string[] = []
+    if (preferredCodeHeader && normalized.some(r => hasVal(r, preferredCodeHeader))) {
+      core.push(preferredCodeHeader)
+    }
+    core.push("Product Name", "Spec")
 
-    // Exclude "Product Code" from appearing as an extra header
-    const exclude = new Set([ ...core.map(normKey), "price", "product code" ])
+    // extras
+    const extrasCandidates = [
+      "Size/Dia (mm)","Dia (mm)","Size (mm)","Diameter (mm)",
+      "Capacity (mL)","Capacity ml","Capacity",
+      "Length (mm)","Length",
+      "Micro Rating (µm)","Pore Size (µm)","Pore Size (um)",
+      "Membrane","Pack","HSN Code"
+    ]
+    const extras = extrasCandidates
+      .filter((h) => normalized.some((r) => hasVal(r, h)))
+      .filter((h, i, arr) => arr.findIndex(x => normKey(x) === normKey(h)) === i)
+
+    // others: original headers with data, excluding core/extras/Price AND excluding "Product Code"
     const others = origHeaders
-      .filter((h) => !exclude.has(normKey(h)))
+      .filter((h) => normKey(h) !== "product code")
+      .filter((h) => !core.some(c => normKey(c) === normKey(h)))
+      .filter((h) => !extras.some(e => normKey(e) === normKey(h)))
+      .filter((h) => normKey(h) !== "price")
       .filter((h) => normalized.some((r) => hasVal(r, h)))
 
     const headers = [...core, ...extras, ...others, "Price"]
 
-    // prune rows to these headers
+    // render rows restricted to decided headers
     const rows = normalized.map((r) => {
       const o: Record<string, any> = {}
       for (const h of headers) o[h] = r[h] ?? ""
@@ -415,9 +434,6 @@ else if (brandKey === "omsons") {
     }
   }).filter((g: any) => Array.isArray(g.variants) && g.variants.length > 0)
 }
-
-
-
   /* ---------------- Rankem ---------------- */
   else if (brandKey === "rankem") {
     const flat: any[] = []
