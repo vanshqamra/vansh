@@ -300,10 +300,8 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   }
     /* ---------------- Omsons ---------------- */
 else if (brandKey === "omsons") {
-  // NOTE: make sure you have this at the top of the file:
   // import omsonsDataRaw from "@/lib/omsons_products.json"
 
-  // Accept {catalog:[{variants:[]}, ...]} or other shapes
   const raw = omsonsDataRaw as any
   const sections: any[] = Array.isArray(raw?.catalog) ? raw.catalog : []
   const allRows: any[] = sections.flatMap((sec: any) =>
@@ -312,19 +310,14 @@ else if (brandKey === "omsons") {
       : []
   )
 
-  // Search (empty query shows all)
   const q = String(searchQuery ?? "").trim().toLowerCase()
   const pool = q
-    ? allRows.filter((row) =>
-        Object.values(row || {}).some((v) => String(v ?? "").toLowerCase().includes(q))
-      )
+    ? allRows.filter((row) => Object.values(row || {}).some((v) => String(v ?? "").toLowerCase().includes(q)))
     : allRows
 
-  // Pagination
   pageCount = Math.max(1, Math.ceil(pool.length / productsPerPage))
   const pageSlice = pool.slice((page - 1) * productsPerPage, page * productsPerPage)
 
-  // Helpers
   const parseNum = (v: any) => {
     if (typeof v === "number" && Number.isFinite(v)) return v
     if (v == null) return null
@@ -339,11 +332,8 @@ else if (brandKey === "omsons") {
     return ""
   }
 
-  // Normalize the current page’s rows
   const normalized = pageSlice.map((p: any) => {
-    const priceNum = parseNum(
-      p["Price List 2024-25"] ?? p["Price"] ?? p.price ?? null
-    )
+    const priceNum = parseNum(p["Price List 2024-25"] ?? p["Price"] ?? p.price)
     return {
       "Product Code": pick(p, "Product Code", "code"),
       "Product Name": pick(p, "Product Name", "name") || pick(p, "__title", "__category"),
@@ -354,29 +344,19 @@ else if (brandKey === "omsons") {
       "Diameter (mm)": pick(p, "Diameter (mm)", "diameter_mm"),
       "Pore Size (µm)": pick(p, "Pore Size (µm)", "pore_size_um"),
       Membrane: pick(p, "Membrane", "membrane"),
-      Price: priceNum != null ? priceNum : pick(p, "Price Raw", "priceRaw", "Price") || "On request",
       "HSN Code": pick(p, "HSN Code", "hsn"),
+      Price: priceNum != null ? priceNum : (pick(p, "Price Raw", "priceRaw", "Price") || "On request"),
     }
   })
 
-  // Build headers: core + extras that actually have data
-  const core = ["Product Code", "Product Name", "Spec"]
-  const extras = ["Length (mm)", "Capacity (mL)", "Diameter (mm)", "Pore Size (µm)", "Membrane", "Pack", "HSN Code"]
-  const hasVal = (row: any, k: string) => {
-    const v = row?.[k]
-    return v !== undefined && v !== null && String(v).trim() !== ""
-  }
-  const enabledExtras = extras.filter((k) => normalized.some((r) => hasVal(r, k)))
-  const headers = [...core, ...enabledExtras, "Price"]
-
-  // Single grouped table (simple + works with your renderer)
   grouped = [
     {
       category: "Omsons Glassware",
       title: "Omsons Glassware (Price List 2024–25)",
       description: "",
-      _tableHeaders: headers,
-      variants: normalized,
+      _asCards: true,          // <- tell the renderer to use cards instead of table
+      _tableHeaders: [],       // <- keep empty so nothing table-like leaks
+      variants: normalized,    // <- card items source
     },
   ]
 }
