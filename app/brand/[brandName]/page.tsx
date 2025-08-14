@@ -300,31 +300,29 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   }
     /* ---------------- Omsons ---------------- */
 else if (brandKey === "omsons") {
-  // Accept several shapes: {products: [...]}, {data: [...]}, {items: [...]}, or raw array
+  // NOTE: make sure you have this at the top of the file:
+  // import omsonsDataRaw from "@/lib/omsons_products.json"
+
+  // Accept {catalog:[{variants:[]}, ...]} or other shapes
   const raw = omsonsDataRaw as any
-  const source: any[] = Array.isArray(raw?.products)
-    ? raw.products
-    : Array.isArray(raw?.data)
-    ? raw.data
-    : Array.isArray(raw?.items)
-    ? raw.items
-    : Array.isArray(raw)
-    ? raw
-    : []
+  const sections: any[] = Array.isArray(raw?.catalog) ? raw.catalog : []
+  const allRows: any[] = sections.flatMap((sec: any) =>
+    Array.isArray(sec?.variants)
+      ? sec.variants.map((v: any) => ({ ...v, __category: sec?.category, __title: sec?.title }))
+      : []
+  )
 
   // Search (empty query shows all)
   const q = String(searchQuery ?? "").trim().toLowerCase()
   const pool = q
-    ? source.filter((p: any) =>
-        Object.values(p || {}).some((v) =>
-          String(v ?? "").toLowerCase().includes(q),
-        ),
+    ? allRows.filter((row) =>
+        Object.values(row || {}).some((v) => String(v ?? "").toLowerCase().includes(q))
       )
-    : source
+    : allRows
 
   // Pagination
   pageCount = Math.max(1, Math.ceil(pool.length / productsPerPage))
-  const paginated = pool.slice((page - 1) * productsPerPage, page * productsPerPage)
+  const pageSlice = pool.slice((page - 1) * productsPerPage, page * productsPerPage)
 
   // Helpers
   const parseNum = (v: any) => {
@@ -333,59 +331,52 @@ else if (brandKey === "omsons") {
     const n = Number(String(v).replace(/[^\d.]/g, ""))
     return Number.isFinite(n) ? n : null
   }
-  const val = (obj: any, ...keys: string[]) => {
+  const pick = (obj: any, ...keys: string[]) => {
     for (const k of keys) {
-      if (obj && obj[k] != null && String(obj[k]).trim() !== "") return obj[k]
+      const val = obj?.[k]
+      if (val !== undefined && val !== null && String(val).trim() !== "") return val
     }
     return ""
   }
 
-  // Normalize rows
-  const variants = paginated.map((p: any) => {
+  // Normalize the current page’s rows
+  const normalized = pageSlice.map((p: any) => {
     const priceNum = parseNum(
-      p["Price List 2024-25"] ?? p["Price"] ?? p.price ?? null,
+      p["Price List 2024-25"] ?? p["Price"] ?? p.price ?? null
     )
-
     return {
-      "Product Code": val(p, "Product Code", "code"),
-      "Product Name": val(p, "Product Name", "name"),
-      "Spec": val(p, "Spec", "spec"),
-      "Pack": val(p, "Pack", "pack"),
-      "Capacity (mL)": val(p, "Capacity (mL)", "capacity_ml"),
-      "Diameter (mm)": val(p, "Diameter (mm)", "diameter_mm"),
-      "Length (mm)": val(p, "Length (mm)", "length_mm"),
-      "Neck (GL)": val(p, "Neck (GL)", "neck_gl"),
-      "Pore Size (µm)": val(p, "Pore Size (µm)", "pore_size_um"),
-      Membrane: val(p, "Membrane", "membrane"),
-      Price: priceNum != null ? priceNum : val(p, "Price Raw", "priceRaw", "Price"),
-      "HSN Code": val(p, "HSN Code", "hsn"),
+      "Product Code": pick(p, "Product Code", "code"),
+      "Product Name": pick(p, "Product Name", "name") || pick(p, "__title", "__category"),
+      "Spec": pick(p, "Spec", "spec"),
+      "Pack": pick(p, "Pack", "Pack Size", "pack"),
+      "Length (mm)": pick(p, "Length (mm)", "length_mm"),
+      "Capacity (mL)": pick(p, "Capacity (mL)", "capacity_ml"),
+      "Diameter (mm)": pick(p, "Diameter (mm)", "diameter_mm"),
+      "Pore Size (µm)": pick(p, "Pore Size (µm)", "pore_size_um"),
+      Membrane: pick(p, "Membrane", "membrane"),
+      Price: priceNum != null ? priceNum : pick(p, "Price Raw", "priceRaw", "Price") || "On request",
+      "HSN Code": pick(p, "HSN Code", "hsn"),
     }
   })
 
-  // Build headers: core + only the extra columns that actually have data
-  const core = ["Product Code", "Product Name", "Spec", "Pack", "Price", "HSN Code"]
-  const extras = [
-    "Capacity (mL)",
-    "Diameter (mm)",
-    "Length (mm)",
-    "Neck (GL)",
-    "Pore Size (µm)",
-    "Membrane",
-  ]
-  const hasValue = (row: any, key: string) => {
-    const v = row?.[key]
+  // Build headers: core + extras that actually have data
+  const core = ["Product Code", "Product Name", "Spec"]
+  const extras = ["Length (mm)", "Capacity (mL)", "Diameter (mm)", "Pore Size (µm)", "Membrane", "Pack", "HSN Code"]
+  const hasVal = (row: any, k: string) => {
+    const v = row?.[k]
     return v !== undefined && v !== null && String(v).trim() !== ""
   }
-  const enabledExtras = extras.filter((k) => variants.some((r) => hasValue(r, k)))
-  const headers = [...core.slice(0, 3), ...enabledExtras, ...core.slice(3)]
+  const enabledExtras = extras.filter((k) => normalized.some((r) => hasVal(r, k)))
+  const headers = [...core, ...enabledExtras, "Price"]
 
+  // Single grouped table (simple + works with your renderer)
   grouped = [
     {
       category: "Omsons Glassware",
       title: "Omsons Glassware (Price List 2024–25)",
       description: "",
       _tableHeaders: headers,
-      variants,
+      variants: normalized,
     },
   ]
 }
