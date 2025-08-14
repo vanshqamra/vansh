@@ -317,7 +317,7 @@ else if (brandKey === "omsons") {
     return Number.isFinite(n) ? n : null
   }
 
-  // case-insensitive key pick (exact-match by normalized label)
+  // case-insensitive exact-key pick
   const pickCI = (obj: any, candidates: string[]) => {
     for (const key of Object.keys(obj || {})) {
       const k = normKey(key)
@@ -331,8 +331,10 @@ else if (brandKey === "omsons") {
     return ""
   }
 
+  // treat all code-like labels as sources for "Cat. No."
   const codeKeys = [
-    "Product Code","Cat. No.","Cat No","Cat No.","Catalogue No","Catalog No","Order Code","Code","Cat No."
+    "Cat. No.","Cat No","Cat No.","Cat No .","Catalogue No","Catalog No",
+    "Order Code","Code","Product Code","Cat No."
   ]
   const nameKeys = ["Product Name","Item","Description","Name","Product"]
   const packKeys = ["Pack","Pack of","Pack Size","Qty/Pack","Quantity/Pack","Pkg","Packing"]
@@ -345,11 +347,11 @@ else if (brandKey === "omsons") {
   grouped = sections.map((sec: any, idx: number) => {
     const sectionTitle =
       sec?.product_name || sec?.title || sec?.category || `Section ${idx + 1}`
-    // Original table headers from JSON (may include “Price / Piece”, “Cat. No.”, etc.)
+
     const origHeaders: string[] = Array.isArray(sec?.table_headers) ? sec.table_headers : []
     const variants = Array.isArray(sec?.variants) ? sec.variants : []
 
-    // Search inside this section
+    // filter within section by search
     const pool = q
       ? variants.filter((v: any) =>
           Object.values(v || {}).some((val) =>
@@ -358,15 +360,15 @@ else if (brandKey === "omsons") {
         )
       : variants
 
-    // Decide price keys dynamically from the section’s headers
     const pKeys = priceFromHeaders(origHeaders)
+
     const normalized = pool.map((row: any) => {
       const rawPrice = pickCI(row, pKeys.length ? pKeys : ["Price","Price / Piece","Rate","Amount","Price (₹)"])
       const priceNum = parseNum(rawPrice)
 
       return {
-        // Standardized keys your renderer & add-to-cart can rely on:
-        "Product Code": pickCI(row, codeKeys),
+        // Use "Cat. No." as the only code column
+        "Cat. No.": pickCI(row, codeKeys),
         "Product Name": pickCI(row, nameKeys) || sectionTitle,
         "Spec": pickCI(row, specKeys),
         "Size/Dia (mm)": pickCI(row, ["Size/Dia (mm)","Dia (mm)","Size (mm)","Diameter (mm)"]),
@@ -378,25 +380,26 @@ else if (brandKey === "omsons") {
         "HSN Code": pickCI(row, hsnKeys) || sec?.hsn || "",
         "Price": priceNum != null ? priceNum : (rawPrice || "On request"),
 
-        // Keep all original columns so nothing is lost:
+        // keep original fields (won’t render unless included in headers below)
         ...row,
       }
     })
 
-    // Build per-section headers: core + useful extras + any other original headers that have data
-    const core = ["Product Code","Product Name","Spec"]
+    // Core columns (no "Product Code", only "Cat. No.")
+    const core = ["Cat. No.","Product Name","Spec"]
     const extras = [
       "Size/Dia (mm)","Capacity (mL)","Length (mm)","Micro Rating (µm)","Membrane","Pack","HSN Code"
     ].filter((k) => normalized.some((r) => hasVal(r, k)))
 
-    // Include any original header that carries data and isn’t already in core/extras/Price
+    // Exclude "Product Code" from appearing as an extra header
+    const exclude = new Set([ ...core.map(normKey), "price", "product code" ])
     const others = origHeaders
-      .filter((h) => ![...core, ...extras, "Price"].some((k) => normKey(k) === normKey(h)))
+      .filter((h) => !exclude.has(normKey(h)))
       .filter((h) => normalized.some((r) => hasVal(r, h)))
 
     const headers = [...core, ...extras, ...others, "Price"]
 
-    // Prune rows to only render headers we decided to show
+    // prune rows to these headers
     const rows = normalized.map((r) => {
       const o: Record<string, any> = {}
       for (const h of headers) o[h] = r[h] ?? ""
@@ -412,6 +415,7 @@ else if (brandKey === "omsons") {
     }
   }).filter((g: any) => Array.isArray(g.variants) && g.variants.length > 0)
 }
+
 
 
   /* ---------------- Rankem ---------------- */
