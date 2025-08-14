@@ -1,0 +1,4133 @@
+{
+  "brand": "Omsons",
+  "price_list": "2024-25",
+  "updated_at": "2025-08-14",
+  "pages_covered": [
+    21,
+    412
+  ],
+  "catalog": [
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP261-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP261-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP262-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP262-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP262-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP262-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP263-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP263-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP264-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP264-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP265-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP265-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP266-020",
+          "Spec": "25 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP266-045",
+          "Spec": "25 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP267-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP267-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP268-020",
+          "Spec": "25 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP268-045",
+          "Spec": "25 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP338-020",
+          "Spec": "47 0.20 50",
+          "Pack": "50",
+          "Price List 2024-25": 1500.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP338-045",
+          "Spec": "47 0.45 50",
+          "Pack": "50",
+          "Price List 2024-25": 1500.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP339-020",
+          "Spec": "47 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price List 2024-25": 1500.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP339-045",
+          "Spec": "47 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price List 2024-25": 1500.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP340-020",
+          "Spec": "90 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP340-045",
+          "Spec": "90 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP341-020",
+          "Spec": "142 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP341-045",
+          "Spec": "142 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP342-020",
+          "Spec": "293 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP342-045",
+          "Spec": "293 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP269-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP269-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP270-020",
+          "Spec": "13 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP270-045",
+          "Spec": "13 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP271-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP271-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP272-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP272-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP273-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP273-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP274-020",
+          "Spec": "13 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP274-045",
+          "Spec": "13 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP275-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP275-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP276-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP276-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP281-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP281-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP282-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP282-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP283-020",
+          "Spec": "25 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP283-045",
+          "Spec": "25 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP284-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP284-045",
+          "Spec": "33 0.45 50 On Request FP277-020 4 0.20 100",
+          "Application": "33 0.45 50 On Request FP",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP277-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP278-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP278-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP279-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP279-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP280-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP280-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP289-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP289-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP290-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP290-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP291-020",
+          "Spec": "25 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP291-045",
+          "Spec": "25 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP292-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP292-045",
+          "Spec": "33 0.45 50 On Request FP285-020 4 0.20 100",
+          "Application": "33 0.45 50 On Request FP",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP285-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP286-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP286-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP287-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP287-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP288-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP288-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP297-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP297-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP298-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP298-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP299-020",
+          "Spec": "25 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP299-045",
+          "Spec": "25 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP300-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP300-045",
+          "Spec": "33 0.45 50 On Request  FP293-020 4 0.20 100",
+          "Application": "33 0.45 50 On Request  FP",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP293-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP294-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP294-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP295-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP295-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP296-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP296-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP301-010",
+          "Spec": "13 1.0 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP301-016",
+          "Spec": "13 1.6 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP302-010",
+          "Spec": "25 1.0 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP302-016",
+          "Spec": "25 1.6 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP303-010",
+          "Spec": "33 1.0 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP303-016",
+          "Spec": "33 1.6 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP304-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP304-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP305-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP305-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP306-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP306-020",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP307-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP307-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP308-020",
+          "Spec": "25 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP308-045",
+          "Spec": "25 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP309-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP309-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP310-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP310-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP311-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP311-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP312-020",
+          "Spec": "25 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP312-045",
+          "Spec": "25 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP313-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP313-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP314-020",
+          "Spec": "4 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP314-045",
+          "Spec": "4 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP315-020",
+          "Spec": "13 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP315-045",
+          "Spec": "13 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP316-020",
+          "Spec": "25 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP316-045",
+          "Spec": "25 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP317-020",
+          "Spec": "33 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP317-045",
+          "Spec": "33 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP324",
+          "Spec": "– FP",
+          "Price List 2024-25": 325.0,
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP318-020",
+          "Spec": "13 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP318-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP319-020",
+          "Spec": "25 2 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP319-045",
+          "Spec": "25 2 0.45 50 On RequestPrice / Piece",
+          "Application": "25 2 0.45 50 On RequestPrice / Piece",
+          "Pack": "50",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP320-020",
+          "Spec": "13 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP320-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP321-020",
+          "Spec": "25 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP321-045",
+          "Spec": "25 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP322-020",
+          "Spec": "13 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP322-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP323-020",
+          "Spec": "25 2 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP323-045",
+          "Spec": "25 2 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP324-020",
+          "Spec": "13 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP324-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP325-020",
+          "Spec": "25 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP325-045",
+          "Spec": "25 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP326-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP327-020",
+          "Spec": "25 2 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP327-045",
+          "Spec": "25 2 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP328-020",
+          "Spec": "13 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP328-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP329-020",
+          "Spec": "25 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP329-045",
+          "Spec": "25 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP332-020",
+          "Spec": "13 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP332-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP333-020",
+          "Spec": "25 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP333-045",
+          "Spec": "25 2 0.45 100 On Request FP330-020 13 2 0.20 100",
+          "Application": "25 2 0.45 100 On Request FP",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP330-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP331-020",
+          "Spec": "25 2 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP331-045",
+          "Spec": "25 2 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "S Y R I N G E F I L T E R S",
+      "title": "S Y R I N G E F I L T E R S",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price Raw",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FP334-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP335-020",
+          "Spec": "25 2 0.20 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP335-045",
+          "Spec": "25 2 0.45 50",
+          "Pack": "50",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP336-020",
+          "Spec": "13 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP336-045",
+          "Spec": "13 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP337-020",
+          "Spec": "25 2 0.20 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        },
+        {
+          "Product Code": "FP337-045",
+          "Spec": "25 2 0.45 100",
+          "Length (mm)": "100",
+          "Pack": "100",
+          "Price Raw": "On Request",
+          "Product Name": "S Y R I N G E F I L T E R S"
+        }
+      ]
+    },
+    {
+      "category": "Single Channel Variable Volume Micropipettes",
+      "title": "Single Channel Variable Volume Micropipettes",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "VVM-2",
+          "Spec": "0.2 to 2.0µL 0.002 2 0.04 1.2 0.024 1",
+          "Range": "0.2 to 2.0",
+          "Length (mm)": "024",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-10",
+          "Spec": "0.5 to 10µL 0.02 1 0.1 0.5 0.05 1",
+          "Range": "0.5 to 10",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-20",
+          "Spec": "2 to 20µL 0.02 0.8 0.16 0.4 0.08 1",
+          "Range": "2 to 20",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-50",
+          "Spec": "5 to 50µL 0.1 0.8 0.4 0.4 0.2 1",
+          "Range": "5 to 50",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-100",
+          "Spec": "10 to 100µL 0.2 0.6 0.6 0.2 0.2 1",
+          "Range": "10 to 100",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-200",
+          "Spec": "20 to 200µL 0.2 0.6 1.2 0.2 0.4 1",
+          "Range": "20 to 200",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-1000",
+          "Spec": "100 to 1000µL 1.0 0.6 6 0.2 2 1",
+          "Range": "100 to 1000",
+          "Length (mm)": "100",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-5000",
+          "Spec": "0.5 to 5 mL 10.0 0.6 30 0.2 10 1",
+          "Range": "0.5 to 5",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        },
+        {
+          "Product Code": "VVM-10000",
+          "Spec": "1 to 10 mL 20.0 0.6 60 0.2 20 1",
+          "Range": "1 to 10",
+          "Pack": "1",
+          "Price List 2024-25": 6820.0,
+          "Product Name": "Single Channel Variable Volume Micropipettes"
+        }
+      ]
+    },
+    {
+      "category": "Single Channel Fixed Volume Micropipettes",
+      "title": "Single Channel Fixed Volume Micropipettes",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "FVM-1",
+          "Spec": "1.0 5 0.05 5 0.05 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-2",
+          "Spec": "2.0 4 0.08 2 0.04 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-5",
+          "Spec": "5.0 2 0.1 1 0.05 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-10",
+          "Spec": "10.0 1 0.1 0.5 0.05 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-20",
+          "Spec": "20.0 0.8 0.16 0.4 0.08 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-25",
+          "Spec": "25.0 0.8 0.2 0.4 0.1 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-50",
+          "Spec": "50.0 0.8 0.4 0.4 0.2 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-100",
+          "Spec": "100.0 0.6 0.6 0.2 0.2 1",
+          "Length (mm)": "100",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-200",
+          "Spec": "200.0 0.6 1.2 0.2 0.4 1",
+          "Length (mm)": "200",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-250",
+          "Spec": "250.0 0.6 1.5 0.2 0.5 1",
+          "Length (mm)": "250",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-500",
+          "Spec": "500.0 0.6 3 0.2 1 1",
+          "Length (mm)": "500",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-1000",
+          "Spec": "1000.0 0.6 6 0.2 2 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-2000",
+          "Spec": "2000.0 0.6 12 0.2 4 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-5000",
+          "Spec": "5000.0 0.6 30 0.2 10 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        },
+        {
+          "Product Code": "FVM-10000",
+          "Spec": "10000.0 0.4 40 0.2 20 1",
+          "Pack": "1",
+          "Price List 2024-25": 3600.0,
+          "Product Name": "Single Channel Fixed Volume Micropipettes"
+        }
+      ]
+    },
+    {
+      "category": "Multi",
+      "title": "Multi-Channel (8-Channel & 12-Channel)",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "MVM-8/10",
+          "Spec": "0.5 to 10 0.02 1.6 0.16 1 0.1 1",
+          "Range": "0.5 to 10",
+          "Pack": "1",
+          "Price List 2024-25": 23000.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-8/20",
+          "Spec": "02 to 20 0.02 0.8 0.16 0.4 0.08 1",
+          "Range": "02 to 20",
+          "Pack": "1",
+          "Price List 2024-25": 23000.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-8/50",
+          "Spec": "5 to 50 0.1 0.8 0.4 0.4 0.2 1",
+          "Range": "5 to 50",
+          "Pack": "1",
+          "Price List 2024-25": 23000.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-8/100",
+          "Spec": "10 to 100 0.2 0.8 0.8 0.3 0.3 1",
+          "Range": "10 to 100",
+          "Length (mm)": "100",
+          "Pack": "1",
+          "Price List 2024-25": 23000.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-8/200",
+          "Spec": "20 to 200 0.2 0.8 1.6 0.3 0.6 1",
+          "Range": "20 to 200",
+          "Length (mm)": "200",
+          "Pack": "1",
+          "Price List 2024-25": 23000.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-8/300",
+          "Spec": "40 to 300 0.2 0.8 2.4 0.3 0.9 1",
+          "Range": "40 to 300",
+          "Length (mm)": "300",
+          "Pack": "1",
+          "Price List 2024-25": 23000.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-12/10",
+          "Spec": "0.5 to 10 0.02 1.6 0.16 1 0.1 1",
+          "Range": "0.5 to 10",
+          "Pack": "1",
+          "Price List 2024-25": 30600.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-12/20",
+          "Spec": "02 to 20 0.02 0.8 0.16 0.4 0.08 1",
+          "Range": "02 to 20",
+          "Pack": "1",
+          "Price List 2024-25": 30600.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-12/50",
+          "Spec": "5 to 50 0.1 0.8 0.4 0.4 0.2 1",
+          "Range": "5 to 50",
+          "Pack": "1",
+          "Price List 2024-25": 30600.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-12/100",
+          "Spec": "10 to 100 0.2 0.8 0.8 0.3 0.3 1",
+          "Range": "10 to 100",
+          "Length (mm)": "100",
+          "Pack": "1",
+          "Price List 2024-25": 30600.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-12/200",
+          "Spec": "20 to 200 0.2 0.8 1.6 0.3 0.6 1",
+          "Range": "20 to 200",
+          "Length (mm)": "200",
+          "Pack": "1",
+          "Price List 2024-25": 30600.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        },
+        {
+          "Product Code": "MVM-12/300",
+          "Spec": "40 to 300 0.2 0.8 2.4 0.3 0.9 1",
+          "Range": "40 to 300",
+          "Length (mm)": "300",
+          "Pack": "1",
+          "Price List 2024-25": 30600.0,
+          "Product Name": "Multi-Channel (8-Channel & 12-Channel)"
+        }
+      ]
+    },
+    {
+      "category": "Bottle Top Dispensers (Btd)",
+      "title": "Bottle Top Dispensers (BTD), Pearl",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "PRL-5",
+          "Spec": "0.5 to 5 0.10 0.5 0.025 0.2 0.010 1",
+          "Range": "0.5 to 5",
+          "Length (mm)": "010",
+          "Pack": "1",
+          "Price List 2024-25": 13800.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Pearl"
+        },
+        {
+          "Product Code": "PRL-10",
+          "Spec": "1 to 10 0.20 0.5 0.050 0.1 0.010 1",
+          "Range": "1 to 10",
+          "Length (mm)": "010",
+          "Pack": "1",
+          "Price List 2024-25": 13800.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Pearl"
+        },
+        {
+          "Product Code": "PRL-30",
+          "Spec": "2.5 to 30 0.50 0.5 0.150 0.1 0.030 1",
+          "Range": "2.5 to 30",
+          "Length (mm)": "030",
+          "Pack": "1",
+          "Price List 2024-25": 20000.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Pearl"
+        },
+        {
+          "Product Code": "PRL-60",
+          "Spec": "5 to 60 1.00 0.5 0.300 0.1 0.060 1",
+          "Range": "5 to 60",
+          "Length (mm)": "060",
+          "Pack": "1",
+          "Price List 2024-25": 20000.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Pearl"
+        },
+        {
+          "Product Code": "PRL-100",
+          "Spec": "10 to 100 2.00 0.5 0.500 0.1 0.100 1 24600.00A",
+          "Range": "10 to 100",
+          "Length (mm)": "100",
+          "Pack": "1",
+          "Product Name": "Bottle Top Dispensers (BTD), Pearl"
+        }
+      ]
+    },
+    {
+      "category": "Bottle Top Dispensers (Btd)",
+      "title": "Bottle Top Dispensers (BTD), Emerald",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "ERL-5",
+          "Spec": "0.5 to 5 0.10 0.6 0.030 0.2 0.010 1",
+          "Range": "0.5 to 5",
+          "Length (mm)": "010",
+          "Pack": "1",
+          "Price List 2024-25": 19000.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Emerald"
+        },
+        {
+          "Product Code": "ERL-10",
+          "Spec": "1 to 10 0.20 0.6 0.060 0.2 0.020 1",
+          "Range": "1 to 10",
+          "Length (mm)": "020",
+          "Pack": "1",
+          "Price List 2024-25": 19000.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Emerald"
+        },
+        {
+          "Product Code": "ERL-30",
+          "Spec": "2.5 to 30  0.50 0.6 0.180 0.2 0.060 1",
+          "Range": "2.5 to 30",
+          "Length (mm)": "060",
+          "Pack": "1",
+          "Price List 2024-25": 27800.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Emerald"
+        },
+        {
+          "Product Code": "ERL-60",
+          "Spec": "5 to 60 1.00 0.6 0.360 0.2 0.120 1",
+          "Range": "5 to 60",
+          "Length (mm)": "120",
+          "Pack": "1",
+          "Price List 2024-25": 27800.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Emerald"
+        },
+        {
+          "Product Code": "ERL-100",
+          "Spec": "10 to 100 2.00 0.6 0.600 0.2 0.200 1",
+          "Range": "10 to 100",
+          "Length (mm)": "200",
+          "Pack": "1",
+          "Price List 2024-25": 34200.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Emerald"
+        }
+      ]
+    },
+    {
+      "category": "Bottle Top Dispensers (Btd)",
+      "title": "Bottle Top Dispensers (BTD), Coral",
+      "description": "",
+      "_tableHeaders": [
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "CRL-5",
+          "Spec": "0.5 to 5 0.10 0.5 0.025 0.2 0.010 1",
+          "Range": "0.5 to 5",
+          "Length (mm)": "010",
+          "Pack": "1",
+          "Price List 2024-25": 27100.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Coral"
+        },
+        {
+          "Product Code": "CRL-10",
+          "Spec": "1 to 10 0.20 0.5 0.050 0.1 0.010 1",
+          "Range": "1 to 10",
+          "Length (mm)": "010",
+          "Pack": "1",
+          "Price List 2024-25": 27100.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Coral"
+        },
+        {
+          "Product Code": "CRL-30",
+          "Spec": "2.5 to 30 0.50 0.5 0.150 0.1 0.030 1",
+          "Range": "2.5 to 30",
+          "Length (mm)": "030",
+          "Pack": "1",
+          "Price List 2024-25": 40400.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Coral"
+        },
+        {
+          "Product Code": "CRL-60",
+          "Spec": "5 to 60 1.00 0.5 0.300 0.1 0.060 1",
+          "Range": "5 to 60",
+          "Length (mm)": "060",
+          "Pack": "1",
+          "Price List 2024-25": 40400.0,
+          "Product Name": "Bottle Top Dispensers (BTD), Coral"
+        },
+        {
+          "Product Code": "CRL-100",
+          "Spec": "10 to 100 2.00 0.5 0.500 0.1 0.100 1 48600.00A",
+          "Range": "10 to 100",
+          "Length (mm)": "100",
+          "Pack": "1",
+          "Product Name": "Bottle Top Dispensers (BTD), Coral"
+        }
+      ]
+    },
+    {
+      "category": "O.D. × Height",
+      "title": "O.D. × Height",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Division",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "D60",
+          "Spec": "X H40 MM",
+          "Application": "X H40 MM",
+          "Product Name": "O.D. × Height"
+        },
+        {
+          "Product Code": "A50",
+          "Spec": "mlEx 27 °C",
+          "Application": "mlEx 27 °C",
+          "Division": "27°C",
+          "Pack": "27",
+          "Price List 2024-25": 245.0,
+          "Product Name": "O.D. × Height"
+        }
+      ]
+    },
+    {
+      "category": "A50 Mlex 27 °C250",
+      "title": "A50 mlEx 27 °C250",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Division",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "A50",
+          "Spec": "mlEx 27 °C",
+          "Application": "mlEx 27 °C",
+          "Division": "27°C",
+          "Pack": "27",
+          "Price List 2024-25": 250.0,
+          "Product Name": "A50 mlEx 27 °C250"
+        },
+        {
+          "Product Code": "B50",
+          "Spec": "mlEx 27 °C",
+          "Application": "mlEx 27 °C",
+          "Division": "27°C",
+          "Pack": "27",
+          "Product Name": "A50 mlEx 27 °C250"
+        }
+      ]
+    },
+    {
+      "category": "A50 Mlex 27 °C252",
+      "title": "A50 mlEx 27 °C252",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Division",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "A50",
+          "Spec": "mlEx 27 °C",
+          "Application": "mlEx 27 °C",
+          "Division": "27°C",
+          "Pack": "27",
+          "Price List 2024-25": 252.0,
+          "Product Name": "A50 mlEx 27 °C252"
+        }
+      ]
+    },
+    {
+      "category": "Ain 27°Cns 19/26500 Ml±0.25",
+      "title": "AIn 27°CNS 19/26500 mL±0.25",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "CM/L-9600078263VOLU",
+          "Spec": "MET RI C FL AS K S",
+          "Application": "MET RI C FL AS K S",
+          "Product Name": "AIn 27°CNS 19/26500 mL±0.25"
+        }
+      ]
+    },
+    {
+      "category": "Is",
+      "title": "IS : 1381 Part-1",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "CM/L-960",
+          "Spec": "0078268FLASKS",
+          "Application": "0078268FLASKS",
+          "Product Name": "IS : 1381 Part-1"
+        }
+      ]
+    },
+    {
+      "category": "100Boro 3.3250Ml",
+      "title": "100BORO 3.3250mL",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "CM/L-96000783",
+          "Spec": "1324/",
+          "Price List 2024-25": 29136.0,
+          "Product Name": "100BORO 3.3250mL"
+        },
+        {
+          "Product Code": "CM/L-9600078313IS",
+          "Spec": ": 1381 Part-",
+          "Application": ": 1381 Part",
+          "Price List 2024-25": 2.0,
+          "Product Name": "100BORO 3.3250mL"
+        }
+      ]
+    },
+    {
+      "category": "Is",
+      "title": "IS : 1381 Part-2",
+      "description": "",
+      "_tableHeaders": [
+        "Application",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "CM/L-9600078268IS",
+          "Spec": ": 1381 Part-",
+          "Application": ": 1381 Part",
+          "Price List 2024-25": 2.0,
+          "Product Name": "IS : 1381 Part-2"
+        }
+      ]
+    },
+    {
+      "category": "25Mlboro 3.3",
+      "title": "25mLBoro 3.3",
+      "description": "",
+      "_tableHeaders": [
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "CM/L-9600078267IS",
+          "Spec": ":",
+          "Price List 2024-25": 1117.0,
+          "Product Name": "25mLBoro 3.3"
+        }
+      ]
+    },
+    {
+      "category": "Battery Hydrometers",
+      "title": "Battery Hydrometers,",
+      "description": "",
+      "_tableHeaders": [
+        "Division",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "L2BC",
+          "Spec": "1.100 to 1.300 Sp. Gr. at 27°C (±0.005)",
+          "Range": "1.100 to 1.300",
+          "Division": "27°C",
+          "Length (mm)": "005",
+          "Pack": "005",
+          "Price List 2024-25": 900.0,
+          "Product Name": "Battery Hydrometers,"
+        },
+        {
+          "Product Code": "M2BC",
+          "Spec": "1.100 to 1.300 Sp. Gr. at 27°C",
+          "Range": "1.100 to 1.300",
+          "Division": "27°C",
+          "Length (mm)": "300",
+          "Pack": "27",
+          "Price List 2024-25": 900.0,
+          "Product Name": "Battery Hydrometers,"
+        },
+        {
+          "Product Code": "S2BC",
+          "Spec": "1.100 to 1.300 Sp. Gr. at 27°C 900.00Speciﬁc Gravity RangePrice / Piece",
+          "Range": "1.100 to 1.300",
+          "Division": "27°C",
+          "Length (mm)": "900",
+          "Pack": "900",
+          "Product Name": "Battery Hydrometers,"
+        },
+        {
+          "Product Code": "L2B",
+          "Spec": "1.100 to 1.300 Sp. Gr. at 27°C (±0.005)",
+          "Range": "1.100 to 1.300",
+          "Division": "27°C",
+          "Length (mm)": "005",
+          "Pack": "005",
+          "Price List 2024-25": 300.0,
+          "Product Name": "Battery Hydrometers,"
+        },
+        {
+          "Product Code": "M2B",
+          "Spec": "1.100 to 1.300 Sp. Gr. at 27°C",
+          "Range": "1.100 to 1.300",
+          "Division": "27°C",
+          "Length (mm)": "300",
+          "Pack": "27",
+          "Price List 2024-25": 200.0,
+          "Product Name": "Battery Hydrometers,"
+        },
+        {
+          "Product Code": "S2B",
+          "Spec": "1.100 to 1.300 Sp. Gr. at 27°C",
+          "Range": "1.100 to 1.300",
+          "Division": "27°C",
+          "Length (mm)": "300",
+          "Pack": "27",
+          "Price List 2024-25": 210.0,
+          "Product Name": "Battery Hydrometers,"
+        }
+      ]
+    },
+    {
+      "category": "Ip/Astm Glass Thermometers",
+      "title": "IP/ASTM Glass Thermometers",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3110",
+          "Spec": "1 F — Partial Immersion 0 to 302 2°F Hg 76 317 10",
+          "Range": "0 to 302",
+          "Division": "1°F",
+          "Fill": "Hg",
+          "Length (mm)": "317",
+          "Pack": "10",
+          "Price List 2024-25": 1000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3111",
+          "Spec": "2 F 62 F Partial Immersion 20 to 580 2°F Hg 76 385 10",
+          "ASTM No": "62F",
+          "Range": "20 to 580",
+          "Division": "2°F",
+          "Fill": "Hg",
+          "Length (mm)": "385",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3112",
+          "Spec": "3 F 73 F Partial Immersion 20 to 760 2°F Hg 76 410 10",
+          "ASTM No": "73F",
+          "Range": "20 to 760",
+          "Division": "3°F",
+          "Fill": "Hg",
+          "Length (mm)": "410",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3113",
+          "Spec": "5 F 1 F Cloud and Pour -36 to 120 2°F Hg 108 225 10",
+          "Application": "5 F 1 F Cloud and Pour",
+          "Range": "-36 to 120",
+          "Division": "5°F",
+          "Fill": "Hg",
+          "Length (mm)": "225",
+          "Pack": "10",
+          "Price List 2024-25": 1000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3114",
+          "Spec": "6 F 2 F Low Cloud and Pour -112 to 70 2°F Toluene 76 225 10",
+          "Application": "6 F 2 F Low Cloud and Pour",
+          "Range": "-112 to 70",
+          "Division": "6°F",
+          "Length (mm)": "225",
+          "Pack": "10",
+          "Price List 2024-25": 1000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3115",
+          "Spec": "7 F — Low Distillation 30 to 580 2°F Hg Total 380 10",
+          "Range": "30 to 580",
+          "Division": "7°F",
+          "Fill": "Hg",
+          "Length (mm)": "380",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3116",
+          "Spec": "8 F — High Distillation 30 to 760 2°F Hg Total 380 10",
+          "Range": "30 to 760",
+          "Division": "8°F",
+          "Fill": "Hg",
+          "Length (mm)": "380",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3117",
+          "Spec": "9 F 15 F Low-Pensky-Martens 20 to 230 1°F Hg 57 285 10",
+          "ASTM No": "15F",
+          "Application": "9 F 15 F Low",
+          "Range": "20 to 230",
+          "Division": "9°F",
+          "Fill": "Hg",
+          "Length (mm)": "285",
+          "Pack": "10",
+          "Price List 2024-25": 1000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3118",
+          "Spec": "10 F 16 F High-Pensky-Martens 200 to 700 5°F Hg 57 285 10",
+          "ASTM No": "10F",
+          "Application": "10 F 16 F High",
+          "Range": "200 to 700",
+          "Division": "10°F",
+          "Fill": "Hg",
+          "Length (mm)": "285",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3119",
+          "Spec": "11 F 28 F Cleveland Open Flash 20 to 760 5°F Hg 25 305 10",
+          "ASTM No": "11F",
+          "Range": "20 to 760",
+          "Division": "11°F",
+          "Fill": "Hg",
+          "Length (mm)": "305",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3120",
+          "Spec": "12 F 64 F Density-Wide Range -5 to 215 0.5°F Hg Total 415 10",
+          "ASTM No": "12F",
+          "Application": "12 F 64 F Density",
+          "Range": "-5 to 215",
+          "Division": "12°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3122",
+          "Spec": "14 F 17 F Wax Melting Point 100 to 180 0.2°F Hg 79 370 10",
+          "ASTM No": "14F",
+          "Range": "100 to 180",
+          "Division": "14°F",
+          "Fill": "Hg",
+          "Length (mm)": "370",
+          "Pack": "10",
+          "Price List 2024-25": 1500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3123",
+          "Spec": "15 F — Low Softening Point 30 to 180 0.5°F Hg Total 390 10",
+          "ASTM No": "15F",
+          "Range": "30 to 180",
+          "Division": "15°F",
+          "Fill": "Hg",
+          "Length (mm)": "390",
+          "Pack": "10",
+          "Price List 2024-25": 1000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3124",
+          "Spec": "16 F — High Softening Point 85 to 392 1°F Hg Total 390 10",
+          "ASTM No": "16F",
+          "Range": "85 to 392",
+          "Division": "16°F",
+          "Fill": "Hg",
+          "Length (mm)": "390",
+          "Pack": "10",
+          "Price List 2024-25": 1200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3125",
+          "Spec": "17 F — Saybolt Viscosity 66 to 80 0.2°F Hg Total 270 10",
+          "ASTM No": "17F",
+          "Range": "66 to 80",
+          "Division": "17°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3126",
+          "Spec": "18 F 23 F Reid Vapor Pressure 94 to 108 0.2°F Hg Total 270 10",
+          "ASTM No": "18F",
+          "Range": "94 to 108",
+          "Division": "18°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3127",
+          "Spec": "19 F — Saybolt Viscosity 120 to 134 0.2°F Hg Total 270 10",
+          "ASTM No": "19F",
+          "Range": "120 to 134",
+          "Division": "19°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3128",
+          "Spec": "20 F — Saybolt Viscosity 134 to 148 0.2°F Hg Total 270 10",
+          "ASTM No": "20F",
+          "Range": "134 to 148",
+          "Division": "20°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3129",
+          "Spec": "21 F — Saybolt Viscosity 174 to 188 0.2°F Hg Total 270 10",
+          "ASTM No": "21F",
+          "Range": "174 to 188",
+          "Division": "21°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3130",
+          "Spec": "22 F 24 F Oxidation Stability 204 to 218 0.2°F Hg Total 270 10",
+          "ASTM No": "22F",
+          "Range": "204 to 218",
+          "Division": "22°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3285",
+          "Spec": "28 F 31 F Kinematic Viscosity 97.5 to 102.5 0.1°F Hg Total 300 10",
+          "ASTM No": "28F",
+          "Range": "97.5 to 102.5",
+          "Division": "28°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3286",
+          "Spec": "29 F 34 F Kinematic Viscosity 127.5 to 132.5 0.1°F Hg Total 300 10",
+          "ASTM No": "29F",
+          "Range": "127.5 to 132.5",
+          "Division": "29°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        }
+      ]
+    },
+    {
+      "category": "Ip/Astm Glass Thermometers",
+      "title": "IP/ASTM Glass Thermometers",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3136",
+          "Spec": "33 F — Low Aniline Point -36.5 to 107.5 0.5°F Hg 50 415 10",
+          "ASTM No": "33F",
+          "Application": "Low Aniline Point",
+          "Range": "-36.5 to 107.5",
+          "Division": "33°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3137",
+          "Spec": "34 F — Medium Aniline Point 77 to 221 0.5°F Hg 50 415 10",
+          "ASTM No": "34F",
+          "Range": "77 to 221",
+          "Division": "34°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3138",
+          "Spec": "35 F — High Aniline Point 194 to 338 0.5°F Hg 50 415 10",
+          "ASTM No": "35F",
+          "Range": "194 to 338",
+          "Division": "35°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 2200.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3139",
+          "Spec": "36 C — Titer Test -2 to 68 0.2°C Hg 45 400 10",
+          "Application": "Titer Test",
+          "Range": "-2 to 68",
+          "Division": "36°C",
+          "Fill": "Hg",
+          "Length (mm)": "400",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3288",
+          "Spec": "43 F 65 F Kinematic Viscosity -61 to -29 0.2°F Hg-TL Total 410 10",
+          "ASTM No": "43F",
+          "Application": "43 F 65 F Kinematic Viscosity",
+          "Range": "-61 to -29",
+          "Division": "43°F",
+          "Fill": "Hg",
+          "Length (mm)": "410",
+          "Pack": "10",
+          "Price List 2024-25": 3000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3289",
+          "Spec": "44 F 29 F Kinematic Viscosity 66.5 to 71.5 0.1°F Hg Total 300 10",
+          "ASTM No": "44F",
+          "Range": "66.5 to 71.5",
+          "Division": "44°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3290",
+          "Spec": "45 F 30 F Kinematic Viscosity 74.5 to 79.5 0.1°F Hg Total 300 10",
+          "ASTM No": "45F",
+          "Range": "74.5 to 79.5",
+          "Division": "45°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3291",
+          "Spec": "46 F 66 F Kinematic Viscosity 119.5 to 124.5 0.1°F Hg Total 300 10",
+          "ASTM No": "46F",
+          "Range": "119.5 to 124.5",
+          "Division": "46°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3292",
+          "Spec": "47 F 35 F Kinematic Viscosity 137.5 to 142.5 0.1°F Hg Total 410 10",
+          "ASTM No": "47F",
+          "Range": "137.5 to 142.5",
+          "Division": "47°F",
+          "Fill": "Hg",
+          "Length (mm)": "410",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3293",
+          "Spec": "48 F 90 F Kinematic Viscosity 177.5 to 182.5 0.1°F Hg Total 300 10",
+          "ASTM No": "48F",
+          "Range": "177.5 to 182.5",
+          "Division": "48°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3294",
+          "Spec": "50 F — Gas Calorimeter Inlet 54 to 101 0.1°F Hg Total 463 10",
+          "ASTM No": "50F",
+          "Range": "54 to 101",
+          "Division": "50°F",
+          "Fill": "Hg",
+          "Length (mm)": "463",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3148",
+          "Spec": "54 F 18 F Congealing Point 68 to 213 0.5°F Hg Total 305 10",
+          "ASTM No": "54F",
+          "Range": "68 to 213",
+          "Division": "54°F",
+          "Fill": "Hg",
+          "Length (mm)": "305",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3297",
+          "Spec": "56 F — Bomb Calorimeter 66 to 95 0.05°F Hg Total 570 10",
+          "ASTM No": "56F",
+          "Range": "66 to 95",
+          "Division": "56°F",
+          "Fill": "Hg",
+          "Length (mm)": "570",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3149",
+          "Spec": "57 F — Tag Closed Tester, Low Range -4 to 122 1°F Hg 57 282 10",
+          "ASTM No": "57F",
+          "Application": "Tag Closed Tester, Low Range",
+          "Range": "-4 to 122",
+          "Division": "57°F",
+          "Fill": "Hg",
+          "Length (mm)": "282",
+          "Pack": "10",
+          "Price List 2024-25": 1500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3150",
+          "Spec": "58 F — Tank -30 to 120 1°F Hg Total 300 10",
+          "ASTM No": "58F",
+          "Application": "Tank",
+          "Range": "-30 to 120",
+          "Division": "58°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 1400.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3151",
+          "Spec": "59 F — Tank 0 to 180 1°F Hg Total 300 10",
+          "ASTM No": "59F",
+          "Range": "0 to 180",
+          "Division": "59°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 1400.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3152",
+          "Spec": "60 F — Tank 170 to 500 2°F Hg Total 300 10",
+          "ASTM No": "60F",
+          "Range": "170 to 500",
+          "Division": "60°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3153",
+          "Spec": "61 F — Petrolatum Melting Point 90 to 260 0.5°F Hg 79 375 10",
+          "ASTM No": "61F",
+          "Range": "90 to 260",
+          "Division": "61°F",
+          "Fill": "Hg",
+          "Length (mm)": "375",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3154",
+          "Spec": "62 F — Precision -36 to 35 0.2°F Hg Total 374 10",
+          "ASTM No": "62F",
+          "Application": "Precision",
+          "Range": "-36 to 35",
+          "Division": "62°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3155",
+          "Spec": "63 F — Precision 18 to 89 0.2°F Hg Total 374 10",
+          "ASTM No": "63F",
+          "Range": "18 to 89",
+          "Division": "63°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3156",
+          "Spec": "64 F — Precision 77 to 131 0.2°F Hg Total 374 10 1600.00Cat. No.Pack",
+          "ASTM No": "64F",
+          "Range": "77 to 131",
+          "Division": "64°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Product Name": "IP/ASTM Glass Thermometers"
+        }
+      ]
+    },
+    {
+      "category": "Ip/Astm Glass Thermometers",
+      "title": "IP/ASTM Glass Thermometers",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Immersion",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3157",
+          "Spec": "65 F — Precision 122 to 176 0.2°F Hg Total 374 10",
+          "ASTM No": "65F",
+          "Range": "122 to 176",
+          "Division": "65°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1400.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3158",
+          "Spec": "66 F — Precision 167 to 221 0.2°F Hg Total 374 10",
+          "ASTM No": "66F",
+          "Range": "167 to 221",
+          "Division": "66°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1400.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3159",
+          "Spec": "67 F — Precision 203 to 311 0.5°F Hg Total 374 10",
+          "ASTM No": "67F",
+          "Range": "203 to 311",
+          "Division": "67°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1400.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3160",
+          "Spec": "68 F — Precision 293 to 401 0.5°F Hg Total 374 10",
+          "ASTM No": "68F",
+          "Range": "293 to 401",
+          "Division": "68°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3161",
+          "Spec": "69 F — Precision 383 to 581 1°F Hg Total 374 10",
+          "ASTM No": "69F",
+          "Range": "383 to 581",
+          "Division": "69°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3162",
+          "Spec": "70 F — Precision 563 to 761 1°F Hg Total 374 10",
+          "ASTM No": "70F",
+          "Range": "563 to 761",
+          "Division": "70°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 1800.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3163",
+          "Spec": "71 F 72 F Oil in Wax -35 to 70 1°F Hg 76 350 10",
+          "ASTM No": "71F",
+          "Application": "71 F 72 F Oil in Wax",
+          "Range": "-35 to 70",
+          "Division": "71°F",
+          "Fill": "Hg",
+          "Length (mm)": "350",
+          "Pack": "10",
+          "Price List 2024-25": 1400.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3164",
+          "Spec": "72 F 67 F Kinematic Viscosity -2.5 to 2.5 0.1°F Hg Total 300 10",
+          "ASTM No": "72F",
+          "Application": "72 F 67 F Kinematic Viscosity",
+          "Range": "-2.5 to 2.5",
+          "Division": "72°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 1000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3297",
+          "Spec": "73 F 68 F Kinematic Viscosity -42.5 to -37.5 0.1°F Hg-TI Total 300 10",
+          "ASTM No": "73F",
+          "Application": "73 F 68 F Kinematic Viscosity",
+          "Range": "-42.5 to -37.5",
+          "Division": "73°F",
+          "Fill": "Hg",
+          "Immersion": "TI",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 3500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3298",
+          "Spec": "74 F 69 F Kinematic Viscosity -67.5 to -62.5 0.1°F Hg-TI Total 300 10",
+          "ASTM No": "74F",
+          "Application": "74 F 69 F Kinematic Viscosity",
+          "Range": "-67.5 to -62.5",
+          "Division": "74°F",
+          "Fill": "Hg",
+          "Immersion": "TI",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 3500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3164",
+          "Spec": "82 F — Fuel Rating Engine 0 to 220 2°F Hg 30 159 10",
+          "ASTM No": "82F",
+          "Range": "0 to 220",
+          "Division": "82°F",
+          "Fill": "Hg",
+          "Length (mm)": "159",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3165",
+          "Spec": "83 F — Fuel Rating Air-Low 60 to 160 1°F Hg 40 168 10",
+          "ASTM No": "83F",
+          "Application": "Fuel Rating Air",
+          "Range": "60 to 160",
+          "Division": "83°F",
+          "Fill": "Hg",
+          "Length (mm)": "168",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3166",
+          "Spec": "84 F — Fuel Rating, Orifice Tank 75 to 175 1°F Hg 249 378 10",
+          "ASTM No": "84F",
+          "Range": "75 to 175",
+          "Division": "84°F",
+          "Fill": "Hg",
+          "Length (mm)": "378",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3167",
+          "Spec": "85 F — Fuel Rating, Surge 100 to 300 2°F Hg 181 305 10",
+          "ASTM No": "85F",
+          "Range": "100 to 300",
+          "Division": "85°F",
+          "Fill": "Hg",
+          "Length (mm)": "305",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3168",
+          "Spec": "86 F — Fuel Rating, Mix. 200 to 350 2°F Hg 35 164 10",
+          "ASTM No": "86F",
+          "Range": "200 to 350",
+          "Division": "86°F",
+          "Fill": "Hg",
+          "Length (mm)": "164",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3169",
+          "Spec": "87 F — Fuel Rating Coolant 300 to 400 1°F Hg 40 169 10",
+          "ASTM No": "87F",
+          "Range": "300 to 400",
+          "Division": "87°F",
+          "Fill": "Hg",
+          "Length (mm)": "169",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3170",
+          "Spec": "88 F — Vegetable Oil Flash 50 to 392 2°F Hg 57 282 10",
+          "ASTM No": "88F",
+          "Range": "50 to 392",
+          "Division": "88°F",
+          "Fill": "Hg",
+          "Length (mm)": "282",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3179",
+          "Spec": "97 F — Tank 0 to 120 1°F Hg Total 300 10 2000.00Pack",
+          "ASTM No": "97F",
+          "Range": "0 to 120",
+          "Division": "97°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Product Name": "IP/ASTM Glass Thermometers"
+        }
+      ]
+    },
+    {
+      "category": "Ip/Astm Glass Thermometers",
+      "title": "IP/ASTM Glass Thermometers",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Immersion",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3180",
+          "Spec": "98 F — Tank 60 to 180 1°F Hg Total 300 10",
+          "ASTM No": "98F",
+          "Range": "60 to 180",
+          "Division": "98°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3306",
+          "Spec": "99 F — Weathering Test -58 to 41 0.5°F Hg-TI 35 299 10",
+          "ASTM No": "99F",
+          "Application": "Weathering Test",
+          "Range": "-58 to 41",
+          "Division": "99°F",
+          "Fill": "Hg",
+          "Immersion": "TI",
+          "Length (mm)": "299",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3309",
+          "Spec": "110 F — Kinematic Viscosity 272.5 to 277.5 0.1°F Hg — 300 10",
+          "ASTM No": "110F",
+          "Range": "272.5 to 277.5",
+          "Division": "110°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3190",
+          "Spec": "113 F 89 F Wide Range 30 to 350 0.1°F — — 400 10",
+          "ASTM No": "113F",
+          "Range": "30 to 350",
+          "Division": "113°F",
+          "Length (mm)": "400",
+          "Pack": "10",
+          "Price List 2024-25": 1600.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3315",
+          "Spec": "119 F — Freezing Point -37 to -22 0.2°F Hg — 415 10",
+          "ASTM No": "119F",
+          "Application": "Freezing Point",
+          "Range": "-37 to -22",
+          "Division": "119°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 3500.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3319",
+          "Spec": "126 F 71 F Kinematic Viscosity -17.5 to -12.5 0.1°F Hg — 300 10",
+          "ASTM No": "126F",
+          "Application": "126 F 71 F Kinematic Viscosity",
+          "Range": "-17.5 to -12.5",
+          "Division": "126°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3321",
+          "Spec": "128 F 33 F Kinematic Viscosity 29.5 to 34.5 0.1°F Hg — 300 10",
+          "ASTM No": "128F",
+          "Range": "29.5 to 34.5",
+          "Division": "128°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3322",
+          "Spec": "129 F 36 F Kinematic Viscosity 197.5 to 202.5 0.1°F Hg — 300 10",
+          "ASTM No": "129F",
+          "Range": "197.5 to 202.5",
+          "Division": "129°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3323",
+          "Spec": "130 F — Tank 20 to 220 1°F Hg — 300 10",
+          "ASTM No": "130F",
+          "Range": "20 to 220",
+          "Division": "130°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 1800.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3197",
+          "Spec": "135 F — Fuel Rating Air-High 100 to 200 1°F Hg — 168 10",
+          "ASTM No": "135F",
+          "Application": "Fuel Rating Air",
+          "Range": "100 to 200",
+          "Division": "135°F",
+          "Fill": "Hg",
+          "Length (mm)": "168",
+          "Pack": "10",
+          "Price List 2024-25": 1800.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        },
+        {
+          "Product Code": "F3198",
+          "Spec": "136 F — Aviation Fuel Density -5 to 140 0.5°F Hg — 285 10",
+          "ASTM No": "136F",
+          "Application": "Aviation Fuel Density",
+          "Range": "-5 to 140",
+          "Division": "136°F",
+          "Fill": "Hg",
+          "Length (mm)": "285",
+          "Pack": "10",
+          "Price List 2024-25": 1800.0,
+          "Product Name": "IP/ASTM Glass Thermometers"
+        }
+      ]
+    },
+    {
+      "category": "Ip/Astm Glass Thermometers",
+      "title": "IP/ASTM Glass Thermometers, with NABL Certificate",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3110C",
+          "Spec": "1 F — Partial Immersion 0 to 302 2°F Hg 76 317 10",
+          "Range": "0 to 302",
+          "Division": "1°F",
+          "Fill": "Hg",
+          "Length (mm)": "317",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3111C",
+          "Spec": "2 F 62 F Partial Immersion 20 to 580 2°F Hg 76 385 10",
+          "ASTM No": "62F",
+          "Range": "20 to 580",
+          "Division": "2°F",
+          "Fill": "Hg",
+          "Length (mm)": "385",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3112C",
+          "Spec": "3 F 73 F Partial Immersion 20 to 760 2°F Hg 76 410 10",
+          "ASTM No": "73F",
+          "Range": "20 to 760",
+          "Division": "3°F",
+          "Fill": "Hg",
+          "Length (mm)": "410",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3113C",
+          "Spec": "5 F 1 F Cloud and Pour -36 to 120 2°F Hg 108 225 10",
+          "Application": "5 F 1 F Cloud and Pour",
+          "Range": "-36 to 120",
+          "Division": "5°F",
+          "Fill": "Hg",
+          "Length (mm)": "225",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3114C",
+          "Spec": "6 F 2 F Low Cloud and Pour -112 to 70 2°F Toluene 76 225 10",
+          "Application": "6 F 2 F Low Cloud and Pour",
+          "Range": "-112 to 70",
+          "Division": "6°F",
+          "Length (mm)": "225",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3115C",
+          "Spec": "7 F — Low Distillation 30 to 580 2°F Hg Total 380 10",
+          "Range": "30 to 580",
+          "Division": "7°F",
+          "Fill": "Hg",
+          "Length (mm)": "380",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3116C",
+          "Spec": "8 F — High Distillation 30 to 760 2°F Hg Total 380 10",
+          "Range": "30 to 760",
+          "Division": "8°F",
+          "Fill": "Hg",
+          "Length (mm)": "380",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3117C",
+          "Spec": "9 F 15 F Low-Pensky-Martens 20 to 230 1°F Hg 57 285 10",
+          "ASTM No": "15F",
+          "Application": "9 F 15 F Low",
+          "Range": "20 to 230",
+          "Division": "9°F",
+          "Fill": "Hg",
+          "Length (mm)": "285",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3118C",
+          "Spec": "10 F 16 F High-Pensky-Martens 200 to 700 5°F Hg 57 285 10",
+          "ASTM No": "10F",
+          "Application": "10 F 16 F High",
+          "Range": "200 to 700",
+          "Division": "10°F",
+          "Fill": "Hg",
+          "Length (mm)": "285",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3119C",
+          "Spec": "11 F 28 F Cleveland Open Flash 20 to 760 5°F Hg 25 305 10",
+          "ASTM No": "11F",
+          "Range": "20 to 760",
+          "Division": "11°F",
+          "Fill": "Hg",
+          "Length (mm)": "305",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3120C",
+          "Spec": "12 F 64 F Density-Wide Range -5 to 215 0.5°F Hg Total 415 10",
+          "ASTM No": "12F",
+          "Application": "12 F 64 F Density",
+          "Range": "-5 to 215",
+          "Division": "12°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3122C",
+          "Spec": "14 F 17 F Wax Melting Point 100 to 180 0.2°F Hg 79 370 10",
+          "ASTM No": "14F",
+          "Range": "100 to 180",
+          "Division": "14°F",
+          "Fill": "Hg",
+          "Length (mm)": "370",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3123C",
+          "Spec": "15 F — Low Softening Point 30 to 180 0.5°F Hg Total 390 10",
+          "ASTM No": "15F",
+          "Range": "30 to 180",
+          "Division": "15°F",
+          "Fill": "Hg",
+          "Length (mm)": "390",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3124C",
+          "Spec": "16 F — High Softening Point 85 to 392 1°F Hg Total 390 10",
+          "ASTM No": "16F",
+          "Range": "85 to 392",
+          "Division": "16°F",
+          "Fill": "Hg",
+          "Length (mm)": "390",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3125C",
+          "Spec": "17 F — Saybolt Viscosity 66 to 80 0.2°F Hg Total 270 10",
+          "ASTM No": "17F",
+          "Range": "66 to 80",
+          "Division": "17°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3126C",
+          "Spec": "18 F 23 F Reid Vapor Pressure 94 to 108 0.2°F Hg Total 270 10",
+          "ASTM No": "18F",
+          "Range": "94 to 108",
+          "Division": "18°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3127C",
+          "Spec": "19 F — Saybolt Viscosity 120 to 134 0.2°F Hg Total 270 10",
+          "ASTM No": "19F",
+          "Range": "120 to 134",
+          "Division": "19°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3128C",
+          "Spec": "20 F — Saybolt Viscosity 134 to 148 0.2°F Hg Total 270 10",
+          "ASTM No": "20F",
+          "Range": "134 to 148",
+          "Division": "20°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3129C",
+          "Spec": "21 F — Saybolt Viscosity 174 to 188 0.2°F Hg Total 270 10",
+          "ASTM No": "21F",
+          "Range": "174 to 188",
+          "Division": "21°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3130C",
+          "Spec": "22 F 24 F Oxidation Stability 204 to 218 0.2°F Hg Total 270 10",
+          "ASTM No": "22F",
+          "Range": "204 to 218",
+          "Division": "22°F",
+          "Fill": "Hg",
+          "Length (mm)": "270",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3285C",
+          "Spec": "28 F 31 F Kinematic Viscosity 97.5 to 102.5 0.1°F Hg Total 300 10",
+          "ASTM No": "28F",
+          "Range": "97.5 to 102.5",
+          "Division": "28°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        },
+        {
+          "Product Code": "F3286C",
+          "Spec": "29 F 34 F Kinematic Viscosity 127.5 to 132.5 0.1°F Hg Total 300 10",
+          "ASTM No": "29F",
+          "Range": "127.5 to 132.5",
+          "Division": "29°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "IP/ASTM Glass Thermometers, with NABL Certificate"
+        }
+      ]
+    },
+    {
+      "category": "Oflength",
+      "title": "ofLength",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3136C",
+          "Spec": "33 F — Low Aniline Point -36.5 to 107.5 0.5°F Hg 50 415 10",
+          "ASTM No": "33F",
+          "Application": "Low Aniline Point",
+          "Range": "-36.5 to 107.5",
+          "Division": "33°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3137C",
+          "Spec": "34 F — Medium Aniline Point 77 to 221 0.5°F Hg 50 415 10",
+          "ASTM No": "34F",
+          "Range": "77 to 221",
+          "Division": "34°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3138C",
+          "Spec": "35 F — High Aniline Point 194 to 338 0.5°F Hg 50 415 10",
+          "ASTM No": "35F",
+          "Range": "194 to 338",
+          "Division": "35°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3139C",
+          "Spec": "36 C — Titer Test -2 to 68 0.2°C Hg 45 400 10",
+          "Application": "Titer Test",
+          "Range": "-2 to 68",
+          "Division": "36°C",
+          "Fill": "Hg",
+          "Length (mm)": "400",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3288C",
+          "Spec": "43 F 65 F Kinematic Viscosity -61 to -29 0.2°F Hg-TL Total 410 10",
+          "ASTM No": "43F",
+          "Application": "43 F 65 F Kinematic Viscosity",
+          "Range": "-61 to -29",
+          "Division": "43°F",
+          "Fill": "Hg",
+          "Length (mm)": "410",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3289C",
+          "Spec": "44 F 29 F Kinematic Viscosity 66.5 to 71.5 0.1°F Hg Total 300 10",
+          "ASTM No": "44F",
+          "Range": "66.5 to 71.5",
+          "Division": "44°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3290C",
+          "Spec": "45 F 30 F Kinematic Viscosity 74.5 to 79.5 0.1°F Hg Total 300 10",
+          "ASTM No": "45F",
+          "Range": "74.5 to 79.5",
+          "Division": "45°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3291C",
+          "Spec": "46 F 66 F Kinematic Viscosity 119.5 to 124.5 0.1°F Hg Total 300 10",
+          "ASTM No": "46F",
+          "Range": "119.5 to 124.5",
+          "Division": "46°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3292C",
+          "Spec": "47 F 35 F Kinematic Viscosity 137.5 to 142.5 0.1°F Hg Total 410 10",
+          "ASTM No": "47F",
+          "Range": "137.5 to 142.5",
+          "Division": "47°F",
+          "Fill": "Hg",
+          "Length (mm)": "410",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3293C",
+          "Spec": "48 F 90 F Kinematic Viscosity 177.5 to 182.5 0.1°F Hg Total 300 10",
+          "ASTM No": "48F",
+          "Range": "177.5 to 182.5",
+          "Division": "48°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3294C",
+          "Spec": "50 F — Gas Calorimeter Inlet 54 to 101 0.1°F Hg Total 463 10",
+          "ASTM No": "50F",
+          "Range": "54 to 101",
+          "Division": "50°F",
+          "Fill": "Hg",
+          "Length (mm)": "463",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3148C",
+          "Spec": "54 F 18 F Congealing Point 68 to 213 0.5°F Hg Total 305 10",
+          "ASTM No": "54F",
+          "Range": "68 to 213",
+          "Division": "54°F",
+          "Fill": "Hg",
+          "Length (mm)": "305",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3297C",
+          "Spec": "56 F — Bomb Calorimeter 66 to 95 0.05°F Hg Total 570 10",
+          "ASTM No": "56F",
+          "Range": "66 to 95",
+          "Division": "56°F",
+          "Fill": "Hg",
+          "Length (mm)": "570",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3149C",
+          "Spec": "57 F — Tag Closed Tester, Low Range -4 to 122 1°F Hg 57 282 10",
+          "ASTM No": "57F",
+          "Application": "Tag Closed Tester, Low Range",
+          "Range": "-4 to 122",
+          "Division": "57°F",
+          "Fill": "Hg",
+          "Length (mm)": "282",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3150C",
+          "Spec": "58 F — Tank -30 to 120 1°F Hg Total 300 10",
+          "ASTM No": "58F",
+          "Application": "Tank",
+          "Range": "-30 to 120",
+          "Division": "58°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3151C",
+          "Spec": "59 F — Tank 0 to 180 1°F Hg Total 300 10",
+          "ASTM No": "59F",
+          "Range": "0 to 180",
+          "Division": "59°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3152C",
+          "Spec": "60 F — Tank 170 to 500 2°F Hg Total 300 10",
+          "ASTM No": "60F",
+          "Range": "170 to 500",
+          "Division": "60°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3153C",
+          "Spec": "61 F — Petrolatum Melting Point 90 to 260 0.5°F Hg 79 375 10",
+          "ASTM No": "61F",
+          "Range": "90 to 260",
+          "Division": "61°F",
+          "Fill": "Hg",
+          "Length (mm)": "375",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3154C",
+          "Spec": "62 F — Precision -36 to 35 0.2°F Hg Total 374 10",
+          "ASTM No": "62F",
+          "Application": "Precision",
+          "Range": "-36 to 35",
+          "Division": "62°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3155C",
+          "Spec": "63 F — Precision 18 to 89 0.2°F Hg Total 374 10",
+          "ASTM No": "63F",
+          "Range": "18 to 89",
+          "Division": "63°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3156C",
+          "Spec": "64 F — Precision 77 to 131 0.2°F Hg Total 374 10 2000.00IP/ASTM Glass Thermometers, with NABL Certificate",
+          "ASTM No": "64F",
+          "Range": "77 to 131",
+          "Division": "64°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Product Name": "ofLength"
+        }
+      ]
+    },
+    {
+      "category": "Oflength",
+      "title": "ofLength",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Immersion",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3157C",
+          "Spec": "65 F — Precision 122 to 176 0.2°F Hg Total 374 10",
+          "ASTM No": "65F",
+          "Range": "122 to 176",
+          "Division": "65°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3158C",
+          "Spec": "66 F — Precision 167 to 221 0.2°F Hg Total 374 10",
+          "ASTM No": "66F",
+          "Range": "167 to 221",
+          "Division": "66°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3159C",
+          "Spec": "67 F — Precision 203 to 311 0.5°F Hg Total 374 10",
+          "ASTM No": "67F",
+          "Range": "203 to 311",
+          "Division": "67°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3160C",
+          "Spec": "68 F — Precision 293 to 401 0.5°F Hg Total 374 10",
+          "ASTM No": "68F",
+          "Range": "293 to 401",
+          "Division": "68°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3161C",
+          "Spec": "69 F — Precision 383 to 581 1°F Hg Total 374 10",
+          "ASTM No": "69F",
+          "Range": "383 to 581",
+          "Division": "69°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3162C",
+          "Spec": "70 F — Precision 563 to 761 1°F Hg Total 374 10",
+          "ASTM No": "70F",
+          "Range": "563 to 761",
+          "Division": "70°F",
+          "Fill": "Hg",
+          "Length (mm)": "374",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3163C",
+          "Spec": "71 F 72 F Oil in Wax -35 to 70 1°F Hg 76 350 10",
+          "ASTM No": "71F",
+          "Application": "71 F 72 F Oil in Wax",
+          "Range": "-35 to 70",
+          "Division": "71°F",
+          "Fill": "Hg",
+          "Length (mm)": "350",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3164C",
+          "Spec": "72 F 67 F Kinematic Viscosity -2.5 to 2.5 0.1°F Hg Total 300 10",
+          "ASTM No": "72F",
+          "Application": "72 F 67 F Kinematic Viscosity",
+          "Range": "-2.5 to 2.5",
+          "Division": "72°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3297C",
+          "Spec": "73 F 68 F Kinematic Viscosity -42.5 to -37.5 0.1°F Hg-TI Total 300 10",
+          "ASTM No": "73F",
+          "Application": "73 F 68 F Kinematic Viscosity",
+          "Range": "-42.5 to -37.5",
+          "Division": "73°F",
+          "Fill": "Hg",
+          "Immersion": "TI",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3298C",
+          "Spec": "74 F 69 F Kinematic Viscosity -67.5 to -62.5 0.1°F Hg-TI Total 300 10",
+          "ASTM No": "74F",
+          "Application": "74 F 69 F Kinematic Viscosity",
+          "Range": "-67.5 to -62.5",
+          "Division": "74°F",
+          "Fill": "Hg",
+          "Immersion": "TI",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3164C",
+          "Spec": "82 F — Fuel Rating Engine 0 to 220 2°F Hg 30 159 10",
+          "ASTM No": "82F",
+          "Range": "0 to 220",
+          "Division": "82°F",
+          "Fill": "Hg",
+          "Length (mm)": "159",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3165C",
+          "Spec": "83 F — Fuel Rating Air-Low 60 to 160 1°F Hg 40 168 10",
+          "ASTM No": "83F",
+          "Application": "Fuel Rating Air",
+          "Range": "60 to 160",
+          "Division": "83°F",
+          "Fill": "Hg",
+          "Length (mm)": "168",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3166C",
+          "Spec": "84 F — Fuel Rating, Orifice Tank 75 to 175 1°F Hg 249 378 10",
+          "ASTM No": "84F",
+          "Range": "75 to 175",
+          "Division": "84°F",
+          "Fill": "Hg",
+          "Length (mm)": "378",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3167C",
+          "Spec": "85 F — Fuel Rating, Surge 100 to 300 2°F Hg 181 305 10",
+          "ASTM No": "85F",
+          "Range": "100 to 300",
+          "Division": "85°F",
+          "Fill": "Hg",
+          "Length (mm)": "305",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3168C",
+          "Spec": "86 F — Fuel Rating, Mix. 200 to 350 2°F Hg 35 164 10",
+          "ASTM No": "86F",
+          "Range": "200 to 350",
+          "Division": "86°F",
+          "Fill": "Hg",
+          "Length (mm)": "164",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3169C",
+          "Spec": "87 F — Fuel Rating Coolant 300 to 400 1°F Hg 40 169 10",
+          "ASTM No": "87F",
+          "Range": "300 to 400",
+          "Division": "87°F",
+          "Fill": "Hg",
+          "Length (mm)": "169",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3170C",
+          "Spec": "88 F — Vegetable Oil Flash 50 to 392 2°F Hg 57 282 10",
+          "ASTM No": "88F",
+          "Range": "50 to 392",
+          "Division": "88°F",
+          "Fill": "Hg",
+          "Length (mm)": "282",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3179C",
+          "Spec": "97 F — Tank 0 to 120 1°F Hg Total 300 10 2000.00IP/ASTM Glass Thermometers, with NABL Certificate",
+          "ASTM No": "97F",
+          "Range": "0 to 120",
+          "Division": "97°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Product Name": "ofLength"
+        }
+      ]
+    },
+    {
+      "category": "Oflength",
+      "title": "ofLength",
+      "description": "",
+      "_tableHeaders": [
+        "ASTM No",
+        "Application",
+        "Division",
+        "Fill",
+        "Immersion",
+        "Length (mm)",
+        "Pack",
+        "Price List 2024-25",
+        "Product Code",
+        "Product Name",
+        "Range",
+        "Spec"
+      ],
+      "variants": [
+        {
+          "Product Code": "F3180C",
+          "Spec": "98 F — Tank 60 to 180 1°F Hg Total 300 10",
+          "ASTM No": "98F",
+          "Range": "60 to 180",
+          "Division": "98°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3306C",
+          "Spec": "99 F — Weathering Test -58 to 41 0.5°F Hg-TI 35 299 10",
+          "ASTM No": "99F",
+          "Application": "Weathering Test",
+          "Range": "-58 to 41",
+          "Division": "99°F",
+          "Fill": "Hg",
+          "Immersion": "TI",
+          "Length (mm)": "299",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3309C",
+          "Spec": "110 F — Kinematic Viscosity 272.5 to 277.5 0.1°F Hg — 300 10",
+          "ASTM No": "110F",
+          "Range": "272.5 to 277.5",
+          "Division": "110°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3190C",
+          "Spec": "113 F 89 F Wide Range 30 to 350 0.1°F — — 400 10",
+          "ASTM No": "113F",
+          "Range": "30 to 350",
+          "Division": "113°F",
+          "Length (mm)": "400",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3315C",
+          "Spec": "119 F — Freezing Point -37 to -22 0.2°F Hg — 415 10",
+          "ASTM No": "119F",
+          "Application": "Freezing Point",
+          "Range": "-37 to -22",
+          "Division": "119°F",
+          "Fill": "Hg",
+          "Length (mm)": "415",
+          "Pack": "10",
+          "Price List 2024-25": 5000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3319C",
+          "Spec": "126 F 71 F Kinematic Viscosity -17.5 to -12.5 0.1°F Hg — 300 10",
+          "ASTM No": "126F",
+          "Application": "126 F 71 F Kinematic Viscosity",
+          "Range": "-17.5 to -12.5",
+          "Division": "126°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3321C",
+          "Spec": "128 F 33 F Kinematic Viscosity 29.5 to 34.5 0.1°F Hg — 300 10",
+          "ASTM No": "128F",
+          "Range": "29.5 to 34.5",
+          "Division": "128°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3322C",
+          "Spec": "129 F 36 F Kinematic Viscosity 197.5 to 202.5 0.1°F Hg — 300 10",
+          "ASTM No": "129F",
+          "Range": "197.5 to 202.5",
+          "Division": "129°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 4000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3323C",
+          "Spec": "130 F — Tank 20 to 220 1°F Hg — 300 10",
+          "ASTM No": "130F",
+          "Range": "20 to 220",
+          "Division": "130°F",
+          "Fill": "Hg",
+          "Length (mm)": "300",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3197C",
+          "Spec": "135 F — Fuel Rating Air-High 100 to 200 1°F Hg — 168 10",
+          "ASTM No": "135F",
+          "Application": "Fuel Rating Air",
+          "Range": "100 to 200",
+          "Division": "135°F",
+          "Fill": "Hg",
+          "Length (mm)": "168",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        },
+        {
+          "Product Code": "F3198C",
+          "Spec": "136 F — Aviation Fuel Density -5 to 140 0.5°F Hg — 285 10",
+          "ASTM No": "136F",
+          "Application": "Aviation Fuel Density",
+          "Range": "-5 to 140",
+          "Division": "136°F",
+          "Fill": "Hg",
+          "Length (mm)": "285",
+          "Pack": "10",
+          "Price List 2024-25": 2000.0,
+          "Product Name": "ofLength"
+        }
+      ]
+    }
+  ]
+}
