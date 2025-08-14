@@ -10,7 +10,15 @@ import {
   Biohazard
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import brandDiscounts from "@/lib/brandDiscounts"
+import omsonsDataRaw from "@/lib/omsons_products.json"
+
+// derive Omsons product count from the JSON (supports { products: [] } or plain [])
+const omsonsData: any = (omsonsDataRaw as any)
+const omsonsCount =
+  Array.isArray(omsonsData?.products) ? omsonsData.products.length :
+  Array.isArray(omsonsData) ? omsonsData.length : 0
 
 const laboratoryBrands = [
   {
@@ -59,7 +67,17 @@ const laboratoryBrands = [
     icon: Biohazard,
     productCount: "5000+",
     specialties: ["Culture Media", "Prepared Plates", "Microbiological Tools", "Cell Biology"],
-    href: "/brand/himedia", // 🔧 updated here
+    href: "/brand/himedia",
+  },
+  // NEW: Omsons Glassware
+  {
+    name: "Omsons Glassware",
+    description: "ISO/IEC certified lab glassware – Price List 2024–25",
+    icon: FlaskConical,
+    productCount: String(omsonsCount || "—"),
+    specialties: ["Laboratory Glassware", "Volumetrics", "Measuring Cylinders", "Adapters & Joints"],
+    href: "/brand/omsons",
+    isNew: true,
   },
 ]
 
@@ -76,11 +94,35 @@ export default function LaboratorySuppliesPage() {
           </p>
         </div>
 
+        {/* Omsons banner */}
+        <div className="mb-10">
+          <div className="relative overflow-hidden rounded-xl ring-1 ring-slate-200">
+            <Image
+              src="/images/brands/omsons/banner.jpg"
+              alt="Omsons Glassware"
+              width={1600}
+              height={500}
+              className="w-full h-56 md:h-72 object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/30" />
+            <div className="absolute inset-0 flex items-center justify-between px-6">
+              <div className="text-white">
+                <h2 className="text-2xl md:text-3xl font-bold">Omsons Glassware</h2>
+                <p className="text-sm md:text-base opacity-90">Now available in Laboratory Supplies</p>
+              </div>
+              <Button asChild variant="secondary" className="bg-white/90 text-slate-900 hover:bg-white">
+                <Link href="/brand/omsons">Explore Omsons</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
         {/* Brands Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {laboratoryBrands.map((brand) => {
             const IconComponent = brand.icon
-            const discount = brandDiscounts[brand.name] || 0
+            const discount = (brandDiscounts as any)[brand.name] || 0
             return (
               <Card
                 key={brand.name}
@@ -97,6 +139,9 @@ export default function LaboratorySuppliesPage() {
                         <Badge className="bg-green-100 text-green-800 text-xs font-medium">
                           {discount}% OFF
                         </Badge>
+                      )}
+                      {"isNew" in brand && (brand as any).isNew && (
+                        <Badge className="bg-amber-100 text-amber-800 text-[10px]">NEW</Badge>
                       )}
                     </div>
                   </div>
