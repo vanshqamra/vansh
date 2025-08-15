@@ -17,7 +17,7 @@ import whatmanData from "@/lib/whatman_products.json"
 import himediaData from "@/lib/himedia_products_grouped"
 import { commercialChemicals as bulkProducts } from "@/lib/data"
 
-// ✅ NEW imports for searchability
+// NEW: add Avarice + Omsons sources
 import avariceProductsRaw from "@/lib/avarice_products.json"
 import omsonsDataRaw from "@/lib/omsons_products.json"
 
@@ -57,7 +57,6 @@ function QuotationBuilderInner() {
   // — State & Refs —
   const [clientName, setClientName] = useState("")
   const [clientEmail, setClientEmail] = useState("")
-
   const [items, setItems] = useState<QuotationItem[]>([])
   const [transport, setTransport] = useState(0)
   const [form, setForm] = useState({
@@ -70,9 +69,7 @@ function QuotationBuilderInner() {
     discount: "",
     gst: "",
   })
-  const [filtered, setFiltered] = useState<FlatProduct[]>([])
-
-  // (existing code uses this – define it safely)
+  const [filtered, setFiltered] = useState<FlatProduct[]>([]) // kept as-is (used by your click-out handler)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // — Load from Past Quotation —
@@ -106,16 +103,16 @@ function QuotationBuilderInner() {
     })()
   }, [quoteId])
 
-  const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
+  const asArray = (x: any) => (Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : [])
+  const clean = (s: any) => (typeof s === "string" ? s.replace(/[\u2028\u2029]/g, "").trim() : s ?? "")
   const toPrice = (v: any): number => {
     if (typeof v === "number" && Number.isFinite(v)) return v
     if (v == null) return 0
     const n = Number(String(v).replace(/[^\d.]/g, ""))
     return Number.isFinite(n) ? n : 0
   }
-  const clean = (s: any) => typeof s === "string" ? s.replace(/[\u2028\u2029]/g, "").trim() : (s ?? "")
 
-  // — Flatten all catalogs into one array once —
+  // — Flatten catalogs once —
   const allProducts = useMemo<FlatProduct[]>(() => {
     const all: FlatProduct[] = []
 
@@ -198,12 +195,11 @@ function QuotationBuilderInner() {
       console.warn("Whatman parse error:", e)
     }
 
-    // ✅ HiMedia — handle BOTH shapes: nested (header_sections/sub_sections/products) OR flat (products)
+    // HiMedia (nested or flat)
     try {
       const src: any = (himediaData as any)?.default ?? himediaData
       if (Array.isArray(src)) {
         src.forEach((grp: any) => {
-          // Nested structure
           if (Array.isArray(grp?.header_sections)) {
             grp.header_sections.forEach((header: any) => {
               ;(header?.sub_sections || []).forEach((sub: any) => {
@@ -235,9 +231,7 @@ function QuotationBuilderInner() {
                 })
               })
             })
-          }
-          // Flat grouped structure
-          else if (Array.isArray(grp?.products)) {
+          } else if (Array.isArray(grp?.products)) {
             const groupName =
               clean(grp?.sub_section) ||
               clean(grp?.section) ||
@@ -277,7 +271,7 @@ function QuotationBuilderInner() {
       console.warn("HiMedia parse error:", e)
     }
 
-    // ✅ Avarice — flatten product.variants
+    // Avarice (product.variants)
     try {
       const arr: any[] = asArray(avariceProductsRaw)
       arr.forEach((p: any) => {
@@ -301,7 +295,7 @@ function QuotationBuilderInner() {
       console.warn("Avarice parse error:", e)
     }
 
-    // ✅ Omsons — sections with table_headers + variants
+    // Omsons (catalog sections)
     try {
       const src: any = (omsonsDataRaw as any)?.default ?? omsonsDataRaw
       const sections: any[] = Array.isArray(src?.catalog) ? src.catalog : []
@@ -348,7 +342,20 @@ function QuotationBuilderInner() {
     return all
   }, [])
 
-  // — Close dropdown when clicking outside —
+  // ✅ Pass display-friendly records to ProductSearchInput:
+  //    productName includes brand so queries like "benzene avarice" match,
+  //    and the dropdown visibly shows the brand.
+  const displayProducts = useMemo(
+    () =>
+      allProducts.map((p) => ({
+        ...p,
+        _baseName: p.productName,                                  // preserve original for selection
+        productName: `${p.productName}${p.brand ? ` — ${p.brand}` : ""}`, // label in dropdown
+      })),
+    [allProducts]
+  )
+
+  // (debug log preserved)
   useEffect(() => {
     console.log(
       "Totals:",
@@ -358,7 +365,7 @@ function QuotationBuilderInner() {
     )
   }, [allProducts])
 
-  // Existing effect for closing dropdown when clicking outside
+  // Close dropdown when clicking outside (kept)
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -369,27 +376,29 @@ function QuotationBuilderInner() {
     return () => document.removeEventListener("mousedown", onClick)
   }, [])
 
-  // — Search handler —
+  // — Smart local filter (token-based) kept for your internal dropdown if used elsewhere —
   const handleSearch = (q: string) => {
     setForm((f) => ({ ...f, productName: q }))
     if (!q) return setFiltered([])
-    const lower = q.toLowerCase()
+    const tokens = q.toLowerCase().trim().split(/\s+/).filter(Boolean)
     setFiltered(
-      allProducts.filter((p) =>
-        `${p.productName} ${p.code} ${p.packSize}`.toLowerCase().includes(lower)
-      )
+      allProducts.filter((p) => {
+        const hay = `${p.productName} ${p.code} ${p.packSize} ${p.brand}`.toLowerCase()
+        return tokens.every((t) => hay.includes(t))
+      })
     )
   }
 
   // — When user selects one result —
-  const handleSelect = (p: FlatProduct) => {
+  const handleSelect = (p: any) => {
+    // p._baseName is the original productName without the " — Brand" postfix
     setForm({
-      productName: p.productName,
+      productName: `${(p._baseName ?? p.productName).replace(/\s+—\s+.+$/, "")} [${p.code}]`,
       productCode: p.code,
       brand: p.brand,
       packSize: p.packSize,
       quantity: "",
-      price: p.price.toString(),
+      price: p.price ? String(p.price) : "",
       discount: "",
       gst: "",
     })
@@ -534,25 +543,13 @@ function QuotationBuilderInner() {
       <Card className="mb-6">
         <CardHeader><CardTitle>Add Product to Quotation</CardTitle></CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-7 gap-4 relative">
-          {/* Search (reusable component with arrow keys) */}
           <div className="md:col-span-3">
             <Label>Search Product</Label>
             <ProductSearchInput
-              products={allProducts as any}
+              products={displayProducts as any}                 // ✅ brand shown in dropdown label
               value={form.productName}
               onChange={(text) => setForm((f) => ({ ...f, productName: text }))}
-              onSelect={(p) => {
-                setForm({
-                  productName: `${p.productName} [${p.code}]`,
-                  productCode: p.code,
-                  brand: p.brand,
-                  packSize: p.packSize,
-                  quantity: "",
-                  price: p.price ? String(p.price) : "",
-                  discount: "",
-                  gst: "",
-                })
-              }}
+              onSelect={handleSelect}                           // ✅ uses _baseName so form stays clean
               placeholder="Search product…"
             />
           </div>
@@ -627,7 +624,9 @@ function QuotationBuilderInner() {
                     <td className="text-center">{i.discount}%</td>
                     <td className="text-center">{i.gst}%</td>
                     <td className="text-center">{i.hsnCode || "—"}</td>
-                    <td className="text-center">₹{(i.price * i.quantity * (1 - i.discount / 100) * (1 + i.gst / 100)).toFixed(2)}</td>
+                    <td className="text-center">
+                      ₹{(i.price * i.quantity * (1 - i.discount / 100) * (i.gst / 100 + 1)).toFixed(2)}
+                    </td>
                     <td className="text-right">
                       <Button variant="ghost" size="sm" onClick={() => removeItem(i.id)}>Remove</Button>
                     </td>
