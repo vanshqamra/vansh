@@ -356,9 +356,7 @@ function SearchResults() {
     e.preventDefault()
     triggerSearch(searchQuery)
   }
-
-  const { addItem, isLoaded } = useCart()
-  const { toast } = useToast()
+  
 
   const handleAddToCart = (product: any) => {
     if (!isLoaded) {
