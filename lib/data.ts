@@ -135,3 +135,11 @@ export const labSupplyBrands = {
     categories: ["Culture Media", "Prepared Plates", "Microbiological Tools", "Cell Biology"],
   },
 }
+ avarice: {
+    key: "avarice",
+    name: "Avarice",
+    slug: "avarice",
+    description: "Avarice laboratory chemicals and reagents",
+    supportsAddToCart: true,
+  },
+}
