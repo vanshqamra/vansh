@@ -79,7 +79,7 @@ if (existing?.id) {
 
   return {
     success:
-      "Registration updated. Your account is pending admin approval.",
+      "Registration done. Kindly check your email for verification.",
   }
 }
 
@@ -118,6 +118,6 @@ if (existing?.id) {
 
   return {
     success:
-      "Registration submitted. Please verify your email if prompted; an admin will approve your account shortly.",
+      "Registration done. Please verify your email if prompted.",
   }
 }
