@@ -314,54 +314,53 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   }
 
   /* ---------------- Qualigens ---------------- */
-else if (brandKey === "qualigens") {
-  let qualigensProducts: any[] = []
-  try {
-    const raw: any = (qualigensProductsRaw as any).default || qualigensProductsRaw
-    qualigensProducts = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : []
-  } catch {
-    notFound()
-  }
+  else if (brandKey === "qualigens") {
+    let qualigensProducts: any[] = []
+    try {
+      const raw: any = (qualigensProductsRaw as any).default || qualigensProductsRaw
+      qualigensProducts = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : []
+    } catch {
+      notFound()
+    }
 
-  const toPORIfZero = (v: any): number | string => {
-    if (v == null) return "POR"
-    const s = String(v).trim()
-    if (!s) return "POR"
-    // treat any numeric <= 0 as POR (handles "0", "0.00", 0, etc.)
-    const n = Number(s.replace(/[^\d.]/g, ""))
-    if (Number.isFinite(n) && n > 0) return n
-    return "POR"
-  }
+    const toPORIfZero = (v: any): number | string => {
+      if (v == null) return "POR"
+      const s = String(v).trim()
+      if (!s) return "POR"
+      // treat any numeric <= 0 as POR (handles "0", "0.00", 0, etc.)
+      const n = Number(s.replace(/[^\d.]/g, ""))
+      if (Number.isFinite(n) && n > 0) return n
+      return "POR"
+    }
 
-  const filtered = qualigensProducts.filter((p) =>
-    Object.values(p).some((v) =>
-      String(v).toLowerCase().includes(String(searchQuery).toLowerCase())
+    const filtered = qualigensProducts.filter((p) =>
+      Object.values(p).some((v) =>
+        String(v).toLowerCase().includes(String(searchQuery).toLowerCase())
+      )
     )
-  )
 
-  pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
-  const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
+    pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
+    const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
 
-  grouped = [
-    {
-      category: "Qualigens",
-      title: "Qualigens Products",
-      description: "",
-      _tableHeaders: ["Product Code", "CAS No", "Product Name", "Pack Size", "Packing", "Price", "HSN Code"],
-      variants: paginated.map((p) => ({
-        "Product Code": p["Product Code"] || "",
-        "CAS No": p["CAS No"] || "",
-        "Product Name": p["Product Name"] || "",
-        "Pack Size": p["Pack Size"] || "",
-        Packing: p["Packing"] || "",
-        // ⬇️ convert 0-ish to "POR", keep positive numbers as numbers
-        Price: toPORIfZero(p["Price"]),
-        "HSN Code": p["HSN Code"] || "",
-      })),
-    },
-  ]
-}
-
+    grouped = [
+      {
+        category: "Qualigens",
+        title: "Qualigens Products",
+        description: "",
+        _tableHeaders: ["Product Code", "CAS No", "Product Name", "Pack Size", "Packing", "Price", "HSN Code"],
+        variants: paginated.map((p) => ({
+          "Product Code": p["Product Code"] || "",
+          "CAS No": p["CAS No"] || "",
+          "Product Name": p["Product Name"] || "",
+          "Pack Size": p["Pack Size"] || "",
+          Packing: p["Packing"] || "",
+          // ⬇️ convert 0-ish to "POR", keep positive numbers as numbers
+          Price: toPORIfZero(p["Price"]),
+          "HSN Code": p["HSN Code"] || "",
+        })),
+      },
+    ]
+  }
 
   /* ---------------- Omsons ---------------- */
   else if (brandKey === "omsons") {
@@ -524,6 +523,20 @@ else if (brandKey === "qualigens") {
       (group?._priceKey ? row[group._priceKey] : undefined)
       ?? firstNonEmpty(row, priceKeys())
     const priceNum = parsePriceToNumber(dynPrice)
+    const rawStr = dynPrice == null ? "" : String(dynPrice).trim()
+    const isQualigensPOR =
+      brandKey === "qualigens" && (
+        /por/i.test(rawStr) || !Number.isFinite(priceNum) || priceNum <= 0
+      )
+
+    // 🔒 Prevent adding free Qualigens (POR) items
+    if (isQualigensPOR) {
+      toast({
+        title: "Price on Request",
+        description: `${friendlyName}${codeVal ? ` (${codeVal})` : ""} • POR`,
+      })
+      return
+    }
 
     const safeNameKey = normalizeKey(friendlyName).slice(0, 32)
     const id = `${brandKey}-${codeVal || safeNameKey || "item"}`
@@ -546,7 +559,7 @@ else if (brandKey === "qualigens") {
       image: null,
     })
 
-    const priceMsg = priceNum > 0 ? inr(priceNum) : "Price on request"
+    const priceMsg = inr(priceNum)
     toast({ title: "Added to Cart", description: `${friendlyName}${codeVal ? ` (${codeVal})` : ""} • ${priceMsg}` })
   }
 
@@ -576,9 +589,19 @@ else if (brandKey === "qualigens") {
                 </thead>
                 <tbody>
                   {group.variants.map((row: any, ri: number) => {
-                    const rawForPrice = (group._priceKey ? row[group._priceKey] : undefined) ?? firstNonEmpty(row, priceKeys())
+                    const rawForPrice =
+                      (group._priceKey ? row[group._priceKey] : undefined) ??
+                      firstNonEmpty(row, priceKeys())
                     const priceNum = parsePriceToNumber(rawForPrice)
-                    const displayPrice = priceNum > 0 ? inr(priceNum) : "Price on request"
+                    const rawStr = rawForPrice == null ? "" : String(rawForPrice).trim()
+                    const isQualigensPOR =
+                      brandKey === "qualigens" && (
+                        /por/i.test(rawStr) || !Number.isFinite(priceNum) || priceNum <= 0
+                      )
+
+                    const displayPrice = isQualigensPOR
+                      ? "POR"
+                      : (priceNum > 0 ? inr(priceNum) : "Price on request")
 
                     return (
                       <tr key={ri} className="border-b last:border-none">
@@ -586,9 +609,14 @@ else if (brandKey === "qualigens") {
                           const cell = row[h]
                           if (/price|rate/i.test(h)) {
                             const n = parsePriceToNumber(cell)
+                            const s = (cell == null ? "" : String(cell)).trim()
+                            const isPORCell =
+                              brandKey === "qualigens" && (
+                                /por/i.test(s) || !Number.isFinite(n) || n <= 0
+                              )
                             return (
                               <td key={`${ri}-${h}`} className="py-2 px-3">
-                                {n > 0 ? inr(n) : (String(cell ?? "").trim() || "—")}
+                                {isPORCell ? "POR" : (n > 0 ? inr(n) : (s || "—"))}
                               </td>
                             )
                           }
