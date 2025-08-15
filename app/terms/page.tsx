@@ -87,7 +87,7 @@ export default function TermsPage() {
                 <h4 className="font-semibold mb-2">Delivery Terms</h4>
                 <ul className="list-disc list-inside space-y-1 text-gray-700">
                   <li>Delivery timelines are estimates and may vary based on product availability and location</li>
-                  <li>Free shipping is provided on all orders within India</li>
+                  <li>Shipping charges will be applied as applicable</li>
                   <li>Special handling charges may apply for hazardous materials</li>
                   <li>Delivery address changes after order confirmation may incur additional charges</li>
                 </ul>
@@ -226,9 +226,9 @@ export default function TermsPage() {
           <div className="text-center text-gray-600 space-y-2">
             <p className="font-semibold">Contact Information</p>
             <p>Chemical Corporation</p>
-            <p>Email: legal@chemicalcorp.com</p>
-            <p>Phone: +91-9876543210</p>
-            <p>Address: 123 Industrial Area, Mumbai, Maharashtra 400001</p>
+            <p>Email: chemicalcorporation.ldh@gmail.com</p>
+            <p>Phone: +91-9417250691</p>
+            <p>Address: CHEMICAL CORPORATION, GOKAL ROAD, LUDHIANA 141008</p>
           </div>
         </div>
       </div>
