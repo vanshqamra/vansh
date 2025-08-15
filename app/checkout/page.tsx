@@ -408,7 +408,7 @@ export default function CheckoutPage() {
                       <Input id="company" name="company" required disabled={addressMode === "saved"} />
                     </div>
                     <div>
-                      <Label htmlFor="gst">GST (optional)</Label>
+                      <Label htmlFor="gst">GST (Orders with hazardous chemicals won't be accepted without verifying GST details)</Label>
                       <Input id="gst" name="gst" placeholder="e.g., 22AAAAA0000A1Z5" disabled={addressMode === "saved"} />
                     </div>
                   </div>
