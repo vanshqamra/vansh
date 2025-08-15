@@ -568,7 +568,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Shipping</span>
-                      <span className="text-green-600">Free</span>
+                      <span className="text-green-600">As Applicable</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tax (18%)</span>
