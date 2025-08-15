@@ -3,28 +3,7 @@
   "price_list": "2024-25",
   "catalog": [
     {
-      "product_name": "Single Channel Variable Volume Micropipettes",
-      "spec_header": "• Fully autoclavable at 121°C and 15psi for a duration of 10–15 minutes.",
-      "table_headers": [
-        "Adjust Volume Easily with Plunger",
-        "Col10",
-        "Work with a Good Grip",
-        "Col13",
-        "Store Safely with a Holder"
-      ],
-      "variants": [
-        {
-          "Adjust Volume Easily with Plunger": "Set the Volume with\nPerfection",
-          "Col10": "Use Various Tips with\na Universal Tipcone",
-          "Work with a Good Grip": "",
-          "Col13": "Eject Tips Easily with\na Tip Ejector",
-          "Store Safely with a Holder": ""
-        }
-      ],
-      "hsn": ""
-    },
-    {
-      "product_name": "Eject Tips Easily with\na Tip Ejector",
+      "product_name": "Single Channel Variable Volume Micropipettes, Fully autoclavable at 121°C and 15psi for a duration of 10–15 minutes.",
       "spec_header": "",
       "table_headers": [
         "Cat. No..",
