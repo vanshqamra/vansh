@@ -66,15 +66,22 @@ function firstNonEmpty(obj: Record<string, any>, keys: string[]) {
   }
   return ""
 }
+
+/** NEW: detect POR exactly, case-insensitive */
+function isPOR(v: any) {
+  return /^por$/i.test(String(v ?? "").trim())
+}
+
+/** Parse numeric price safely; DO NOT convert POR to 0 */
 function parsePriceToNumber(v: any): number {
   if (typeof v === "number") return Number.isFinite(v) ? v : 0
   if (v == null) return 0
-  // treat POR as non-numeric → 0 so we can detect and override in UI
   const s = String(v).trim()
-  if (/^por$/i.test(s)) return 0
+  // ← removed the old line that converted POR to 0
   const n = Number(s.replace(/[^\d.]/g, ""))
   return Number.isFinite(n) ? n : 0
 }
+
 function inr(n: number) {
   return n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
 }
@@ -97,11 +104,6 @@ function guessDynamicPriceKey(headers: string[]): string | null {
   return cands[0] ?? null
 }
 const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
-const isZeroish = (v: any) => {
-  const s = v == null ? "" : String(v).trim()
-  const n = Number(String(s).replace(/[^\d.]/g, ""))
-  return !Number.isFinite(n) || n <= 0 || /^por$/i.test(s)
-}
 
 /* ---------------- Preprocess Borosil ---------------- */
 const normalizedBorosil: any[] = (Array.isArray(borosilProducts) ? borosilProducts : [])?.map(
@@ -278,9 +280,11 @@ export default function BrandPage({ params }: { params: { brandName: string } })
 
   /* ---------------- Avarice ---------------- */
   else if (brandKey === "avarice") {
+    // Expected shape: [{ product_code, cas_no, product_name, variants: [{ packing, hsn_code, price_inr }] }]
     const raw = (avariceProductsRaw as any).default || avariceProductsRaw
     const products: any[] = asArray(raw)
 
+    // Flatten products → rows
     const allRows = products.flatMap((p: any) =>
       (p?.variants || []).map((v: any) => ({
         "Product Code": p?.product_code || "",
@@ -292,6 +296,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       }))
     )
 
+    // Search
     const q = String(searchQuery ?? "").trim().toLowerCase()
     const filtered = q
       ? allRows.filter((row) =>
@@ -299,6 +304,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
         )
       : allRows
 
+    // Pagination
     const pageCountCalc = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     pageCount = pageCountCalc
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
@@ -324,12 +330,6 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       notFound()
     }
 
-    const toPORIfZero = (v: any): number | string => {
-      if (isZeroish(v)) return "POR"
-      const n = Number(String(v).replace(/[^\d.]/g, ""))
-      return Number.isFinite(n) && n > 0 ? n : "POR"
-    }
-
     const filtered = qualigensProducts.filter((p) =>
       Object.values(p).some((v) =>
         String(v).toLowerCase().includes(String(searchQuery).toLowerCase())
@@ -351,7 +351,8 @@ export default function BrandPage({ params }: { params: { brandName: string } })
           "Product Name": p["Product Name"] || "",
           "Pack Size": p["Pack Size"] || "",
           Packing: p["Packing"] || "",
-          Price: toPORIfZero(p["Price"]), // enforce POR at data level
+          // keep raw "POR" as-is from JSON
+          Price: p["Price"],
           "HSN Code": p["HSN Code"] || "",
         })),
       },
@@ -519,11 +520,9 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       (group?._priceKey ? row[group._priceKey] : undefined)
       ?? firstNonEmpty(row, priceKeys())
     const priceNum = parsePriceToNumber(dynPrice)
-    const isQualigensPOR =
-      brandKey === "qualigens" && isZeroish(dynPrice)
 
-    // 🔒 Prevent adding free Qualigens (POR) items
-    if (isQualigensPOR) {
+    // 🔒 Never add POR items (any brand)
+    if (isPOR(dynPrice) || priceNum <= 0) {
       toast({
         title: "Price on Request",
         description: `${friendlyName}${codeVal ? ` (${codeVal})` : ""} • POR`,
@@ -587,8 +586,8 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                       firstNonEmpty(row, priceKeys())
                     const priceNum = parsePriceToNumber(rawForPrice)
 
-                    const isQualigensPOR = brandKey === "qualigens" && isZeroish(rawForPrice)
-                    const displayPrice = isQualigensPOR
+                    // Show POR in Action chip if raw is POR
+                    const displayPrice = isPOR(rawForPrice)
                       ? "POR"
                       : (priceNum > 0 ? inr(priceNum) : "Price on request")
 
@@ -597,11 +596,14 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                         {group._tableHeaders.map((h: string) => {
                           const cell = row[h]
                           if (/price|rate/i.test(h)) {
+                            // Explicitly show POR in price cells
+                            if (isPOR(cell)) {
+                              return <td key={`${ri}-${h}`} className="py-2 px-3">POR</td>
+                            }
                             const n = parsePriceToNumber(cell)
-                            const cellIsPOR = brandKey === "qualigens" && isZeroish(cell)
                             return (
                               <td key={`${ri}-${h}`} className="py-2 px-3">
-                                {cellIsPOR ? "POR" : (n > 0 ? inr(n) : (String(cell ?? "").trim() || "—"))}
+                                {n > 0 ? inr(n) : (String(cell ?? "").trim() || "—")}
                               </td>
                             )
                           }
