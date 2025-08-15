@@ -4,7 +4,8 @@ export interface QualigensProduct {
   name: string
   packSize: string
   material: string
-  price: number
+  /** Raw price value – may be numeric or the literal string "POR" */
+  price: number | string
   hsn: string
   category?: string
   purity?: string
@@ -31,9 +32,11 @@ export const qualigensProducts: QualigensProduct[] = raw.map((item) => {
   const price =
     typeof priceValue === "number"
       ? priceValue
-      : typeof priceValue === "string" && /^\d/.test(priceValue)
-        ? Number(priceValue)
-        : 0
+      : typeof priceValue === "string" && /^por$/i.test(priceValue.trim())
+        ? "POR"
+        : typeof priceValue === "string" && /^\d/.test(priceValue)
+          ? Number(priceValue.replace(/[^\d.]/g, ""))
+          : 0
   const hsn = item["HSN Code"] || ""
 
   return {
