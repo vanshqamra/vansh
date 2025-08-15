@@ -28,6 +28,7 @@ const norm = (s: any) => (s == null ? "" : String(s)).toLowerCase()
 const stripNonAlnum = (s: any) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "")
 const inr = (n: number) => n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
 const isNum = (v: any) => typeof v === "number" && Number.isFinite(v)
+const isPOR = (v: any) => /^por$/i.test(String(v ?? "").trim())
 const toNum = (v: any): number | null => {
   if (typeof v === "number") return Number.isFinite(v) ? v : null
   if (v == null) return null
@@ -364,14 +365,19 @@ function SearchResults() {
       return
     }
     try {
+      if (isPOR(product.price)) {
+        toast({ title: "Price on Request", description: "Price on Request • POR" })
+        return
+      }
       const priceNum = toNum(product.price)
       if (priceNum == null || priceNum <= 0) {
         toast({ title: "Price on request", description: "This item does not have a numeric price.", variant: "default" })
+        return
       }
       addItem({
         id: product.id || product.code || `${product.source}-${Math.random().toString(36).slice(2, 10)}`,
         name: product.name || product.product || product.title,
-        price: priceNum || 0,
+        price: priceNum,
         brand: product.source,
         category: product.category,
       })
@@ -417,7 +423,11 @@ function SearchResults() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedResults.map((product) => {
                 const priceNum = toNum(product.price)
-                const priceDisplay = priceNum != null && priceNum > 0 ? inr(priceNum) : "Price on request"
+                const priceDisplay = isPOR(product.price)
+                  ? "POR"
+                  : priceNum != null && priceNum > 0
+                    ? inr(priceNum)
+                    : "Price on request"
 
                 const specs: {label: string, value: any}[] = Array.isArray(product.specs)
                   ? product.specs.map((s: any) =>

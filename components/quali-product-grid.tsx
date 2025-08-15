@@ -16,7 +16,8 @@ type QualigensProduct = {
   category: string
   packSize: string
   material: string
-  price: number
+  /** Price may be numeric or the literal string "POR" */
+  price: number | string
   purity: string
   brand: string
   hsn: string
@@ -32,6 +33,8 @@ export function QualiProductGrid({ products }: QualiProductGridProps) {
   const productsPerPage = 24
   const { addItem } = useCart()
   const { toast } = useToast()
+
+  const isPOR = (v: any) => /^por$/i.test(String(v ?? "").trim())
 
   const filteredProducts = useMemo(() => {
     if (!products || !Array.isArray(products)) return []
@@ -50,10 +53,15 @@ export function QualiProductGrid({ products }: QualiProductGridProps) {
   const displayedProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage)
 
   const handleAddToCart = (product: QualigensProduct) => {
+    if (isPOR(product.price) || Number(product.price) <= 0) {
+      toast({ title: "Price on Request", description: "Price on Request • POR" })
+      return
+    }
+    const priceNum = typeof product.price === "number" ? product.price : Number(String(product.price).replace(/[^\d.]/g, "")) || 0
     const cartItem = {
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: priceNum,
       brand: "Qualigens",
       category: product.category,
       packSize: product.packSize,
@@ -112,7 +120,9 @@ export function QualiProductGrid({ products }: QualiProductGridProps) {
                 <p>
                   <span className="font-medium">HSN:</span> {product.hsn}
                 </p>
-                <p className="font-semibold text-blue-600">₹{product.price.toLocaleString()}</p>
+                <p className="font-semibold text-blue-600">
+                  {isPOR(product.price) ? "POR" : `₹${Number(product.price).toLocaleString()}`}
+                </p>
               </div>
             </CardContent>
             <CardFooter>
