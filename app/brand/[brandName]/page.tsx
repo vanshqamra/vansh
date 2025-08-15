@@ -314,39 +314,61 @@ export default function BrandPage({ params }: { params: { brandName: string } })
   }
 
   /* ---------------- Qualigens ---------------- */
-  else if (brandKey === "qualigens") {
-    let qualigensProducts: any[] = []
-    try {
-      const raw: any = (qualigensProductsRaw as any).default || qualigensProductsRaw
-      qualigensProducts = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : []
-    } catch {
-      notFound()
-    }
-
-    const filtered = qualigensProducts.filter((p) =>
-      Object.values(p).some((v) => String(v).toLowerCase().includes(String(searchQuery).toLowerCase()))
-    )
-    pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
-    const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
-
-    grouped = [
-      {
-        category: "Qualigens",
-        title: "Qualigens Products",
-        description: "",
-        _tableHeaders: ["Product Code", "CAS No", "Product Name", "Pack Size", "Packing", "Price", "HSN Code"],
-        variants: paginated.map((p) => ({
-          "Product Code": p["Product Code"] || "",
-          "CAS No": p["CAS No"] || "",
-          "Product Name": p["Product Name"] || "",
-          "Pack Size": p["Pack Size"] || "",
-          Packing: p["Packing"] || "",
-          Price: p["Price"] || "",
-          "HSN Code": p["HSN Code"] || "",
-        })),
-      },
-    ]
+else if (brandKey === "qualigens") {
+  let qualigensProducts: any[] = []
+  try {
+    const raw: any = (qualigensProductsRaw as any).default || qualigensProductsRaw
+    qualigensProducts = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : []
+  } catch {
+    notFound()
   }
+
+  // helper: keep POR as text; only keep numeric prices if valid
+  const normalizePrice = (val: any): number | string => {
+    if (val == null) return "POR"
+    const s = String(val).trim()
+    if (!s) return "POR"
+    if (/^por$/i.test(s)) return "POR"
+    const n = Number(s.replace(/[^\d.]/g, ""))
+    return Number.isFinite(n) && n > 0 ? n : "POR"
+  }
+
+  const filtered = qualigensProducts.filter((p) =>
+    Object.values(p).some((v) =>
+      String(v).toLowerCase().includes(String(searchQuery).toLowerCase())
+    )
+  )
+
+  pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
+  const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
+
+  grouped = [
+    {
+      category: "Qualigens",
+      title: "Qualigens Products",
+      description: "",
+      _tableHeaders: [
+        "Product Code",
+        "CAS No",
+        "Product Name",
+        "Pack Size",
+        "Packing",
+        "Price",
+        "HSN Code",
+      ],
+      variants: paginated.map((p) => ({
+        "Product Code": p["Product Code"] || "",
+        "CAS No": p["CAS No"] || "",
+        "Product Name": p["Product Name"] || "",
+        "Pack Size": p["Pack Size"] || "",
+        Packing: p["Packing"] || "",
+        // ⬇️ keep POR as "POR" string; otherwise a clean number
+        Price: normalizePrice(p["Price"]),
+        "HSN Code": p["HSN Code"] || "",
+      })),
+    },
+  ]
+}
 
   /* ---------------- Omsons ---------------- */
   else if (brandKey === "omsons") {
