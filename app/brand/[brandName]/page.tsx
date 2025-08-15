@@ -69,7 +69,7 @@ function firstNonEmpty(obj: Record<string, any>, keys: string[]) {
 function parsePriceToNumber(v: any): number {
   if (typeof v === "number") return Number.isFinite(v) ? v : 0
   if (v == null) return 0
-  // keep POR as 0 (quote-first)
+  // treat POR as non-numeric → 0 so we can detect and override in UI
   const s = String(v).trim()
   if (/^por$/i.test(s)) return 0
   const n = Number(s.replace(/[^\d.]/g, ""))
@@ -97,6 +97,11 @@ function guessDynamicPriceKey(headers: string[]): string | null {
   return cands[0] ?? null
 }
 const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
+const isZeroish = (v: any) => {
+  const s = v == null ? "" : String(v).trim()
+  const n = Number(String(s).replace(/[^\d.]/g, ""))
+  return !Number.isFinite(n) || n <= 0 || /^por$/i.test(s)
+}
 
 /* ---------------- Preprocess Borosil ---------------- */
 const normalizedBorosil: any[] = (Array.isArray(borosilProducts) ? borosilProducts : [])?.map(
@@ -273,11 +278,9 @@ export default function BrandPage({ params }: { params: { brandName: string } })
 
   /* ---------------- Avarice ---------------- */
   else if (brandKey === "avarice") {
-    // Expected shape: [{ product_code, cas_no, product_name, variants: [{ packing, hsn_code, price_inr }] }]
     const raw = (avariceProductsRaw as any).default || avariceProductsRaw
     const products: any[] = asArray(raw)
 
-    // Flatten products → rows
     const allRows = products.flatMap((p: any) =>
       (p?.variants || []).map((v: any) => ({
         "Product Code": p?.product_code || "",
@@ -289,7 +292,6 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       }))
     )
 
-    // Search
     const q = String(searchQuery ?? "").trim().toLowerCase()
     const filtered = q
       ? allRows.filter((row) =>
@@ -297,7 +299,6 @@ export default function BrandPage({ params }: { params: { brandName: string } })
         )
       : allRows
 
-    // Pagination
     const pageCountCalc = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     pageCount = pageCountCalc
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
@@ -324,13 +325,9 @@ export default function BrandPage({ params }: { params: { brandName: string } })
     }
 
     const toPORIfZero = (v: any): number | string => {
-      if (v == null) return "POR"
-      const s = String(v).trim()
-      if (!s) return "POR"
-      // treat any numeric <= 0 as POR (handles "0", "0.00", 0, etc.)
-      const n = Number(s.replace(/[^\d.]/g, ""))
-      if (Number.isFinite(n) && n > 0) return n
-      return "POR"
+      if (isZeroish(v)) return "POR"
+      const n = Number(String(v).replace(/[^\d.]/g, ""))
+      return Number.isFinite(n) && n > 0 ? n : "POR"
     }
 
     const filtered = qualigensProducts.filter((p) =>
@@ -354,8 +351,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
           "Product Name": p["Product Name"] || "",
           "Pack Size": p["Pack Size"] || "",
           Packing: p["Packing"] || "",
-          // ⬇️ convert 0-ish to "POR", keep positive numbers as numbers
-          Price: toPORIfZero(p["Price"]),
+          Price: toPORIfZero(p["Price"]), // enforce POR at data level
           "HSN Code": p["HSN Code"] || "",
         })),
       },
@@ -523,11 +519,8 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       (group?._priceKey ? row[group._priceKey] : undefined)
       ?? firstNonEmpty(row, priceKeys())
     const priceNum = parsePriceToNumber(dynPrice)
-    const rawStr = dynPrice == null ? "" : String(dynPrice).trim()
     const isQualigensPOR =
-      brandKey === "qualigens" && (
-        /por/i.test(rawStr) || !Number.isFinite(priceNum) || priceNum <= 0
-      )
+      brandKey === "qualigens" && isZeroish(dynPrice)
 
     // 🔒 Prevent adding free Qualigens (POR) items
     if (isQualigensPOR) {
@@ -593,12 +586,8 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                       (group._priceKey ? row[group._priceKey] : undefined) ??
                       firstNonEmpty(row, priceKeys())
                     const priceNum = parsePriceToNumber(rawForPrice)
-                    const rawStr = rawForPrice == null ? "" : String(rawForPrice).trim()
-                    const isQualigensPOR =
-                      brandKey === "qualigens" && (
-                        /por/i.test(rawStr) || !Number.isFinite(priceNum) || priceNum <= 0
-                      )
 
+                    const isQualigensPOR = brandKey === "qualigens" && isZeroish(rawForPrice)
                     const displayPrice = isQualigensPOR
                       ? "POR"
                       : (priceNum > 0 ? inr(priceNum) : "Price on request")
@@ -609,14 +598,10 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                           const cell = row[h]
                           if (/price|rate/i.test(h)) {
                             const n = parsePriceToNumber(cell)
-                            const s = (cell == null ? "" : String(cell)).trim()
-                            const isPORCell =
-                              brandKey === "qualigens" && (
-                                /por/i.test(s) || !Number.isFinite(n) || n <= 0
-                              )
+                            const cellIsPOR = brandKey === "qualigens" && isZeroish(cell)
                             return (
                               <td key={`${ri}-${h}`} className="py-2 px-3">
-                                {isPORCell ? "POR" : (n > 0 ? inr(n) : (s || "—"))}
+                                {cellIsPOR ? "POR" : (n > 0 ? inr(n) : (String(cell ?? "").trim() || "—"))}
                               </td>
                             )
                           }
