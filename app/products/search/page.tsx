@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,183 +19,266 @@ import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import whatmanProducts from "@/lib/whatman_products.json"
 import himediaData from "@/lib/himedia_products_grouped"
 
-// ✅ NEW IMPORTS
 import avariceProductsRaw from "@/lib/avarice_products.json"
 import omsonsDataRaw from "@/lib/omsons_products.json"
 
+/* ---------------- Helpers ---------------- */
+const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
+const norm = (s: any) => (s == null ? "" : String(s)).toLowerCase()
+const stripNonAlnum = (s: any) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "")
+const inr = (n: number) => n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
+const isNum = (v: any) => typeof v === "number" && Number.isFinite(v)
+const toNum = (v: any): number | null => {
+  if (typeof v === "number") return Number.isFinite(v) ? v : null
+  if (v == null) return null
+  const s = String(v).trim()
+  if (/^por$/i.test(s)) return null
+  const n = Number(s.replace(/[^\d.]/g, ""))
+  return Number.isFinite(n) ? n : null
+}
+const normalizeKey = (str: string) =>
+  String(str).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
+
+const dedupe = (rows: any[]) => {
+  const seen = new Set<string>()
+  const out: any[] = []
+  for (const r of rows) {
+    const key = [
+      r.source || "",
+      stripNonAlnum(r.code || ""),
+      stripNonAlnum(r.packSize || r.packing || ""),
+      stripNonAlnum(r.name || r.product || r.title || "")
+    ].join("|")
+    if (!seen.has(key)) {
+      seen.add(key)
+      out.push(r)
+    }
+  }
+  return out
+}
+
+// Borosil helpers
+const getBorosilCode = (v: any) => v?.code ?? v?.Code ?? v?.["Product Code"] ?? v?.["Cat No"] ?? ""
+const getBorosilName = (v: any, g: any) =>
+  v?.["Product Name"] || v?.Description || v?.Name || g?.product || g?.title || "Borosil Product"
+
+// Map human headers to row keys (normalized)
+const BOROSIL_HEADER_ALIASES: Record<string, string[]> = {
+  product_code: ["code", "product_code", "cat_no", "cat_no_", "cat_no__", "catalog_no", "catalogue_no", "product code"],
+  "capacity_ml": ["capacity ml", "capacity", "capacity_mL", "capacity_ml"],
+  "graduation_interval_ml": ["graduation interval ml", "interval ml", "graduation_interval_ml", "interval_ml"],
+  "tolerance___ml": ["tolerance + ml", "tolerance ml", "tolerance", "tolerance_ml", "tolerance__ml", "tolerance___ml"],
+  "quantity_per_case": ["quantity per case", "qty/case", "qty_per_case", "quantity_per_case"],
+  "price__piece": ["price /piece", "price", "price_piece", "list price", "price_(rs.)", "rate"],
+}
+const resolveBorosilValue = (v: any, header: string) => {
+  // try as-is
+  if (v?.[header] != null && String(v[header]).trim() !== "") return v[header]
+  // try normalized header
+  const nk = normalizeKey(header)
+  if (v?.[nk] != null && String(v[nk]).trim() !== "") return v[nk]
+  // try alias list
+  const aliasList = BOROSIL_HEADER_ALIASES[nk] || []
+  for (const alias of aliasList) {
+    const cand1 = v?.[alias]
+    const cand2 = v?.[normalizeKey(alias)]
+    if (cand1 != null && String(cand1).trim() !== "") return cand1
+    if (cand2 != null && String(cand2).trim() !== "") return cand2
+  }
+  // final: if header looks like Product Code, return code
+  if (/product\s*code|cat\s*no/i.test(header) && v?.code) return v.code
+  return undefined
+}
+
+/* ---------------- Page ---------------- */
 function SearchResults() {
-  const searchParams = useSearchParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const initialQuery = searchParams.get("q") || ""
+
   const { searchQuery, setSearchQuery } = useSearch()
+  const [displayQuery, setDisplayQuery] = useState(initialQuery)
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const resultsPerPage = 50
+
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
-
-  const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const matchesSearchQuery = (product: any, query: string): boolean => {
-    const normalizedQuery = query.trim().toLowerCase().replace(/[^a-z0-9]/gi, "")
+    const normalizedQuery = stripNonAlnum(query)
     if (!normalizedQuery) return false
-
     const searchFields: string[] = []
-    const collectFields = (obj: any) => {
-      if (typeof obj === "string") {
-        searchFields.push(obj.toLowerCase().replace(/[^a-z0-9]/gi, ""))
-      } else if (typeof obj === "number") {
-        searchFields.push(obj.toString())
-      } else if (Array.isArray(obj)) {
-        obj.forEach(collectFields)
-      } else if (typeof obj === "object" && obj !== null) {
-        Object.values(obj).forEach(collectFields)
-      }
+    const collect = (obj: any) => {
+      if (typeof obj === "string") searchFields.push(stripNonAlnum(obj))
+      else if (typeof obj === "number") searchFields.push(String(obj))
+      else if (Array.isArray(obj)) obj.forEach(collect)
+      else if (obj && typeof obj === "object") Object.values(obj).forEach(collect)
     }
-
-    collectFields(product)
+    collect(product)
     return searchFields.some((field) => field.includes(normalizedQuery))
   }
 
-  const triggerSearch = (query: string) => {
+  const triggerSearch = (rawQuery: string) => {
+    const query = rawQuery || ""
     router.replace(`/products/search?q=${encodeURIComponent(query)}`)
+    setDisplayQuery(query)
+    setSearchQuery("")           // auto-clear input after submit
+    inputRef.current?.blur()
 
-    const qualigensResults = (Array.isArray(qualigensProducts) ? qualigensProducts : qualigensProducts.data || [])
-      .filter((product) => matchesSearchQuery(product, query))
-      .map((product) => ({
-        ...product,
+    /* -------- Build brand results -------- */
+
+    // Qualigens
+    const qualigensArr: any[] = Array.isArray(qualigensProducts) ? qualigensProducts : (qualigensProducts as any)?.data || []
+    const qualigensResults = qualigensArr
+      .filter((p) => matchesSearchQuery(p, query))
+      .map((p) => ({
+        ...p,
         source: "qualigens",
-        name: product["Product Name"],
-        code: product["Product Code"],
-        price: product["Price"]
+        category: "Qualigens",
+        title: "Qualigens",
+        name: p["Product Name"],
+        code: p["Product Code"],
+        price: p["Price"],
       }))
 
+    // Commercial
     const commercialResults = commercialChemicals
-      .filter((product) => matchesSearchQuery(product, query))
-      .map((product) => ({ ...product, source: "commercial" }))
+      .filter((p) => matchesSearchQuery(p, query))
+      .map((p) => ({ ...p, source: "commercial", title: p.category, name: p.name, code: p.code }))
 
+    // Rankem
     const rankemResults = rankemProducts.flatMap((group: any) =>
-      group.variants
+      (group.variants || [])
         .map((variant: any) => {
-          const isStandardFormat = variant["Cat No"] && variant["Description"]
-          const isAlternateFormat = variant["Unnamed: 1"] && variant["Unnamed: 5"]
-
-          if (isStandardFormat) {
+          const isStandard = variant["Cat No"] && variant["Description"]
+          const isAlt = variant["Unnamed: 1"] && variant["Unnamed: 5"]
+          if (isStandard) {
             return {
               ...variant,
-              specs: group.specs_headers?.map((header: string) => variant[header] || "") || [],
-              category: group.category,
-              title: group.title,
-              description: group.description,
-              specs_headers: group.specs_headers,
               source: "rankem",
+              category: "Rankem",
+              title: group.title || "Rankem",
+              description: group.description || "",
+              specs_headers: group.specs_headers,
               name: variant["Description"] || group.title || "—",
               code: variant["Cat No"] || "—",
               price: variant["List Price\n2025(INR)"] || variant["Price"] || "—",
-              packSize: variant["Pack\nSize"] || variant["Packing"] || "—"
+              packSize: variant["Pack\nSize"] || variant["Packing"] || "—",
             }
-          } else if (isAlternateFormat) {
+          } else if (isAlt) {
             const code = variant["Baker Analyzed ACS\nReagent\n(PVC"]?.trim()
             const name = variant["Unnamed: 1"]?.trim()
             const packSize = variant["Unnamed: 3"]?.trim()
             const price = variant["Unnamed: 5"]
-
             if (!name || !code) return null
-
             return {
               ...variant,
-              specs: [],
-              category: group.category,
-              title: group.title,
-              description: group.description,
-              specs_headers: group.specs_headers,
               source: "rankem",
-              name,
-              code,
+              category: "Rankem",
+              title: group.title || "Rankem",
+              description: group.description || "",
+              specs_headers: group.specs_headers,
+              name, code,
               packSize: packSize || "—",
-              price: price || "—"
+              price: price || "—",
             }
           }
           return null
         })
-        .filter((product: any) => product && matchesSearchQuery(product, query))
+        .filter(Boolean)
+        .filter((row: any) => matchesSearchQuery(row, query))
     )
 
+    // Borosil — USE ALIASES to resolve spec values and show group description
     const borosilResults = borosilProducts.flatMap((group: any) => {
-      const groupMatch = (
-        group.title?.toLowerCase().includes(query.toLowerCase()) ||
-        group.category?.toLowerCase().includes(query.toLowerCase()) ||
-        group.product?.toLowerCase().includes(query.toLowerCase()) ||
-        group.description?.toLowerCase().includes(query.toLowerCase())
-      )
+      const title = group.product || group.title || group.category || "Borosil"
+      const description = group.description || ""
+      const headers: string[] = Array.isArray(group.specs_headers) ? group.specs_headers : []
+      const variants: any[] = Array.isArray(group.variants) ? group.variants : []
 
-      const matchedVariants = (group.variants || []).filter((variant: any) => matchesSearchQuery(variant, query))
+      const mapped = variants.map((v: any) => {
+        // compute specs via alias mapping; skip empties
+        const specs = headers
+          .filter((h) => !/price/i.test(h))
+          .map((h) => {
+            const val = resolveBorosilValue(v, h)
+            return { label: h, value: val }
+          })
+          .filter((x) => x.value != null && String(x.value).trim() !== "")
 
-      if (groupMatch || matchedVariants.length > 0) {
-        const variantsToUse = groupMatch && matchedVariants.length === 0 ? group.variants : matchedVariants
-
-        return variantsToUse.map((variant: any) => {
-          const specs = group.specs_headers?.map((header: string) => `${header}: ${variant[header] || "—"}`) || []
-
-          return {
-            ...variant,
-            category: "Borosil",
-            title: group.title,
-            description: group.description,
-            product: group.product,
-            specs_headers: group.specs_headers,
-            specs,
-            source: "borosil",
-          }
-        })
-      }
-      return []
-    })
-
-    const whatmanResults = (whatmanProducts?.variants || [])
-      .filter((variant: any) => matchesSearchQuery(variant, query))
-      .map((variant: any) => {
-        const specs = whatmanProducts.specs_headers?.filter(h => h.toLowerCase() !== "price")
-          .map((header: string) => `${header}: ${variant[header] ?? "—"}`) || []
+        // price: look through alias too
+        const priceCandidates = ["Price", "Price /Piece", "Rate", "List Price", "Price_(Rs.)"]
+        let priceVal: any = undefined
+        for (const h of [ ...priceCandidates, ...headers ]) {
+          const vResolved = resolveBorosilValue(v, h)
+          if (vResolved != null && String(vResolved).trim() !== "") { priceVal = vResolved; break }
+        }
 
         return {
-          ...variant,
-          source: "whatman",
-          name: variant["name"] || variant["Name"] || variant["Code"] || "Whatman Product",
-          code: variant["Code"] || variant["code"] || "",
-          price: variant["Price"] || variant["price"] || "—",
-          description: whatmanProducts.description || "",
-          category: "Whatman",
-          title: whatmanProducts.title || "",
+          ...v,
+          source: "borosil",
+          category: "Borosil",
+          title,
+          description,               // ← renderable now
+          name: getBorosilName(v, group),
+          code: getBorosilCode(v),
+          price: priceVal ?? "—",
           specs,
         }
       })
 
-    const himediaResults = himediaData.flatMap((section: any) =>
-      section.header_sections?.flatMap((header: any) =>
-        header.sub_sections?.flatMap((sub: any) =>
-          sub.products?.filter((product: any) => matchesSearchQuery(product, query)).map((product: any) => ({
+      return mapped.filter((row) => matchesSearchQuery(row, query))
+    })
+
+    // Whatman
+    const whatmanResults = (whatmanProducts?.variants || [])
+      .map((variant: any) => {
+        const specs = (whatmanProducts.specs_headers || [])
+          .filter((h: string) => !/price/i.test(h))
+          .map((h: string) => ({ label: h, value: variant[h] }))
+          .filter((x) => x.value != null && String(x.value).trim() !== "")
+        return {
+          ...variant,
+          source: "whatman",
+          category: "Whatman",
+          title: whatmanProducts.title || "Whatman",
+          description: whatmanProducts.description || "",
+          name: variant["name"] || variant["Name"] || variant["Code"] || "Whatman Product",
+          code: variant["Code"] || variant["code"] || "",
+          price: variant["Price"] || variant["price"] || "—",
+          specs,
+        }
+      })
+      .filter((row: any) => matchesSearchQuery(row, query))
+
+    // HiMedia
+    const himediaResults = (himediaData || []).flatMap((section: any) =>
+      (section.header_sections || []).flatMap((header: any) =>
+        (header.sub_sections || []).flatMap((sub: any) =>
+          (sub.products || []).map((product: any) => ({
             ...product,
-            name: product.name || "HiMedia Product",
-            code: product.code || "—",
-            price: product.rate || "—",
             source: "himedia",
             category: section.main_section,
             title: header.header_section,
             description: sub.sub_section,
+            name: product.name || "HiMedia Product",
+            code: product.code || "—",
+            price: product.rate || "—",
             specs: [
-              `Packing: ${product.packing || "—"}`,
-              `HSN: ${product.hsn || "—"}`,
-              `GST: ${product.gst || "—"}%`
-            ]
+              { label: "Packing", value: product.packing || "" },
+              { label: "HSN", value: product.hsn || "" },
+              { label: "GST", value: product.gst != null ? `${product.gst}%` : "" },
+            ].filter((x) => x.value !== ""),
           }))
         )
       )
-    )
+    ).filter((row: any) => matchesSearchQuery(row, query))
 
-    // ✅ NEW: Avarice — flatten {product, variants[]} to rows
-    const avariceArray: any[] = asArray(avariceProductsRaw)
-    const avariceRows = avariceArray.flatMap((p: any) =>
+    // Avarice
+    const avariceArr: any[] = asArray(avariceProductsRaw)
+    const avariceRows = avariceArr.flatMap((p: any) =>
       (p?.variants || []).map((v: any) => ({
         source: "avarice",
         category: "Avarice",
@@ -203,92 +286,97 @@ function SearchResults() {
         name: p?.product_name || "Avarice Product",
         code: p?.product_code || "",
         price: v?.price_inr ?? "—",
-        description: "",
+        description: "", // (no group description in this dataset)
         specs: [
-          `Packing: ${v?.packing ?? "—"}`,
-          `HSN: ${v?.hsn_code ?? "—"}`,
-          ...(p?.cas_no ? [`CAS: ${p.cas_no}`] : [])
-        ]
+          { label: "Packing", value: v?.packing ?? "" },
+          { label: "HSN", value: v?.hsn_code ?? "" },
+          ...(p?.cas_no ? [{ label: "CAS", value: p.cas_no }] : []),
+        ].filter((x) => x.value !== ""),
       }))
     )
     const avariceResults = avariceRows.filter((row) => matchesSearchQuery(row, query))
 
-    // ✅ NEW: Omsons — sections with table_headers + variants
+    // Omsons — attach section meta BEFORE filtering (enables spec_header/product_name queries)
     const omsonsSections: any[] = Array.isArray((omsonsDataRaw as any)?.catalog) ? (omsonsDataRaw as any).catalog : []
-    const omsonsResults = omsonsSections.flatMap((sec: any) => {
+    const omsonsRows = omsonsSections.flatMap((sec: any) => {
       const title = sec?.product_name || sec?.title || sec?.category || "Omsons"
+      const sectionSpec = sec?.spec_header || ""
       const headers: string[] = Array.isArray(sec?.table_headers) ? sec.table_headers : []
       const priceKey = headers.find((h) => /price|rate/i.test(h)) || "Price"
       const variants: any[] = Array.isArray(sec?.variants) ? sec.variants : []
 
-      return variants
-        .filter((v: any) => matchesSearchQuery(v, query))
-        .map((v: any) => ({
+      return variants.map((v: any) => {
+        const specsList = headers
+          .filter((h) => !/price/i.test(h))
+          .map((h) => ({ label: h, value: v[h] }))
+          .filter((x) => x.value != null && String(x.value).trim() !== "")
+
+        return {
           ...v,
           source: "omsons",
           category: "Omsons",
-          title,
+          title,                     // ← product_name searchable
+          description: sectionSpec,  // ← spec_header searchable
           name: v["Product Name"] || v["Description"] || title || "Omsons Product",
           code: v["Cat. No."] || v["Cat No"] || v["Code"] || v["Product Code"] || "—",
           price: v[priceKey] || v["Price"] || "—",
-          description: sec?.spec_header || "",
-          specs: headers
-            .filter((h) => !/price/i.test(h))
-            .map((h) => `${h}: ${v[h] ?? "—"}`)
-        }))
+          specs: specsList,
+        }
+      })
     })
+    const omsonsResults = omsonsRows.filter((row) => matchesSearchQuery(row, query))
 
-    const combinedResults = [
+    // Combine + DEDUPE
+    const combined = dedupe([
       ...qualigensResults,
       ...commercialResults,
       ...rankemResults,
       ...borosilResults,
       ...whatmanResults,
       ...himediaResults,
-      ...avariceResults,   // ← added
-      ...omsonsResults,    // ← added
-    ]
+      ...avariceResults,
+      ...omsonsResults,
+    ])
 
-    setSearchResults(combinedResults)
+    setSearchResults(combined)
     setCurrentPage(1)
   }
 
+  // bootstrap from ?q
   useEffect(() => {
     if (initialQuery) {
-      setSearchQuery(initialQuery)
+      setDisplayQuery(initialQuery)
+      // keep input filled with initial for first render; clear on next submit
       triggerSearch(initialQuery)
     }
-  }, [initialQuery, setSearchQuery])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuery])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     triggerSearch(searchQuery)
   }
 
+  const { addItem, isLoaded } = useCart()
+  const { toast } = useToast()
+
   const handleAddToCart = (product: any) => {
     if (!isLoaded) {
       toast({ title: "Loading...", description: "Please wait while the cart loads", variant: "destructive" })
       return
     }
-
     try {
-      const price = typeof product.price === "number"
-        ? product.price
-        : Number.parseFloat(product.price?.toString().replace(/[^\d.]/g, ""))
-
-      if (isNaN(price) || price <= 0) {
-        toast({ title: "Invalid Price", description: "Unable to add item with invalid price.", variant: "destructive" })
-        return
+      const priceNum = toNum(product.price)
+      if (priceNum == null || priceNum <= 0) {
+        toast({ title: "Price on request", description: "This item does not have a numeric price.", variant: "default" })
       }
-
       addItem({
-        id: product.id || product.code,
+        id: product.id || product.code || `${product.source}-${Math.random().toString(36).slice(2, 10)}`,
         name: product.name || product.product || product.title,
-        price,
+        price: priceNum || 0,
         brand: product.source,
         category: product.category,
       })
-
       toast({ title: "Added to Cart", description: `${product.name || product.title} has been added to your cart` })
     } catch (error) {
       console.error("Error adding to cart:", error)
@@ -297,11 +385,10 @@ function SearchResults() {
   }
 
   const paginatedResults = searchResults.slice(
-    (currentPage - 1) * resultsPerPage,
-    currentPage * resultsPerPage
+    (currentPage - 1) * 50,
+    currentPage * 50
   )
-
-  const totalPages = Math.ceil(searchResults.length / resultsPerPage)
+  const totalPages = Math.max(1, Math.ceil(searchResults.length / 50))
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -310,8 +397,9 @@ function SearchResults() {
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Search Results</h1>
           <form onSubmit={handleSearch} className="flex gap-4 max-w-md mb-6">
             <Input
+              ref={inputRef}
               placeholder="Search products..."
-              value={searchQuery}
+              value={/* input reflects current entry, clears on submit */ (searchQuery)}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
             />
@@ -319,9 +407,9 @@ function SearchResults() {
               <Search className="h-4 w-4" />
             </Button>
           </form>
-          {searchQuery && (
+          {displayQuery && (
             <p className="text-slate-600 mb-6">
-              Showing {searchResults.length} results for "{searchQuery}"
+              Showing {searchResults.length} results for "<span className="font-medium">{displayQuery}</span>"
             </p>
           )}
         </div>
@@ -329,41 +417,59 @@ function SearchResults() {
         {paginatedResults.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedResults.map((product) => (
-                <Card
-                  key={`${product.source}-${product.id || product.code || Math.random().toString(36).substring(2, 10)}`}
-                  className="hover:shadow-lg transition-shadow"
-                >
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg">{product.name || product.product || product.title}</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{product.source}</Badge>
-                      <Badge variant="outline">{product.category}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 mb-4">
-                      {product.code && <p className="text-sm text-slate-600">Code: {product.code}</p>}
-                      {product.description && <p className="text-sm text-slate-600">{product.description}</p>}
-                      {product.specs?.map((spec: string, idx: number) => (
-                        <p key={idx} className="text-sm text-slate-600">{spec}</p>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-blue-600">
-                        {typeof product.price === "number"
-                          ? `₹${product.price.toLocaleString()}`
-                          : `₹${product.price}`}
-                      </span>
-                      <Button onClick={() => handleAddToCart(product)} disabled={!isLoaded} className="bg-green-600 hover:bg-green-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        {isLoaded ? "Add to Cart" : "Loading..."}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {paginatedResults.map((product) => {
+                const priceNum = toNum(product.price)
+                const priceDisplay = priceNum != null && priceNum > 0 ? inr(priceNum) : "Price on request"
+
+                const specs: {label: string, value: any}[] = Array.isArray(product.specs)
+                  ? product.specs.map((s: any) =>
+                      typeof s === "string"
+                        ? { label: "", value: s }
+                        : { label: s.label ?? "", value: s.value }
+                    ).filter(x => x.value != null && String(x.value).trim() !== "")
+                  : []
+
+                return (
+                  <Card
+                    key={`${product.source}-${product.id || product.code || Math.random().toString(36).substring(2, 10)}`}
+                    className="hover:shadow-lg transition-shadow"
+                  >
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg">
+                        {product.name || product.product || product.title}
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">{product.source}</Badge>
+                        <Badge variant="outline">{product.category}</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 mb-4">
+                        {product.code && <p className="text-sm text-slate-600">Code: {product.code}</p>}
+                        {product.description && <p className="text-sm text-slate-600">{product.description}</p>}
+                        {specs.slice(0, 6).map((s, idx) => (
+                          <p key={idx} className="text-sm text-slate-600">
+                            {s.label ? <><span className="font-medium">{s.label}:</span> {s.value}</> : String(s.value)}
+                          </p>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold text-blue-600">{priceDisplay}</span>
+                        <Button
+                          onClick={() => handleAddToCart(product)}
+                          disabled={!isLoaded}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          {isLoaded ? "Add to Cart" : "Loading..."}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
+
             {totalPages > 1 && (
               <div className="flex justify-center gap-4 mt-8">
                 <Button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>Previous</Button>
@@ -371,7 +477,7 @@ function SearchResults() {
               </div>
             )}
           </>
-        ) : searchQuery ? (
+        ) : displayQuery ? (
           <div className="text-center py-12">
             <Search className="h-24 w-24 text-slate-400 mx-auto mb-6" />
             <h2 className="text-2xl font-bold text-slate-900 mb-4">No products found</h2>
