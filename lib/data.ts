@@ -66,7 +66,7 @@ export const labSupplyBrands = {
     key: "qualigens",
     slug: "qualigens",
     href: "/brands/qualigens",
-    family: "chemicals", // <— added
+    family: "chemicals",
     name: "Qualigens",
     description: "High-quality laboratory chemicals and reagents",
     logo: "/images/logo-qualigens.png",
@@ -76,7 +76,7 @@ export const labSupplyBrands = {
     key: "borosil",
     slug: "borosil",
     href: "/brands/borosil",
-    family: "laboratory-supplies", // <— added
+    family: "laboratory-supplies",
     name: "Borosil",
     description: "Premium laboratory glassware and equipment",
     logo: "/images/logo-borosil.png",
@@ -86,7 +86,7 @@ export const labSupplyBrands = {
     key: "whatman",
     slug: "whatman",
     href: "/brands/whatman",
-    family: "laboratory-supplies", // <— added
+    family: "laboratory-supplies",
     name: "Whatman",
     description: "Filtration and separation products",
     logo: "/images/logo-whatman.png",
@@ -96,7 +96,7 @@ export const labSupplyBrands = {
     key: "rankem",
     slug: "rankem",
     href: "/brands/rankem",
-    family: "chemicals", // <— added
+    family: "chemicals",
     name: "Rankem",
     description: "Analytical and laboratory chemicals",
     logo: "/images/logo-rankem.png",
@@ -106,10 +106,10 @@ export const labSupplyBrands = {
     key: "omsons",
     slug: "omsons",
     href: "/brands/omsons",
-    family: "laboratory-supplies", // used for grouping on the Lab Supplies page
+    family: "laboratory-supplies",
     name: "Omsons Glassware",
     description: "ISO/IEC certified lab glassware – Price List 2024–25",
-    logo: "/images/brands/omsons/logo.png",   // ensure these files exist
+    logo: "/images/brands/omsons/logo.png",
     banner: "/images/brands/omsons/banner.jpg",
     dataPath: "/data/omsons_glassware_2024-25.json",
     isNew: true,
@@ -118,7 +118,7 @@ export const labSupplyBrands = {
     key: "jtbaker",
     slug: "jtbaker",
     href: "/brands/jtbaker",
-    family: "chemicals", // <— added
+    family: "chemicals",
     name: "J.T. Baker",
     description: "High-purity chemicals and solvents",
     logo: "/images/logo-jtbaker.png",
@@ -128,18 +128,20 @@ export const labSupplyBrands = {
     key: "himedia",
     slug: "himedia",
     href: "/brands/himedia",
-    family: "laboratory-supplies", // <— added
+    family: "laboratory-supplies",
     name: "HiMedia",
     description: "Trusted for microbiology, culture media, and diagnostics",
     logo: "/images/logo-himedia.png",
     categories: ["Culture Media", "Prepared Plates", "Microbiological Tools", "Cell Biology"],
   },
-}
- avarice: {
+  avarice: {
     key: "avarice",
-    name: "Avarice",
     slug: "avarice",
+    href: "/brands/avarice",
+    family: "laboratory-supplies", // or "chemicals" depending on your menu
+    name: "Avarice",
     description: "Avarice laboratory chemicals and reagents",
+    logo: "/images/logo-avarice.png", // ensure file exists
     supportsAddToCart: true,
   },
 }
