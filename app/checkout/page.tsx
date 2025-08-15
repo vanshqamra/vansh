@@ -482,21 +482,21 @@ export default function CheckoutPage() {
                       <RadioGroupItem value="bank_transfer" id="bank_transfer" />
                       <Label htmlFor="bank_transfer" className="flex-1">
                         <div className="font-medium">Bank Transfer / NEFT</div>
-                        <div className="text-sm text-gray-600">Payment after order confirmation</div>
+                        <div className="text-sm text-gray-600">Payment details will be sent on mail after order confirmation</div>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 p-4 border rounded-lg">
                       <RadioGroupItem value="credit_terms" id="credit_terms" />
                       <Label htmlFor="credit_terms" className="flex-1">
                         <div className="font-medium">Credit Terms</div>
-                        <div className="text-sm text-gray-600">Net 30 days payment terms</div>
+                        <div className="text-sm text-gray-600">Net 30 days payment terms(only on special approval)</div>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 p-4 border rounded-lg">
                       <RadioGroupItem value="cheque" id="cheque" />
                       <Label htmlFor="cheque" className="flex-1">
                         <div className="font-medium">Cheque Payment</div>
-                        <div className="text-sm text-gray-600">Post-dated cheque on delivery</div>
+                        <div className="text-sm text-gray-600">Post-dated cheque on delivery(only on special approval)</div>
                       </Label>
                     </div>
                   </RadioGroup>
@@ -507,8 +507,7 @@ export default function CheckoutPage() {
                       <div className="text-sm">
                         <div className="font-medium text-blue-900">Payment Security</div>
                         <div className="text-blue-700">
-                          Payment will only be processed after we confirm your order and provide final pricing. No charges
-                          will be made at this stage.
+                          Payment will only be made after we confirm your order and provide final pricing for shipping. 
                         </div>
                       </div>
                     </div>
@@ -530,7 +529,7 @@ export default function CheckoutPage() {
                       <Link href="/terms" className="text-blue-600 hover:underline" target="_blank">
                         Terms and Conditions
                       </Link>{" "}
-                      and understand that payment will only be processed after order confirmation.
+                      and understand that order will be accepted after confirmation.
                     </Label>
                   </div>
                 </CardContent>
@@ -587,7 +586,7 @@ export default function CheckoutPage() {
                   <div className="text-xs text-gray-600 space-y-1">
                     <p>• Final pricing subject to confirmation</p>
                     <p>• Payment only after order approval</p>
-                    <p>• Free shipping included</p>
+                    <p>• Shipping as applicable </p>
                   </div>
 
                   {errorMsg && <p className="text-red-600 text-sm">{errorMsg}</p>}
