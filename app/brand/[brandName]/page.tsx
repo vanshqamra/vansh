@@ -323,14 +323,14 @@ else if (brandKey === "qualigens") {
     notFound()
   }
 
-  // helper: keep POR as text; only keep numeric prices if valid
-  const normalizePrice = (val: any): number | string => {
-    if (val == null) return "POR"
-    const s = String(val).trim()
+  const toPORIfZero = (v: any): number | string => {
+    if (v == null) return "POR"
+    const s = String(v).trim()
     if (!s) return "POR"
-    if (/^por$/i.test(s)) return "POR"
+    // treat any numeric <= 0 as POR (handles "0", "0.00", 0, etc.)
     const n = Number(s.replace(/[^\d.]/g, ""))
-    return Number.isFinite(n) && n > 0 ? n : "POR"
+    if (Number.isFinite(n) && n > 0) return n
+    return "POR"
   }
 
   const filtered = qualigensProducts.filter((p) =>
@@ -347,28 +347,21 @@ else if (brandKey === "qualigens") {
       category: "Qualigens",
       title: "Qualigens Products",
       description: "",
-      _tableHeaders: [
-        "Product Code",
-        "CAS No",
-        "Product Name",
-        "Pack Size",
-        "Packing",
-        "Price",
-        "HSN Code",
-      ],
+      _tableHeaders: ["Product Code", "CAS No", "Product Name", "Pack Size", "Packing", "Price", "HSN Code"],
       variants: paginated.map((p) => ({
         "Product Code": p["Product Code"] || "",
         "CAS No": p["CAS No"] || "",
         "Product Name": p["Product Name"] || "",
         "Pack Size": p["Pack Size"] || "",
         Packing: p["Packing"] || "",
-        // ⬇️ keep POR as "POR" string; otherwise a clean number
-        Price: normalizePrice(p["Price"]),
+        // ⬇️ convert 0-ish to "POR", keep positive numbers as numbers
+        Price: toPORIfZero(p["Price"]),
         "HSN Code": p["HSN Code"] || "",
       })),
     },
   ]
 }
+
 
   /* ---------------- Omsons ---------------- */
   else if (brandKey === "omsons") {
