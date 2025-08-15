@@ -137,7 +137,7 @@ export default function CartPage() {
                 <p className="text-sm text-gray-600">Subtotal: ₹{subtotal.toLocaleString()}</p>
                 {discount > 0 && <p className="text-sm text-green-600">Extra Promo: -₹{discount.toLocaleString()}</p>}
                 <p className="text-sm text-gray-600">
-                  Shipping: <span className="text-green-700">Free</span>
+                  Shipping: <span className="text-green-700">As Applicable</span>
                 </p>
                 <p className="text-sm text-gray-600">GST (18%): ₹{taxAmount.toLocaleString()}</p>
                 <p className="text-lg font-bold mt-1">Total: ₹{finalTotal.toLocaleString()}</p>
