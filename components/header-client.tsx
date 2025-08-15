@@ -54,6 +54,12 @@ export function ClientHeaderBrandDropdown() {
             HiMedia
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/brand/omsons" className="flex items-center">
+            <Image src="/images/brands/omsons/logo.png" alt="Omsons Glassware" width={20} height={20} className="mr-2" />
+            Omsons Glassware
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/products/laboratory-supplies" className="text-blue-600 font-medium">
