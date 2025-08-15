@@ -10,7 +10,6 @@ import {
   Biohazard
 } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import brandDiscounts from "@/lib/brandDiscounts"
 import omsonsDataRaw from "@/lib/omsons_products.json"
 
@@ -69,7 +68,7 @@ const laboratoryBrands = [
     specialties: ["Culture Media", "Prepared Plates", "Microbiological Tools", "Cell Biology"],
     href: "/brand/himedia",
   },
-  // NEW: Omsons Glassware
+  // NEW — Omsons (icon-only, no images)
   {
     name: "Omsons Glassware",
     description: "ISO/IEC certified lab glassware – Price List 2024–25",
@@ -94,31 +93,7 @@ export default function LaboratorySuppliesPage() {
           </p>
         </div>
 
-        {/* Omsons banner */}
-        <div className="mb-10">
-          <div className="relative overflow-hidden rounded-xl ring-1 ring-slate-200">
-            <Image
-              src="/images/brands/omsons/banner.jpg"
-              alt="Omsons Glassware"
-              width={1600}
-              height={500}
-              className="w-full h-56 md:h-72 object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/30" />
-            <div className="absolute inset-0 flex items-center justify-between px-6">
-              <div className="text-white">
-                <h2 className="text-2xl md:text-3xl font-bold">Omsons Glassware</h2>
-                <p className="text-sm md:text-base opacity-90">Now available in Laboratory Supplies</p>
-              </div>
-              <Button asChild variant="secondary" className="bg-white/90 text-slate-900 hover:bg-white">
-                <Link href="/brand/omsons">Explore Omsons</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Brands Grid */}
+        {/* Brands Grid (uniform, icon-only cards) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {laboratoryBrands.map((brand) => {
             const IconComponent = brand.icon
@@ -130,7 +105,9 @@ export default function LaboratorySuppliesPage() {
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <IconComponent className="h-8 w-8 text-blue-600" />
+                    <div className="h-16 w-16 flex items-center justify-center rounded bg-slate-100">
+                      <IconComponent className="h-8 w-8 text-blue-600" />
+                    </div>
                     <div className="flex flex-col items-end gap-1">
                       <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                         {brand.productCount} Products
