@@ -5,10 +5,13 @@ import { notFound } from "next/navigation"
 import { useCart } from "@/app/context/CartContext"
 import { useToast } from "@/hooks/use-toast"
 import { labSupplyBrands } from "@/lib/data"
+
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
+import avariceProductsRaw from "@/lib/avarice_products.json"
 import qualigensProductsRaw from "@/lib/qualigens-products.json"
 import rankemProducts from "@/lib/rankem_products.json"
 import omsonsDataRaw from "@/lib/omsons_products.json"
+
 import { useSearch } from "@/app/context/search-context"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -43,7 +46,7 @@ function nameKeys() {
     "material", "material description", "product_description"
   ]
 }
-function packKeys() { return ["Pack Size", "pack_size", "pack", "packing", "package", "Packsize"] }
+function packKeys() { return ["Pack Size", "pack_size", "pack", "packing", "package", "Packsize", "Packing"] }
 function casKeys() { return ["CAS No", "cas_no", "cas", "cas_number"] }
 function hsnKeys() { return ["HSN Code", "hsn_code", "hsn"] }
 
@@ -66,7 +69,10 @@ function firstNonEmpty(obj: Record<string, any>, keys: string[]) {
 function parsePriceToNumber(v: any): number {
   if (typeof v === "number") return Number.isFinite(v) ? v : 0
   if (v == null) return 0
-  const n = Number(String(v).replace(/[^\d.]/g, ""))
+  // keep POR as 0 (quote-first)
+  const s = String(v).trim()
+  if (/^por$/i.test(s)) return 0
+  const n = Number(s.replace(/[^\d.]/g, ""))
   return Number.isFinite(n) ? n : 0
 }
 function inr(n: number) {
@@ -77,12 +83,11 @@ function makeFriendlyName(row: any, group: any, code: string) {
   if (fromRow) return fromRow
   const fallback = stripTablePrefix(group?.title) || stripTablePrefix(group?.category)
   if (fallback) return code ? `${fallback} (${code})` : fallback
-  return code || "Rankem product"
+  return code || "Product"
 }
 /** Guess a dynamic price column like “Price List 2025”, “PRICE 2025 (Rs.)”, etc. */
 function guessDynamicPriceKey(headers: string[]): string | null {
   const cands = headers.filter((h) => /price|rate/i.test(h))
-  // prefer explicit year
   const withYear = cands.find((h) => /2025|24-25|2024-25|fy\s*2025/i.test(h.toLowerCase()))
   if (withYear) return withYear
   const withList = cands.find((h) => /list/i.test(h))
@@ -91,6 +96,7 @@ function guessDynamicPriceKey(headers: string[]): string | null {
   if (withRs) return withRs
   return cands[0] ?? null
 }
+const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
 
 /* ---------------- Preprocess Borosil ---------------- */
 const normalizedBorosil: any[] = (Array.isArray(borosilProducts) ? borosilProducts : [])?.map(
@@ -200,7 +206,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       groupMeta.specs_headers.forEach((header: string) => {
         const nk = normalizeKey(header)
         if (codeKeys().some((k) => nk === normalizeKey(k)) || priceKeys().some((k) => nk === normalizeKey(k))) return
-        const val = variant[header] ?? variant[nk] ?? (header in variant ? variant[header] : undefined)
+        const val = (variant as any)[header] ?? (variant as any)[nk] ?? ((header in (variant as any)) ? (variant as any)[header] : undefined)
         if (isNum(val) || hasText(val)) displaySpecs.add(header)
       })
     })
@@ -220,7 +226,7 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       }
       ;[...displaySpecs].forEach((header) => {
         const nk = normalizeKey(header)
-        const v = variant[header] ?? variant[nk] ?? (header in variant ? variant[header] : undefined)
+        const v = (variant as any)[header] ?? (variant as any)[nk] ?? ((header in (variant as any)) ? (variant as any)[header] : undefined)
         row[header] = isNum(v) ? v : hasText(v) ? safeStr(v) : "—"
       })
       if (showPrice) {
@@ -264,6 +270,49 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       })
       .filter(Boolean) as any[]
   }
+
+  /* ---------------- Avarice ---------------- */
+  else if (brandKey === "avarice") {
+    // Expected shape: [{ product_code, cas_no, product_name, variants: [{ packing, hsn_code, price_inr }] }]
+    const raw = (avariceProductsRaw as any).default || avariceProductsRaw
+    const products: any[] = asArray(raw)
+
+    // Flatten products → rows
+    const allRows = products.flatMap((p: any) =>
+      (p?.variants || []).map((v: any) => ({
+        "Product Code": p?.product_code || "",
+        "CAS No": p?.cas_no || "",
+        "Product Name": p?.product_name || "",
+        "Packing": v?.packing || "",
+        "HSN Code": v?.hsn_code || "",
+        "Price": v?.price_inr ?? ""
+      }))
+    )
+
+    // Search
+    const q = String(searchQuery ?? "").trim().toLowerCase()
+    const filtered = q
+      ? allRows.filter((row) =>
+          Object.values(row).some((val) => String(val ?? "").toLowerCase().includes(q))
+        )
+      : allRows
+
+    // Pagination
+    const pageCountCalc = Math.max(1, Math.ceil(filtered.length / productsPerPage))
+    pageCount = pageCountCalc
+    const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
+
+    grouped = [
+      {
+        category: "Avarice",
+        title: "Avarice Products",
+        description: "",
+        _tableHeaders: ["Product Code", "CAS No", "Product Name", "Packing", "HSN Code", "Price"],
+        variants: paginated
+      }
+    ]
+  }
+
   /* ---------------- Qualigens ---------------- */
   else if (brandKey === "qualigens") {
     let qualigensProducts: any[] = []
@@ -298,125 +347,115 @@ export default function BrandPage({ params }: { params: { brandName: string } })
       },
     ]
   }
-  /* ---------------- Omsons ---------------- */
-else if (brandKey === "omsons") {
-  // import omsonsDataRaw from "@/lib/omsons_products.json"
-  const raw = omsonsDataRaw as any
-  const sections: any[] = Array.isArray(raw?.catalog) ? raw.catalog : []
 
-  const q = String(searchQuery ?? "").trim().toLowerCase()
-  const normKey = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim()
-  const hasVal = (row: any, k: string) => {
-    const v = row?.[k]
-    return v !== undefined && v !== null && String(v).trim() !== ""
-  }
-  const parseNum = (v: any) => {
-    if (typeof v === "number" && Number.isFinite(v)) return v
-    if (v == null) return null
-    const n = Number(String(v).replace(/[^\d.]/g, ""))
-    return Number.isFinite(n) ? n : null
-  }
-  const pickCI = (obj: any, candidates: string[]) => {
-    for (const key of Object.keys(obj || {})) {
-      const k = normKey(key)
-      for (const c of candidates) {
-        if (k === normKey(c)) {
-          const v = obj[key]
-          if (v !== undefined && v !== null && String(v).trim() !== "") return v
+  /* ---------------- Omsons ---------------- */
+  else if (brandKey === "omsons") {
+    const raw = omsonsDataRaw as any
+    const sections: any[] = Array.isArray(raw?.catalog) ? raw.catalog : []
+
+    const q = String(searchQuery ?? "").trim().toLowerCase()
+    const normKey = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim()
+    const hasVal = (row: any, k: string) => {
+      const v = row?.[k]
+      return v !== undefined && v !== null && String(v).trim() !== ""
+    }
+    const parseNum = (v: any) => {
+      if (typeof v === "number" && Number.isFinite(v)) return v
+      if (v == null) return null
+      const n = Number(String(v).replace(/[^\d.]/g, ""))
+      return Number.isFinite(n) ? n : null
+    }
+    const pickCI = (obj: any, candidates: string[]) => {
+      for (const key of Object.keys(obj || {})) {
+        const k = normKey(key)
+        for (const c of candidates) {
+          if (k === normKey(c)) {
+            const v = obj[key]
+            if (v !== undefined && v !== null && String(v).trim() !== "") return v
+          }
         }
       }
+      return ""
     }
-    return ""
+    const findHeader = (headers: string[] = [], candidates: string[]) => {
+      for (const h of headers) for (const c of candidates) {
+        if (normKey(h) === normKey(c)) return h
+      }
+      return null
+    }
+
+    const codeLikeLabels = ["Cat. No.","Cat No","Cat No.","Catalogue No","Catalog No","Order Code","Code"]
+    const nameKeyList = ["Product Name","Item","Description","Name","Product"]
+    const packKeyList = ["Pack","Pack of","Pack Size","Qty/Pack","Quantity/Pack","Pkg","Packing"]
+    const hsnKeyList  = ["HSN Code","HSN"]
+    const priceFromHeaders = (headers: string[]) => headers.filter((h) => /price|rate/i.test(h))
+
+    const groupedAll = sections.map((sec: any, idx: number) => {
+      const sectionTitle = sec?.product_name || sec?.title || sec?.category || `Section ${idx + 1}`
+      const origHeaders: string[] = Array.isArray(sec?.table_headers) ? sec.table_headers : []
+      const variants = Array.isArray(sec?.variants) ? sec.variants : []
+      const preferredCodeHeader = findHeader(origHeaders, codeLikeLabels)
+
+      const pool = q
+        ? variants.filter((v: any) =>
+            Object.values(v || {}).some((val) => String(val ?? "").toLowerCase().includes(q))
+          )
+        : variants
+
+      const pKeys = priceFromHeaders(origHeaders)
+      const normalized = pool.map((row: any) => {
+        const rawPrice = pickCI(row, pKeys.length ? pKeys : ["Price","Price / Piece","Rate","Amount","Price (₹)"])
+        const priceNum = parseNum(rawPrice)
+
+        const out: Record<string, any> = { ...row }
+        out["Product Name"] = pickCI(row, nameKeyList) || sectionTitle
+        if (!hasVal(out, "Pack")) out["Pack"] = pickCI(row, packKeyList)
+        if (!hasVal(out, "HSN Code")) out["HSN Code"] = pickCI(row, hsnKeyList) || sec?.hsn || ""
+        out["Price"] = priceNum != null ? priceNum : (rawPrice || "On request")
+        return out
+      })
+
+      const core: string[] = []
+      if (preferredCodeHeader && normalized.some(r => hasVal(r, preferredCodeHeader))) core.push(preferredCodeHeader)
+      core.push("Product Name")
+
+      const extrasCandidates = [
+        "Size/Dia (mm)","Dia (mm)","Size (mm)","Diameter (mm)",
+        "Capacity (mL)","Capacity ml","Capacity",
+        "Length (mm)","Length",
+        "Micro Rating (µm)","Pore Size (µm)","Pore Size (um)",
+        "Membrane","Pack","HSN Code"
+      ]
+      const extras = extrasCandidates
+        .filter((h) => normalized.some((r) => hasVal(r, h)))
+        .filter((h, i, arr) => arr.findIndex(x => normKey(x) === normKey(h)) === i)
+
+      const others = (Array.isArray(sec?.table_headers) ? sec.table_headers : [])
+        .filter((h) => !["product code","spec","price"].includes(normKey(h)))
+        .filter((h) => !core.some(c => normKey(c) === normKey(h)))
+        .filter((h) => !extras.some(e => normKey(e) === normKey(h)))
+        .filter((h) => normalized.some((r) => hasVal(r, h)))
+
+      const headers = [...core, ...extras, ...others, "Price"]
+      const rows = normalized.map((r) => {
+        const o: Record<string, any> = {}
+        for (const h of headers) o[h] = r[h] ?? ""
+        return o
+      })
+
+      return {
+        category: sectionTitle,
+        title: sectionTitle,
+        description: sec?.spec_header || "",
+        _tableHeaders: headers,
+        variants: rows,
+      }
+    }).filter((g: any) => Array.isArray(g.variants) && g.variants.length > 0)
+
+    const sectionsPerPage = 8
+    pageCount = Math.max(1, Math.ceil(groupedAll.length / sectionsPerPage))
+    grouped = groupedAll.slice((page - 1) * sectionsPerPage, page * sectionsPerPage)
   }
-  const findHeader = (headers: string[] = [], candidates: string[]) => {
-    for (const h of headers) for (const c of candidates) {
-      if (normKey(h) === normKey(c)) return h
-    }
-    return null
-  }
-
-  // never show "Product Code"; prefer these as the visible code column (if present)
-  const codeLikeLabels = [
-    "Cat. No.","Cat No","Cat No.","Catalogue No","Catalog No","Order Code","Code"
-  ]
-  const nameKeys = ["Product Name","Item","Description","Name","Product"]
-  const packKeys = ["Pack","Pack of","Pack Size","Qty/Pack","Quantity/Pack","Pkg","Packing"]
-  const hsnKeys  = ["HSN Code","HSN"]
-  const priceFromHeaders = (headers: string[]) => headers.filter((h) => /price|rate/i.test(h))
-
-  // Build ALL groups first
-  const groupedAll = sections.map((sec: any, idx: number) => {
-    const sectionTitle = sec?.product_name || sec?.title || sec?.category || `Section ${idx + 1}`
-    const origHeaders: string[] = Array.isArray(sec?.table_headers) ? sec.table_headers : []
-    const variants = Array.isArray(sec?.variants) ? sec.variants : []
-    const preferredCodeHeader = findHeader(origHeaders, codeLikeLabels)
-
-    // search within section
-    const pool = q
-      ? variants.filter((v: any) =>
-          Object.values(v || {}).some((val) => String(val ?? "").toLowerCase().includes(q))
-        )
-      : variants
-
-    const pKeys = priceFromHeaders(origHeaders)
-    const normalized = pool.map((row: any) => {
-      const rawPrice = pickCI(row, pKeys.length ? pKeys : ["Price","Price / Piece","Rate","Amount","Price (₹)"])
-      const priceNum = parseNum(rawPrice)
-
-      const out: Record<string, any> = { ...row }
-      // fill key fields (NO "Spec")
-      out["Product Name"] = pickCI(row, nameKeys) || sectionTitle
-      if (!hasVal(out, "Pack")) out["Pack"] = pickCI(row, packKeys)
-      if (!hasVal(out, "HSN Code")) out["HSN Code"] = pickCI(row, hsnKeys) || sec?.hsn || ""
-      out["Price"] = priceNum != null ? priceNum : (rawPrice || "On request")
-      return out
-    })
-
-    // core headers: code column (if present) + Product Name  (NO "Spec")
-    const core: string[] = []
-    if (preferredCodeHeader && normalized.some(r => hasVal(r, preferredCodeHeader))) core.push(preferredCodeHeader)
-    core.push("Product Name")
-
-    // extras (common dims + pack/HSN)
-    const extrasCandidates = [
-      "Size/Dia (mm)","Dia (mm)","Size (mm)","Diameter (mm)",
-      "Capacity (mL)","Capacity ml","Capacity",
-      "Length (mm)","Length",
-      "Micro Rating (µm)","Pore Size (µm)","Pore Size (um)",
-      "Membrane","Pack","HSN Code"
-    ]
-    const extras = extrasCandidates
-      .filter((h) => normalized.some((r) => hasVal(r, h)))
-      .filter((h, i, arr) => arr.findIndex(x => normKey(x) === normKey(h)) === i)
-
-    // others: include original headers with data, excluding Product Code/Spec/Price and duplicates
-    const others = (Array.isArray(sec?.table_headers) ? sec.table_headers : [])
-      .filter((h) => !["product code","spec","price"].includes(normKey(h)))
-      .filter((h) => !core.some(c => normKey(c) === normKey(h)))
-      .filter((h) => !extras.some(e => normKey(e) === normKey(h)))
-      .filter((h) => normalized.some((r) => hasVal(r, h)))
-
-    const headers = [...core, ...extras, ...others, "Price"]
-    const rows = normalized.map((r) => {
-      const o: Record<string, any> = {}
-      for (const h of headers) o[h] = r[h] ?? ""
-      return o
-    })
-
-    return {
-      category: sectionTitle,
-      title: sectionTitle,
-      description: sec?.spec_header || "",
-      _tableHeaders: headers,
-      variants: rows,
-    }
-  }).filter((g: any) => Array.isArray(g.variants) && g.variants.length > 0)
-
-  // PAGINATE BY SECTIONS (categories)
-  const sectionsPerPage = 8 // ← adjust to taste
-  pageCount = Math.max(1, Math.ceil(groupedAll.length / sectionsPerPage))
-  grouped = groupedAll.slice((page - 1) * sectionsPerPage, page * sectionsPerPage)
-}
 
   /* ---------------- Rankem ---------------- */
   else if (brandKey === "rankem") {
@@ -435,7 +474,6 @@ else if (brandKey === "omsons") {
     pageCount = Math.max(1, Math.ceil(filtered.length / productsPerPage))
     const paginated = filtered.slice((page - 1) * productsPerPage, page * productsPerPage)
 
-    // group by category-title and compute dynamic price key per group
     const map: Record<string, any> = {}
     paginated.forEach(({ variant, groupMeta }) => {
       const key = `${groupMeta.category}-${groupMeta.title}`
@@ -445,7 +483,7 @@ else if (brandKey === "omsons") {
           ...groupMeta,
           variants: [],
           _tableHeaders: headers,
-          _priceKey: guessDynamicPriceKey(headers), // <- e.g. "Price List 2025"
+          _priceKey: guessDynamicPriceKey(headers),
         }
       }
       map[key].variants.push(variant)
@@ -467,11 +505,10 @@ else if (brandKey === "omsons") {
     const casVal = String(firstNonEmpty(row, casKeys()) || "").trim()
     const hsnVal = String(firstNonEmpty(row, hsnKeys()) || "").trim()
 
-    // Prefer Rankem’s dynamic "Price List 2025" column if present
     const dynPrice =
       (group?._priceKey ? row[group._priceKey] : undefined)
       ?? firstNonEmpty(row, priceKeys())
-    const priceNum = parsePriceToNumber(dynPrice) // allow 0 (quote-first)
+    const priceNum = parsePriceToNumber(dynPrice)
 
     const safeNameKey = normalizeKey(friendlyName).slice(0, 32)
     const id = `${brandKey}-${codeVal || safeNameKey || "item"}`
@@ -485,11 +522,11 @@ else if (brandKey === "omsons") {
       catNo: codeVal,
       casNo: casVal,
       packSize: packVal,
-      packing: row.Packing ?? "",
+      packing: (row.Packing ?? row["Pack"] ?? ""),
       hsn: hsnVal,
       price: priceNum,
       quantity: 1,
-      brand: (labSupplyBrands as any)[brandKey]?.name ?? "Rankem",
+      brand: (labSupplyBrands as any)[brandKey]?.name ?? "Product",
       category: stripTablePrefix(group?.category || group?.title),
       image: null,
     })
@@ -524,7 +561,6 @@ else if (brandKey === "omsons") {
                 </thead>
                 <tbody>
                   {group.variants.map((row: any, ri: number) => {
-                    // Compute price for display: prefer dynamic key for Rankem
                     const rawForPrice = (group._priceKey ? row[group._priceKey] : undefined) ?? firstNonEmpty(row, priceKeys())
                     const priceNum = parsePriceToNumber(rawForPrice)
                     const displayPrice = priceNum > 0 ? inr(priceNum) : "Price on request"
@@ -533,12 +569,11 @@ else if (brandKey === "omsons") {
                       <tr key={ri} className="border-b last:border-none">
                         {group._tableHeaders.map((h: string) => {
                           const cell = row[h]
-                          // If this column looks like a price/rate, format it nicely
                           if (/price|rate/i.test(h)) {
                             const n = parsePriceToNumber(cell)
                             return (
                               <td key={`${ri}-${h}`} className="py-2 px-3">
-                                {n > 0 ? inr(n) : (cell ?? "—")}
+                                {n > 0 ? inr(n) : (String(cell ?? "").trim() || "—")}
                               </td>
                             )
                           }
