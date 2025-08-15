@@ -19,6 +19,10 @@ import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import whatmanProducts from "@/lib/whatman_products.json"
 import himediaData from "@/lib/himedia_products_grouped"
 
+// ✅ NEW IMPORTS
+import avariceProductsRaw from "@/lib/avarice_products.json"
+import omsonsDataRaw from "@/lib/omsons_products.json"
+
 function SearchResults() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -30,12 +34,13 @@ function SearchResults() {
   const { addItem, isLoaded } = useCart()
   const { toast } = useToast()
 
+  const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
+
   const matchesSearchQuery = (product: any, query: string): boolean => {
     const normalizedQuery = query.trim().toLowerCase().replace(/[^a-z0-9]/gi, "")
     if (!normalizedQuery) return false
 
     const searchFields: string[] = []
-
     const collectFields = (obj: any) => {
       if (typeof obj === "string") {
         searchFields.push(obj.toLowerCase().replace(/[^a-z0-9]/gi, ""))
@@ -188,6 +193,51 @@ function SearchResults() {
       )
     )
 
+    // ✅ NEW: Avarice — flatten {product, variants[]} to rows
+    const avariceArray: any[] = asArray(avariceProductsRaw)
+    const avariceRows = avariceArray.flatMap((p: any) =>
+      (p?.variants || []).map((v: any) => ({
+        source: "avarice",
+        category: "Avarice",
+        title: "Avarice Products",
+        name: p?.product_name || "Avarice Product",
+        code: p?.product_code || "",
+        price: v?.price_inr ?? "—",
+        description: "",
+        specs: [
+          `Packing: ${v?.packing ?? "—"}`,
+          `HSN: ${v?.hsn_code ?? "—"}`,
+          ...(p?.cas_no ? [`CAS: ${p.cas_no}`] : [])
+        ]
+      }))
+    )
+    const avariceResults = avariceRows.filter((row) => matchesSearchQuery(row, query))
+
+    // ✅ NEW: Omsons — sections with table_headers + variants
+    const omsonsSections: any[] = Array.isArray((omsonsDataRaw as any)?.catalog) ? (omsonsDataRaw as any).catalog : []
+    const omsonsResults = omsonsSections.flatMap((sec: any) => {
+      const title = sec?.product_name || sec?.title || sec?.category || "Omsons"
+      const headers: string[] = Array.isArray(sec?.table_headers) ? sec.table_headers : []
+      const priceKey = headers.find((h) => /price|rate/i.test(h)) || "Price"
+      const variants: any[] = Array.isArray(sec?.variants) ? sec.variants : []
+
+      return variants
+        .filter((v: any) => matchesSearchQuery(v, query))
+        .map((v: any) => ({
+          ...v,
+          source: "omsons",
+          category: "Omsons",
+          title,
+          name: v["Product Name"] || v["Description"] || title || "Omsons Product",
+          code: v["Cat. No."] || v["Cat No"] || v["Code"] || v["Product Code"] || "—",
+          price: v[priceKey] || v["Price"] || "—",
+          description: sec?.spec_header || "",
+          specs: headers
+            .filter((h) => !/price/i.test(h))
+            .map((h) => `${h}: ${v[h] ?? "—"}`)
+        }))
+    })
+
     const combinedResults = [
       ...qualigensResults,
       ...commercialResults,
@@ -195,6 +245,8 @@ function SearchResults() {
       ...borosilResults,
       ...whatmanResults,
       ...himediaResults,
+      ...avariceResults,   // ← added
+      ...omsonsResults,    // ← added
     ]
 
     setSearchResults(combinedResults)
@@ -299,7 +351,9 @@ function SearchResults() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-blue-600">
-                        {typeof product.price === "number" ? `₹${product.price.toLocaleString()}` : `₹${product.price}`}
+                        {typeof product.price === "number"
+                          ? `₹${product.price.toLocaleString()}`
+                          : `₹${product.price}`}
                       </span>
                       <Button onClick={() => handleAddToCart(product)} disabled={!isLoaded} className="bg-green-600 hover:bg-green-700">
                         <Plus className="h-4 w-4 mr-2" />
