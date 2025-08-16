@@ -18,16 +18,16 @@ export default function RegisterPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Client Registration</CardTitle>
           <CardDescription>
-            Submit your details for approval to access the client portal.
+            Registration Successful!
           </CardDescription>
         </CardHeader>
         <CardContent>
           {state?.success ? (
             <div className="text-center p-4 bg-green-100 border border-green-200 rounded-md">
-              <p className="font-semibold text-green-800">Registration Successful!</p>
+              <p className="font-semibold text-green-800">Login again after verifying your email</p>
               <p className="text-green-700">{state.success}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                You can close this tab. An admin will review and approve your account.
+               Thank You!
               </p>
             </div>
           ) : (
