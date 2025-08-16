@@ -23,7 +23,7 @@ import avariceProductsRaw from "@/lib/avarice_products.json"
 import omsonsDataRaw from "@/lib/omsons_products.json"
 
 /* ---------------- Helpers ---------------- */
-const asArray = (x: any) => Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : []
+const asArray = (x: any) => (Array.isArray((x as any)?.data) ? (x as any).data : Array.isArray(x) ? x : [])
 const norm = (s: any) => (s == null ? "" : String(s)).toLowerCase()
 const stripNonAlnum = (s: any) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "")
 const inr = (n: number) => n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
@@ -40,6 +40,9 @@ const toNum = (v: any): number | null => {
 const normalizeKey = (str: string) =>
   String(str).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
 
+/** Safely coerce to a single-spaced trimmed string */
+const str = (v: any) => (v ?? "").toString().replace(/\s+/g, " ").trim()
+
 const dedupe = (rows: any[]) => {
   const seen = new Set<string>()
   const out: any[] = []
@@ -47,8 +50,8 @@ const dedupe = (rows: any[]) => {
     const key = [
       r.source || "",
       stripNonAlnum(r.code || ""),
-      stripNonAlnum(r.packSize || r.packing || ""),
-      stripNonAlnum(r.name || r.product || r.title || "")
+      stripNonAlnum(r.packSize || r.packing || r.pack || ""),
+      stripNonAlnum(r.name || r.product || r.title || ""),
     ].join("|")
     if (!seen.has(key)) {
       seen.add(key)
@@ -66,19 +69,16 @@ const getBorosilName = (v: any, g: any) =>
 // Map human headers to row keys (normalized)
 const BOROSIL_HEADER_ALIASES: Record<string, string[]> = {
   product_code: ["code", "product_code", "cat_no", "cat_no_", "cat_no__", "catalog_no", "catalogue_no", "product code"],
-  "capacity_ml": ["capacity ml", "capacity", "capacity_mL", "capacity_ml"],
-  "graduation_interval_ml": ["graduation interval ml", "interval ml", "graduation_interval_ml", "interval_ml"],
-  "tolerance___ml": ["tolerance + ml", "tolerance ml", "tolerance", "tolerance_ml", "tolerance__ml", "tolerance___ml"],
-  "quantity_per_case": ["quantity per case", "qty/case", "qty_per_case", "quantity_per_case"],
-  "price__piece": ["price /piece", "price", "price_piece", "list price", "price_(rs.)", "rate"],
+  capacity_ml: ["capacity ml", "capacity", "capacity_mL", "capacity_ml"],
+  graduation_interval_ml: ["graduation interval ml", "interval ml", "graduation_interval_ml", "interval_ml"],
+  tolerance___ml: ["tolerance + ml", "tolerance ml", "tolerance", "tolerance_ml", "tolerance__ml", "tolerance___ml"],
+  quantity_per_case: ["quantity per case", "qty/case", "qty_per_case", "quantity_per_case"],
+  price__piece: ["price /piece", "price", "price_piece", "list price", "price_(rs.)", "rate"],
 }
 const resolveBorosilValue = (v: any, header: string) => {
-  // try as-is
   if (v?.[header] != null && String(v[header]).trim() !== "") return v[header]
-  // try normalized header
   const nk = normalizeKey(header)
   if (v?.[nk] != null && String(v[nk]).trim() !== "") return v[nk]
-  // try alias list
   const aliasList = BOROSIL_HEADER_ALIASES[nk] || []
   for (const alias of aliasList) {
     const cand1 = v?.[alias]
@@ -86,7 +86,6 @@ const resolveBorosilValue = (v: any, header: string) => {
     if (cand1 != null && String(cand1).trim() !== "") return cand1
     if (cand2 != null && String(cand2).trim() !== "") return cand2
   }
-  // final: if header looks like Product Code, return code
   if (/product\s*code|cat\s*no/i.test(header) && v?.code) return v.code
   return undefined
 }
@@ -125,13 +124,15 @@ function SearchResults() {
     const query = rawQuery || ""
     router.replace(`/products/search?q=${encodeURIComponent(query)}`)
     setDisplayQuery(query)
-    setSearchQuery("")           // auto-clear input after submit
+    setSearchQuery("") // auto-clear input after submit
     inputRef.current?.blur()
 
     /* -------- Build brand results -------- */
 
     // Qualigens
-    const qualigensArr: any[] = Array.isArray(qualigensProducts) ? qualigensProducts : (qualigensProducts as any)?.data || []
+    const qualigensArr: any[] = Array.isArray(qualigensProducts)
+      ? qualigensProducts
+      : (qualigensProducts as any)?.data || []
     const qualigensResults = qualigensArr
       .filter((p) => matchesSearchQuery(p, query))
       .map((p) => ({
@@ -148,69 +149,68 @@ function SearchResults() {
     const commercialResults = commercialChemicals
       .filter((p) => matchesSearchQuery(p, query))
       .map((p) => ({ ...p, source: "commercial", title: p.category, name: p.name, code: p.code }))
+
     // Rankem
-const rankemResults = rankemProducts.flatMap((group: any) => {
-  const variants = Array.isArray(group.variants) ? group.variants : [];
+    const rankemResults = (Array.isArray(rankemProducts) ? rankemProducts : []).flatMap((group: any) => {
+      const variants = Array.isArray(group?.variants) ? group.variants : []
 
-  return variants
-    .map((variant: any) => {
-      const name =
-        str(variant["Description"]) ||
-        str(variant["Unnamed: 1"]) ||
-        str(group.title);
+      return variants
+        .map((variant: any) => {
+          const name =
+            str(variant["Description"]) ||
+            str(variant["Unnamed: 1"]) ||
+            str(group?.title)
 
-      const code =
-        str(variant["Cat No"]) ||
-        str(variant["Cat No."]) ||
-        str(variant["Catalog No"]) ||
-        str(variant["Catalog Number"]) ||
-        str(variant["Code"]) ||
-        str(variant["Baker Analyzed ACS\nReagent\n(PVC"]);
+          const code =
+            str(variant["Cat No"]) ||
+            str(variant["Cat No."]) ||
+            str(variant["Catalog No"]) ||
+            str(variant["Catalog Number"]) ||
+            str(variant["Code"]) ||
+            str(variant["Baker Analyzed ACS\nReagent\n(PVC"])
 
-      const packRaw =
-        variant["Pack\nSize"] ??
-        variant["Pack Size"] ??
-        variant["Packing"] ??
-        variant["Unnamed: 3"];
-      const pack = str(packRaw);
+          const packRaw =
+            variant["Pack\nSize"] ??
+            variant["Pack Size"] ??
+            variant["Packing"] ??
+            variant["Unnamed: 3"]
+          const pack = str(packRaw)
 
-      const price =
-        variant["List Price\n2025(INR)"] ??
-        variant["Price"] ??
-        variant["Unnamed: 5"] ??
-        "—";
+          const price =
+            variant["List Price\n2025(INR)"] ??
+            variant["Price"] ??
+            variant["Unnamed: 5"] ??
+            "—"
 
-      if (!name && !code) return null;
+          if (!name && !code) return null
 
-      return {
-        ...variant,
-        source: "rankem",
-        brand: "Rankem",
-        category: "Rankem",
-        title: group.title || "Rankem",
-        description: group.description || "",
-        specs_headers: group.specs_headers,
-        name: name || "—",
-        code: code || "—",
-        pack,
-        packSize: pack,
-        price,
-      };
+          return {
+            ...variant,
+            source: "rankem",
+            brand: "Rankem",
+            category: "Rankem",
+            title: group?.title || "Rankem",
+            description: group?.description || "",
+            specs_headers: group?.specs_headers,
+            name: name || "—",
+            code: code || "—",
+            pack,
+            packSize: pack,
+            price,
+          }
+        })
+        .filter(Boolean)
+        .filter((row: any) => matchesSearchQuery(row, query))
     })
-    .filter(Boolean)
-    .filter((row: any) => matchesSearchQuery(row, query));
-});
-
 
     // Borosil — USE ALIASES to resolve spec values and show group description
-    const borosilResults = borosilProducts.flatMap((group: any) => {
+    const borosilResults = (Array.isArray(borosilProducts) ? borosilProducts : []).flatMap((group: any) => {
       const title = group.product || group.title || group.category || "Borosil"
       const description = group.description || ""
       const headers: string[] = Array.isArray(group.specs_headers) ? group.specs_headers : []
       const variants: any[] = Array.isArray(group.variants) ? group.variants : []
 
       const mapped = variants.map((v: any) => {
-        // compute specs via alias mapping; skip empties
         const specs = headers
           .filter((h) => !/price/i.test(h))
           .map((h) => {
@@ -219,12 +219,14 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
           })
           .filter((x) => x.value != null && String(x.value).trim() !== "")
 
-        // price: look through alias too
         const priceCandidates = ["Price", "Price /Piece", "Rate", "List Price", "Price_(Rs.)"]
         let priceVal: any = undefined
-        for (const h of [ ...priceCandidates, ...headers ]) {
+        for (const h of [...priceCandidates, ...headers]) {
           const vResolved = resolveBorosilValue(v, h)
-          if (vResolved != null && String(vResolved).trim() !== "") { priceVal = vResolved; break }
+          if (vResolved != null && String(vResolved).trim() !== "") {
+            priceVal = vResolved
+            break
+          }
         }
 
         return {
@@ -232,7 +234,7 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
           source: "borosil",
           category: "Borosil",
           title,
-          description,               // ← renderable now
+          description,
           name: getBorosilName(v, group),
           code: getBorosilCode(v),
           price: priceVal ?? "—",
@@ -265,27 +267,29 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
       .filter((row: any) => matchesSearchQuery(row, query))
 
     // HiMedia
-    const himediaResults = (himediaData || []).flatMap((section: any) =>
-      (section.header_sections || []).flatMap((header: any) =>
-        (header.sub_sections || []).flatMap((sub: any) =>
-          (sub.products || []).map((product: any) => ({
-            ...product,
-            source: "himedia",
-            category: section.main_section,
-            title: header.header_section,
-            description: sub.sub_section,
-            name: product.name || "HiMedia Product",
-            code: product.code || "—",
-            price: product.rate || "—",
-            specs: [
-              { label: "Packing", value: product.packing || "" },
-              { label: "HSN", value: product.hsn || "" },
-              { label: "GST", value: product.gst != null ? `${product.gst}%` : "" },
-            ].filter((x) => x.value !== ""),
-          }))
+    const himediaResults = (himediaData || [])
+      .flatMap((section: any) =>
+        (section.header_sections || []).flatMap((header: any) =>
+          (header.sub_sections || []).flatMap((sub: any) =>
+            (sub.products || []).map((product: any) => ({
+              ...product,
+              source: "himedia",
+              category: section.main_section,
+              title: header.header_section,
+              description: sub.sub_section,
+              name: product.name || "HiMedia Product",
+              code: product.code || "—",
+              price: product.rate || "—",
+              specs: [
+                { label: "Packing", value: product.packing || "" },
+                { label: "HSN", value: product.hsn || "" },
+                { label: "GST", value: product.gst != null ? `${product.gst}%` : "" },
+              ].filter((x) => x.value !== ""),
+            }))
+          )
         )
       )
-    ).filter((row: any) => matchesSearchQuery(row, query))
+      .filter((row: any) => matchesSearchQuery(row, query))
 
     // Avarice
     const avariceArr: any[] = asArray(avariceProductsRaw)
@@ -297,7 +301,7 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
         name: p?.product_name || "Avarice Product",
         code: p?.product_code || "",
         price: v?.price_inr ?? "—",
-        description: "", // (no group description in this dataset)
+        description: "",
         specs: [
           { label: "Packing", value: v?.packing ?? "" },
           { label: "HSN", value: v?.hsn_code ?? "" },
@@ -307,7 +311,7 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
     )
     const avariceResults = avariceRows.filter((row) => matchesSearchQuery(row, query))
 
-    // Omsons — attach section meta BEFORE filtering (enables spec_header/product_name queries)
+    // Omsons
     const omsonsSections: any[] = Array.isArray((omsonsDataRaw as any)?.catalog) ? (omsonsDataRaw as any).catalog : []
     const omsonsRows = omsonsSections.flatMap((sec: any) => {
       const title = sec?.product_name || sec?.title || sec?.category || "Omsons"
@@ -326,8 +330,8 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
           ...v,
           source: "omsons",
           category: "Omsons",
-          title,                     // ← product_name searchable
-          description: sectionSpec,  // ← spec_header searchable
+          title,
+          description: sectionSpec,
           name: v["Product Name"] || v["Description"] || title || "Omsons Product",
           code: v["Cat. No."] || v["Cat No"] || v["Code"] || v["Product Code"] || "—",
           price: v[priceKey] || v["Price"] || "—",
@@ -357,7 +361,6 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
   useEffect(() => {
     if (initialQuery) {
       setDisplayQuery(initialQuery)
-      // keep input filled with initial for first render; clear on next submit
       triggerSearch(initialQuery)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -367,7 +370,8 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
     e.preventDefault()
     triggerSearch(searchQuery)
   }
-  
+
+  const { addItem: addToCart } = useCart() // alias if needed
 
   const handleAddToCart = (product: any) => {
     if (!isLoaded) {
@@ -384,7 +388,7 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
         toast({ title: "Price on request", description: "This item does not have a numeric price.", variant: "default" })
         return
       }
-      addItem({
+      addToCart({
         id: product.id || product.code || `${product.source}-${Math.random().toString(36).slice(2, 10)}`,
         name: product.name || product.product || product.title,
         price: priceNum,
@@ -398,11 +402,8 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
     }
   }
 
-  const paginatedResults = searchResults.slice(
-    (currentPage - 1) * 50,
-    currentPage * 50
-  )
-  const totalPages = Math.max(1, Math.ceil(searchResults.length / 50))
+  const paginatedResults = searchResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage)
+  const totalPages = Math.max(1, Math.ceil(searchResults.length / resultsPerPage))
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -413,7 +414,7 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
             <Input
               ref={inputRef}
               placeholder="Search products..."
-              value={/* input reflects current entry, clears on submit */ (searchQuery)}
+              value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
             />
@@ -436,15 +437,15 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
                 const priceDisplay = isPOR(product.price)
                   ? "POR"
                   : priceNum != null && priceNum > 0
-                    ? inr(priceNum)
-                    : "Price on request"
+                  ? inr(priceNum)
+                  : "Price on request"
 
-                const specs: {label: string, value: any}[] = Array.isArray(product.specs)
-                  ? product.specs.map((s: any) =>
-                      typeof s === "string"
-                        ? { label: "", value: s }
-                        : { label: s.label ?? "", value: s.value }
-                    ).filter(x => x.value != null && String(x.value).trim() !== "")
+                const specs: { label: string; value: any }[] = Array.isArray(product.specs)
+                  ? product.specs
+                      .map((s: any) =>
+                        typeof s === "string" ? { label: "", value: s } : { label: s.label ?? "", value: s.value }
+                      )
+                      .filter((x) => x.value != null && String(x.value).trim() !== "")
                   : []
 
                 return (
@@ -464,10 +465,17 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
                     <CardContent>
                       <div className="space-y-2 mb-4">
                         {product.code && <p className="text-sm text-slate-600">Code: {product.code}</p>}
+                        {product.pack && <p className="text-sm text-slate-600">Pack: {product.pack}</p>}
                         {product.description && <p className="text-sm text-slate-600">{product.description}</p>}
                         {specs.slice(0, 6).map((s, idx) => (
                           <p key={idx} className="text-sm text-slate-600">
-                            {s.label ? <><span className="font-medium">{s.label}:</span> {s.value}</> : String(s.value)}
+                            {s.label ? (
+                              <>
+                                <span className="font-medium">{s.label}:</span> {s.value}
+                              </>
+                            ) : (
+                              String(s.value)
+                            )}
                           </p>
                         ))}
                       </div>
@@ -490,8 +498,12 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
 
             {totalPages > 1 && (
               <div className="flex justify-center gap-4 mt-8">
-                <Button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>Previous</Button>
-                <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => p + 1)}>Next</Button>
+                <Button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>
+                  Previous
+                </Button>
+                <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => p + 1)}>
+                  Next
+                </Button>
               </div>
             )}
           </>
