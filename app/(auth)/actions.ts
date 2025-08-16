@@ -79,7 +79,7 @@ if (existing?.id) {
 
   return {
     success:
-      "Registration done. Kindly check your email for verification.",
+      Kindly check your email for verification.",
   }
 }
 
