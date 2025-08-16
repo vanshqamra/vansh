@@ -52,10 +52,12 @@ function pickItems(json: AnyObj): Array<{ sku: string; name: string; qty: number
       it?.description ??
       "Item",
     qty: ((): number => {
-      const q = (typeof it?.qty === "number" && it.qty) ??
-                (typeof it?.quantity === "number" && it.quantity) ??
-                (typeof it?.count === "number" && it.count) ??
-                (typeof it?.qty_requested === "number" && it.qty_requested) ?? 1
+      const q =
+        (typeof it?.qty === "number" && it.qty) ??
+        (typeof it?.quantity === "number" && it.quantity) ??
+        (typeof it?.count === "number" && it.count) ??
+        (typeof it?.qty_requested === "number" && it.qty_requested) ??
+        1
       return asNumber(q, 1)
     })(),
   })
@@ -125,12 +127,12 @@ export async function POST(req: Request) {
     customer,
     shipping_address,
     totals,
-    items,                          // normalized for UI
+    items,                               // normalized for UI
     products: json.products ?? undefined, // keep original if provided
-    raw: json, // (optional) remove in prod if sensitive
+    raw: json,                            // (optional) remove in prod if sensitive
   }
 
-  // Optional: upsert profile basics
+  // Optional: upsert profile basics (ignore failures — schema may differ)
   try {
     await admin.from("profiles").upsert(
       {
@@ -146,7 +148,7 @@ export async function POST(req: Request) {
     console.warn("[orders] profile upsert failed", e)
   }
 
-  // Insert order
+  // Insert order and select the human code (display_id) as well
   const { data: order, error } = await admin
     .from("orders")
     .insert({
@@ -156,17 +158,27 @@ export async function POST(req: Request) {
       shipping_address,
       checkout_snapshot,
     })
-    .select("id, status")
+    .select("id, status, display_id, order_no")
     .single()
 
   if (error || !order) {
     return NextResponse.json({ error: error?.message || "Order creation failed" }, { status: 500 })
   }
 
+  // Fire-and-forget notifications
   await Promise.allSettled([
     sendAdminNewOrderEmail?.(order.id, user.email ?? ""),
     sendOrderReceivedEmail?.(user.email ?? "", order.id),
   ])
 
-  return NextResponse.json({ orderId: order.id, status: order.status }, { status: 201 })
+  // Return both IDs: UUID and pretty code (e.g. CC123)
+  return NextResponse.json(
+    {
+      orderId: order.id,                 // internal UUID
+      orderCode: order.display_id ?? null, // human-friendly 'CC#' if column exists
+      orderNo: order.order_no ?? null,     // raw sequence (optional)
+      status: order.status,
+    },
+    { status: 201 }
+  )
 }
