@@ -1,3 +1,4 @@
+// app/product/[slug]/page.tsx
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
@@ -9,13 +10,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getProductSEO } from "@/lib/seo";
 import { getBySlug } from "@/lib/product-index";
 
+// ---------- tiny utils ----------
 const clean = (v: any) => (typeof v === "string" ? v.trim() : "");
 const first = (...vals: any[]) => clean(vals.find((x) => clean(x)) || "");
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 const slugPart = (s: any) => (typeof s === "string" && s.trim() ? slugify(s) : "");
-const makeSlug = (...parts: any[]) =>
-  parts.map(slugPart).filter(Boolean).join("-");
+const makeSlug = (...parts: any[]) => parts.map(slugPart).filter(Boolean).join("-");
 
 function tokens(s: string) {
   return s
@@ -24,6 +25,7 @@ function tokens(s: string) {
     .filter((t) => t.length >= 2);
 }
 
+// very tolerant readers (don’t assume schema)
 function nameFrom(p: any, g?: any) {
   return first(
     p.productName,
@@ -91,13 +93,12 @@ function codeFrom(p: any) {
   );
   if (direct) return direct;
 
+  // fallback: derive code-like token from name/title (e.g., "0048")
   const nameLike = nameFrom(p);
   if (nameLike) {
     const bad = /^(mm|ml|l|pk|pcs?|um|µm|gm|kg|g|x|mmf)$/i;
-    const tokens = String(nameLike)
-      .split(/[\s,/()_\-]+/)
-      .filter(Boolean);
-    const cands = tokens.filter((t) => {
+    const toks = String(nameLike).split(/[\s,/()_\-]+/).filter(Boolean);
+    const cands = toks.filter((t) => {
       const T = t.toLowerCase();
       if (bad.test(T)) return false;
       if (!/^[a-z0-9-]+$/i.test(t)) return false;
@@ -127,6 +128,7 @@ function priceFromAny(p: any): number | undefined {
   return Number.isFinite(num) ? num : undefined;
 }
 
+// ---------- fallback: fuzzy scan if index misses ----------
 async function fuzzyFind(slug: string) {
   const target = slugify(slug);
   const want = tokens(target);
@@ -141,8 +143,10 @@ async function fuzzyFind(slug: string) {
     group?: any;
   }> = [];
 
+  // prefer shared iterator if present
   try {
     const mod = await import("@/lib/catalog/sources");
+    // @ts-ignore – generator in that module
     for (const p of mod.iterAllProducts()) {
       pile.push({
         brand: p.brand,
@@ -153,9 +157,8 @@ async function fuzzyFind(slug: string) {
         group: p.group,
       });
     }
-  } catch {}
-
-  if (pile.length === 0) {
+  } catch {
+    // fall back to guarded direct imports per brand
     try {
       const mod: any = await import("@/lib/whatman_products.json");
       const data = (mod.default ?? mod) as any;
@@ -193,7 +196,8 @@ async function fuzzyFind(slug: string) {
     } catch {}
     try {
       const mod: any = await import("@/lib/qualigens-products.json");
-      const arr = Array.isArray(mod.default) ? mod.default : Array.isArray(mod) ? mod : [];
+      const raw = mod.default ?? mod;
+      const arr = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : [];
       for (const p of arr) {
         pile.push({
           brand: brandFrom(p),
@@ -206,7 +210,8 @@ async function fuzzyFind(slug: string) {
     } catch {}
     try {
       const mod: any = await import("@/lib/rankem_products.json");
-      const arr = Array.isArray(mod.default) ? mod.default : Array.isArray(mod) ? mod : [];
+      const raw = mod.default ?? mod;
+      const arr = Array.isArray(raw) ? raw : [];
       for (const g of arr) {
         for (const v of g.variants || []) {
           pile.push({
@@ -222,11 +227,8 @@ async function fuzzyFind(slug: string) {
     } catch {}
     try {
       const mod: any = await import("@/lib/omsons_products.json");
-      const arr = Array.isArray(mod.default?.catalog)
-        ? mod.default.catalog
-        : Array.isArray(mod.catalog)
-        ? mod.catalog
-        : [];
+      const raw = mod.default ?? mod;
+      const arr = Array.isArray(raw?.catalog) ? raw.catalog : [];
       for (const sec of arr) {
         for (const v of sec.variants || []) {
           pile.push({
@@ -242,8 +244,9 @@ async function fuzzyFind(slug: string) {
     } catch {}
     try {
       const mod: any = await import("@/lib/avarice_products.json");
-      const arr = Array.isArray(mod.default) ? mod.default : Array.isArray(mod) ? mod : [];
-      for (const parent of arr) {
+      const raw = mod.default ?? mod;
+      const parents = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : [];
+      for (const parent of parents) {
         for (const v of parent.variants || []) {
           const merged = {
             ...v,
@@ -264,7 +267,8 @@ async function fuzzyFind(slug: string) {
     } catch {}
     try {
       const mod: any = await import("@/lib/himedia_products_grouped");
-      const arr = Array.isArray(mod.default) ? mod.default : Array.isArray(mod) ? mod : [];
+      const raw = mod.default ?? mod;
+      const arr = Array.isArray(raw) ? raw : [];
       for (const section of arr) {
         for (const header of section.header_sections || []) {
           for (const sub of header.sub_sections || []) {
@@ -306,16 +310,15 @@ async function fuzzyFind(slug: string) {
   return best.rec;
 }
 
+// ---------- generic renderer for any data ----------
 function RenderValue({ value }: { value: any }) {
   const type = Object.prototype.toString.call(value);
 
-  if (value == null)
-    return <span className="text-slate-400">—</span>;
+  if (value == null) return <span className="text-slate-400">—</span>;
 
   if (type === "[object Object]") {
     const entries = Object.entries(value as Record<string, any>);
-    if (entries.length === 0)
-      return <span className="text-slate-400">{"{}"}</span>;
+    if (entries.length === 0) return <span className="text-slate-400">{"{}"}</span>;
     return (
       <div className="overflow-x-auto border rounded">
         <table className="min-w-full text-xs">
@@ -323,9 +326,7 @@ function RenderValue({ value }: { value: any }) {
             {entries.map(([k, val], i) => (
               <tr key={i} className="border-b last:border-none">
                 <td className="px-2 py-1 font-medium whitespace-nowrap align-top bg-slate-50">{String(k)}</td>
-                <td className="px-2 py-1 align-top">
-                  <RenderValue value={val} />
-                </td>
+                <td className="px-2 py-1 align-top"><RenderValue value={val} /></td>
               </tr>
             ))}
           </tbody>
@@ -335,8 +336,7 @@ function RenderValue({ value }: { value: any }) {
   }
 
   if (Array.isArray(value)) {
-    if (value.length === 0)
-      return <span className="text-slate-400">[]</span>;
+    if (value.length === 0) return <span className="text-slate-400">[]</span>;
     return (
       <div className="space-y-2">
         {value.map((item, idx) => (
@@ -351,11 +351,11 @@ function RenderValue({ value }: { value: any }) {
   return <span>{String(value)}</span>;
 }
 
+// ---------- metadata ----------
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  let rec = getBySlug(params.slug);
-  if (!rec) {
-    rec = await fuzzyFind(params.slug);
-  }
+  let rec: any = getBySlug(params.slug);
+  if (!rec) rec = await fuzzyFind(params.slug);
+
   if (!rec) {
     return {
       title: "Product Not Found | Chemical Corporation",
@@ -363,40 +363,51 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       robots: { index: false, follow: false },
     };
   }
+
   const canonical = `/product/${slugify(params.slug)}`;
-  const seo = getProductSEO(rec.raw, rec.group, canonical);
+  const seo = getProductSEO(rec.raw ?? rec, rec.group, canonical);
   return {
     title: seo.title,
     description: seo.description,
     alternates: { canonical },
-    openGraph: { title: seo.title, description: seo.description, type: "product", url: canonical },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      type: "product",
+      url: canonical,
+    },
   };
 }
 
+// ---------- page ----------
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-  let rec = getBySlug(params.slug);
-  if (!rec) {
-    rec = await fuzzyFind(params.slug);
-  }
+  // 1) try shared index
+  let rec: any = getBySlug(params.slug);
+  // 2) fallback fuzzy scan
+  if (!rec) rec = await fuzzyFind(params.slug);
   if (!rec) return notFound();
 
   const canonical = `/product/${slugify(params.slug)}`;
-  const seo = getProductSEO(rec.raw, rec.group, canonical);
+  const seo = getProductSEO(rec.raw ?? rec, rec.group, canonical);
 
-  const priceNum = priceFromAny(rec);
+  // show a price if present on record, else try raw
+  const priceNum =
+    typeof rec.price === "number" ? rec.price : priceFromAny(rec.raw ?? rec);
   const priceTxt =
-    priceNum !== undefined
-      ? `₹${priceNum.toLocaleString("en-IN")}`
-      : "POR";
+    priceNum !== undefined ? `₹${priceNum.toLocaleString("en-IN")}` : "POR";
 
   return (
     <div className="container mx-auto px-4 py-10">
+      {/* Header */}
       <div className="mb-6">
         <Badge className="mb-3 bg-blue-100 text-blue-900 border-blue-200">PRODUCT</Badge>
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{seo.h1}</h1>
-        <p className="text-slate-600 mt-2">Discounts auto-apply in cart • Fast delivery across India</p>
+        <p className="text-slate-600 mt-2">
+          Discounts auto-apply in cart • Fast delivery across India
+        </p>
       </div>
 
+      {/* Summary */}
       <Card className="bg-white">
         <CardContent className="p-6">
           <div className="flex flex-wrap gap-2 mb-4">
@@ -408,7 +419,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
 
           <div className="text-2xl font-semibold text-slate-900 mb-2">{priceTxt}</div>
-          <div className="text-sm text-emerald-700 mb-6">Discount applies in cart — final price shown at checkout</div>
+          <div className="text-sm text-emerald-700 mb-6">
+            Discount applies in cart — final price shown at checkout
+          </div>
 
           <div className="flex gap-3">
             <Button asChild><Link href="/products">Continue Shopping</Link></Button>
@@ -422,6 +435,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </CardContent>
       </Card>
 
+      {/* Raw data */}
       <Card className="bg-white mt-8">
         <CardContent className="p-6 space-y-6">
           <div>
@@ -430,14 +444,18 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
           {rec.group ? (
             <div>
-              <h3 className="text-sm font-semibold mb-2 text-slate-700">Group/Context</h3>
+              <h3 className="text-sm font-semibold mb-2 text-slate-700">Group / Context</h3>
               <RenderValue value={rec.group} />
             </div>
           ) : null}
         </CardContent>
       </Card>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.jsonLd ?? {}) }} />
+      {/* JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.jsonLd ?? {}) }}
+      />
     </div>
   );
 }
