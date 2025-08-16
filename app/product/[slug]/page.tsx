@@ -133,7 +133,7 @@ const asArray = (x: any) =>
 // finder
 async function findProductBySlug(slug: string): Promise<Found | null> {
   const target = slug.toLowerCase();
-  // console.log("[product-detail] resolving", slug);
+  console.log("[product-detail] resolving slug:", slug);
 
   // Borosil (grouped -> variants)
   if (Array.isArray(borosilProducts)) {
@@ -143,7 +143,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
         const prod = { ...v, brand: "Borosil" };
         const cands = candidateSlugs(prod, g);
         if (cands.includes(target) || looksLikeCodeMatch(target, prod) || slugContainsCode(target, prod)) {
-          // console.log("[product-detail] match", { brand: "Borosil", via: "candidateSlugs|code|contains" });
+        console.log("[product-detail] MATCH", { brand: "Borosil", via: "candidateSlugs|code|contains" });
           return { product: { ...prod, productName: nameFrom(prod, g) }, group: g, brand: "Borosil" };
         }
       }
@@ -157,7 +157,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
       const prod = { ...p, brand: "Qualigens" };
       const cands = candidateSlugs(prod);
       if (cands.includes(target) || looksLikeCodeMatch(target, prod) || slugContainsCode(target, prod)) {
-        // console.log("[product-detail] match", { brand: "Qualigens", via: "candidateSlugs|code|contains" });
+        console.log("[product-detail] MATCH", { brand: "Qualigens", via: "candidateSlugs|code|contains" });
         return { product: prod, brand: "Qualigens" };
       }
     }
@@ -172,7 +172,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
         const prod = { ...v, brand: "Rankem" };
         const cands = candidateSlugs(prod, grp);
         if (cands.includes(target) || looksLikeCodeMatch(target, prod) || slugContainsCode(target, prod)) {
-          // console.log("[product-detail] match", { brand: "Rankem", via: "candidateSlugs|code|contains" });
+        console.log("[product-detail] MATCH", { brand: "Rankem", via: "candidateSlugs|code|contains" });
           return { product: prod, group: grp, brand: "Rankem" };
         }
       }
@@ -194,7 +194,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
       const prod = { ...p, brand: "HiMedia" };
       const cands = candidateSlugs(prod);
       if (cands.includes(target) || looksLikeCodeMatch(target, prod) || slugContainsCode(target, prod)) {
-        // console.log("[product-detail] match", { brand: "HiMedia", via: "candidateSlugs|code|contains" });
+        console.log("[product-detail] MATCH", { brand: "HiMedia", via: "candidateSlugs|code|contains" });
         return { product: prod, brand: "HiMedia" };
       }
     }
@@ -209,8 +209,8 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
         const prod = { ...v, brand: "Omsons" };
         const cands = candidateSlugs(prod, sec);
         if (cands.includes(target) || looksLikeCodeMatch(target, prod) || slugContainsCode(target, prod)) {
-          // console.log("[product-detail] match", { brand: "Omsons", via: "candidateSlugs|code|contains" });
-          return { product: prod, group: sec, brand: "Omsons" };
+        console.log("[product-detail] MATCH", { brand: "Omsons", via: "candidateSlugs|code|contains" });
+        return { product: prod, group: sec, brand: "Omsons" };
         }
       }
     }
@@ -230,8 +230,8 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
         };
         const cands = candidateSlugs(merged, parent);
         if (cands.includes(target) || looksLikeCodeMatch(target, merged) || slugContainsCode(target, merged)) {
-          // console.log("[product-detail] match", { brand: "Avarice", via: "candidateSlugs|code|contains" });
-          return { product: merged, group: parent, brand: "Avarice" };
+        console.log("[product-detail] MATCH", { brand: "Avarice", via: "candidateSlugs|code|contains" });
+        return { product: merged, group: parent, brand: "Avarice" };
         }
       }
     }
@@ -245,12 +245,13 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
       const prod = { ...v, brand: "Whatman" };
       const cands = candidateSlugs(prod, grp);
       if (cands.includes(target) || looksLikeCodeMatch(target, prod) || slugContainsCode(target, prod)) {
-        // console.log("[product-detail] match", { brand: "Whatman", via: "candidateSlugs|code|contains" });
+        console.log("[product-detail] MATCH", { brand: "Whatman", via: "candidateSlugs|code|contains" });
         return { product: prod, group: grp, brand: "Whatman" };
       }
     }
   }
 
+  console.warn("[product-detail] NOT FOUND", { slug });
   return null;
 }
 
@@ -277,6 +278,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 // page (no images)
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const found = await findProductBySlug(params.slug);
+  console.log("[product-detail] render", {
+    slug: params.slug,
+    brand: found?.brand || found?.product?.brand,
+    name: found?.product?.name || found?.product?.productName || found?.product?.title,
+    code: found ? codeFrom(found.product) : undefined,
+  });
   if (!found) return notFound();
 
   const { product, group, brand: forcedBrand } = found;

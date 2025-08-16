@@ -5,6 +5,10 @@ export function createSupabaseBrowserClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[diagnostics] Supabase env not set; skipping Supabase init")
+      return null as unknown as ReturnType<typeof createBrowserClient>
+    }
     throw new Error("Supabase URL and/or Anon Key are missing from environment variables.")
   }
 
