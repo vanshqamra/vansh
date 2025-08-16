@@ -223,24 +223,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== FEATURED BRANDS (4) ===== */}
+            {/* ===== FEATURED BRANDS (8) ===== */}
       <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fx-reveal">
             <Badge className="mb-4 bg-green-100 text-green-900 border-green-200">FEATURED BRANDS</Badge>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Comprehensive Laboratory Solutions</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+              Comprehensive Laboratory Solutions
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Qualigens — /public/image4.jpeg */}
+            {/* Qualigens */}
             <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "40ms" }}>
               <CardContent className="p-6">
                 <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image4.jpeg"
                     alt="Qualigens reagents and bottles"
-                    fill
-                    unoptimized
+                    fill unoptimized
                     className="object-cover"
                     sizes="(min-width:1024px) 25vw, 90vw"
                   />
@@ -253,15 +254,14 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Borosil — /public/image5.jpeg */}
+            {/* Borosil */}
             <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "80ms" }}>
               <CardContent className="p-6">
                 <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image5.jpeg"
                     alt="Borosil laboratory glassware"
-                    fill
-                    unoptimized
+                    fill unoptimized
                     className="object-cover"
                     sizes="(min-width:1024px) 25vw, 90vw"
                   />
@@ -274,15 +274,14 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Scientific Instruments — /public/image6.jpeg */}
+            {/* Scientific Instruments */}
             <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "120ms" }}>
               <CardContent className="p-6">
                 <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image6.jpeg"
                     alt="Scientific instruments and microscopes"
-                    fill
-                    unoptimized
+                    fill unoptimized
                     className="object-cover"
                     sizes="(min-width:1024px) 25vw, 90vw"
                   />
@@ -295,15 +294,14 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Whatman — /public/image7.jpeg */}
+            {/* Whatman */}
             <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "160ms" }}>
               <CardContent className="p-6">
                 <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
                   <Image
                     src="/image7.jpeg"
                     alt="Whatman filter paper products"
-                    fill
-                    unoptimized
+                    fill unoptimized
                     className="object-cover"
                     sizes="(min-width:1024px) 25vw, 90vw"
                   />
@@ -315,9 +313,90 @@ export default function HomePage() {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* HiMedia */}
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "200ms" }}>
+              <CardContent className="p-6">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
+                  <Image
+                    src="/image8.jpeg"
+                    alt="HiMedia laboratory products"
+                    fill unoptimized
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">HiMedia</h3>
+                <p className="text-slate-600 text-sm mb-4">Culture media & diagnostics</p>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/brand/himedia">Buy Now</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Omsons */}
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "240ms" }}>
+              <CardContent className="p-6">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
+                  <Image
+                    src="/image9.jpeg"
+                    alt="Omsons laboratory glassware"
+                    fill unoptimized
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Omsons</h3>
+                <p className="text-slate-600 text-sm mb-4">Laboratory glassware & supplies</p>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/brand/omsons">Buy Now</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Avarice */}
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "280ms" }}>
+              <CardContent className="p-6">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
+                  <Image
+                    src="/image10.jpeg"
+                    alt="Avarice laboratory products"
+                    fill unoptimized
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Avarice</h3>
+                <p className="text-slate-600 text-sm mb-4">Laboratory essentials & reagents</p>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/brand/avarice">Buy Now</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Rankem */}
+            <Card className="group hover:shadow-xl bg-white text-slate-900 fx-reveal" style={{ animationDelay: "320ms" }}>
+              <CardContent className="p-6">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden ring-1 ring-slate-200 mb-4">
+                  <Image
+                    src="/image11.jpeg"
+                    alt="Rankem laboratory chemicals"
+                    fill unoptimized
+                    className="object-cover"
+                    sizes="(min-width:1024px) 25vw, 90vw"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Rankem</h3>
+                <p className="text-slate-600 text-sm mb-4">Analytical reagents & solvents</p>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/brand/rankem">Buy Now</Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
+
 
       {/* ===== TRUST ===== */}
       <section className="py-20 bg-transparent">
