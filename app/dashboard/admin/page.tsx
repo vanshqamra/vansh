@@ -8,7 +8,7 @@ import { getServerSupabase } from "@/lib/supabase/server-client"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Package, ClipboardList, Settings, Users } from "lucide-react"
+import { Package, ClipboardList, Settings } from "lucide-react"
 
 type OrderRow = {
   id: string
@@ -24,26 +24,6 @@ type QuoteRow = {
   title: string | null
   status: string | null
   client_email: string | null
-}
-
-type ProfileRow = {
-  id: string
-  email: string | null
-  full_name: string | null
-
-  // new schema (optional)
-  company?: string | null
-  phone?: string | null
-  gstin?: string | null
-
-  // legacy schema (optional)
-  company_name?: string | null
-  contact_number?: string | null
-  gst_no?: string | null
-
-  role: "pending" | "client" | "admin" | "rejected" | null
-  status?: "pending" | "approved" | "rejected" | null
-  created_at: string
 }
 
 export default async function AdminDashboardPage() {
@@ -65,7 +45,7 @@ export default async function AdminDashboardPage() {
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
   if (profile?.role !== "admin") redirect("/dashboard")
 
-  const [{ data: orders }, { data: quotes }, { data: pending }] = await Promise.all([
+  const [{ data: orders }, { data: quotes }] = await Promise.all([
     supabase
       .from("orders")
       .select("id, created_at, status, grand_total, user_id")
@@ -77,16 +57,6 @@ export default async function AdminDashboardPage() {
       .select("id, created_at, title, status, client_email")
       .order("created_at", { ascending: false })
       .limit(50),
-
-    // 🔧 FIX: use status = 'pending' and select status explicitly
-    supabase
-      .from("profiles")
-      .select(
-        "id, email, full_name, company, company_name, phone, contact_number, gstin, gst_no, role, status, created_at"
-      )
-      .eq("status", "pending")
-      .order("created_at", { ascending: false })
-      .limit(10),
   ])
 
   const formatIST = (iso: string) =>
@@ -102,7 +72,7 @@ export default async function AdminDashboardPage() {
         <p className="text-muted-foreground">Everything you need at a glance.</p>
       </div>
 
-      {/* Quick Links (trimmed) */}
+      {/* Quick Links */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Admin Quick Links</CardTitle>
@@ -250,10 +220,11 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Client Approvals — button only */}
-<div className="mt-8">
-  <Button asChild>
-    <Link href="/admin/client-approvals">Open Client Approvals</Link>
-  </Button>
-</div>
- )
+      <div className="mt-8">
+        <Button asChild>
+          <Link href="/admin/client-approvals">Open Client Approvals</Link>
+        </Button>
+      </div>
+    </div>
+  )
 }
