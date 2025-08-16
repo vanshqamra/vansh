@@ -329,7 +329,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-lg mb-2">HiMedia</h3>
                 <p className="text-slate-600 text-sm mb-4">Culture media & diagnostics</p>
                 <Button asChild variant="outline" className="w-full">
-                  <Link href="/brand/himedia">Buy Now</Link>
+                  <Link href="/brand/HiMedia">Buy Now</Link>
                 </Button>
               </CardContent>
             </Card>
