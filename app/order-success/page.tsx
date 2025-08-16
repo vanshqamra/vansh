@@ -1,5 +1,6 @@
 "use client"
 
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -7,7 +8,10 @@ import { CheckCircle, Clock, Mail, Phone, FileText, ArrowRight } from "lucide-re
 import Link from "next/link"
 
 export default function OrderSuccessPage() {
-  const orderNumber = `CC${Date.now().toString().slice(-6)}`
+  const searchParams = useSearchParams()
+  // Prefer the value sent from checkout redirect: /order-success?order=CC123
+  const orderNumber =
+    searchParams.get("order") || `CC${Date.now().toString().slice(-6)}`
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -60,36 +64,24 @@ export default function OrderSuccessPage() {
           </CardHeader>
           <CardContent className="text-left space-y-4">
             <div className="flex items-start gap-3">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">
-                1
-              </div>
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">1</div>
               <div>
                 <h3 className="font-semibold">Order Review</h3>
-                <p className="text-gray-600 text-sm">
-                  Our team will review your order and verify product availability within 2-4 hours.
-                </p>
+                <p className="text-gray-600 text-sm">Our team will review your order and verify product availability within 2-4 hours.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">
-                2
-              </div>
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">2</div>
               <div>
                 <h3 className="font-semibold">Quote Confirmation</h3>
-                <p className="text-gray-600 text-sm">
-                  We'll send you a detailed quote with final pricing and delivery timeline.
-                </p>
+                <p className="text-gray-600 text-sm">We'll send you a detailed quote with final pricing and delivery timeline.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">
-                3
-              </div>
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">3</div>
               <div>
                 <h3 className="font-semibold">Payment & Processing</h3>
-                <p className="text-gray-600 text-sm">
-                  After your approval, we'll process payment and prepare your order for shipment.
-                </p>
+                <p className="text-gray-600 text-sm">After your approval, we'll process payment and prepare your order for shipment.</p>
               </div>
             </div>
           </CardContent>
@@ -129,10 +121,7 @@ export default function OrderSuccessPage() {
                 <Phone className="h-4 w-4" />
                 Call Support
               </a>
-              <a
-                href="mailto:support@chemicalcorp.com"
-                className="flex items-center gap-1 text-blue-600 hover:underline"
-              >
+              <a href="mailto:support@chemicalcorp.com" className="flex items-center gap-1 text-blue-600 hover:underline">
                 <Mail className="h-4 w-4" />
                 Email Support
               </a>
