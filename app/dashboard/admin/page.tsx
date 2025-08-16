@@ -255,3 +255,5 @@ export default async function AdminDashboardPage() {
     <Link href="/admin/client-approvals">Open Client Approvals</Link>
   </Button>
 </div>
+ )
+}
