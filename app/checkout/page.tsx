@@ -532,7 +532,7 @@ export default function CheckoutPage() {
                       <Input id="country" name="country" defaultValue="India" disabled={addressMode === "saved"} />
                     </div>
                     <div>
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone">Phone Number (10 digits)</Label>
                       <Input
                         id="phone"
                         name="phone"
