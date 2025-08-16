@@ -55,6 +55,15 @@ const dedupe = (rows: any[]) => {
   return out
 }
 
+/** stable key for React rendering (prevents previous results from sticking) */
+const rowKey = (r: any) =>
+  [
+    normBrand(r.source || ""),
+    stripNonAlnum(r.code || ""),
+    stripNonAlnum(r.packSize || r.packing || r.pack || ""),
+    stripNonAlnum(r.name || r.product || r.title || ""),
+  ].join("|")
+
 // Borosil helpers
 const normalizeKey = (s: string) =>
   String(s).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
@@ -98,7 +107,7 @@ function SearchResults() {
   const resultsPerPage = 50
 
   const { addItem, isLoaded } = useCart()
-  const { toast: showToast } = useToast() // ← alias to avoid any naming collisions
+  const { toast: showToast } = useToast() // single alias to avoid duplicate identifier
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Token-based search across combined fields (works for "acetone rankem")
@@ -126,6 +135,11 @@ function SearchResults() {
 
   const triggerSearch = (rawQuery: string) => {
     const query = rawQuery || ""
+
+    // Clear immediately so old results don't linger
+    setSearchResults([])
+    setCurrentPage(1)
+
     router.replace(`/products/search?q=${encodeURIComponent(query)}`)
     setDisplayQuery(query)
     setSearchQuery("") // auto-clear input after submit
@@ -388,6 +402,8 @@ function SearchResults() {
 
     setSearchResults(combined)
     setCurrentPage(1)
+    // optional: scroll to top after results render
+    setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0)
   }
 
   // bootstrap from ?q
@@ -485,7 +501,7 @@ function SearchResults() {
 
                 return (
                   <Card
-                    key={`${product.source}-${product.id || product.code || Math.random().toString(36).substring(2, 10)}`}
+                    key={rowKey(product)}
                     className="hover:shadow-lg transition-shadow"
                   >
                     <CardHeader className="pb-4">
