@@ -1,5 +1,5 @@
 // app/product/[slug]/page.tsx
-export const dynamic = "force-dynamic"; // ensure SSR, no prebuilt params
+export const dynamic = "force-dynamic"; // render on server per-request
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getProductSEO } from "@/lib/seo";
 
-// ----- STATIC CATALOG IMPORTS (ensure bundling) -----
+// ----- STATIC CATALOG IMPORTS -----
 import borosilProducts from "@/lib/borosil_products_absolute_final.json";
 import qualigensProductsRaw from "@/lib/qualigens-products.json";
 import rankemProducts from "@/lib/rankem_products.json";
@@ -59,14 +59,7 @@ function priceFrom(p: any) {
   const num = parseFloat(String(p).replace(/[^\d.]/g, ""));
   return Number.isFinite(num) ? num : undefined;
 }
-function primaryImageFrom(p: any, g?: any) {
-  return (
-    p.image || p.img || g?.image || g?.img ||
-    (Array.isArray(p.images) && p.images[0]) ||
-    (Array.isArray(g?.images) && g.images[0]) ||
-    null
-  );
-}
+
 function candidateSlug(p: any, g?: any) {
   const brand = brandFrom(p, g);
   const name = nameFrom(p, g);
@@ -94,7 +87,7 @@ const asArray = (x: any) =>
 async function findProductBySlug(slug: string): Promise<Found | null> {
   const target = slug.toLowerCase();
 
-  // 1) BOROSIL (grouped with variants)
+  // 1) BOROSIL (grouped -> variants)
   if (Array.isArray(borosilProducts)) {
     for (const g of borosilProducts as any[]) {
       const variants = Array.isArray(g.variants) ? g.variants : [];
@@ -144,7 +137,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
     }
   }
 
-  // 4) HIMEDIA (nested → header_sections → sub_sections → products)
+  // 4) HIMEDIA (nested)
   {
     const root: any[] = Array.isArray(himediaProductsRaw) ? (himediaProductsRaw as any[]) : [];
     const flat: any[] = [];
@@ -169,7 +162,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
     }
   }
 
-  // 5) OMSONS (catalog.sections[].variants[])
+  // 5) OMSONS (sections[].variants[])
   {
     const sections: any[] = Array.isArray((omsonsDataRaw as any)?.catalog) ? (omsonsDataRaw as any).catalog : [];
     for (const sec of sections) {
@@ -210,7 +203,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
     }
   }
 
-  // 7) WHATMAN (group with specs_headers + variants)
+  // 7) WHATMAN (group with variants)
   {
     const grp: any = whatmanProducts as any;
     const variants = Array.isArray(grp?.variants) ? grp.variants : [];
@@ -268,7 +261,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const price = priceFrom(
     (product as any).price ?? (product as any).Price ?? (product as any).rate ?? (product as any).price_inr
   );
-  const image = primaryImageFrom(product, group);
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -278,63 +270,40 @@ export default async function ProductPage({ params }: { params: { slug: string }
         <p className="text-slate-600 mt-2">Discounts auto-apply in cart • Fast delivery across India</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-        {/* Image */}
-        <div className="md:col-span-2">
-          <Card className="bg-white">
-            <CardContent className="p-4 flex items-center justify-center">
-              {image ? (
-                <Image
-                  src={image}
-                  alt={`${brand ? brand + " " : ""}${name || "Product"}`}
-                  width={640}
-                  height={640}
-                  className="object-contain w-full h-auto"
-                  unoptimized
-                />
-              ) : (
-                <div className="aspect-square w-full grid place-items-center text-slate-400">No Image</div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+      {/* Details (full-width since there are no images) */}
+      <Card className="bg-white">
+        <CardContent className="p-6">
+          <div className="flex flex-wrap gap-2 mb-4">
+            {brand ? <Badge variant="outline">{brand}</Badge> : null}
+            {pack ? <Badge variant="outline">{pack}</Badge> : null}
+            {code ? <Badge variant="outline">Code: {code}</Badge> : null}
+            {hsn ? <Badge variant="outline">HSN: {hsn}</Badge> : null}
+            {cas ? <Badge variant="outline">CAS: {cas}</Badge> : null}
+          </div>
 
-        {/* Details */}
-        <div className="md:col-span-3">
-          <Card className="bg-white">
-            <CardContent className="p-6">
-              <div className="flex flex-wrap gap-2 mb-4">
-                {brand ? <Badge variant="outline">{brand}</Badge> : null}
-                {pack ? <Badge variant="outline">{pack}</Badge> : null}
-                {code ? <Badge variant="outline">Code: {code}</Badge> : null}
-                {hsn ? <Badge variant="outline">HSN: {hsn}</Badge> : null}
-                {cas ? <Badge variant="outline">CAS: {cas}</Badge> : null}
-              </div>
+          <div className="text-2xl font-semibold text-slate-900 mb-2">
+            {price !== undefined ? `₹${price.toLocaleString("en-IN")}` : "POR"}
+          </div>
+          <div className="text-sm text-emerald-700 mb-6">
+            Discount applies in cart — final price shown at checkout
+          </div>
 
-              <div className="text-2xl font-semibold text-slate-900 mb-2">
-                {price !== undefined ? `₹${price.toLocaleString("en-IN")}` : "POR"}
-              </div>
-              <div className="text-sm text-emerald-700 mb-6">
-                Discount applies in cart — final price shown at checkout
-              </div>
+          <div className="flex gap-3">
+            <Button asChild><Link href="/products">Continue Shopping</Link></Button>
+            <Button asChild variant="outline"><Link href="/cart">View Cart</Link></Button>
+          </div>
 
-              <div className="flex gap-3">
-                <Button asChild><Link href="/products">Continue Shopping</Link></Button>
-                <Button asChild variant="outline"><Link href="/cart">View Cart</Link></Button>
-              </div>
-
-              <p className="text-slate-700 mt-6">
-                Buy {brand ? `${brand} ` : ""}{name}{pack ? ` ${pack}` : ""} online.
-                10,000+ lab products from top brands with nationwide delivery.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+          <p className="text-slate-700 mt-6">
+            Buy {brand ? `${brand} ` : ""}{name}{pack ? ` ${pack}` : ""} online.
+            10,000+ lab products from top brands with nationwide delivery.
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Product JSON-LD for Google */}
       <script
         type="application/ld+json"
+        // stringify guards against non-serializable values
         dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.jsonLd) }}
       />
     </div>
