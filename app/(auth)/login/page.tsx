@@ -49,10 +49,12 @@ export default function LoginPage() {
         .eq("id", userId)
         .single()
 
-      // 5) Decide destination
-      const destination =
-        redirectTo ||
-        (profile && profile.role === "admin" ? "/dashboard/admin" : "/dashboard")
+      // 5) Decide destination — admins always land on /dashboard/admin
+const destination =
+  profile?.role === "admin"
+    ? "/dashboard/admin"
+    : (redirectTo || "/dashboard")
+
 
       // 6) Replace (not push) + refresh to sync RSC + client
       router.replace(destination)
