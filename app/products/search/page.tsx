@@ -34,10 +34,7 @@ const toNum = (v: any): number | null => {
   const n = Number(s.replace(/[^\d.]/g, ""))
   return Number.isFinite(n) ? n : null
 }
-/** single-spaced trimmed string */
 const str = (v: any) => (v ?? "").toString().replace(/\s+/g, " ").trim()
-
-/** normalize brand/category for comparisons */
 const normBrand = (v: any) => str(v).toLowerCase()
 
 const dedupe = (rows: any[]) => {
@@ -59,8 +56,8 @@ const dedupe = (rows: any[]) => {
 }
 
 // Borosil helpers
-const normalizeKey = (strx: string) =>
-  String(strx).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
+const normalizeKey = (s: string) =>
+  String(s).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
 const getBorosilCode = (v: any) => v?.code ?? v?.Code ?? v?.["Product Code"] ?? v?.["Cat No"] ?? ""
 const getBorosilName = (v: any, g: any) =>
   v?.["Product Name"] || v?.Description || v?.Name || g?.product || g?.title || "Borosil Product"
@@ -101,7 +98,7 @@ function SearchResults() {
   const resultsPerPage = 50
 
   const { addItem, isLoaded } = useCart()
-  const { toast } = useToast()
+  const { toast: showToast } = useToast() // ← alias to avoid any naming collisions
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Token-based search across combined fields (works for "acetone rankem")
@@ -169,7 +166,7 @@ function SearchResults() {
 
       const mapped = variants.map((variant: any) => {
         const bakerKeyA = "Baker Analyzed ACS\nReagent\n(PVC"
-        const bakerKeyB = "Baker Analyzed ACS\nReagent\n(PVC)" // some sheets have the closing )
+        const bakerKeyB = "Baker Analyzed ACS\nReagent\n(PVC)"
         const bakerCode = str(variant[bakerKeyA]) || str(variant[bakerKeyB])
 
         const nameBase =
@@ -327,7 +324,7 @@ function SearchResults() {
       )
     const himediaResults = himediaRows.filter((row: any) => matchesSearchQuery(row, query))
 
-    // Avarice (map → filter) — keep title-cased source/category to avoid case duplicates
+    // Avarice (map → filter)
     const avariceArr: any[] = asArray(avariceProductsRaw)
     const avariceRows = avariceArr.flatMap((p: any) =>
       (p?.variants || []).map((v: any) => ({
@@ -345,7 +342,7 @@ function SearchResults() {
         ].filter((x) => x.value !== ""),
       }))
     )
-    const avariceResults = avariceRows.filter((row) => matchesSearchQuery(row, query))
+    const avariceResults = avariceRows.filter((row: any) => matchesSearchQuery(row, query))
 
     // Omsons (map → filter)
     const omsonsSections: any[] = Array.isArray((omsonsDataRaw as any)?.catalog) ? (omsonsDataRaw as any).catalog : []
@@ -375,7 +372,7 @@ function SearchResults() {
         }
       })
     })
-    const omsonsResults = omsonsRows.filter((row) => matchesSearchQuery(row, query))
+    const omsonsResults = omsonsRows.filter((row: any) => matchesSearchQuery(row, query))
 
     // Combine + DEDUPE
     const combined = dedupe([
@@ -407,22 +404,19 @@ function SearchResults() {
     triggerSearch(searchQuery)
   }
 
-  const { toast } = useToast()
-  const { isLoaded, addItem } = useCart()
-
   const handleAddToCart = (product: any) => {
     if (!isLoaded) {
-      toast({ title: "Loading...", description: "Please wait while the cart loads", variant: "destructive" })
+      showToast({ title: "Loading...", description: "Please wait while the cart loads", variant: "destructive" })
       return
     }
     try {
       if (isPOR(product.price)) {
-        toast({ title: "Price on Request", description: "Price on Request • POR" })
+        showToast({ title: "Price on Request", description: "Price on Request • POR" })
         return
       }
       const priceNum = toNum(product.price)
       if (priceNum == null || priceNum <= 0) {
-        toast({ title: "Price on request", description: "This item does not have a numeric price.", variant: "default" })
+        showToast({ title: "Price on request", description: "This item does not have a numeric price.", variant: "default" })
         return
       }
       addItem({
@@ -432,10 +426,10 @@ function SearchResults() {
         brand: product.source,
         category: product.category,
       })
-      toast({ title: "Added to Cart", description: `${product.name || product.title} has been added to your cart` })
+      showToast({ title: "Added to Cart", description: `${product.name || product.title} has been added to your cart` })
     } catch (error) {
       console.error("Error adding to cart:", error)
-      toast({ title: "Error", description: "Failed to add item to cart. Please try again.", variant: "destructive" })
+      showToast({ title: "Error", description: "Failed to add item to cart. Please try again.", variant: "destructive" })
     }
   }
 
