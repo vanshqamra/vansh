@@ -1,19 +1,11 @@
+// app/product/[slug]/error.tsx
 "use client";
-
-export default function Error({ error, reset }: { error: Error; reset: () => void }) {
-  console.error("[product/[slug]] client error:", error);
+export default function Error({ error }: { error: Error & { digest?: string } }) {
   return (
-    <div className="container mx-auto px-6 py-16">
-      <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
-      <pre className="text-xs bg-red-50 border border-red-200 p-3 rounded overflow-auto">
-        {String(error?.stack || error?.message || error)}
-      </pre>
-      <button
-        onClick={() => reset()}
-        className="mt-4 px-4 py-2 rounded border border-slate-300 hover:bg-slate-50"
-      >
-        Try again
-      </button>
+    <div className="container mx-auto px-4 py-10 text-red-700">
+      <h1 className="text-xl font-bold mb-2">Product page error</h1>
+      <p className="mb-2">Digest: {error?.digest || "n/a"}</p>
+      <p className="text-sm opacity-80">Check server logs with this digest to see the full stack.</p>
     </div>
   );
 }
