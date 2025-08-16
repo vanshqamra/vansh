@@ -1,20 +1,18 @@
 // app/product/[slug]/page.tsx
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-// export const revalidate = 0; // optional: always fresh
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getProductSEO } from "@/lib/seo";
-import { getBySlug } from "@/lib/product-index";
 
-/* ----------------- small utils ----------------- */
+/* ---------------- tiny utils ---------------- */
+const clean = (v: any) => (typeof v === "string" ? v.trim() : "");
+const first = (...vals: any[]) => clean(vals.find((x) => clean(x)) || "");
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-
 const tokens = (s: string) =>
   s.split(/[^a-z0-9]+/i).map(t => t.toLowerCase()).filter(t => t.length >= 2);
 
@@ -28,30 +26,7 @@ function priceFromAny(p: any): number | undefined {
   return Number.isFinite(num) ? num : undefined;
 }
 
-/** Never throw; capture error message for on-page debug */
-function safe<T>(label: string, fn: () => T): { ok: true; value: T } | { ok: false; error: string } {
-  try {
-    return { ok: true, value: fn() };
-  } catch (e: any) {
-    return { ok: false, error: `${label}: ${e?.message || String(e)}` };
-  }
-}
-async function safeAsync<T>(label: string, fn: () => Promise<T>): Promise<{ ok: true; value: T } | { ok: false; error: string }> {
-  try {
-    return { ok: true, value: await fn() };
-  } catch (e: any) {
-    return { ok: false, error: `${label}: ${e?.message || String(e)}` };
-  }
-}
-
-/* ----------------- tolerant field readers ----------------- */
-const first = (...vals: any[]) => {
-  for (const v of vals) {
-    if (typeof v === "string" && v.trim()) return v.trim();
-    if (typeof v === "number" && Number.isFinite(v)) return v;
-  }
-  return "";
-};
+/* ---------------- tolerant readers ---------------- */
 function nameFrom(p: any, g?: any) {
   return first(p.productName, p.name, p.title, p["Product Name"], p.description, g?.title, g?.product, p.product);
 }
@@ -69,7 +44,6 @@ function codeFrom(p: any) {
     p.order_code, p.orderCode, p.sku, p.item_code, p.itemCode, p.code_no, p["Code"]
   );
   if (direct) return direct;
-
   const nameLike = nameFrom(p);
   if (nameLike) {
     const bad = /^(mm|ml|l|pk|pcs?|um|µm|gm|kg|g|x|mmf)$/i;
@@ -90,7 +64,29 @@ function codeFrom(p: any) {
   return "";
 }
 
-/* ----------------- fuzzy fallback (guarded) ----------------- */
+/* ---------------- safe dynamic imports ---------------- */
+async function loadIndex(): Promise<null | ((slug: string) => any)> {
+  try {
+    const mod: any = await import("@/lib/product-index");
+    return typeof mod?.getBySlug === "function" ? mod.getBySlug : null;
+  } catch {
+    return null;
+  }
+}
+
+async function loadSEO(): Promise<{
+  getProductSEO: (prod: any, group?: any, canonical?: string) => any;
+} | null> {
+  try {
+    const mod: any = await import("@/lib/seo");
+    if (typeof mod?.getProductSEO === "function") return { getProductSEO: mod.getProductSEO };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/* ---------------- fuzzy fallback (guarded) ---------------- */
 async function fuzzyFind(slug: string) {
   const target = slugify(slug);
   const want = tokens(target);
@@ -99,71 +95,74 @@ async function fuzzyFind(slug: string) {
   type Rec = { brand: string; name: string; pack: string; code: string; raw: any; group?: any };
   const pile: Rec[] = [];
 
-  // Prefer shared iterator if repo has it
-  const iter = await safeAsync("import catalog/sources", async () => await import("@/lib/catalog/sources"));
-  if (iter.ok && typeof (iter.value as any).iterAllProducts === "function") {
-    // @ts-ignore generator
-    for (const p of (iter.value as any).iterAllProducts()) {
-      pile.push({ brand: p.brand, name: p.name, pack: p.pack, code: p.code, raw: p.raw, group: p.group });
+  // Prefer any shared iterator if present
+  try {
+    const mod: any = await import("@/lib/catalog/sources");
+    if (typeof mod?.iterAllProducts === "function") {
+      for (const p of mod.iterAllProducts() as any[]) {
+        pile.push({ brand: p.brand, name: p.name, pack: p.pack, code: p.code, raw: p.raw, group: p.group });
+      }
     }
-  } else {
-    // Fallback: guarded direct imports per brand. Each one is wrapped so a missing file never throws the page.
-    const tryLoad = async <T>(label: string, loader: () => Promise<T>, onData: (data: any) => void) => {
-      const res = await safeAsync(label, loader);
-      if (res.ok) onData(res.value);
-    };
+  } catch {}
 
-    await tryLoad("whatman", async () => (await import("@/lib/whatman_products.json")) as any, (mod) => {
-      const data = (mod as any).default ?? mod;
+  // Fallback guarded brand imports
+  if (pile.length === 0) {
+    const push = (p: any, g?: any) => pile.push({
+      brand: brandFrom(p, g),
+      name: nameFrom(p, g),
+      pack: packFrom(p),
+      code: codeFrom(p),
+      raw: p,
+      group: g,
+    });
+
+    try {
+      const mod: any = await import("@/lib/whatman_products.json");
+      const data = (mod.default ?? mod);
       const variants = Array.isArray(data?.variants) ? data.variants : Array.isArray(data) ? data : [];
-      for (const v of variants) pile.push({ brand: brandFrom(v, data), name: nameFrom(v, data), pack: packFrom(v), code: codeFrom(v), raw: v, group: data });
-    });
-
-    await tryLoad("borosil", async () => (await import("@/lib/borosil_products_absolute_final.json")) as any, (mod) => {
-      const arr = (mod as any).default ?? mod;
-      for (const g of (Array.isArray(arr) ? arr : [])) {
-        for (const v of g.variants || []) pile.push({ brand: brandFrom(v, g), name: nameFrom(v, g), pack: packFrom(v), code: codeFrom(v), raw: v, group: g });
-      }
-    });
-
-    await tryLoad("qualigens", async () => (await import("@/lib/qualigens-products.json")) as any, (mod) => {
-      const raw = (mod as any).default ?? mod;
+      variants.forEach((v: any) => push(v, data));
+    } catch {}
+    try {
+      const mod: any = await import("@/lib/borosil_products_absolute_final.json");
+      const arr = (mod.default ?? mod);
+      (Array.isArray(arr) ? arr : []).forEach((g: any) => (g.variants || []).forEach((v: any) => push(v, g)));
+    } catch {}
+    try {
+      const mod: any = await import("@/lib/qualigens-products.json");
+      const raw = (mod.default ?? mod);
       const arr = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : [];
-      for (const p of arr) pile.push({ brand: brandFrom(p), name: nameFrom(p), pack: packFrom(p), code: codeFrom(p), raw: p });
-    });
-
-    await tryLoad("rankem", async () => (await import("@/lib/rankem_products.json")) as any, (mod) => {
-      const arr = (mod as any).default ?? mod;
-      for (const g of (Array.isArray(arr) ? arr : [])) {
-        for (const v of g.variants || []) pile.push({ brand: brandFrom(v, g), name: nameFrom(v, g), pack: packFrom(v), code: codeFrom(v), raw: v, group: g });
-      }
-    });
-
-    await tryLoad("omsons", async () => (await import("@/lib/omsons_products.json")) as any, (mod) => {
-      const raw = (mod as any).default ?? mod;
+      arr.forEach((p: any) => push(p));
+    } catch {}
+    try {
+      const mod: any = await import("@/lib/rankem_products.json");
+      const arr = (mod.default ?? mod);
+      (Array.isArray(arr) ? arr : []).forEach((g: any) => (g.variants || []).forEach((v: any) => push(v, g)));
+    } catch {}
+    try {
+      const mod: any = await import("@/lib/omsons_products.json");
+      const raw = (mod.default ?? mod);
       const arr = Array.isArray(raw?.catalog) ? raw.catalog : [];
-      for (const sec of arr) for (const v of sec.variants || []) pile.push({ brand: brandFrom(v, sec), name: nameFrom(v, sec), pack: packFrom(v), code: codeFrom(v), raw: v, group: sec });
-    });
-
-    await tryLoad("avarice", async () => (await import("@/lib/avarice_products.json")) as any, (mod) => {
-      const raw = (mod as any).default ?? mod;
+      arr.forEach((sec: any) => (sec.variants || []).forEach((v: any) => push(v, sec)));
+    } catch {}
+    try {
+      const mod: any = await import("@/lib/avarice_products.json");
+      const raw = (mod.default ?? mod);
       const parents = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : [];
-      for (const parent of parents) for (const v of parent.variants || []) {
-        const merged = { ...v, product_name: parent.product_name, product_code: parent.product_code, cas_no: parent.cas_no };
-        pile.push({ brand: brandFrom(merged, parent), name: nameFrom(merged, parent), pack: packFrom(merged), code: codeFrom(merged), raw: merged, group: parent });
-      }
-    });
-
-    await tryLoad("himedia", async () => (await import("@/lib/himedia_products_grouped")) as any, (mod) => {
-      const arr = (mod as any).default ?? mod;
-      for (const section of (Array.isArray(arr) ? arr : [])) {
-        for (const header of section.header_sections || []) {
-          for (const sub of header.sub_sections || []) {
-            for (const item of sub.products || []) pile.push({ brand: brandFrom(item), name: nameFrom(item), pack: packFrom(item), code: codeFrom(item), raw: item });
-          }
-        }
-      }
-    });
+      parents.forEach((parent: any) =>
+        (parent.variants || []).forEach((v: any) => push({ ...v, product_name: parent.product_name, product_code: parent.product_code, cas_no: parent.cas_no }, parent))
+      );
+    } catch {}
+    try {
+      const mod: any = await import("@/lib/himedia_products_grouped");
+      const arr = (mod.default ?? mod);
+      (Array.isArray(arr) ? arr : []).forEach((section: any) =>
+        (section.header_sections || []).forEach((h: any) =>
+          (h.sub_sections || []).forEach((s: any) =>
+            (s.products || []).forEach((item: any) => push(item))
+          )
+        )
+      );
+    } catch {}
   }
 
   let best: { rec: Rec; score: number } | null = null;
@@ -184,7 +183,7 @@ async function fuzzyFind(slug: string) {
   return best.rec;
 }
 
-/* ----------------- generic renderer (never throws) ----------------- */
+/* ---------------- generic renderer ---------------- */
 function RenderValue({ value }: { value: any }) {
   const type = Object.prototype.toString.call(value);
   if (value == null) return <span className="text-slate-400">—</span>;
@@ -219,48 +218,73 @@ function RenderValue({ value }: { value: any }) {
   return <span>{String(value)}</span>;
 }
 
-/* ----------------- metadata (guarded) ----------------- */
+/* ---------------- metadata (no top-level SEO imports) ---------------- */
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  // Don’t throw from metadata
-  let rec = getBySlug(params.slug) as any;
+  let rec: any = null;
+
+  const idx = await loadIndex();
+  if (idx) {
+    try { rec = idx(params.slug); } catch {}
+  }
   if (!rec) {
-    const r = await safeAsync("fuzzyFind(metadata)", () => fuzzyFind(params.slug));
-    if (r.ok) rec = r.value;
+    try { rec = await fuzzyFind(params.slug); } catch {}
   }
   if (!rec) {
     return { title: "Product Not Found | Chemical Corporation", description: "The requested product could not be found.", robots: { index: false, follow: false } };
   }
+
   const canonical = `/product/${slugify(params.slug)}`;
-  const seoRes = safe("getProductSEO(metadata)", () => getProductSEO(rec.raw ?? rec, rec.group, canonical));
-  const seo = seoRes.ok ? seoRes.value : { title: `${rec.brand || ""} ${rec.name || "Product"}`.trim(), description: "Buy online. Discount auto-applies in cart.", jsonLd: {} };
-  return { title: (seo as any).title, description: (seo as any).description, alternates: { canonical }, openGraph: { title: (seo as any).title, description: (seo as any).description, type: "product", url: canonical } };
+  const seoMod = await loadSEO();
+  if (seoMod) {
+    try {
+      const seo = seoMod.getProductSEO(rec.raw ?? rec, rec.group, canonical);
+      return {
+        title: seo.title,
+        description: seo.description,
+        alternates: { canonical },
+        openGraph: { title: seo.title, description: seo.description, type: "product", url: canonical },
+      };
+    } catch {}
+  }
+  return {
+    title: `${rec.brand || ""} ${rec.name || "Product"}`.trim(),
+    description: "Buy online. Discount auto-applies in cart.",
+    alternates: { canonical },
+  };
 }
 
-/* ----------------- page ----------------- */
+/* ---------------- page ---------------- */
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const debug: string[] = [];
+  let rec: any = null;
 
-  // 1) Index lookup (never throw)
-  const idxRes = safe("getBySlug", () => getBySlug(params.slug));
-  let rec: any = idxRes.ok ? idxRes.value : null;
-  if (!idxRes.ok) debug.push(idxRes.error || "getBySlug failed");
-
-  // 2) Fallback fuzzy
-  if (!rec) {
-    const fuzz = await safeAsync("fuzzyFind(page)", () => fuzzyFind(params.slug));
-    if (fuzz.ok) rec = fuzz.value;
-    else debug.push(fuzz.error || "fuzzyFind failed");
+  const idx = await loadIndex();
+  if (idx) {
+    try { rec = idx(params.slug); } catch {}
   }
-
+  if (!rec) {
+    try { rec = await fuzzyFind(params.slug); } catch {}
+  }
   if (!rec) return notFound();
 
-  // 3) SEO (guarded)
   const canonical = `/product/${slugify(params.slug)}`;
-  const seoRes = safe("getProductSEO(page)", () => getProductSEO(rec.raw ?? rec, rec.group, canonical));
-  if (!seoRes.ok) debug.push(seoRes.error);
-  const seo = seoRes.ok ? seoRes.value : { title: `${rec.brand || ""} ${rec.name || "Product"}`.trim(), description: "Buy online. Discount auto-applies in cart.", jsonLd: {} };
 
-  // 4) Price (guarded)
+  // SEO (guarded)
+  let jsonLd: any = {};
+  let title = "";
+  let description = "";
+  const seoMod = await loadSEO();
+  if (seoMod) {
+    try {
+      const seo = seoMod.getProductSEO(rec.raw ?? rec, rec.group, canonical);
+      title = seo.title;
+      description = seo.description;
+      jsonLd = seo.jsonLd ?? {};
+    } catch {}
+  }
+  if (!title) title = `${rec.brand || ""} ${rec.name || "Product"}`.trim();
+  if (!description) description = "Buy online. Discount auto-applies in cart.";
+
+  // Price
   const priceNum = priceFromAny(rec) ?? priceFromAny(rec.raw ?? rec);
   const priceTxt = priceNum !== undefined ? `₹${priceNum.toLocaleString("en-IN")}` : "POR";
 
@@ -269,7 +293,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       {/* Header */}
       <div className="mb-6">
         <Badge className="mb-3 bg-blue-100 text-blue-900 border-blue-200">PRODUCT</Badge>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{(seo as any).h1 || (seo as any).title || "Product Details"}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{title}</h1>
         <p className="text-slate-600 mt-2">Discounts auto-apply in cart • Fast delivery across India</p>
       </div>
 
@@ -315,27 +339,10 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </CardContent>
       </Card>
 
-      {/* Debug (shows exactly what's failing) */}
-      {debug.length > 0 ? (
-        <Card className="bg-white mt-8 border-red-300">
-          <CardContent className="p-6">
-            <h3 className="text-sm font-semibold text-red-700 mb-2">Debug</h3>
-            <ul className="list-disc pl-5 text-sm text-red-800 space-y-1">
-              {debug.map((d, i) => <li key={i}>{d}</li>)}
-            </ul>
-          </CardContent>
-        </Card>
-      ) : null}
-
-      {/* JSON-LD (guarded) */}
+      {/* JSON-LD (never throw) */}
       <script
         type="application/ld+json"
-        // If seo.jsonLd is weird, stringify safely; never throw.
-        dangerouslySetInnerHTML={{
-          __html: safe("stringify jsonLd", () => JSON.stringify((seo as any).jsonLd ?? {})).ok
-            ? JSON.stringify((seo as any).jsonLd ?? {})
-            : "{}",
-        }}
+        dangerouslySetInnerHTML={{ __html: (() => { try { return JSON.stringify(jsonLd); } catch { return "{}"; } })() }}
       />
     </div>
   );
