@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,11 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Clock, Mail, Phone, FileText, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
-export default function OrderSuccessPage() {
+function OrderSuccessInner() {
   const searchParams = useSearchParams()
-  // Prefer the value sent from checkout redirect: /order-success?order=CC123
-  const orderNumber =
-    searchParams.get("order") || `CC${Date.now().toString().slice(-6)}`
+  const orderNumber = searchParams.get("order") || `CC${Date.now().toString().slice(-6)}`
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -130,5 +129,13 @@ export default function OrderSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-16">Loading…</div>}>
+      <OrderSuccessInner />
+    </Suspense>
   )
 }
