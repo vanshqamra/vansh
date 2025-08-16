@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, RefreshCcw, ShieldCheck, ShieldX, CheckCircle2, XCircle } from "lucide-react"
 
-// ---------- SUPABASE CLIENT (browser) ----------
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
 const supabase = createClient(supabaseUrl, supabaseKey)
@@ -20,13 +19,21 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 // ---------- TYPES ----------
 type Profile = {
   id: string
-  email: string | null
-  full_name: string | null
-  company: string | null
-  phone: string | null
-  gstin: string | null
-  role: "pending" | "client" | "admin" | "rejected"
-  created_at: string
+  email?: string | null
+  full_name?: string | null
+  name?: string | null
+  // new schema (optional)
+  company?: string | null
+  phone?: string | null
+  gstin?: string | null
+  role?: string | null
+  status?: string | null
+  // legacy schema (optional)
+  company_name?: string | null
+  contact_number?: string | null
+  gst_no?: string | null
+  created_at?: string | null
+  [k: string]: any
 }
 
 type Order = {
@@ -77,34 +84,31 @@ type OrderDetails = {
 const currency = (n: number | null | undefined) =>
   typeof n === "number" ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "—"
 
-const formatIST = (iso: string) =>
-  new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+const formatIST = (iso?: string | null) =>
+  iso ? new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"
 
-// Fallback resolvers for code/pack (in case columns differ)
 const val = (v: any) => (v === null || v === undefined || v === "" ? undefined : v)
 const displayCode = (it: any): string =>
-  val(it.product_code) ??
-  val(it.productCode) ??
-  val(it.code) ??
-  val(it.sku) ??
-  val(it.variant_code) ??
-  val(it.product_id) ??
-  "—"
+  (val(it.product_code) ??
+    val(it.productCode) ??
+    val(it.code) ??
+    val(it.sku) ??
+    val(it.variant_code) ??
+    val(it.product_id) ??
+    "—") as string
 
 const displayPack = (it: any): string =>
-  val(it.pack_size) ??
-  val(it.packSize) ??
-  val(it.pack) ??
-  val(it.size) ??
-  val(it.uom) ??
-  "—"
+  (val(it.pack_size) ?? val(it.packSize) ?? val(it.pack) ?? val(it.size) ?? val(it.uom) ?? "—") as string
 
+const isPending = (r?: Profile | null) => r?.status === "pending" || r?.role === "pending"
+
+// ---------- MUTATIONS ----------
 async function approveUser(userId: string) {
-  const { error } = await supabase.from("profiles").update({ role: "client" }).eq("id", userId)
+  const { error } = await supabase.from("profiles").update({ status: "approved", role: "client" }).eq("id", userId)
   if (error) throw error
 }
 async function rejectUser(userId: string) {
-  const { error } = await supabase.from("profiles").update({ role: "rejected" }).eq("id", userId)
+  const { error } = await supabase.from("profiles").update({ status: "rejected", role: "rejected" }).eq("id", userId)
   if (error) throw error
 }
 async function setOrderStatus(orderId: string, status: Order["status"]) {
@@ -119,10 +123,9 @@ function AdminReviewInner() {
 
   const tabParam = (searchParams.get("tab") || "").toLowerCase()
   const focusedOrderId = searchParams.get("orderId")
-  const focusMode = Boolean(focusedOrderId) // when deep-linking to an order
-  const clientApprovalsOnly = tabParam === "clients" && !focusedOrderId // when coming from Client Approvals button
+  const focusMode = Boolean(focusedOrderId)
+  const clientApprovalsOnly = tabParam === "clients" && !focusedOrderId
 
-  // Tab state (URL-driven)
   const initialTab = (() => {
     if (clientApprovalsOnly) return "accounts"
     const t = tabParam
@@ -141,16 +144,16 @@ function AdminReviewInner() {
   const [orders, setOrders] = useState<Order[]>([])
   const [orderQ, setOrderQ] = useState("")
 
-  // Items viewer state
+  // Items viewer
   const [openOrderId, setOpenOrderId] = useState<string | null>(null)
   const [items, setItems] = useState<OrderItem[]>([])
   const [itemsLoading, setItemsLoading] = useState(false)
 
-  // Details viewer state
+  // Details viewer
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
   const [detailsLoading, setDetailsLoading] = useState(false)
 
-  // Sync URL when tab changes (only when both tabs are visible)
+  // Sync tab in URL (skip when coming from Client Approvals button)
   useEffect(() => {
     if (clientApprovalsOnly) return
     const params = new URLSearchParams(searchParams.toString())
@@ -169,15 +172,15 @@ function AdminReviewInner() {
     const init = async () => {
       setLoading(true)
       try {
-        // Always fetch accounts for the clients tab
+        // Fetch only pending accounts (matches Client Approvals page)
         const { data: acc, error: accErr } = await supabase
           .from("profiles")
-          .select("id,email,full_name,company,phone,gstin,role,created_at")
+          .select("*")
+          .or("status.eq.pending,role.eq.pending")
           .order("created_at", { ascending: false })
         if (accErr) throw accErr
         setAccounts((acc || []) as Profile[])
 
-        // Only fetch orders if we're not in client-approvals-only mode
         if (!clientApprovalsOnly) {
           const { data: ord, error: ordErr } = await supabase
             .from("orders")
@@ -194,17 +197,26 @@ function AdminReviewInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientApprovalsOnly])
 
-  // Realtime subscriptions (orders only when visible)
+  // Realtime — keep only PENDING rows in "accounts"
   useEffect(() => {
     const channel = supabase
       .channel("admin-review")
       // profiles
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, (payload) =>
-        setAccounts((prev) => [payload.new as Profile, ...prev])
-      )
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, (payload) =>
-        setAccounts((prev) => prev.map((p) => (p.id === (payload.new as any).id ? (payload.new as Profile) : p)))
-      )
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, (payload) => {
+        const row = payload.new as Profile
+        if (isPending(row)) {
+          setAccounts((prev) => (prev.find((p) => p.id === row.id) ? prev : [row, ...prev]))
+        }
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, (payload) => {
+        const row = payload.new as Profile
+        if (isPending(row)) {
+          setAccounts((prev) => prev.map((p) => (p.id === row.id ? row : p)))
+        } else {
+          // moved out of pending → remove
+          setAccounts((prev) => prev.filter((p) => p.id !== row.id))
+        }
+      })
 
     if (!clientApprovalsOnly) {
       channel
@@ -233,23 +245,27 @@ function AdminReviewInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
 
-  // Search filters
+  // Filters with legacy/new fallbacks
   const filteredAccounts = useMemo(() => {
     const q = acctQ.trim().toLowerCase()
     if (!q) return accounts
-    return accounts.filter((a) =>
-      [a.email, a.full_name, a.company, a.phone, a.gstin, a.role]
-        .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(q))
-    )
+    return accounts.filter((a) => {
+      const fields = [
+        a.email,
+        a.full_name ?? a.name,
+        a.company ?? a.company_name,
+        a.phone ?? a.contact_number,
+        a.gstin ?? a.gst_no,
+        a.role ?? a.status,
+      ].filter(Boolean)
+      return fields.some((v) => String(v).toLowerCase().includes(q))
+    })
   }, [accounts, acctQ])
 
   const filteredOrders = useMemo(() => {
     const q = orderQ.trim().toLowerCase()
     if (!q) return orders
-    return orders.filter((o) =>
-      [o.id, o.status].filter(Boolean).some((v) => String(v).toLowerCase().includes(q))
-    )
+    return orders.filter((o) => [o.id, o.status].filter(Boolean).some((v) => String(v).toLowerCase().includes(q)))
   }, [orders, orderQ])
 
   // View order items
@@ -260,15 +276,10 @@ function AdminReviewInner() {
 
     let rows: any[] = []
     {
-      const { data, error } = await supabase
-        .from("order_items")
-        .select("*")
-        .eq("order_id", orderId)
-        .order("created_at", { ascending: true })
+      const { data, error } = await supabase.from("order_items").select("*").eq("order_id", orderId).order("created_at", { ascending: true })
       if (!error && data) rows = data as any[]
     }
 
-    // Fallback to server API if no rows (likely RLS)
     if (rows.length === 0) {
       const res = await fetch(`/api/admin/orders/${orderId}`, { cache: "no-store" })
       if (res.ok) {
@@ -288,23 +299,17 @@ function AdminReviewInner() {
     }
   }
 
-  // View order details (buyer/contact/shipping/payment/snapshot)
+  // View order details
   async function viewOrderDetails(orderId: string, opts: { pushUrl?: boolean } = { pushUrl: true }) {
     setDetailsLoading(true)
     setOrderDetails(null)
 
-    // Try client-side first
     let details: any | null = null
     {
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("id", orderId)
-        .single()
+      const { data, error } = await supabase.from("orders").select("*").eq("id", orderId).single()
       if (!error) details = data as any
     }
 
-    // Fallback to server API if nothing came back (RLS or null)
     if (!details) {
       const res = await fetch(`/api/admin/orders/${orderId}`, { cache: "no-store" })
       if (res.ok) {
@@ -327,7 +332,6 @@ function AdminReviewInner() {
   // ---------- UI ----------
   return (
     <div className="container mx-auto py-8">
-      {/* Hide the big header in focus mode */}
       {!focusMode && (
         <div className="mb-6 flex items-center justify-between gap-2">
           <h1 className="text-2xl font-semibold">Admin • Review Center</h1>
@@ -338,9 +342,6 @@ function AdminReviewInner() {
       )}
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
-        {/* Tabs selector:
-            - hidden in focusMode
-            - hidden in clientApprovalsOnly (so no Orders tab there) */}
         {!focusMode && !clientApprovalsOnly && (
           <TabsList>
             <TabsTrigger value="accounts">Accounts</TabsTrigger>
@@ -348,9 +349,6 @@ function AdminReviewInner() {
           </TabsList>
         )}
 
-        {/* ACCOUNTS — shown when:
-            - normal usage & tab=accounts, or
-            - clientApprovalsOnly mode */}
         {(tab === "accounts" || clientApprovalsOnly) && (
           <TabsContent value="accounts">
             <Card className="mt-4">
@@ -381,31 +379,61 @@ function AdminReviewInner() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredAccounts.map((a) => (
-                        <tr key={a.id} className="border-b last:border-none">
-                          <td className="py-2 pr-4">{formatIST(a.created_at)}</td>
-                          <td className="py-2 pr-4">{a.full_name || "—"}</td>
-                          <td className="py-2 pr-4">{a.email}</td>
-                          <td className="py-2 pr-4">{a.company || "—"}</td>
-                          <td className="py-2 pr-4">{a.phone || "—"}</td>
-                          <td className="py-2 pr-4">{a.gstin || "—"}</td>
-                          <td className="py-2 pr-4">
-                            <Badge variant={a.role === "pending" ? "secondary" : a.role === "client" ? "default" : "destructive"}>
-                              {a.role}
-                            </Badge>
-                          </td>
-                          <td className="py-2 pr-4">
-                            <div className="flex gap-2">
-                              <Button size="sm" variant="default" onClick={() => approveUser(a.id)}>
-                                <ShieldCheck className="mr-2 h-4 w-4" /> Approve
-                              </Button>
-                              <Button size="sm" variant="destructive" onClick={() => rejectUser(a.id)}>
-                                <ShieldX className="mr-2 h-4 w-4" /> Reject
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {filteredAccounts.map((a) => {
+                        const company = a.company ?? a.company_name ?? "—"
+                        const phone = a.phone ?? a.contact_number ?? "—"
+                        const gstin = a.gstin ?? a.gst_no ?? "—"
+                        const role = a.role ?? a.status ?? "—"
+                        return (
+                          <tr key={a.id} className="border-b last:border-none">
+                            <td className="py-2 pr-4">{formatIST(a.created_at)}</td>
+                            <td className="py-2 pr-4">{a.full_name || a.name || "—"}</td>
+                            <td className="py-2 pr-4">{a.email || "—"}</td>
+                            <td className="py-2 pr-4">{company}</td>
+                            <td className="py-2 pr-4">{phone}</td>
+                            <td className="py-2 pr-4">{gstin}</td>
+                            <td className="py-2 pr-4">
+                              <Badge variant={role === "pending" ? "secondary" : role === "client" ? "default" : "destructive"}>
+                                {role}
+                              </Badge>
+                            </td>
+                            <td className="py-2 pr-4">
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  onClick={async () => {
+                                    // optimistic remove
+                                    setAccounts((prev) => prev.filter((p) => p.id !== a.id))
+                                    try {
+                                      await approveUser(a.id)
+                                    } catch {
+                                      // rollback on failure
+                                      setAccounts((prev) => [a, ...prev])
+                                    }
+                                  }}
+                                >
+                                  <ShieldCheck className="mr-2 h-4 w-4" /> Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={async () => {
+                                    setAccounts((prev) => prev.filter((p) => p.id !== a.id))
+                                    try {
+                                      await rejectUser(a.id)
+                                    } catch {
+                                      setAccounts((prev) => [a, ...prev])
+                                    }
+                                  }}
+                                >
+                                  <ShieldX className="mr-2 h-4 w-4" /> Reject
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
                       {filteredAccounts.length === 0 && (
                         <tr>
                           <td className="py-6 text-center text-muted-foreground" colSpan={8}>
@@ -421,11 +449,9 @@ function AdminReviewInner() {
           </TabsContent>
         )}
 
-        {/* ORDERS — completely hidden in clientApprovalsOnly; focused when deep-linking */}
         {!clientApprovalsOnly && (
           <TabsContent value="orders">
             <Card className="mt-4">
-              {/* Hide the "Latest Orders" header/search/table in focus mode */}
               {!focusMode && (
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Latest Orders</CardTitle>
@@ -514,7 +540,6 @@ function AdminReviewInner() {
                   </div>
                 )}
 
-                {/* Items panel — no Close button */}
                 {openOrderId && (
                   <div className="mt-4 rounded-xl border p-4">
                     <div className="flex items-center justify-between">
@@ -556,7 +581,6 @@ function AdminReviewInner() {
                   </div>
                 )}
 
-                {/* Details panel — no Close button */}
                 {orderDetails && (
                   <div className="mt-4 rounded-xl border p-4">
                     <div className="flex items-center justify-between">
@@ -570,8 +594,7 @@ function AdminReviewInner() {
                         <div className="space-y-1">
                           <div className="font-semibold">Buyer</div>
                           <div>
-                            {(orderDetails.buyer_first_name || "—")}{" "}
-                            {(orderDetails.buyer_last_name || "")}
+                            {(orderDetails.buyer_first_name || "—")} {(orderDetails.buyer_last_name || "")}
                           </div>
                           <div>{orderDetails.company_name || "—"}</div>
                           <div>{orderDetails.buyer_phone || "—"}</div>
@@ -604,9 +627,7 @@ function AdminReviewInner() {
                           <details className="mt-2">
                             <summary className="cursor-pointer">Raw checkout snapshot</summary>
                             <pre className="mt-2 whitespace-pre-wrap break-words">
-                              {orderDetails.checkout_snapshot
-                                ? JSON.stringify(orderDetails.checkout_snapshot, null, 2)
-                                : "—"}
+                              {orderDetails.checkout_snapshot ? JSON.stringify(orderDetails.checkout_snapshot, null, 2) : "—"}
                             </pre>
                           </details>
                         </div>
