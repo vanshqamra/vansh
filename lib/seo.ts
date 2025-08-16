@@ -32,10 +32,9 @@ function brandFrom(product: any, group?: any) {
   return first(
     product.brand,
     group?.brand,
-    group?.product,        // Borosil groups sometimes carry product/brand
     product.vendor,
     product.mfg,
-    /borosil/i.test(JSON.stringify(product)) ? "Borosil" : "",
+    /borosil/i.test(JSON.stringify(product)) ? "Borosil" : ""
   );
 }
 
@@ -50,13 +49,12 @@ function nameFrom(product: any, group?: any) {
 }
 
 function normalizePrice(p: any) {
-  // Numeric price or POR -> return numeric or undefined (schema omits price if POR)
   if (p === undefined || p === null) return undefined;
   if (typeof p === "number") return p;
   const txt = String(p).trim().toUpperCase();
   if (txt === "POR" || txt === "P.O.R" || txt === "P O R") return undefined;
   const num = parseFloat(String(p).replace(/[^\d.]/g, ""));
-  return isFinite(num) ? num : undefined;
+  return Number.isFinite(num) ? num : undefined;
 }
 
 export type ProductSEO = {
@@ -66,15 +64,26 @@ export type ProductSEO = {
   jsonLd: Record<string, any>;
 };
 
-export function getProductSEO(product: any, group?: any): ProductSEO {
+/**
+ * Optionally pass canonicalUrl if you have it in the page (recommended).
+ */
+export function getProductSEO(
+  product: any,
+  group?: any,
+  canonicalUrl?: string
+): ProductSEO {
   const brand = brandFrom(product, group);
   const name  = nameFrom(product, group);
   const pack  = packFrom(product);
   const code  = codeFrom(product);
 
-  const titleParts = [brand, name, pack].filter(Boolean).join(" ");
+  const titleParts = [brand, name, pack].filter(Boolean).join(" ").trim();
   const codeSuffix = code ? ` – ${code}` : "";
-  const title = `${titleParts}${codeSuffix} | Buy Online – Chemical Corporation`;
+  const baseTitle = titleParts
+    ? `${titleParts}${codeSuffix}`
+    : "Product";
+
+  const title = `${baseTitle} | Buy Online – Chemical Corporation`;
 
   const h1 = `${[brand, name].filter(Boolean).join(" ")}${pack ? ` – ${pack}` : ""}${code ? ` (Code: ${code})` : ""}`;
 
@@ -90,13 +99,14 @@ export function getProductSEO(product: any, group?: any): ProductSEO {
   const offers: Record<string, any> = {
     "@type": "Offer",
     priceCurrency: "INR",
-    availability: "http://schema.org/InStock",
-    url: typeof window !== "undefined" ? window.location.href : undefined,
+    availability: "https://schema.org/InStock",
+    url: canonicalUrl, // preferred; can be undefined if you don't pass it
+    // itemCondition: "https://schema.org/NewCondition", // optional
   };
   if (price !== undefined) offers.price = price;
 
   const jsonLd: Record<string, any> = {
-    "@context": "http://schema.org",
+    "@context": "https://schema.org",
     "@type": "Product",
     name: [brand, name, pack].filter(Boolean).join(" "),
     brand: brand ? { "@type": "Brand", name: brand } : undefined,
