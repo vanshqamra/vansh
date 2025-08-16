@@ -148,18 +148,16 @@ function SearchResults() {
     const commercialResults = commercialChemicals
       .filter((p) => matchesSearchQuery(p, query))
       .map((p) => ({ ...p, source: "commercial", title: p.category, name: p.name, code: p.code }))
-
     // Rankem
 const rankemResults = rankemProducts.flatMap((group: any) => {
-  const variants = Array.isArray(group.variants) ? group.variants : []
+  const variants = Array.isArray(group.variants) ? group.variants : [];
 
   return variants
     .map((variant: any) => {
-      // Try standard columns first, then fallbacks seen in your sheets
       const name =
         str(variant["Description"]) ||
         str(variant["Unnamed: 1"]) ||
-        str(group.title)
+        str(group.title);
 
       const code =
         str(variant["Cat No"]) ||
@@ -167,47 +165,42 @@ const rankemResults = rankemProducts.flatMap((group: any) => {
         str(variant["Catalog No"]) ||
         str(variant["Catalog Number"]) ||
         str(variant["Code"]) ||
-        // odd Rankem header you had in the alt mapping
-        str(variant["Baker Analyzed ACS\nReagent\n(PVC"])
+        str(variant["Baker Analyzed ACS\nReagent\n(PVC"]);
 
       const packRaw =
         variant["Pack\nSize"] ??
         variant["Pack Size"] ??
         variant["Packing"] ??
-        variant["Unnamed: 3"]
-      const pack = str(packRaw)
+        variant["Unnamed: 3"];
+      const pack = str(packRaw);
 
       const price =
         variant["List Price\n2025(INR)"] ??
         variant["Price"] ??
         variant["Unnamed: 5"] ??
-        "—"
+        "—";
 
-      // If neither name nor code, drop this row
-      if (!name && !code) return null
+      if (!name && !code) return null;
 
       return {
         ...variant,
         source: "rankem",
-        brand: "Rankem",            // <-- important for "acetone rankem" search
+        brand: "Rankem",
         category: "Rankem",
         title: group.title || "Rankem",
         description: group.description || "",
         specs_headers: group.specs_headers,
-
         name: name || "—",
         code: code || "—",
-
-        // expose both keys so any UI variant works
         pack,
         packSize: pack,
-
         price,
-      }
+      };
     })
     .filter(Boolean)
-    .filter((row: any) => matchesSearchQuery(row, query))
-    )
+    .filter((row: any) => matchesSearchQuery(row, query));
+});
+
 
     // Borosil — USE ALIASES to resolve spec values and show group description
     const borosilResults = borosilProducts.flatMap((group: any) => {
