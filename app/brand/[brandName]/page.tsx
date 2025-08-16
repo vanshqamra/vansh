@@ -14,7 +14,9 @@ import omsonsDataRaw from "@/lib/omsons_products.json"
 
 import { useSearch } from "@/app/context/search-context"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { slugForProduct } from "@/lib/slug"
 
 /* ---------------- Helpers ---------------- */
 function normalizeKey(str: string) {
@@ -65,6 +67,21 @@ function firstNonEmpty(obj: Record<string, any>, keys: string[]) {
     if (obj?.[nk] !== undefined && obj?.[nk] !== "") return obj[nk]
   }
   return ""
+}
+
+/** Build a slug from a normalized table row + group meta */
+function slugFromRow(row: any, group: any, brandKey: string) {
+  const productLike = {
+    brand: (labSupplyBrands as any)[brandKey]?.name ?? brandKey,
+    productName: firstNonEmpty(row, nameKeys()),
+    packSize: firstNonEmpty(row, packKeys()),
+    code: firstNonEmpty(row, codeKeys()),
+    cas: firstNonEmpty(row, casKeys()),
+    hsn: firstNonEmpty(row, hsnKeys()),
+  }
+  const maybeGroup = brandKey === "borosil" ? group : undefined
+  const slug = slugForProduct(productLike, maybeGroup)
+  return slug ? `/product/${slug}` : "/products"
 }
 
 /** NEW: detect POR exactly, case-insensitive */
@@ -616,6 +633,13 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                         <td className="py-2 px-3">
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-slate-500">{displayPrice}</span>
+
+                            {/* NEW: View Details (slug-aware, safe fallback) */}
+                            <Button size="sm" variant="outline" asChild>
+                              <Link href={slugFromRow(row, group, brandKey)}>View Details</Link>
+                            </Button>
+
+                            {/* Existing Add button (unchanged) */}
                             <Button size="sm" onClick={() => handleAdd(row, group)}>
                               Add
                             </Button>

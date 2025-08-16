@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
+import Link from "next/link"
+import { slugForProduct } from "@/lib/slug"
 
 const flattenProducts = (data: any[]) => {
   const result = []
@@ -34,6 +36,20 @@ const flattenProducts = (data: any[]) => {
   }
 
   return result
+}
+
+/** Stable details URL for a HiMedia row */
+function detailsHrefForHiMedia(p: any) {
+  const productLike = {
+    brand: "HiMedia",
+    productName: p.name,
+    packSize: p.packing,
+    code: p.code,
+    hsn: p.hsn,
+    cas: p.cas,
+  }
+  const slug = slugForProduct(productLike)
+  return slug ? `/product/${slug}` : "/products"
 }
 
 const allProducts = flattenProducts(himediaProductsRaw)
@@ -88,6 +104,11 @@ export default function HiMediaBrandPage() {
                   ? `₹${product.price}`
                   : <span className="italic">On Request</span>}
               </p>
+              {/* NEW: View Details */}
+              <Button size="sm" variant="outline" className="w-full" asChild>
+                <Link href={detailsHrefForHiMedia(product)}>View Details</Link>
+              </Button>
+
               {product.price && (
                 <Button
                   size="sm"

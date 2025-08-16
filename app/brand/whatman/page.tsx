@@ -9,9 +9,30 @@ import whatmanProducts from "@/lib/whatman_products.json"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useSearch } from "@/app/context/search-context"
+import Link from "next/link"
+import { slugForProduct } from "@/lib/slug"
 
 const normalizeKey = (key: string) =>
   key?.toLowerCase().replace(/[^a-z0-9]/gi, "").trim()
+
+/** Stable details URL for a Whatman row */
+function detailsHrefForWhatman(variant: any, group: any) {
+  const productLike = {
+    brand: "Whatman",
+    productName: variant.name ?? variant["Product Name"] ?? "",
+    packSize: variant.packing ?? variant["Pack"] ?? variant["Pack Size"] ?? "",
+    code:
+      variant.code ??
+      variant.catalog_no ??
+      variant.catalogNo ??
+      variant.cat_no ??
+      "",
+    hsn: variant.hsn ?? variant["HSN"] ?? variant["HSN Code"] ?? "",
+    cas: variant.cas ?? variant["CAS"] ?? variant["CAS No"] ?? "",
+  }
+  const slug = slugForProduct(productLike)
+  return slug ? `/product/${slug}` : "/products"
+}
 
 export default function BrandPage({ params }: { params: { brandName: string } }) {
   const brandKey = "whatman"
@@ -86,13 +107,21 @@ export default function BrandPage({ params }: { params: { brandName: string } })
                   </td>
                 ))}
                 <td className="border px-3 py-2">
-                  <Button
-                    onClick={() => handleAddToCart(variant)}
-                    disabled={!isLoaded}
-                    size="sm"
-                  >
-                    Add to Cart
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {/* NEW: View Details */}
+                    <Button size="sm" variant="outline" asChild>
+                      <Link href={detailsHrefForWhatman(variant, group)}>View Details</Link>
+                    </Button>
+
+                    {/* Existing Add to Cart */}
+                    <Button
+                      onClick={() => handleAddToCart(variant)}
+                      disabled={!isLoaded}
+                      size="sm"
+                    >
+                      Add to Cart
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
