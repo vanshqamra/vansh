@@ -1,6 +1,7 @@
 // app/product/[slug]/page.tsx
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+// export const revalidate = 0; // optional: always fresh
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -10,113 +11,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getProductSEO } from "@/lib/seo";
 import { getBySlug } from "@/lib/product-index";
 
-// ---------- tiny utils ----------
-const clean = (v: any) => (typeof v === "string" ? v.trim() : "");
-const first = (...vals: any[]) => clean(vals.find((x) => clean(x)) || "");
+/* ----------------- small utils ----------------- */
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-const slugPart = (s: any) => (typeof s === "string" && s.trim() ? slugify(s) : "");
-const makeSlug = (...parts: any[]) => parts.map(slugPart).filter(Boolean).join("-");
 
-function tokens(s: string) {
-  return s
-    .split(/[^a-z0-9]+/i)
-    .map((t) => t.toLowerCase())
-    .filter((t) => t.length >= 2);
-}
-
-// very tolerant readers (don’t assume schema)
-function nameFrom(p: any, g?: any) {
-  return first(
-    p.productName,
-    p.name,
-    p.title,
-    p["Product Name"],
-    p.description,
-    g?.title,
-    g?.product,
-    p.product
-  );
-}
-function packFrom(p: any) {
-  return first(
-    p.packSize,
-    p.size,
-    p.capacity,
-    p.volume,
-    p.diameter,
-    p.dimensions,
-    p.grade,
-    p.Pack,
-    p["Pack Size"],
-    p.packing,
-    p["Pack"],
-    p["Qty/Pack"],
-    p["Quantity/Pack"]
-  );
-}
-function brandFrom(p: any, g?: any) {
-  return first(
-    p.brand,
-    g?.brand,
-    p.vendor,
-    p.mfg,
-    /borosil/i.test(JSON.stringify(p || {})) ? "Borosil" : ""
-  );
-}
-function codeFrom(p: any) {
-  const direct = first(
-    p.code,
-    p.product_code,
-    p.productCode,
-    p["Product Code"],
-    p.catalog_no,
-    p.catalogNo,
-    p.catalogue_no,
-    p.catalogueNo,
-    p["Catalog No"],
-    p["Catalogue No"],
-    p["Catalogue No."],
-    p.cat_no,
-    p.catno,
-    p["Cat No"],
-    p["Cat No."],
-    p["CAT NO"],
-    p["CAT. NO."],
-    p.order_code,
-    p.orderCode,
-    p.sku,
-    p.item_code,
-    p.itemCode,
-    p.code_no,
-    p["Code"]
-  );
-  if (direct) return direct;
-
-  // fallback: derive code-like token from name/title (e.g., "0048")
-  const nameLike = nameFrom(p);
-  if (nameLike) {
-    const bad = /^(mm|ml|l|pk|pcs?|um|µm|gm|kg|g|x|mmf)$/i;
-    const toks = String(nameLike).split(/[\s,/()_\-]+/).filter(Boolean);
-    const cands = toks.filter((t) => {
-      const T = t.toLowerCase();
-      if (bad.test(T)) return false;
-      if (!/^[a-z0-9-]+$/i.test(t)) return false;
-      if (!/\d/.test(t)) return false;
-      if (/(mm|ml|l|µm|um)$/i.test(T)) return false;
-      return t.length >= 3 && t.length <= 12;
-    });
-    const alnum = cands
-      .filter((t) => /[a-z]/i.test(t) && /\d/.test(t))
-      .sort((a, b) => a.length - b.length);
-    if (alnum[0]) return alnum[0];
-    const numeric = cands
-      .filter((t) => /^\d{3,8}$/.test(t))
-      .sort((a, b) => a.length - b.length);
-    if (numeric[0]) return numeric[0];
-  }
-  return "";
-}
+const tokens = (s: string) =>
+  s.split(/[^a-z0-9]+/i).map(t => t.toLowerCase()).filter(t => t.length >= 2);
 
 function priceFromAny(p: any): number | undefined {
   const raw = p?.price ?? p?.Price ?? p?.rate ?? p?.price_inr;
@@ -128,177 +28,151 @@ function priceFromAny(p: any): number | undefined {
   return Number.isFinite(num) ? num : undefined;
 }
 
-// ---------- fallback: fuzzy scan if index misses ----------
+/** Never throw; capture error message for on-page debug */
+function safe<T>(label: string, fn: () => T): { ok: true; value: T } | { ok: false; error: string } {
+  try {
+    return { ok: true, value: fn() };
+  } catch (e: any) {
+    return { ok: false, error: `${label}: ${e?.message || String(e)}` };
+  }
+}
+async function safeAsync<T>(label: string, fn: () => Promise<T>): Promise<{ ok: true; value: T } | { ok: false; error: string }> {
+  try {
+    return { ok: true, value: await fn() };
+  } catch (e: any) {
+    return { ok: false, error: `${label}: ${e?.message || String(e)}` };
+  }
+}
+
+/* ----------------- tolerant field readers ----------------- */
+const first = (...vals: any[]) => {
+  for (const v of vals) {
+    if (typeof v === "string" && v.trim()) return v.trim();
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+  }
+  return "";
+};
+function nameFrom(p: any, g?: any) {
+  return first(p.productName, p.name, p.title, p["Product Name"], p.description, g?.title, g?.product, p.product);
+}
+function packFrom(p: any) {
+  return first(p.packSize, p.size, p.capacity, p.volume, p.diameter, p.dimensions, p.grade, p.Pack, p["Pack Size"], p.packing, p["Pack"], p["Qty/Pack"], p["Quantity/Pack"]);
+}
+function brandFrom(p: any, g?: any) {
+  return first(p.brand, g?.brand, p.vendor, p.mfg, /borosil/i.test(JSON.stringify(p || {})) ? "Borosil" : "");
+}
+function codeFrom(p: any) {
+  const direct = first(
+    p.code, p.product_code, p.productCode, p["Product Code"],
+    p.catalog_no, p.catalogNo, p.catalogue_no, p.catalogueNo, p["Catalog No"], p["Catalogue No"], p["Catalogue No."],
+    p.cat_no, p.catno, p["Cat No"], p["Cat No."], p["CAT NO"], p["CAT. NO."],
+    p.order_code, p.orderCode, p.sku, p.item_code, p.itemCode, p.code_no, p["Code"]
+  );
+  if (direct) return direct;
+
+  const nameLike = nameFrom(p);
+  if (nameLike) {
+    const bad = /^(mm|ml|l|pk|pcs?|um|µm|gm|kg|g|x|mmf)$/i;
+    const toks = String(nameLike).split(/[\s,/()_\-]+/).filter(Boolean);
+    const cands = toks.filter(t => {
+      const T = t.toLowerCase();
+      if (bad.test(T)) return false;
+      if (!/^[a-z0-9-]+$/i.test(t)) return false;
+      if (!/\d/.test(t)) return false;
+      if (/(mm|ml|l|µm|um)$/i.test(T)) return false;
+      return t.length >= 3 && t.length <= 12;
+    });
+    const alnum = cands.filter(t => /[a-z]/i.test(t) && /\d/.test(t)).sort((a,b)=>a.length-b.length);
+    if (alnum[0]) return alnum[0];
+    const numeric = cands.filter(t => /^\d{3,8}$/.test(t)).sort((a,b)=>a.length-b.length);
+    if (numeric[0]) return numeric[0];
+  }
+  return "";
+}
+
+/* ----------------- fuzzy fallback (guarded) ----------------- */
 async function fuzzyFind(slug: string) {
   const target = slugify(slug);
   const want = tokens(target);
   if (want.length === 0) return null;
 
-  const pile: Array<{
-    brand: string;
-    name: string;
-    pack: string;
-    code: string;
-    raw: any;
-    group?: any;
-  }> = [];
+  type Rec = { brand: string; name: string; pack: string; code: string; raw: any; group?: any };
+  const pile: Rec[] = [];
 
-  // prefer shared iterator if present
-  try {
-    const mod = await import("@/lib/catalog/sources");
-    // @ts-ignore – generator in that module
-    for (const p of mod.iterAllProducts()) {
-      pile.push({
-        brand: p.brand,
-        name: p.name,
-        pack: p.pack,
-        code: p.code,
-        raw: p.raw,
-        group: p.group,
-      });
+  // Prefer shared iterator if repo has it
+  const iter = await safeAsync("import catalog/sources", async () => await import("@/lib/catalog/sources"));
+  if (iter.ok && typeof (iter.value as any).iterAllProducts === "function") {
+    // @ts-ignore generator
+    for (const p of (iter.value as any).iterAllProducts()) {
+      pile.push({ brand: p.brand, name: p.name, pack: p.pack, code: p.code, raw: p.raw, group: p.group });
     }
-  } catch {
-    // fall back to guarded direct imports per brand
-    try {
-      const mod: any = await import("@/lib/whatman_products.json");
-      const data = (mod.default ?? mod) as any;
-      const variants = Array.isArray(data?.variants)
-        ? data.variants
-        : Array.isArray(data)
-        ? data
-        : [];
-      for (const v of variants) {
-        pile.push({
-          brand: brandFrom(v, data),
-          name: nameFrom(v, data),
-          pack: packFrom(v),
-          code: codeFrom(v),
-          raw: v,
-          group: data,
-        });
+  } else {
+    // Fallback: guarded direct imports per brand. Each one is wrapped so a missing file never throws the page.
+    const tryLoad = async <T>(label: string, loader: () => Promise<T>, onData: (data: any) => void) => {
+      const res = await safeAsync(label, loader);
+      if (res.ok) onData(res.value);
+    };
+
+    await tryLoad("whatman", async () => (await import("@/lib/whatman_products.json")) as any, (mod) => {
+      const data = (mod as any).default ?? mod;
+      const variants = Array.isArray(data?.variants) ? data.variants : Array.isArray(data) ? data : [];
+      for (const v of variants) pile.push({ brand: brandFrom(v, data), name: nameFrom(v, data), pack: packFrom(v), code: codeFrom(v), raw: v, group: data });
+    });
+
+    await tryLoad("borosil", async () => (await import("@/lib/borosil_products_absolute_final.json")) as any, (mod) => {
+      const arr = (mod as any).default ?? mod;
+      for (const g of (Array.isArray(arr) ? arr : [])) {
+        for (const v of g.variants || []) pile.push({ brand: brandFrom(v, g), name: nameFrom(v, g), pack: packFrom(v), code: codeFrom(v), raw: v, group: g });
       }
-    } catch {}
-    try {
-      const mod: any = await import("@/lib/borosil_products_absolute_final.json");
-      const arr = (mod.default ?? mod) as any[];
-      for (const g of Array.isArray(arr) ? arr : []) {
-        for (const v of g.variants || []) {
-          pile.push({
-            brand: brandFrom(v, g),
-            name: nameFrom(v, g),
-            pack: packFrom(v),
-            code: codeFrom(v),
-            raw: v,
-            group: g,
-          });
-        }
-      }
-    } catch {}
-    try {
-      const mod: any = await import("@/lib/qualigens-products.json");
-      const raw = mod.default ?? mod;
+    });
+
+    await tryLoad("qualigens", async () => (await import("@/lib/qualigens-products.json")) as any, (mod) => {
+      const raw = (mod as any).default ?? mod;
       const arr = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : [];
-      for (const p of arr) {
-        pile.push({
-          brand: brandFrom(p),
-          name: nameFrom(p),
-          pack: packFrom(p),
-          code: codeFrom(p),
-          raw: p,
-        });
+      for (const p of arr) pile.push({ brand: brandFrom(p), name: nameFrom(p), pack: packFrom(p), code: codeFrom(p), raw: p });
+    });
+
+    await tryLoad("rankem", async () => (await import("@/lib/rankem_products.json")) as any, (mod) => {
+      const arr = (mod as any).default ?? mod;
+      for (const g of (Array.isArray(arr) ? arr : [])) {
+        for (const v of g.variants || []) pile.push({ brand: brandFrom(v, g), name: nameFrom(v, g), pack: packFrom(v), code: codeFrom(v), raw: v, group: g });
       }
-    } catch {}
-    try {
-      const mod: any = await import("@/lib/rankem_products.json");
-      const raw = mod.default ?? mod;
-      const arr = Array.isArray(raw) ? raw : [];
-      for (const g of arr) {
-        for (const v of g.variants || []) {
-          pile.push({
-            brand: brandFrom(v, g),
-            name: nameFrom(v, g),
-            pack: packFrom(v),
-            code: codeFrom(v),
-            raw: v,
-            group: g,
-          });
-        }
-      }
-    } catch {}
-    try {
-      const mod: any = await import("@/lib/omsons_products.json");
-      const raw = mod.default ?? mod;
+    });
+
+    await tryLoad("omsons", async () => (await import("@/lib/omsons_products.json")) as any, (mod) => {
+      const raw = (mod as any).default ?? mod;
       const arr = Array.isArray(raw?.catalog) ? raw.catalog : [];
-      for (const sec of arr) {
-        for (const v of sec.variants || []) {
-          pile.push({
-            brand: brandFrom(v, sec),
-            name: nameFrom(v, sec),
-            pack: packFrom(v),
-            code: codeFrom(v),
-            raw: v,
-            group: sec,
-          });
-        }
-      }
-    } catch {}
-    try {
-      const mod: any = await import("@/lib/avarice_products.json");
-      const raw = mod.default ?? mod;
+      for (const sec of arr) for (const v of sec.variants || []) pile.push({ brand: brandFrom(v, sec), name: nameFrom(v, sec), pack: packFrom(v), code: codeFrom(v), raw: v, group: sec });
+    });
+
+    await tryLoad("avarice", async () => (await import("@/lib/avarice_products.json")) as any, (mod) => {
+      const raw = (mod as any).default ?? mod;
       const parents = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : [];
-      for (const parent of parents) {
-        for (const v of parent.variants || []) {
-          const merged = {
-            ...v,
-            product_name: parent.product_name,
-            product_code: parent.product_code,
-            cas_no: parent.cas_no,
-          };
-          pile.push({
-            brand: brandFrom(merged, parent),
-            name: nameFrom(merged, parent),
-            pack: packFrom(merged),
-            code: codeFrom(merged),
-            raw: merged,
-            group: parent,
-          });
-        }
+      for (const parent of parents) for (const v of parent.variants || []) {
+        const merged = { ...v, product_name: parent.product_name, product_code: parent.product_code, cas_no: parent.cas_no };
+        pile.push({ brand: brandFrom(merged, parent), name: nameFrom(merged, parent), pack: packFrom(merged), code: codeFrom(merged), raw: merged, group: parent });
       }
-    } catch {}
-    try {
-      const mod: any = await import("@/lib/himedia_products_grouped");
-      const raw = mod.default ?? mod;
-      const arr = Array.isArray(raw) ? raw : [];
-      for (const section of arr) {
+    });
+
+    await tryLoad("himedia", async () => (await import("@/lib/himedia_products_grouped")) as any, (mod) => {
+      const arr = (mod as any).default ?? mod;
+      for (const section of (Array.isArray(arr) ? arr : [])) {
         for (const header of section.header_sections || []) {
           for (const sub of header.sub_sections || []) {
-            for (const item of sub.products || []) {
-              pile.push({
-                brand: brandFrom(item),
-                name: nameFrom(item),
-                pack: packFrom(item),
-                code: codeFrom(item),
-                raw: item,
-              });
-            }
+            for (const item of sub.products || []) pile.push({ brand: brandFrom(item), name: nameFrom(item), pack: packFrom(item), code: codeFrom(item), raw: item });
           }
         }
       }
-    } catch {}
+    });
   }
 
-  let best: any = null;
+  let best: { rec: Rec; score: number } | null = null;
   for (const rec of pile) {
     const hay = [
-      rec.brand,
-      rec.name,
-      rec.pack,
-      rec.code,
+      rec.brand, rec.name, rec.pack, rec.code,
       JSON.stringify(rec.raw || {}).slice(0, 2000),
-      rec.group ? JSON.stringify(rec.group || {}).slice(0, 1000) : "",
-    ]
-      .join(" ")
-      .toLowerCase();
+      rec.group ? JSON.stringify(rec.group || {}).slice(0, 1000) : ""
+    ].join(" ").toLowerCase();
 
     let score = 0;
     for (const t of want) if (hay.includes(t)) score++;
@@ -310,23 +184,21 @@ async function fuzzyFind(slug: string) {
   return best.rec;
 }
 
-// ---------- generic renderer for any data ----------
+/* ----------------- generic renderer (never throws) ----------------- */
 function RenderValue({ value }: { value: any }) {
   const type = Object.prototype.toString.call(value);
-
   if (value == null) return <span className="text-slate-400">—</span>;
-
   if (type === "[object Object]") {
     const entries = Object.entries(value as Record<string, any>);
-    if (entries.length === 0) return <span className="text-slate-400">{"{}"}</span>;
+    if (!entries.length) return <span className="text-slate-400">{`{}`}</span>;
     return (
       <div className="overflow-x-auto border rounded">
         <table className="min-w-full text-xs">
           <tbody>
-            {entries.map(([k, val], i) => (
+            {entries.map(([k, v], i) => (
               <tr key={i} className="border-b last:border-none">
                 <td className="px-2 py-1 font-medium whitespace-nowrap align-top bg-slate-50">{String(k)}</td>
-                <td className="px-2 py-1 align-top"><RenderValue value={val} /></td>
+                <td className="px-2 py-1 align-top"><RenderValue value={v} /></td>
               </tr>
             ))}
           </tbody>
@@ -334,77 +206,71 @@ function RenderValue({ value }: { value: any }) {
       </div>
     );
   }
-
   if (Array.isArray(value)) {
-    if (value.length === 0) return <span className="text-slate-400">[]</span>;
+    if (!value.length) return <span className="text-slate-400">[]</span>;
     return (
       <div className="space-y-2">
         {value.map((item, idx) => (
-          <div key={idx} className="border rounded p-2">
-            <RenderValue value={item} />
-          </div>
+          <div key={idx} className="border rounded p-2"><RenderValue value={item} /></div>
         ))}
       </div>
     );
   }
-
   return <span>{String(value)}</span>;
 }
 
-// ---------- metadata ----------
+/* ----------------- metadata (guarded) ----------------- */
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  let rec: any = getBySlug(params.slug);
-  if (!rec) rec = await fuzzyFind(params.slug);
-
+  // Don’t throw from metadata
+  let rec = getBySlug(params.slug) as any;
   if (!rec) {
-    return {
-      title: "Product Not Found | Chemical Corporation",
-      description: "The requested product could not be found.",
-      robots: { index: false, follow: false },
-    };
+    const r = await safeAsync("fuzzyFind(metadata)", () => fuzzyFind(params.slug));
+    if (r.ok) rec = r.value;
   }
-
+  if (!rec) {
+    return { title: "Product Not Found | Chemical Corporation", description: "The requested product could not be found.", robots: { index: false, follow: false } };
+  }
   const canonical = `/product/${slugify(params.slug)}`;
-  const seo = getProductSEO(rec.raw ?? rec, rec.group, canonical);
-  return {
-    title: seo.title,
-    description: seo.description,
-    alternates: { canonical },
-    openGraph: {
-      title: seo.title,
-      description: seo.description,
-      type: "product",
-      url: canonical,
-    },
-  };
+  const seoRes = safe("getProductSEO(metadata)", () => getProductSEO(rec.raw ?? rec, rec.group, canonical));
+  const seo = seoRes.ok ? seoRes.value : { title: `${rec.brand || ""} ${rec.name || "Product"}`.trim(), description: "Buy online. Discount auto-applies in cart.", jsonLd: {} };
+  return { title: (seo as any).title, description: (seo as any).description, alternates: { canonical }, openGraph: { title: (seo as any).title, description: (seo as any).description, type: "product", url: canonical } };
 }
 
-// ---------- page ----------
+/* ----------------- page ----------------- */
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-  // 1) try shared index
-  let rec: any = getBySlug(params.slug);
-  // 2) fallback fuzzy scan
-  if (!rec) rec = await fuzzyFind(params.slug);
+  const debug: string[] = [];
+
+  // 1) Index lookup (never throw)
+  const idxRes = safe("getBySlug", () => getBySlug(params.slug));
+  let rec: any = idxRes.ok ? idxRes.value : null;
+  if (!idxRes.ok) debug.push(idxRes.error || "getBySlug failed");
+
+  // 2) Fallback fuzzy
+  if (!rec) {
+    const fuzz = await safeAsync("fuzzyFind(page)", () => fuzzyFind(params.slug));
+    if (fuzz.ok) rec = fuzz.value;
+    else debug.push(fuzz.error || "fuzzyFind failed");
+  }
+
   if (!rec) return notFound();
 
+  // 3) SEO (guarded)
   const canonical = `/product/${slugify(params.slug)}`;
-  const seo = getProductSEO(rec.raw ?? rec, rec.group, canonical);
+  const seoRes = safe("getProductSEO(page)", () => getProductSEO(rec.raw ?? rec, rec.group, canonical));
+  if (!seoRes.ok) debug.push(seoRes.error);
+  const seo = seoRes.ok ? seoRes.value : { title: `${rec.brand || ""} ${rec.name || "Product"}`.trim(), description: "Buy online. Discount auto-applies in cart.", jsonLd: {} };
 
-  // show a price if present on record, else try raw
-  const priceNum =
-    typeof rec.price === "number" ? rec.price : priceFromAny(rec.raw ?? rec);
-  const priceTxt =
-    priceNum !== undefined ? `₹${priceNum.toLocaleString("en-IN")}` : "POR";
+  // 4) Price (guarded)
+  const priceNum = priceFromAny(rec) ?? priceFromAny(rec.raw ?? rec);
+  const priceTxt = priceNum !== undefined ? `₹${priceNum.toLocaleString("en-IN")}` : "POR";
 
   return (
     <div className="container mx-auto px-4 py-10">
       {/* Header */}
       <div className="mb-6">
         <Badge className="mb-3 bg-blue-100 text-blue-900 border-blue-200">PRODUCT</Badge>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{seo.h1}</h1>
-        <p className="text-slate-600 mt-2">
-          Discounts auto-apply in cart • Fast delivery across India
-        </p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{(seo as any).h1 || (seo as any).title || "Product Details"}</h1>
+        <p className="text-slate-600 mt-2">Discounts auto-apply in cart • Fast delivery across India</p>
       </div>
 
       {/* Summary */}
@@ -419,9 +285,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
 
           <div className="text-2xl font-semibold text-slate-900 mb-2">{priceTxt}</div>
-          <div className="text-sm text-emerald-700 mb-6">
-            Discount applies in cart — final price shown at checkout
-          </div>
+          <div className="text-sm text-emerald-700 mb-6">Discount applies in cart — final price shown at checkout</div>
 
           <div className="flex gap-3">
             <Button asChild><Link href="/products">Continue Shopping</Link></Button>
@@ -451,10 +315,27 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </CardContent>
       </Card>
 
-      {/* JSON-LD */}
+      {/* Debug (shows exactly what's failing) */}
+      {debug.length > 0 ? (
+        <Card className="bg-white mt-8 border-red-300">
+          <CardContent className="p-6">
+            <h3 className="text-sm font-semibold text-red-700 mb-2">Debug</h3>
+            <ul className="list-disc pl-5 text-sm text-red-800 space-y-1">
+              {debug.map((d, i) => <li key={i}>{d}</li>)}
+            </ul>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {/* JSON-LD (guarded) */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.jsonLd ?? {}) }}
+        // If seo.jsonLd is weird, stringify safely; never throw.
+        dangerouslySetInnerHTML={{
+          __html: safe("stringify jsonLd", () => JSON.stringify((seo as any).jsonLd ?? {})).ok
+            ? JSON.stringify((seo as any).jsonLd ?? {})
+            : "{}",
+        }}
       />
     </div>
   );
