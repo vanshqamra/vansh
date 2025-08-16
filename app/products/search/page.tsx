@@ -24,10 +24,8 @@ import omsonsDataRaw from "@/lib/omsons_products.json"
 
 /* ---------------- Helpers ---------------- */
 const asArray = (x: any) => (Array.isArray((x as any)?.data) ? (x as any).data : Array.isArray(x) ? x : [])
-const norm = (s: any) => (s == null ? "" : String(s)).toLowerCase()
 const stripNonAlnum = (s: any) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "")
 const inr = (n: number) => n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
-const isNum = (v: any) => typeof v === "number" && Number.isFinite(v)
 const isPOR = (v: any) => /^por$/i.test(String(v ?? "").trim())
 const toNum = (v: any): number | null => {
   if (typeof v === "number") return Number.isFinite(v) ? v : null
@@ -39,8 +37,7 @@ const toNum = (v: any): number | null => {
 }
 const normalizeKey = (str: string) =>
   String(str).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
-
-/** Safely coerce to a single-spaced trimmed string */
+/** single-spaced trimmed string */
 const str = (v: any) => (v ?? "").toString().replace(/\s+/g, " ").trim()
 
 const dedupe = (rows: any[]) => {
@@ -106,18 +103,27 @@ function SearchResults() {
   const { toast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // NEW: token-based search across a combined haystack
   const matchesSearchQuery = (product: any, query: string): boolean => {
-    const normalizedQuery = stripNonAlnum(query)
-    if (!normalizedQuery) return false
-    const searchFields: string[] = []
-    const collect = (obj: any) => {
-      if (typeof obj === "string") searchFields.push(stripNonAlnum(obj))
-      else if (typeof obj === "number") searchFields.push(String(obj))
-      else if (Array.isArray(obj)) obj.forEach(collect)
-      else if (obj && typeof obj === "object") Object.values(obj).forEach(collect)
-    }
-    collect(product)
-    return searchFields.some((field) => field.includes(normalizedQuery))
+    const tokens = (query || "").toLowerCase().match(/[a-z0-9]+/g) || []
+    if (!tokens.length) return false
+
+    const hay = [
+      product.name,
+      product.product,
+      product.title,
+      product.code,
+      product.brand || product.source,
+      product.category,
+      product.pack || product.packSize,
+      product.description,
+      ...(Array.isArray(product.specs) ? product.specs.flatMap((s: any) => [s?.label, s?.value]) : []),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+
+    return tokens.every((t) => hay.includes(t))
   }
 
   const triggerSearch = (rawQuery: string) => {
@@ -203,7 +209,7 @@ function SearchResults() {
         .filter((row: any) => matchesSearchQuery(row, query))
     })
 
-    // Borosil — USE ALIASES to resolve spec values and show group description
+    // Borosil
     const borosilResults = (Array.isArray(borosilProducts) ? borosilProducts : []).flatMap((group: any) => {
       const title = group.product || group.title || group.category || "Borosil"
       const description = group.description || ""
@@ -371,8 +377,6 @@ function SearchResults() {
     triggerSearch(searchQuery)
   }
 
-  const { addItem: addToCart } = useCart() // alias if needed
-
   const handleAddToCart = (product: any) => {
     if (!isLoaded) {
       toast({ title: "Loading...", description: "Please wait while the cart loads", variant: "destructive" })
@@ -388,7 +392,7 @@ function SearchResults() {
         toast({ title: "Price on request", description: "This item does not have a numeric price.", variant: "default" })
         return
       }
-      addToCart({
+      addItem({
         id: product.id || product.code || `${product.source}-${Math.random().toString(36).slice(2, 10)}`,
         name: product.name || product.product || product.title,
         price: priceNum,
@@ -448,6 +452,10 @@ function SearchResults() {
                       .filter((x) => x.value != null && String(x.value).trim() !== "")
                   : []
 
+                const badgeA = product.source
+                const badgeB = product.category
+                const showBadgeB = badgeB && badgeB !== badgeA
+
                 return (
                   <Card
                     key={`${product.source}-${product.id || product.code || Math.random().toString(36).substring(2, 10)}`}
@@ -458,8 +466,8 @@ function SearchResults() {
                         {product.name || product.product || product.title}
                       </CardTitle>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary">{product.source}</Badge>
-                        <Badge variant="outline">{product.category}</Badge>
+                        {badgeA && <Badge variant="secondary">{badgeA}</Badge>}
+                        {showBadgeB && <Badge variant="outline">{badgeB}</Badge>}
                       </div>
                     </CardHeader>
                     <CardContent>
