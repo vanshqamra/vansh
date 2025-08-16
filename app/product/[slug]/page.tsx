@@ -6,45 +6,44 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getProductSEO } from "@/lib/seo";
-import { slugForProduct } from "@/lib/slug";
 
-// ====== STATIC IMPORTS (present in your repo already) ======
-import borosilProducts from "@/lib/borosil_products_absolute_final.json";
-import qualigensProductsRaw from "@/lib/qualigens-products.json";
-import rankemProducts from "@/lib/rankem_products.json";
-import omsonsDataRaw from "@/lib/omsons_products.json";
-import avariceProductsRaw from "@/lib/avarice_products.json";
-import himediaProductsRaw from "@/lib/himedia_products_grouped";
-import whatmanProducts from "@/lib/whatman_products.json";
-
-// ====== small utils (kept local; no behavior changes elsewhere) ======
+// ---------- small utils ----------
 const clean = (v: any) => (typeof v === "string" ? v.trim() : "");
 const first = (...vals: any[]) => clean(vals.find((x) => clean(x)) || "");
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-const asArray = (x: any) =>
-  Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : [];
-
 function packFrom(p: any) {
   return first(
-    p.packSize, p.size, p.capacity, p.volume, p.diameter, p.dimensions, p.grade
+    p.packSize, p.size, p.capacity, p.volume, p.diameter, p.dimensions, p.grade,
+    p.Pack, p["Pack Size"], p.packing
   );
 }
 function codeFrom(p: any) {
   return first(
-    p.code, p.catalog_no, p.catalogNo, p.catno, p.sku, p.item_code, p.itemCode, p["Product Code"]
+    p.code, p.product_code, p.productCode,
+    p.catalog_no, p.catalogNo,
+    p.cat_no, p.catno, p["Cat No"], p["Cat No."],
+    p.catalogue_no, p.catalogueNo, p["Catalogue No"], p["Catalogue No."],
+    p["Product Code"], p.order_code, p.orderCode,
+    p.sku, p.item_code, p.itemCode,
+    p.code_no, p["Code"]
   );
 }
 function brandFrom(p: any, g?: any) {
-  return first(p.brand, g?.brand, p.vendor, p.mfg);
+  return first(
+    p.brand, g?.brand, p.vendor, p.mfg,
+    /borosil/i.test(JSON.stringify(p)) ? "Borosil" : ""
+  );
 }
 function nameFrom(p: any, g?: any) {
-  return first(p.productName, p.name, p.title, g?.title, g?.product, p.product, p["Product Name"]);
+  return first(
+    p.productName, p.name, p.title, g?.title, g?.product, p.product, p["Product Name"]
+  );
 }
 function priceFrom(p: any) {
   if (p == null) return undefined;
-  if (typeof p === "number") return p;
+  if (typeof p === "number") return Number.isFinite(p) ? p : undefined;
   const txt = String(p).trim().toUpperCase();
   if (txt === "POR" || txt === "P.O.R" || txt === "P O R") return undefined;
   const num = parseFloat(String(p).replace(/[^\d.]/g, ""));
@@ -58,8 +57,6 @@ function primaryImageFrom(p: any, g?: any) {
     null
   );
 }
-
-// Build the same slug we used in lists
 function candidateSlug(p: any, g?: any) {
   const brand = brandFrom(p, g);
   const name = nameFrom(p, g);
@@ -68,67 +65,93 @@ function candidateSlug(p: any, g?: any) {
   const base = [brand, name, pack, code].filter(Boolean).join(" ");
   return slugify(base) || (code ? slugify(code) : "");
 }
-
-// Some users may hit /product/<CODE> directly; allow that too
-function looksLikeCodeMatch(slug: string, p: any) {
+function looksLikeCodeMatch(target: string, p: any) {
   const c = codeFrom(p);
-  return c && slugify(String(c)) === slug;
+  return c && slugify(String(c)) === target;
+}
+function slugContainsCode(target: string, p: any) {
+  const c = codeFrom(p);
+  if (!c) return false;
+  const sc = slugify(String(c));
+  return target.includes(sc);
+}
+
+async function safeImport<T = any>(path: string): Promise<T | undefined> {
+  try {
+    const mod: any = await import(/* @vite-ignore */ path);
+    return (mod?.default ?? mod) as T;
+  } catch {
+    return undefined;
+  }
 }
 
 type Found = { product: any; group?: any; brand?: string };
+const asArray = (x: any) =>
+  Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : [];
 
-// ====== Resolve product across all brands ======
+// ===== Scan catalogs and find by slug or by code (even if code is inside slug) =====
 async function findProductBySlug(slug: string): Promise<Found | null> {
   const target = slug.toLowerCase();
 
-  // 1) BOROSIL (grouped -> variants)
-  if (Array.isArray(borosilProducts)) {
-    for (const g of borosilProducts as any[]) {
+  // 1) BOROSIL (grouped with variants)
+  const borosil = await safeImport<any[]>("@/lib/borosil_products_absolute_final.json");
+  if (Array.isArray(borosil)) {
+    for (const g of borosil) {
       const variants = Array.isArray(g.variants) ? g.variants : [];
       for (const v of variants) {
-        if (candidateSlug({ ...v, brand: "Borosil" }, g) === target || looksLikeCodeMatch(target, v)) {
-          return { product: { ...v, brand: "Borosil" }, group: g, brand: "Borosil" };
+        const prod = { ...v, brand: "Borosil" };
+        if (
+          candidateSlug(prod, g) === target ||
+          looksLikeCodeMatch(target, prod) ||
+          slugContainsCode(target, prod)
+        ) {
+          return { product: { ...prod, productName: nameFrom(prod, g) }, group: g, brand: "Borosil" };
         }
       }
     }
   }
 
-  // helper: scan flat arrays
-  const scanFlat = (arrRaw: any, assumedBrand?: string) => {
-    const arr = asArray(arrRaw);
+  // 2) QUALIGENS (flat)
+  {
+    const raw: any = await safeImport<any>("@/lib/qualigens-products.json");
+    const arr = asArray(raw);
     for (const p of arr) {
-      const slugCand = candidateSlug(assumedBrand ? { ...p, brand: assumedBrand } : p);
-      if (slugCand === target || looksLikeCodeMatch(target, p)) {
-        return { product: assumedBrand ? { ...p, brand: assumedBrand } : p, group: undefined, brand: assumedBrand };
+      const prod = { ...p, brand: "Qualigens" };
+      if (
+        candidateSlug(prod) === target ||
+        looksLikeCodeMatch(target, prod) ||
+        slugContainsCode(target, prod)
+      ) {
+        return { product: prod, brand: "Qualigens" };
       }
     }
-    return null;
-  };
-
-  // 2) QUALIGENS (data or array)
-  {
-    const raw: any = (qualigensProductsRaw as any).default || qualigensProductsRaw;
-    const hit = scanFlat(raw, "Qualigens");
-    if (hit) return hit;
   }
 
-  // 3) RANKEM (grouped objects with variants)
-  if (Array.isArray(rankemProducts as any[])) {
-    for (const grp of rankemProducts as any[]) {
+  // 3) RANKEM (grouped -> variants)
+  {
+    const raw: any = await safeImport<any>("@/lib/rankem_products.json");
+    const groups: any[] = Array.isArray(raw) ? raw : [];
+    for (const grp of groups) {
       const variants = Array.isArray(grp?.variants) ? grp.variants : [];
       for (const v of variants) {
-        if (candidateSlug({ ...v, brand: "Rankem" }) === target || looksLikeCodeMatch(target, v)) {
-          return { product: { ...v, brand: "Rankem" }, group: grp, brand: "Rankem" };
+        const prod = { ...v, brand: "Rankem" };
+        if (
+          candidateSlug(prod, grp) === target ||
+          looksLikeCodeMatch(target, prod) ||
+          slugContainsCode(target, prod)
+        ) {
+          return { product: prod, group: grp, brand: "Rankem" };
         }
       }
     }
   }
 
-  // 4) HIMEDIA (grouped nested structure)
+  // 4) HIMEDIA (nested → header_sections → sub_sections → products)
   {
+    const data: any[] = (await safeImport<any>("@/lib/himedia_products_grouped")) as any;
+    const root: any[] = Array.isArray(data) ? data : [];
     const flat: any[] = [];
-    const data: any[] = Array.isArray(himediaProductsRaw) ? himediaProductsRaw : [];
-    for (const section of data) {
+    for (const section of root) {
       for (const header of section.header_sections || []) {
         for (const sub of header.sub_sections || []) {
           for (const item of sub.products || []) {
@@ -138,21 +161,31 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
       }
     }
     for (const p of flat) {
-      if (candidateSlug({ ...p, brand: "HiMedia" }) === target || looksLikeCodeMatch(target, p)) {
-        return { product: { ...p, brand: "HiMedia" }, group: undefined, brand: "HiMedia" };
+      const prod = { ...p, brand: "HiMedia" };
+      if (
+        candidateSlug(prod) === target ||
+        looksLikeCodeMatch(target, prod) ||
+        slugContainsCode(target, prod)
+      ) {
+        return { product: prod, brand: "HiMedia" };
       }
     }
   }
 
-  // 5) OMSONS
+  // 5) OMSONS (catalog.sections[].variants[])
   {
-    const raw = (omsonsDataRaw as any);
+    const raw: any = await safeImport<any>("@/lib/omsons_products.json");
     const sections: any[] = Array.isArray(raw?.catalog) ? raw.catalog : [];
     for (const sec of sections) {
       const variants = Array.isArray(sec?.variants) ? sec.variants : [];
-      for (const p of variants) {
-        if (candidateSlug({ ...p, brand: "Omsons" }, sec) === target || looksLikeCodeMatch(target, p)) {
-          return { product: { ...p, brand: "Omsons" }, group: sec, brand: "Omsons" };
+      for (const v of variants) {
+        const prod = { ...v, brand: "Omsons" };
+        if (
+          candidateSlug(prod, sec) === target ||
+          looksLikeCodeMatch(target, prod) ||
+          slugContainsCode(target, prod)
+        ) {
+          return { product: prod, group: sec, brand: "Omsons" };
         }
       }
     }
@@ -160,25 +193,40 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
 
   // 6) AVARICE (products[].variants[])
   {
-    const raw = (avariceProductsRaw as any).default || avariceProductsRaw;
+    const raw: any = await safeImport<any>("@/lib/avarice_products.json");
     const products: any[] = asArray(raw);
-    for (const prod of products) {
-      for (const v of prod.variants || []) {
-        const p = { ...v, product_name: prod.product_name, product_code: prod.product_code, cas_no: prod.cas_no };
-        if (candidateSlug({ ...p, brand: "Avarice" }) === target || looksLikeCodeMatch(target, p)) {
-          return { product: { ...p, brand: "Avarice" }, group: prod, brand: "Avarice" };
+    for (const parent of products) {
+      for (const v of parent.variants || []) {
+        const merged = {
+          ...v,
+          product_name: parent.product_name,
+          product_code: parent.product_code,
+          cas_no: parent.cas_no,
+          brand: "Avarice",
+        };
+        if (
+          candidateSlug(merged) === target ||
+          looksLikeCodeMatch(target, merged) ||
+          slugContainsCode(target, merged)
+        ) {
+          return { product: merged, group: parent, brand: "Avarice" };
         }
       }
     }
   }
 
-  // 7) WHATMAN (group object with specs_headers + variants)
+  // 7) WHATMAN (group with specs_headers + variants)
   {
-    const grp: any = whatmanProducts as any;
+    const grp: any = await safeImport<any>("@/lib/whatman_products.json");
     const variants = Array.isArray(grp?.variants) ? grp.variants : [];
-    for (const p of variants) {
-      if (candidateSlug({ ...p, brand: "Whatman" }, grp) === target || looksLikeCodeMatch(target, p)) {
-        return { product: { ...p, brand: "Whatman" }, group: grp, brand: "Whatman" };
+    for (const v of variants) {
+      const prod = { ...v, brand: "Whatman" };
+      if (
+        candidateSlug(prod, grp) === target ||
+        looksLikeCodeMatch(target, prod) ||
+        slugContainsCode(target, prod)
+      ) {
+        return { product: prod, group: grp, brand: "Whatman" };
       }
     }
   }
@@ -186,7 +234,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
   return null;
 }
 
-// ====== Metadata ======
+// --------- Metadata ----------
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const found = await findProductBySlug(params.slug);
   if (!found) {
@@ -196,32 +244,35 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       robots: { index: false, follow: false },
     };
   }
-  const canonical = `/product/${params.slug}`;
-  const seo = getProductSEO(found.product, found.group, canonical);
+  const seo = getProductSEO(found.product, found.group);
   return {
     title: seo.title,
     description: seo.description,
-    alternates: { canonical },
-    openGraph: { title: seo.title, description: seo.description, type: "product", url: canonical },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      type: "product",
+    },
   };
 }
 
-// ====== Page ======
+// --------- Page ----------
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const found = await findProductBySlug(params.slug);
   if (!found) return notFound();
 
-  const { product, group } = found;
-  const canonical = `/product/${params.slug}`;
-  const seo = getProductSEO(product, group, canonical);
+  const { product, group, brand: forcedBrand } = found;
+  const seo = getProductSEO(product, group);
 
-  const brand = brandFrom(product, found.group);
-  const name = nameFrom(product, group);
+  const brand = first(product.brand, forcedBrand);
+  const name = first(product.productName, product.name, product.title, product["Product Name"]);
   const pack = packFrom(product);
   const code = codeFrom(product);
-  const hsn = first((product as any).hsn, (product as any).hsnCode, (product as any)["HSN Code"]);
-  const cas = first((product as any).cas, (product as any).casNo, (product as any)["CAS No"]);
-  const price = priceFrom((product as any).price ?? (product as any).Price);
+  const hsn = first(product.hsn, product.hsnCode, product["HSN Code"], product["HSN"]);
+  const cas = first(product.cas, product.casNo, product.cas_number, product["CAS No"], product["CAS"]);
+  const price = priceFrom(
+    (product as any).price ?? (product as any).Price ?? (product as any).rate ?? (product as any).price_inr
+  );
   const image = primaryImageFrom(product, group);
 
   return (
@@ -286,7 +337,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </div>
       </div>
 
-      {/* Product JSON-LD */}
+      {/* Product JSON-LD for Google */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.jsonLd) }}
