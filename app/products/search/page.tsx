@@ -18,7 +18,6 @@ import rankemProducts from "@/lib/rankem_products.json"
 import borosilProducts from "@/lib/borosil_products_absolute_final.json"
 import whatmanProducts from "@/lib/whatman_products.json"
 import himediaData from "@/lib/himedia_products_grouped"
-
 import avariceProductsRaw from "@/lib/avarice_products.json"
 import omsonsDataRaw from "@/lib/omsons_products.json"
 
@@ -35,17 +34,18 @@ const toNum = (v: any): number | null => {
   const n = Number(s.replace(/[^\d.]/g, ""))
   return Number.isFinite(n) ? n : null
 }
-const normalizeKey = (str: string) =>
-  String(str).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
 /** single-spaced trimmed string */
 const str = (v: any) => (v ?? "").toString().replace(/\s+/g, " ").trim()
+
+/** normalize brand/category for comparisons */
+const normBrand = (v: any) => str(v).toLowerCase()
 
 const dedupe = (rows: any[]) => {
   const seen = new Set<string>()
   const out: any[] = []
   for (const r of rows) {
     const key = [
-      r.source || "",
+      normBrand(r.source || ""),
       stripNonAlnum(r.code || ""),
       stripNonAlnum(r.packSize || r.packing || r.pack || ""),
       stripNonAlnum(r.name || r.product || r.title || ""),
@@ -59,11 +59,12 @@ const dedupe = (rows: any[]) => {
 }
 
 // Borosil helpers
+const normalizeKey = (strx: string) =>
+  String(strx).toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "")
 const getBorosilCode = (v: any) => v?.code ?? v?.Code ?? v?.["Product Code"] ?? v?.["Cat No"] ?? ""
 const getBorosilName = (v: any, g: any) =>
   v?.["Product Name"] || v?.Description || v?.Name || g?.product || g?.title || "Borosil Product"
 
-// Map human headers to row keys (normalized)
 const BOROSIL_HEADER_ALIASES: Record<string, string[]> = {
   product_code: ["code", "product_code", "cat_no", "cat_no_", "cat_no__", "catalog_no", "catalogue_no", "product code"],
   capacity_ml: ["capacity ml", "capacity", "capacity_mL", "capacity_ml"],
@@ -103,7 +104,7 @@ function SearchResults() {
   const { toast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // NEW: token-based search across a combined haystack
+  // Token-based search across combined fields (works for "acetone rankem")
   const matchesSearchQuery = (product: any, query: string): boolean => {
     const tokens = (query || "").toLowerCase().match(/[a-z0-9]+/g) || []
     if (!tokens.length) return false
@@ -133,83 +134,113 @@ function SearchResults() {
     setSearchQuery("") // auto-clear input after submit
     inputRef.current?.blur()
 
-    /* -------- Build brand results -------- */
+    /* -------- Map first, then filter (fixes Qualigens visibility) -------- */
 
-    // Qualigens
+    // Qualigens (map → filter)
     const qualigensArr: any[] = Array.isArray(qualigensProducts)
       ? qualigensProducts
       : (qualigensProducts as any)?.data || []
-    const qualigensResults = qualigensArr
-      .filter((p) => matchesSearchQuery(p, query))
-      .map((p) => ({
-        ...p,
-        source: "qualigens",
-        category: "Qualigens",
-        title: "Qualigens",
-        name: p["Product Name"],
-        code: p["Product Code"],
-        price: p["Price"],
-      }))
+    const qualigensMapped = qualigensArr.map((p) => ({
+      ...p,
+      source: "Qualigens",
+      category: "Qualigens",
+      title: "Qualigens",
+      name: p["Product Name"] || p["Name"] || p["Title"],
+      code: p["Product Code"] || p["Code"],
+      price: p["Price"] ?? p["Rate"] ?? "—",
+    }))
+    const qualigensResults = qualigensMapped.filter((row) => matchesSearchQuery(row, query))
 
-    // Commercial
-    const commercialResults = commercialChemicals
-      .filter((p) => matchesSearchQuery(p, query))
-      .map((p) => ({ ...p, source: "commercial", title: p.category, name: p.name, code: p.code }))
+    // Commercial (map → filter)
+    const commercialMapped = commercialChemicals.map((p) => ({
+      ...p,
+      source: "Commercial",
+      category: p.category,
+      title: p.category,
+      name: p.name,
+      code: p.code,
+      price: p.price ?? "—",
+    }))
+    const commercialResults = commercialMapped.filter((row) => matchesSearchQuery(row, query))
 
-    // Rankem
+    // Rankem — handle standard & "Unnamed:*" + "Baker Analyzed ACS\nReagent\n(PVC)" rows
     const rankemResults = (Array.isArray(rankemProducts) ? rankemProducts : []).flatMap((group: any) => {
       const variants = Array.isArray(group?.variants) ? group.variants : []
 
-      return variants
-        .map((variant: any) => {
-          const name =
-            str(variant["Description"]) ||
-            str(variant["Unnamed: 1"]) ||
-            str(group?.title)
+      const mapped = variants.map((variant: any) => {
+        const bakerKeyA = "Baker Analyzed ACS\nReagent\n(PVC"
+        const bakerKeyB = "Baker Analyzed ACS\nReagent\n(PVC)" // some sheets have the closing )
+        const bakerCode = str(variant[bakerKeyA]) || str(variant[bakerKeyB])
 
-          const code =
-            str(variant["Cat No"]) ||
-            str(variant["Cat No."]) ||
-            str(variant["Catalog No"]) ||
-            str(variant["Catalog Number"]) ||
-            str(variant["Code"]) ||
-            str(variant["Baker Analyzed ACS\nReagent\n(PVC"])
+        const nameBase =
+          str(variant["Description"]) ||
+          str(variant["Unnamed: 1"]) ||
+          str(group?.title)
 
-          const packRaw =
-            variant["Pack\nSize"] ??
-            variant["Pack Size"] ??
-            variant["Packing"] ??
-            variant["Unnamed: 3"]
-          const pack = str(packRaw)
+        // If bakerCode present, append "(JT BAKER)" to name
+        const name = bakerCode ? `${nameBase || "Rankem Product"} (JT BAKER)` : nameBase || "Rankem Product"
 
-          const price =
-            variant["List Price\n2025(INR)"] ??
-            variant["Price"] ??
-            variant["Unnamed: 5"] ??
-            "—"
+        // Code priorities (include bakerCode fallback)
+        const code =
+          str(variant["Cat No"]) ||
+          str(variant["Cat No."]) ||
+          str(variant["Catalog No"]) ||
+          str(variant["Catalog Number"]) ||
+          str(variant["Code"]) ||
+          bakerCode
 
-          if (!name && !code) return null
+        // Pack size
+        const packRaw =
+          variant["Pack\nSize"] ??
+          variant["Pack Size"] ??
+          variant["Packing"] ??
+          variant["Unnamed: 3"]
+        const pack = str(packRaw)
 
-          return {
-            ...variant,
-            source: "rankem",
-            brand: "Rankem",
-            category: "Rankem",
-            title: group?.title || "Rankem",
-            description: group?.description || "",
-            specs_headers: group?.specs_headers,
-            name: name || "—",
-            code: code || "—",
-            pack,
-            packSize: pack,
-            price,
-          }
-        })
-        .filter(Boolean)
-        .filter((row: any) => matchesSearchQuery(row, query))
+        // Price — IMPORTANT: use Unnamed: 5 for these alt rows (not Unnamed: 4)
+        const price =
+          variant["List Price\n2025(INR)"] ??
+          variant["Price"] ??
+          variant["Unnamed: 5"] ??
+          "—"
+
+        // Extra spec: HSN/CAS from Unnamed: 4 when present
+        const hsnOrCas = variant["Unnamed: 4"]
+
+        if (!name && !code) return null
+
+        const base = {
+          ...variant,
+          source: "Rankem",
+          brand: "Rankem",
+          category: "Rankem",
+          title: group?.title || "Rankem",
+          description: group?.description || "",
+          specs_headers: group?.specs_headers,
+          name,
+          code: code || "—",
+          pack,
+          packSize: pack,
+          price,
+        }
+
+        const specs = [
+          ...(Array.isArray(base.specs_headers)
+            ? base.specs_headers
+                .filter((h: string) => !/price/i.test(h))
+                .map((h: string) => ({ label: h, value: (variant as any)[h] }))
+            : []),
+          ...(hsnOrCas != null ? [{ label: "HSN/CAS", value: hsnOrCas }] : []),
+          ...(bakerCode ? [{ label: "Brand", value: "JT BAKER" }] : []),
+        ].filter((x) => x.value != null && String(x.value).trim() !== "")
+
+        return { ...base, specs }
+      })
+
+      return mapped.filter(Boolean).filter((row: any) => matchesSearchQuery(row, query))
     })
 
-    // Borosil
+    // Borosil (map → filter)
     const borosilResults = (Array.isArray(borosilProducts) ? borosilProducts : []).flatMap((group: any) => {
       const title = group.product || group.title || group.category || "Borosil"
       const description = group.description || ""
@@ -237,7 +268,7 @@ function SearchResults() {
 
         return {
           ...v,
-          source: "borosil",
+          source: "Borosil",
           category: "Borosil",
           title,
           description,
@@ -251,35 +282,34 @@ function SearchResults() {
       return mapped.filter((row) => matchesSearchQuery(row, query))
     })
 
-    // Whatman
-    const whatmanResults = (whatmanProducts?.variants || [])
-      .map((variant: any) => {
-        const specs = (whatmanProducts.specs_headers || [])
-          .filter((h: string) => !/price/i.test(h))
-          .map((h: string) => ({ label: h, value: variant[h] }))
-          .filter((x) => x.value != null && String(x.value).trim() !== "")
-        return {
-          ...variant,
-          source: "whatman",
-          category: "Whatman",
-          title: whatmanProducts.title || "Whatman",
-          description: whatmanProducts.description || "",
-          name: variant["name"] || variant["Name"] || variant["Code"] || "Whatman Product",
-          code: variant["Code"] || variant["code"] || "",
-          price: variant["Price"] || variant["price"] || "—",
-          specs,
-        }
-      })
-      .filter((row: any) => matchesSearchQuery(row, query))
+    // Whatman (map → filter)
+    const whatmanMapped = (whatmanProducts?.variants || []).map((variant: any) => {
+      const specs = (whatmanProducts.specs_headers || [])
+        .filter((h: string) => !/price/i.test(h))
+        .map((h: string) => ({ label: h, value: variant[h] }))
+        .filter((x) => x.value != null && String(x.value).trim() !== "")
+      return {
+        ...variant,
+        source: "Whatman",
+        category: "Whatman",
+        title: whatmanProducts.title || "Whatman",
+        description: whatmanProducts.description || "",
+        name: variant["name"] || variant["Name"] || variant["Code"] || "Whatman Product",
+        code: variant["Code"] || variant["code"] || "",
+        price: variant["Price"] || variant["price"] || "—",
+        specs,
+      }
+    })
+    const whatmanResults = whatmanMapped.filter((row: any) => matchesSearchQuery(row, query))
 
-    // HiMedia
-    const himediaResults = (himediaData || [])
+    // HiMedia (map → filter)
+    const himediaRows = (himediaData || [])
       .flatMap((section: any) =>
         (section.header_sections || []).flatMap((header: any) =>
           (header.sub_sections || []).flatMap((sub: any) =>
             (sub.products || []).map((product: any) => ({
               ...product,
-              source: "himedia",
+              source: "HiMedia",
               category: section.main_section,
               title: header.header_section,
               description: sub.sub_section,
@@ -295,13 +325,13 @@ function SearchResults() {
           )
         )
       )
-      .filter((row: any) => matchesSearchQuery(row, query))
+    const himediaResults = himediaRows.filter((row: any) => matchesSearchQuery(row, query))
 
-    // Avarice
+    // Avarice (map → filter) — keep title-cased source/category to avoid case duplicates
     const avariceArr: any[] = asArray(avariceProductsRaw)
     const avariceRows = avariceArr.flatMap((p: any) =>
       (p?.variants || []).map((v: any) => ({
-        source: "avarice",
+        source: "Avarice",
         category: "Avarice",
         title: "Avarice Products",
         name: p?.product_name || "Avarice Product",
@@ -317,7 +347,7 @@ function SearchResults() {
     )
     const avariceResults = avariceRows.filter((row) => matchesSearchQuery(row, query))
 
-    // Omsons
+    // Omsons (map → filter)
     const omsonsSections: any[] = Array.isArray((omsonsDataRaw as any)?.catalog) ? (omsonsDataRaw as any).catalog : []
     const omsonsRows = omsonsSections.flatMap((sec: any) => {
       const title = sec?.product_name || sec?.title || sec?.category || "Omsons"
@@ -334,7 +364,7 @@ function SearchResults() {
 
         return {
           ...v,
-          source: "omsons",
+          source: "Omsons",
           category: "Omsons",
           title,
           description: sectionSpec,
@@ -376,6 +406,9 @@ function SearchResults() {
     e.preventDefault()
     triggerSearch(searchQuery)
   }
+
+  const { toast } = useToast()
+  const { isLoaded, addItem } = useCart()
 
   const handleAddToCart = (product: any) => {
     if (!isLoaded) {
@@ -452,9 +485,9 @@ function SearchResults() {
                       .filter((x) => x.value != null && String(x.value).trim() !== "")
                   : []
 
-                const badgeA = product.source
-                const badgeB = product.category
-                const showBadgeB = badgeB && badgeB !== badgeA
+                const badgeA = String(product.source || "")
+                const badgeB = String(product.category || "")
+                const showBadgeB = !!badgeB && normBrand(badgeB) !== normBrand(badgeA)
 
                 return (
                   <Card
