@@ -23,23 +23,66 @@ const first = (...vals: any[]) => clean(vals.find((x) => clean(x)) || "");
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+// Pull “code-like” token from the slug (e.g., 0048 in whatman-0048-32mm-1000-pk)
+function codeHintFromSlug(slug: string): string {
+  const parts = slug.split("-");
+  const stop = new Set(["mm","ml","l","pk","pcs","pc","um","µm","gm","kg","g","x","mmf"]);
+  const cands: string[] = [];
+  for (const p of parts) {
+    const s = p.toLowerCase();
+    if (stop.has(s)) continue;
+    if (/^\d{3,8}[a-z]?$/i.test(p)) cands.push(p);              // 0048, 12345, 1234A
+    else if (/^[a-z]{1,3}\d{2,8}$/i.test(p)) cands.push(p);      // LR1009, GF6, etc.
+  }
+  // prefer shorter/cleaner tokens (avoid 1000)
+  cands.sort((a,b)=>a.length-b.length);
+  return cands[0] || "";
+}
+
 function packFrom(p: any) {
   return first(
     p.packSize, p.size, p.capacity, p.volume, p.diameter, p.dimensions, p.grade,
-    p.Pack, p["Pack Size"], p.packing
+    p.Pack, p["Pack Size"], p.packing, p["Pack"], p["Qty/Pack"], p["Quantity/Pack"]
   );
 }
+
+// Heuristic: try many keys; if none, try extracting from name/title
 function codeFrom(p: any) {
-  return first(
+  const direct = first(
     p.code, p.product_code, p.productCode,
     p.catalog_no, p.catalogNo,
-    p.cat_no, p.catno, p["Cat No"], p["Cat No."],
-    p.catalogue_no, p.catalogueNo, p["Catalogue No"], p["Catalogue No."],
-    p["Product Code"], p.order_code, p.orderCode,
-    p.sku, p.item_code, p.itemCode,
-    p.code_no, p["Code"]
+    p.cat_no, p.catno, p["Cat No"], p["Cat No."], p["CAT NO"], p["CAT. NO."],
+    p.catalogue_no, p.catalogueNo, p["Catalogue No"], p["Catalogue No."], p["Catalog No"],
+    p["Product Code"], p.productcode,
+    p.order_code, p.orderCode,
+    p.sku, p.item_code, p.itemCode, p.code_no, p["Code"]
   );
+  if (direct) return direct;
+
+  const nameLike = first(p.name, p.title, p.productName, p["Product Name"], p.description);
+  if (nameLike) {
+    // tokenize and keep alnum codes; drop unit-ish tokens
+    const tokens = String(nameLike).split(/[\s,/()_-]+/).filter(Boolean);
+    const bad = /^(mm|ml|l|pk|pcs?|um|µm|gm|kg|g|x|mmf)$/i;
+    const candidates = tokens.filter(t => {
+      const T = t.toLowerCase();
+      if (bad.test(T)) return false;
+      if (!/^[a-z0-9-]+$/i.test(t)) return false;
+      // must contain a digit but not be obvious unit/size-only like 32mm
+      if (!/\d/.test(t)) return false;
+      if (/(mm|ml|l|µm|um)$/i.test(T)) return false;
+      return t.length >= 3 && t.length <= 12;
+    });
+
+    // prefer letter+digit combos (LR1009) over pure numbers; then shortest first
+    const alnum = candidates.filter(t => /[a-z]/i.test(t) && /\d/.test(t)).sort((a,b)=>a.length-b.length);
+    if (alnum[0]) return alnum[0];
+    const numeric = candidates.filter(t => /^\d{3,8}$/.test(t)).sort((a,b)=>a.length-b.length);
+    if (numeric[0]) return numeric[0];
+  }
+  return "";
 }
+
 function brandFrom(p: any, g?: any) {
   return first(
     p.brand, g?.brand, p.vendor, p.mfg,
@@ -59,7 +102,6 @@ function priceFrom(p: any) {
   const num = parseFloat(String(p).replace(/[^\d.]/g, ""));
   return Number.isFinite(num) ? num : undefined;
 }
-
 function candidateSlug(p: any, g?: any) {
   const brand = brandFrom(p, g);
   const name = nameFrom(p, g);
@@ -86,6 +128,7 @@ const asArray = (x: any) =>
 // ===== Scan catalogs and find by slug or by code (even if code is inside slug) =====
 async function findProductBySlug(slug: string): Promise<Found | null> {
   const target = slug.toLowerCase();
+  const hint = codeHintFromSlug(target); // <-- new
 
   // 1) BOROSIL (grouped -> variants)
   if (Array.isArray(borosilProducts)) {
@@ -93,10 +136,12 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
       const variants = Array.isArray(g.variants) ? g.variants : [];
       for (const v of variants) {
         const prod = { ...v, brand: "Borosil" };
+        const c = codeFrom(prod);
         if (
           candidateSlug(prod, g) === target ||
           looksLikeCodeMatch(target, prod) ||
-          slugContainsCode(target, prod)
+          slugContainsCode(target, prod) ||
+          (hint && c && slugify(String(c)) === hint) // <-- new
         ) {
           return { product: { ...prod, productName: nameFrom(prod, g) }, group: g, brand: "Borosil" };
         }
@@ -109,10 +154,12 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
     const arr = asArray((qualigensProductsRaw as any).default ?? qualigensProductsRaw);
     for (const p of arr) {
       const prod = { ...p, brand: "Qualigens" };
+      const c = codeFrom(prod);
       if (
         candidateSlug(prod) === target ||
         looksLikeCodeMatch(target, prod) ||
-        slugContainsCode(target, prod)
+        slugContainsCode(target, prod) ||
+        (hint && c && slugify(String(c)) === hint)
       ) {
         return { product: prod, brand: "Qualigens" };
       }
@@ -126,10 +173,12 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
       const variants = Array.isArray(grp?.variants) ? grp.variants : [];
       for (const v of variants) {
         const prod = { ...v, brand: "Rankem" };
+        const c = codeFrom(prod);
         if (
           candidateSlug(prod, grp) === target ||
           looksLikeCodeMatch(target, prod) ||
-          slugContainsCode(target, prod)
+          slugContainsCode(target, prod) ||
+          (hint && c && slugify(String(c)) === hint)
         ) {
           return { product: prod, group: grp, brand: "Rankem" };
         }
@@ -144,18 +193,18 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
     for (const section of root) {
       for (const header of section.header_sections || []) {
         for (const sub of header.sub_sections || []) {
-          for (const item of sub.products || []) {
-            flat.push(item);
-          }
+          for (const item of sub.products || []) flat.push(item);
         }
       }
     }
     for (const p of flat) {
       const prod = { ...p, brand: "HiMedia" };
+      const c = codeFrom(prod);
       if (
         candidateSlug(prod) === target ||
         looksLikeCodeMatch(target, prod) ||
-        slugContainsCode(target, prod)
+        slugContainsCode(target, prod) ||
+        (hint && c && slugify(String(c)) === hint)
       ) {
         return { product: prod, brand: "HiMedia" };
       }
@@ -169,10 +218,12 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
       const variants = Array.isArray(sec?.variants) ? sec.variants : [];
       for (const v of variants) {
         const prod = { ...v, brand: "Omsons" };
+        const c = codeFrom(prod);
         if (
           candidateSlug(prod, sec) === target ||
           looksLikeCodeMatch(target, prod) ||
-          slugContainsCode(target, prod)
+          slugContainsCode(target, prod) ||
+          (hint && c && slugify(String(c)) === hint)
         ) {
           return { product: prod, group: sec, brand: "Omsons" };
         }
@@ -192,10 +243,12 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
           cas_no: parent.cas_no,
           brand: "Avarice",
         };
+        const c = codeFrom(merged);
         if (
           candidateSlug(merged) === target ||
           looksLikeCodeMatch(target, merged) ||
-          slugContainsCode(target, merged)
+          slugContainsCode(target, merged) ||
+          (hint && c && slugify(String(c)) === hint)
         ) {
           return { product: merged, group: parent, brand: "Avarice" };
         }
@@ -209,10 +262,12 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
     const variants = Array.isArray(grp?.variants) ? grp.variants : [];
     for (const v of variants) {
       const prod = { ...v, brand: "Whatman" };
+      const c = codeFrom(prod);
       if (
         candidateSlug(prod, grp) === target ||
         looksLikeCodeMatch(target, prod) ||
-        slugContainsCode(target, prod)
+        slugContainsCode(target, prod) ||
+        (hint && c && slugify(String(c)) === hint)
       ) {
         return { product: prod, group: grp, brand: "Whatman" };
       }
@@ -270,7 +325,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         <p className="text-slate-600 mt-2">Discounts auto-apply in cart • Fast delivery across India</p>
       </div>
 
-      {/* Details (full-width since there are no images) */}
+      {/* Details (no images in catalog) */}
       <Card className="bg-white">
         <CardContent className="p-6">
           <div className="flex flex-wrap gap-2 mb-4">
@@ -303,7 +358,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
       {/* Product JSON-LD for Google */}
       <script
         type="application/ld+json"
-        // stringify guards against non-serializable values
         dangerouslySetInnerHTML={{ __html: JSON.stringify(seo.jsonLd) }}
       />
     </div>
