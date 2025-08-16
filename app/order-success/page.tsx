@@ -117,11 +117,11 @@ export default function OrderSuccessPage() {
           <div className="text-center text-sm text-gray-600 space-y-2">
             <p>Need help with your order?</p>
             <div className="flex justify-center gap-4">
-              <a href="tel:+91-9876543210" className="flex items-center gap-1 text-blue-600 hover:underline">
+              <a href="tel:+91-9417250691" className="flex items-center gap-1 text-blue-600 hover:underline">
                 <Phone className="h-4 w-4" />
                 Call Support
               </a>
-              <a href="mailto:support@chemicalcorp.com" className="flex items-center gap-1 text-blue-600 hover:underline">
+              <a href="mailto:chemicalcorporation.ldh@gmail.com" className="flex items-center gap-1 text-blue-600 hover:underline">
                 <Mail className="h-4 w-4" />
                 Email Support
               </a>
