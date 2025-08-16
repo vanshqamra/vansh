@@ -150,46 +150,63 @@ function SearchResults() {
       .map((p) => ({ ...p, source: "commercial", title: p.category, name: p.name, code: p.code }))
 
     // Rankem
-    const rankemResults = rankemProducts.flatMap((group: any) =>
-      (group.variants || [])
-        .map((variant: any) => {
-          const isStandard = variant["Cat No"] && variant["Description"]
-          const isAlt = variant["Unnamed: 1"] && variant["Unnamed: 5"]
-          if (isStandard) {
-            return {
-              ...variant,
-              source: "rankem",
-              category: "Rankem",
-              title: group.title || "Rankem",
-              description: group.description || "",
-              specs_headers: group.specs_headers,
-              name: variant["Description"] || group.title || "—",
-              code: variant["Cat No"] || "—",
-              price: variant["List Price\n2025(INR)"] || variant["Price"] || "—",
-              packSize: variant["Pack\nSize"] || variant["Packing"] || "—",
-            }
-          } else if (isAlt) {
-            const code = variant["Baker Analyzed ACS\nReagent\n(PVC"]?.trim()
-            const name = variant["Unnamed: 1"]?.trim()
-            const packSize = variant["Unnamed: 3"]?.trim()
-            const price = variant["Unnamed: 5"]
-            if (!name || !code) return null
-            return {
-              ...variant,
-              source: "rankem",
-              category: "Rankem",
-              title: group.title || "Rankem",
-              description: group.description || "",
-              specs_headers: group.specs_headers,
-              name, code,
-              packSize: packSize || "—",
-              price: price || "—",
-            }
-          }
-          return null
-        })
-        .filter(Boolean)
-        .filter((row: any) => matchesSearchQuery(row, query))
+const rankemResults = rankemProducts.flatMap((group: any) => {
+  const variants = Array.isArray(group.variants) ? group.variants : []
+
+  return variants
+    .map((variant: any) => {
+      // Try standard columns first, then fallbacks seen in your sheets
+      const name =
+        str(variant["Description"]) ||
+        str(variant["Unnamed: 1"]) ||
+        str(group.title)
+
+      const code =
+        str(variant["Cat No"]) ||
+        str(variant["Cat No."]) ||
+        str(variant["Catalog No"]) ||
+        str(variant["Catalog Number"]) ||
+        str(variant["Code"]) ||
+        // odd Rankem header you had in the alt mapping
+        str(variant["Baker Analyzed ACS\nReagent\n(PVC"])
+
+      const packRaw =
+        variant["Pack\nSize"] ??
+        variant["Pack Size"] ??
+        variant["Packing"] ??
+        variant["Unnamed: 3"]
+      const pack = str(packRaw)
+
+      const price =
+        variant["List Price\n2025(INR)"] ??
+        variant["Price"] ??
+        variant["Unnamed: 5"] ??
+        "—"
+
+      // If neither name nor code, drop this row
+      if (!name && !code) return null
+
+      return {
+        ...variant,
+        source: "rankem",
+        brand: "Rankem",            // <-- important for "acetone rankem" search
+        category: "Rankem",
+        title: group.title || "Rankem",
+        description: group.description || "",
+        specs_headers: group.specs_headers,
+
+        name: name || "—",
+        code: code || "—",
+
+        // expose both keys so any UI variant works
+        pack,
+        packSize: pack,
+
+        price,
+      }
+    })
+    .filter(Boolean)
+    .filter((row: any) => matchesSearchQuery(row, query))
     )
 
     // Borosil — USE ALIASES to resolve spec values and show group description
