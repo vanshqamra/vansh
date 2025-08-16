@@ -14,13 +14,18 @@ type ProfileRow = {
   email?: string | null
   full_name?: string | null
   name?: string | null
-  company_name?: string | null
+  // new schema (optional)
   company?: string | null
   phone?: string | null
-  contact_number?: string | null
-  role?: string | null
+  gstin?: string | null
   status?: string | null
+  role?: string | null
+  // legacy schema (optional)
+  company_name?: string | null
+  contact_number?: string | null
+  gst_no?: string | null
   created_at?: string | null
+  [k: string]: any
 }
 
 export default function ClientApprovalsPage() {
@@ -39,16 +44,21 @@ export default function ClientApprovalsPage() {
 
     const load = async () => {
       setLoading(true)
-      const { data, error } = await supabase
+
+      // Select all columns to avoid "column does not exist" errors on some deployments
+      let { data, error } = await supabase
         .from("profiles")
-        .select("id, email, full_name, name, company_name, company, phone, contact_number, role, status, created_at")
-        .eq("status", "pending")
+        .select("*")
+        // Support both schema styles: status='pending' or role='pending'
+        .or("status.eq.pending,role.eq.pending")
         .order("created_at", { ascending: false })
 
       if (error) {
         toast({ title: "Error", description: error.message, variant: "destructive" })
+        setRows([])
+      } else {
+        setRows(data || [])
       }
-      setRows(data || [])
       setLoading(false)
     }
 
@@ -62,21 +72,20 @@ export default function ClientApprovalsPage() {
             const newRow = payload.new as ProfileRow | undefined
             const oldRow = payload.old as ProfileRow | undefined
 
-            // Only react to rows that are pending or became non-pending
-            if (payload.eventType === "INSERT" && newRow?.status === "pending") {
-              setRows((prev) => {
-                // avoid dupes
-                if (prev.find((r) => r.id === newRow.id)) return prev
-                return [newRow, ...prev]
-              })
+            const isPending = (r?: ProfileRow | null) =>
+              r?.status === "pending" || r?.role === "pending"
+
+            if (payload.eventType === "INSERT" && isPending(newRow)) {
+              setRows((prev) => (prev.find((r) => r.id === newRow!.id) ? prev : [newRow!, ...prev]))
             }
 
             if (payload.eventType === "UPDATE") {
-              // If status changed away from pending, remove; if still pending, update fields
-              if (newRow?.status !== "pending") {
-                setRows((prev) => prev.filter((r) => r.id !== newRow.id))
+              if (!isPending(newRow)) {
+                // moved out of pending → remove
+                setRows((prev) => prev.filter((r) => r.id !== newRow!.id))
               } else {
-                setRows((prev) => prev.map((r) => (r.id === newRow.id ? { ...r, ...newRow } : r)))
+                // still pending → update in place
+                setRows((prev) => prev.map((r) => (r.id === newRow!.id ? { ...r, ...newRow } : r)))
               }
             }
 
@@ -92,7 +101,7 @@ export default function ClientApprovalsPage() {
       }
     }
 
-    load()
+    void load()
     subscribe()
 
     return () => {
@@ -103,13 +112,16 @@ export default function ClientApprovalsPage() {
   async function approve(id: string) {
     if (busyId) return
     setBusyId(id)
+
     const prev = rows
     // optimistic remove
     setRows((r) => r.filter((x) => x.id !== id))
+
     const { error } = await supabase
       .from("profiles")
       .update({ status: "approved", role: "client" })
       .eq("id", id)
+
     if (error) {
       setRows(prev) // rollback
       toast({ title: "Approve failed", description: error.message, variant: "destructive" })
@@ -122,12 +134,15 @@ export default function ClientApprovalsPage() {
   async function reject(id: string) {
     if (busyId) return
     setBusyId(id)
+
     const prev = rows
     setRows((r) => r.filter((x) => x.id !== id))
+
     const { error } = await supabase
       .from("profiles")
       .update({ status: "rejected", role: "rejected" })
       .eq("id", id)
+
     if (error) {
       setRows(prev)
       toast({ title: "Reject failed", description: error.message, variant: "destructive" })
@@ -140,6 +155,9 @@ export default function ClientApprovalsPage() {
   if (!authLoading && role !== "admin") {
     return <AccessDenied />
   }
+
+  const fmtIST = (iso?: string | null) =>
+    iso ? new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -182,17 +200,17 @@ export default function ClientApprovalsPage() {
               </TableRow>
             ) : (
               rows.map((p) => {
+                const joinedStr = fmtIST(p.created_at)
                 const name = p.full_name || p.name || "—"
-                const company = p.company_name || p.company || "—"
-                const phone = p.phone || p.contact_number || "—"
-                const joined = p.created_at ? new Date(p.created_at) : null
-                const joinedStr = joined ? joined.toLocaleString() : "—"
+                const email = p.email || "—"
+                const company = p.company ?? p.company_name ?? "—"
+                const phone = p.phone ?? p.contact_number ?? "—"
 
                 return (
                   <TableRow key={p.id}>
                     <TableCell>{joinedStr}</TableCell>
                     <TableCell>{name}</TableCell>
-                    <TableCell>{p.email || "—"}</TableCell>
+                    <TableCell>{email}</TableCell>
                     <TableCell>{company}</TableCell>
                     <TableCell>{phone}</TableCell>
                     <TableCell className="text-right space-x-2">
