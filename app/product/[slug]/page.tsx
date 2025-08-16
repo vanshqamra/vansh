@@ -1,4 +1,6 @@
 // app/product/[slug]/page.tsx
+export const dynamic = "force-dynamic"; // ensure SSR, no prebuilt params
+
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,6 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getProductSEO } from "@/lib/seo";
+
+// ----- STATIC CATALOG IMPORTS (ensure bundling) -----
+import borosilProducts from "@/lib/borosil_products_absolute_final.json";
+import qualigensProductsRaw from "@/lib/qualigens-products.json";
+import rankemProducts from "@/lib/rankem_products.json";
+import omsonsDataRaw from "@/lib/omsons_products.json";
+import avariceProductsRaw from "@/lib/avarice_products.json";
+import himediaProductsRaw from "@/lib/himedia_products_grouped";
+import whatmanProducts from "@/lib/whatman_products.json";
 
 // ---------- small utils ----------
 const clean = (v: any) => (typeof v === "string" ? v.trim() : "");
@@ -76,15 +87,6 @@ function slugContainsCode(target: string, p: any) {
   return target.includes(sc);
 }
 
-async function safeImport<T = any>(path: string): Promise<T | undefined> {
-  try {
-    const mod: any = await import(/* @vite-ignore */ path);
-    return (mod?.default ?? mod) as T;
-  } catch {
-    return undefined;
-  }
-}
-
 type Found = { product: any; group?: any; brand?: string };
 const asArray = (x: any) =>
   Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : [];
@@ -94,9 +96,8 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
   const target = slug.toLowerCase();
 
   // 1) BOROSIL (grouped with variants)
-  const borosil = await safeImport<any[]>("@/lib/borosil_products_absolute_final.json");
-  if (Array.isArray(borosil)) {
-    for (const g of borosil) {
+  if (Array.isArray(borosilProducts)) {
+    for (const g of borosilProducts as any[]) {
       const variants = Array.isArray(g.variants) ? g.variants : [];
       for (const v of variants) {
         const prod = { ...v, brand: "Borosil" };
@@ -113,8 +114,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
 
   // 2) QUALIGENS (flat)
   {
-    const raw: any = await safeImport<any>("@/lib/qualigens-products.json");
-    const arr = asArray(raw);
+    const arr = asArray((qualigensProductsRaw as any).default ?? qualigensProductsRaw);
     for (const p of arr) {
       const prod = { ...p, brand: "Qualigens" };
       if (
@@ -129,8 +129,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
 
   // 3) RANKEM (grouped -> variants)
   {
-    const raw: any = await safeImport<any>("@/lib/rankem_products.json");
-    const groups: any[] = Array.isArray(raw) ? raw : [];
+    const groups: any[] = Array.isArray(rankemProducts) ? (rankemProducts as any[]) : [];
     for (const grp of groups) {
       const variants = Array.isArray(grp?.variants) ? grp.variants : [];
       for (const v of variants) {
@@ -148,8 +147,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
 
   // 4) HIMEDIA (nested → header_sections → sub_sections → products)
   {
-    const data: any[] = (await safeImport<any>("@/lib/himedia_products_grouped")) as any;
-    const root: any[] = Array.isArray(data) ? data : [];
+    const root: any[] = Array.isArray(himediaProductsRaw) ? (himediaProductsRaw as any[]) : [];
     const flat: any[] = [];
     for (const section of root) {
       for (const header of section.header_sections || []) {
@@ -174,8 +172,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
 
   // 5) OMSONS (catalog.sections[].variants[])
   {
-    const raw: any = await safeImport<any>("@/lib/omsons_products.json");
-    const sections: any[] = Array.isArray(raw?.catalog) ? raw.catalog : [];
+    const sections: any[] = Array.isArray((omsonsDataRaw as any)?.catalog) ? (omsonsDataRaw as any).catalog : [];
     for (const sec of sections) {
       const variants = Array.isArray(sec?.variants) ? sec.variants : [];
       for (const v of variants) {
@@ -193,8 +190,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
 
   // 6) AVARICE (products[].variants[])
   {
-    const raw: any = await safeImport<any>("@/lib/avarice_products.json");
-    const products: any[] = asArray(raw);
+    const products: any[] = asArray((avariceProductsRaw as any).default ?? avariceProductsRaw);
     for (const parent of products) {
       for (const v of parent.variants || []) {
         const merged = {
@@ -217,7 +213,7 @@ async function findProductBySlug(slug: string): Promise<Found | null> {
 
   // 7) WHATMAN (group with specs_headers + variants)
   {
-    const grp: any = await safeImport<any>("@/lib/whatman_products.json");
+    const grp: any = whatmanProducts as any;
     const variants = Array.isArray(grp?.variants) ? grp.variants : [];
     for (const v of variants) {
       const prod = { ...v, brand: "Whatman" };
