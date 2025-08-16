@@ -9,14 +9,13 @@ export function createClient(): SupabaseClient {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const hasSupabaseEnv = !!url && !!anon
 
-  if (!url || !anon) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        "[diagnostics] Supabase env not set; skipping Supabase init"
-      )
-      return undefined as unknown as SupabaseClient
-    }
+  if (!hasSupabaseEnv && process.env.NODE_ENV !== "production") {
+    console.warn("[diagnostics] Supabase env not set; skipping Supabase init in dev.")
+    return undefined as unknown as SupabaseClient
+  }
+  if (!hasSupabaseEnv) {
     throw new Error(
       "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Set them in .env.local / Vercel."
     )

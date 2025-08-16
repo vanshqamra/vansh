@@ -131,9 +131,9 @@ const asArray = (x: any) =>
   Array.isArray(x?.data) ? x.data : Array.isArray(x) ? x : [];
 
 // finder
-async function findProductBySlug(slug: string): Promise<Found | null> {
+export async function findProductBySlug(slug: string): Promise<Found | null> {
   const target = slug.toLowerCase();
-  console.log("[product-detail] resolving slug:", slug);
+  console.log("[product-detail] resolving:", slug);
 
   // Borosil (grouped -> variants)
   if (Array.isArray(borosilProducts)) {
@@ -278,14 +278,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 // page (no images)
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const found = await findProductBySlug(params.slug);
-  console.log("[product-detail] render", {
+  console.log("[product-detail] render payload", {
     slug: params.slug,
     brand: found?.brand || found?.product?.brand,
-    name:
-      found?.product?.name ||
-      found?.product?.productName ||
-      found?.product?.title,
-    code: codeFrom(found?.product),
+    keys: found ? Object.keys(found.product || {}) : [],
   });
   if (!found) return notFound();
 
