@@ -5,13 +5,16 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr"
 export function getServerSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const hasSupabaseEnv = !!url && !!key
 
-  // Don't throw during build/prerender — just return null-like client
-  if (!url || !key) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[supabase] Env missing at build/prerender; returning null client")
-    }
+  if (!hasSupabaseEnv && process.env.NODE_ENV !== "production") {
+    console.warn("[diagnostics] Supabase env not set; skipping Supabase init in dev.")
     return null as unknown as ReturnType<typeof createServerClient>
+  }
+  if (!hasSupabaseEnv) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY."
+    )
   }
 
   // Create a normal server client

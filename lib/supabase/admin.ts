@@ -7,12 +7,16 @@ let _admin: SupabaseClient | null = null
 export function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const hasSupabaseEnv = !!url && !!serviceRole
 
-  if (!url || !serviceRole) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[supabase-admin] Missing URL or SERVICE_ROLE; returning null client")
-    }
+  if (!hasSupabaseEnv && process.env.NODE_ENV !== "production") {
+    console.warn("[diagnostics] Supabase env not set; skipping Supabase init in dev.")
     return null as unknown as SupabaseClient
+  }
+  if (!hasSupabaseEnv) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY."
+    )
   }
 
   if (!_admin) {
