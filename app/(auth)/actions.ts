@@ -78,11 +78,9 @@ if (existing?.id) {
   }
 
   return {
-    success:
-      Kindly check your email for verification.",
-  }
+  success: "Kindly check your email for verification.",
 }
-
+  
   // 4) Build payloads for legacy/new schemas
   const base = { id: user.id, email, full_name: name, role: "pending" as const }
 
