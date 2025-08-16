@@ -249,60 +249,9 @@ export default async function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Client Approvals (preview) */}
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Client Approvals (Pending)
-          </CardTitle>
-          <CardDescription>Newest pending signups. Manage full details in Review.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left border-b">
-                  <th className="py-2 pr-4">Joined</th>
-                  <th className="py-2 pr-4">Name</th>
-                  <th className="py-2 pr-4">Email</th>
-                  <th className="py-2 pr-4">Company</th>
-                  <th className="py-2 pr-4">Role</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(pending || []).map((p: ProfileRow) => (
-                  <tr key={p.id} className="border-b last:border-none">
-                    {/* 🔧 FIX: show joined date in IST */}
-                    <td className="py-2 pr-4">{formatIST(p.created_at)}</td>
-                    <td className="py-2 pr-4">{p.full_name || "—"}</td>
-                    <td className="py-2 pr-4">{p.email || "—"}</td>
-                    <td className="py-2 pr-4">{p.company ?? (p as any).company_name ?? "—"}</td>
-                    <td className="py-2 pr-4">
-                      <Badge variant={p.role === "pending" ? "secondary" : p.role === "client" ? "default" : "destructive"}>
-                        {p.role || "—"}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-                {(!pending || pending.length === 0) && (
-                  <tr>
-                    <td className="py-6 text-center text-muted-foreground" colSpan={5}>
-                      No pending accounts 🎉
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-4">
-            <Button asChild>
-              <Link href="/admin/review?tab=clients">Open Client Approvals</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+      {/* Client Approvals — button only */}
+<div className="mt-8">
+  <Button asChild>
+    <Link href="/admin/client-approvals">Open Client Approvals</Link>
+  </Button>
+</div>
