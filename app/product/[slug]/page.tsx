@@ -2,7 +2,6 @@
 export const dynamic = "force-dynamic"; // ensure SSR, no prebuilt params
 
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
