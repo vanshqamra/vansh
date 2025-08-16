@@ -24,6 +24,20 @@ export default function HomePage() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <ParallaxBackground />
 
+        {/* Hero Stamp: 10,000+ Products */}
+        <div
+          className="absolute top-8 left-8 z-30 hidden md:flex items-center justify-center rounded-full bg-white/10 backdrop-blur border border-white/20 shadow-lg w-36 h-36"
+          aria-label="Ten thousand plus products available to buy online"
+        >
+          <div className="text-center leading-tight">
+            <div className="text-2xl font-bold text-blue-100">10,000+</div>
+            <div className="text-[11px] uppercase tracking-wider text-blue-200">
+              Products
+            </div>
+            <div className="text-[10px] text-blue-300 mt-1">Buy Online</div>
+          </div>
+        </div>
+
         <div
           className="relative z-20 text-center text-white px-4 max-w-4xl mx-auto fx-reveal"
           style={{ animationDelay: "80ms" }}
@@ -63,6 +77,11 @@ export default function HomePage() {
             >
               <Link href="/contact">Get Quote</Link>
             </Button>
+
+            {/* Discount Chip beside CTAs */}
+            <Badge className="bg-white/10 text-blue-100 border-white/20 hover:bg-white/20">
+              Discount applies in cart
+            </Badge>
           </div>
 
           {/* Stats */}
@@ -86,6 +105,39 @@ export default function HomePage() {
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-blue-300 rounded-full flex justify-center">
             <div className="w-1 h-3 bg-blue-300 rounded-full mt-2 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Mobile-only sticky discount note (no JS, no links) */}
+        <div className="fixed bottom-4 inset-x-0 z-40 flex justify-center md:hidden">
+          <div className="px-4 py-2 rounded-full bg-blue-600 text-white text-sm shadow-lg border border-white/20">
+            Discounts apply in cart
+          </div>
+        </div>
+      </section>
+
+      {/* ===== USP BAR (under hero) ===== */}
+      <section className="py-6 bg-white/80 backdrop-blur border-y border-slate-200">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow">
+                <FlaskConical className="h-5 w-5 text-slate-50" />
+              </div>
+              <div className="text-slate-900 font-semibold">10,000+ Products</div>
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center shadow">
+                <Award className="h-5 w-5 text-slate-50" />
+              </div>
+              <div className="text-slate-900 font-semibold">Top Lab Brands</div>
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center shadow">
+                <Zap className="h-5 w-5 text-slate-50" />
+              </div>
+              <div className="text-slate-900 font-semibold">Discount auto-applies in cart</div>
+            </div>
           </div>
         </div>
       </section>
