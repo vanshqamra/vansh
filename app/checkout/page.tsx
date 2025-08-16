@@ -348,9 +348,9 @@ export default function CheckoutPage() {
       if (!res.ok) {
         throw new Error(json?.error || `Order failed (${res.status})`)
       }
-
       clearCart()
-      router.push(`/order-success?order=${encodeURIComponent(json.orderId ?? "")}`)
+        const codeOrId = json.orderCode || json.orderId || ""
+          router.replace(`/order-success?order=${encodeURIComponent(codeOrId)}`)
     } catch (err: any) {
       console.error("checkout error:", err)
       setErrorMsg(err?.message || "Something went wrong placing your order.")
