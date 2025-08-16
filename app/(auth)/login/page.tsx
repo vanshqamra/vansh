@@ -1,8 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useMemo } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,50 +13,54 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
   const router = useRouter()
-  const supabase = createSupabaseBrowserClient()
+  const searchParams = useSearchParams()
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []) // create once
+
+  // where to go after login (defaults to /dashboard)
+  const redirectTo = searchParams.get("redirect") || "/dashboard"
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (loading) return
     setError("")
+    setLoading(true)
 
-    // 🔐 Sign in
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      // 1) Sign in
+      const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+      if (loginError) throw loginError
 
-    if (loginError) {
-      setError(loginError.message)
-      return
-    }
+      // 2) Ensure a fresh session (helps after coming from 404 / error routes)
+      await supabase.auth.refreshSession()
 
-    // 🧠 Fetch updated session right after login
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession()
+      // 3) Pull session and user
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError || !session?.user) throw new Error("Failed to retrieve session.")
 
-    if (sessionError || !session?.user) {
-      setError("Failed to retrieve session.")
-      return
-    }
+      const userId = session.user.id
 
-    const userId = session.user.id
+      // 4) Get role (optional, but you had it)
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .single()
 
-    // 🧾 Fetch user role from `profiles` table
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single()
+      // 5) Decide destination
+      const destination =
+        redirectTo ||
+        (profile && profile.role === "admin" ? "/dashboard/admin" : "/dashboard")
 
-    if (profileError || !profile) {
-      router.push("/dashboard")
-    } else if (profile.role === "admin") {
-      router.push("/dashboard/admin")
-    } else {
-      router.push("/dashboard")
+      // 6) Replace (not push) + refresh to sync RSC + client
+      router.replace(destination)
+      router.refresh()
+    } catch (err: any) {
+      setError(err?.message || "Login failed. Please try again.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -81,6 +85,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
                 className="bg-white/70 backdrop-blur-sm"
               />
             </div>
@@ -93,12 +98,15 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
                 className="bg-white/70 backdrop-blur-sm"
               />
             </div>
+
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button type="submit" className="w-full">
-              Login
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Login"}
             </Button>
           </form>
         </CardContent>
