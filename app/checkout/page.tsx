@@ -36,7 +36,7 @@ type Address = {
 
 export default function CheckoutPage() {
   const { state, clearCart } = useCart()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
 
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer")
@@ -63,16 +63,19 @@ export default function CheckoutPage() {
 
   useEffect(() => setMounted(true), [])
 
+  // ✅ Only redirect to login once auth has hydrated
   useEffect(() => {
-    if (mounted && !user) router.push("/login?redirect=/checkout")
-  }, [user, router, mounted])
+    if (!mounted || authLoading) return
+    if (!user) router.replace("/login?redirect=/checkout")
+  }, [mounted, authLoading, user, router])
 
   useEffect(() => {
     if (mounted && items.length === 0) router.push("/cart")
   }, [items.length, router, mounted])
 
-  // Load saved addresses
+  // ✅ Load saved addresses only after auth has hydrated and there is a user
   useEffect(() => {
+    if (!mounted || authLoading || !user) return
     const run = async () => {
       try {
         const r = await fetch("/api/me/addresses", { cache: "no-store" })
@@ -92,7 +95,7 @@ export default function CheckoutPage() {
       }
     }
     run()
-  }, [])
+  }, [mounted, authLoading, user])
 
   // If addresses become empty later, force "new"
   useEffect(() => {
@@ -334,8 +337,7 @@ export default function CheckoutPage() {
         },
         shipping_address,
         totals,
-        // Send BOTH for maximum compatibility
-        products, // original detail-rich array
+        products,         // detail-rich array
         items: normalizedItems, // normalized for UI
         addressMode,
         selectedAddressId: addressMode === "saved" ? selectedAddressId : undefined,
@@ -357,7 +359,8 @@ export default function CheckoutPage() {
     }
   }
 
-  if (!mounted) {
+  // ✅ While either the page or auth is hydrating, show a skeleton (prevents “logout on refresh” flash)
+  if (!mounted || authLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
@@ -375,10 +378,6 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-2xl font-bold mb-4">Please Login</h1>
-          <p className="mb-4">You need to be logged in to access checkout.</p>
-          <Link href="/login?redirect=/checkout">
-            <Button>Login</Button>
-          </Link>
         </div>
       </div>
     )
@@ -405,12 +404,9 @@ export default function CheckoutPage() {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
-        {/* Wrap ALL content in one form so we can read fields + submit */}
         <form ref={formRef} onSubmit={handleSubmitOrder} onChange={onFormChange}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Checkout Form */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Address Mode Selector */}
               <Card>
                 <CardHeader>
                   <CardTitle>Address</CardTitle>
@@ -467,7 +463,6 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {/* Shipping Information (enabled only when entering new) */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -569,7 +564,6 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {/* Payment Method */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -616,7 +610,6 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {/* Terms and Conditions */}
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start space-x-2">
@@ -637,7 +630,6 @@ export default function CheckoutPage() {
               </Card>
             </div>
 
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <Card className="sticky top-4">
                 <CardHeader>
