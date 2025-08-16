@@ -18,29 +18,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [role, setRole] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("user_role")
-    }
-    return null
-  })
+  const [role, setRole] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("user_role") : null
+  )
+
   const supabase = useMemo(() => createSupabaseBrowserClient(), [])
   const router = useRouter()
 
   useEffect(() => {
     const getInitialSession = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        const user = session?.user || null
-        setUser(user)
+        const { data: { session } } = await supabase.auth.getSession()
+        const currentUser = session?.user || null
+        setUser(currentUser)
 
-        if (user) {
+        if (currentUser) {
           const { data, error } = await supabase
             .from("profiles")
             .select("role")
-            .eq("id", user.id)
+            .eq("id", currentUser.id)
             .single()
 
           if (!error && data?.role) {
@@ -48,8 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem("user_role", data.role)
           }
         }
-      } catch (error) {
-        console.error("Error getting session or role:", error)
+      } catch (err) {
+        console.error("Error getting session or role:", err)
         setUser(null)
         setRole(null)
         localStorage.removeItem("user_role")
@@ -62,34 +58,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const user = session?.user || null
-      setUser(user)
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user || null
+      setUser(currentUser)
       setLoading(false)
 
-      if (user) {
-        const { data, error } = await supabase
+      if (currentUser) {
+        supabase
           .from("profiles")
           .select("role")
-          .eq("id", user.id)
+          .eq("id", currentUser.id)
           .single()
-
-        if (!error && data?.role) {
-          setRole(data.role)
-          localStorage.setItem("user_role", data.role)
-        } else {
-          setRole(null)
-          localStorage.removeItem("user_role")
-        }
+          .then(({ data, error }) => {
+            if (!error && data?.role) {
+              setRole(data.role)
+              localStorage.setItem("user_role", data.role)
+            } else {
+              setRole(null)
+              localStorage.removeItem("user_role")
+            }
+          })
       } else {
         setRole(null)
         localStorage.removeItem("user_role")
       }
-      router.refresh()
+
+      // ⚠️ Don’t always refresh here — let components react naturally.
+      // Optional: debounce refresh to avoid 404-loop issues
+      setTimeout(() => router.refresh(), 50)
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase])
+  }, [supabase, router])
 
   const signOut = async () => {
     try {
@@ -97,12 +97,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
       setRole(null)
       localStorage.removeItem("user_role")
-    } catch (error) {
-      console.error("Error signing out:", error)
+
+      // 🔑 force navigation out of restricted pages
+      router.replace("/login")
+      router.refresh()
+    } catch (err) {
+      console.error("Error signing out:", err)
     }
   }
 
-  return <AuthContext.Provider value={{ user, loading, role, signOut }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, loading, role, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth() {
