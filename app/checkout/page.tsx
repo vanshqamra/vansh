@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -47,9 +47,14 @@ export default function CheckoutPage() {
 
   // Address book
   const [addresses, setAddresses] = useState<Address[]>([])
+  const hasSaved = (addresses?.length ?? 0) > 0
   const [addressMode, setAddressMode] = useState<"new" | "saved">("new")
   const [selectedAddressId, setSelectedAddressId] = useState<string>("")
   const [saveThisAddress, setSaveThisAddress] = useState<boolean>(true)
+
+  // Form ref to compute "can submit" live without making inputs controlled
+  const formRef = useRef<HTMLFormElement | null>(null)
+  const [canSubmit, setCanSubmit] = useState(false)
 
   // Safe access to cart state with defaults
   const items = state?.items || []
@@ -66,7 +71,7 @@ export default function CheckoutPage() {
     if (mounted && items.length === 0) router.push("/cart")
   }, [items.length, router, mounted])
 
-  // Load saved addresses (non-blocking; ignore errors if API not present yet)
+  // Load saved addresses
   useEffect(() => {
     const run = async () => {
       try {
@@ -79,13 +84,20 @@ export default function CheckoutPage() {
         if (def?.id) {
           setSelectedAddressId(def.id)
           setAddressMode("saved")
+        } else {
+          setAddressMode("new")
         }
       } catch {
-        // silently ignore
+        // ignore
       }
     }
     run()
   }, [])
+
+  // If addresses become empty later, force "new"
+  useEffect(() => {
+    if (!hasSaved && addressMode === "saved") setAddressMode("new")
+  }, [hasSaved, addressMode])
 
   // Totals
   const taxAmount = useMemo(() => Math.round(totalPrice * 0.18), [totalPrice])
@@ -103,6 +115,52 @@ export default function CheckoutPage() {
       a.phone ? `Phone: ${a.phone}` : null,
     ].filter(Boolean)
     return parts.join(" • ")
+  }
+
+  // Lightweight validators
+  function isValidPIN(pin?: string) {
+    if (!pin) return false
+    return /^[1-9]\d{5}$/.test(pin.trim())
+  }
+  function isValidPhone(ph?: string) {
+    if (!ph) return false
+    const d = ph.replace(/\D/g, "")
+    return /^\d{10}$/.test(d)
+  }
+  function isNewAddressValidFromForm(fd: FormData) {
+    const req = [
+      String(fd.get("firstName") || "").trim(),
+      String(fd.get("lastName") || "").trim(),
+      String(fd.get("company") || "").trim(),
+      String(fd.get("address") || "").trim(),
+      String(fd.get("city") || "").trim(),
+      String(fd.get("state") || "").trim(),
+      String(fd.get("pincode") || "").trim(),
+      String(fd.get("phone") || "").trim(),
+    ]
+    if (req.some(v => !v)) return false
+    if (!isValidPIN(String(fd.get("pincode") || ""))) return false
+    if (!isValidPhone(String(fd.get("phone") || ""))) return false
+    return true
+  }
+
+  // Live canSubmit calculation
+  function recomputeCanSubmit() {
+    if (!formRef.current) return setCanSubmit(false)
+    const fd = new FormData(formRef.current)
+    const ok =
+      (addressMode === "saved" && hasSaved && !!selectedAddressId) ||
+      (addressMode === "new" && isNewAddressValidFromForm(fd))
+    setCanSubmit(Boolean(ok))
+  }
+
+  useEffect(() => {
+    recomputeCanSubmit()
+  }, [addressMode, selectedAddressId, hasSaved, mounted])
+
+  // Also recompute on any form field change
+  function onFormChange() {
+    recomputeCanSubmit()
   }
 
   async function postOrder(payload: any) {
@@ -141,11 +199,28 @@ export default function CheckoutPage() {
       return
     }
 
+    const fd = new FormData(e.currentTarget)
+
+    // Final guard: address must be valid
+    if (addressMode === "saved") {
+      if (!hasSaved) {
+        setErrorMsg("No saved addresses. Please enter a new shipping address.")
+        return
+      }
+      if (!selectedAddressId) {
+        setErrorMsg("Please select a saved address.")
+        return
+      }
+    } else {
+      if (!isNewAddressValidFromForm(fd)) {
+        setErrorMsg("Shipping address is incomplete or invalid.")
+        return
+      }
+    }
+
     setIsSubmitting(true)
     try {
-      const fd = new FormData(e.currentTarget)
-
-      // Collect customer basics
+      // Collect customer basics from form (works for both modes; in saved mode these inputs are disabled)
       const firstName = String(fd.get("firstName") || "")
       const lastName = String(fd.get("lastName") || "")
       const company = String(fd.get("company") || "")
@@ -157,20 +232,22 @@ export default function CheckoutPage() {
       let shipping_address: any
       if (addressMode === "saved" && selectedAddressId) {
         const a = addresses.find(x => x.id === selectedAddressId)
-        shipping_address = a ? {
-          firstName: a.first_name ?? "",
-          lastName: a.last_name ?? "",
-          company: a.company ?? "",
-          gst: a.gst ?? "",
-          phone: a.phone ?? "",
-          address: a.line1 ?? "",
-          address2: a.line2 ?? "",
-          city: a.city ?? "",
-          state: a.state ?? "",
-          pincode: a.pincode ?? "",
-          country: a.country ?? "India",
-          notes: a.notes ?? "",
-        } : null
+        shipping_address = a
+          ? {
+              firstName: a.first_name ?? "",
+              lastName: a.last_name ?? "",
+              company: a.company ?? "",
+              gst: a.gst ?? "",
+              phone: a.phone ?? "",
+              address: a.line1 ?? "",
+              address2: a.line2 ?? "",
+              city: a.city ?? "",
+              state: a.state ?? "",
+              pincode: a.pincode ?? "",
+              country: a.country ?? "India",
+              notes: a.notes ?? "",
+            }
+          : null
       } else {
         shipping_address = {
           firstName,
@@ -215,14 +292,14 @@ export default function CheckoutPage() {
         grand_total: finalTotal,
       }
 
-      // Optional: save new address
-      if (addressMode === "new" && saveThisAddress) {
+      // Optional: save new address (only when valid)
+      if (addressMode === "new" && saveThisAddress && isNewAddressValidFromForm(fd)) {
         try {
           const body: Partial<Address> = {
             label: company ? `${company} (${shipping_address.city || ""})` : `${firstName} ${lastName}`,
             first_name: shipping_address.firstName,
             last_name: shipping_address.lastName,
-            company: shipping_address.company,
+            company: shipping_address.company || null,
             gst: shipping_address.gst || null,
             phone: shipping_address.phone,
             line1: shipping_address.address,
@@ -258,8 +335,10 @@ export default function CheckoutPage() {
         shipping_address,
         totals,
         // Send BOTH for maximum compatibility
-        products,         // original detail-rich array
+        products, // original detail-rich array
         items: normalizedItems, // normalized for UI
+        addressMode,
+        selectedAddressId: addressMode === "saved" ? selectedAddressId : undefined,
       }
 
       const res = await postOrder(payload)
@@ -308,7 +387,7 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-6xl mx-auto text-center">
           <h1 className="text-2xl font-bold mb-4">Your Cart is Empty</h1>
           <p className="mb-4">Add some products to your cart before checkout.</p>
           <Link href="/products">
@@ -327,7 +406,7 @@ export default function CheckoutPage() {
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
         {/* Wrap ALL content in one form so we can read fields + submit */}
-        <form onSubmit={handleSubmitOrder}>
+        <form ref={formRef} onSubmit={handleSubmitOrder} onChange={onFormChange}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Checkout Form */}
             <div className="lg:col-span-2 space-y-6">
@@ -346,9 +425,13 @@ export default function CheckoutPage() {
                       <RadioGroupItem value="new" id="addr_new" />
                       <span>Enter new address</span>
                     </label>
-                    <label className="flex items-center space-x-2 p-3 border rounded-lg cursor-pointer">
-                      <RadioGroupItem value="saved" id="addr_saved" />
-                      <span>Use saved address</span>
+                    <label
+                      className={`flex items-center space-x-2 p-3 border rounded-lg ${
+                        hasSaved ? "cursor-pointer" : "opacity-50 cursor-not-allowed"
+                      }`}
+                    >
+                      <RadioGroupItem value="saved" id="addr_saved" disabled={!hasSaved} />
+                      <span>Use saved address {hasSaved ? `(${addresses.length})` : "(none available)"}</span>
                     </label>
                   </RadioGroup>
 
@@ -365,6 +448,9 @@ export default function CheckoutPage() {
                             value={selectedAddressId}
                             onChange={(e) => setSelectedAddressId(e.target.value)}
                           >
+                            <option value="" disabled>
+                              -- Select a saved address --
+                            </option>
                             {addresses.map((a) => (
                               <option key={a.id} value={a.id}>
                                 {(a.label || a.company || `${a.first_name || ""} ${a.last_name || ""}`).trim()} — {formatAddressPreview(a)}
@@ -372,9 +458,7 @@ export default function CheckoutPage() {
                             ))}
                           </select>
                           {selectedSaved && (
-                            <div className="text-xs text-slate-600">
-                              {formatAddressPreview(selectedSaved)}
-                            </div>
+                            <div className="text-xs text-slate-600">{formatAddressPreview(selectedSaved)}</div>
                           )}
                         </div>
                       )}
@@ -395,17 +479,17 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name</Label>
-                      <Input id="firstName" name="firstName" required disabled={addressMode === "saved"} />
+                      <Input id="firstName" name="firstName" required={addressMode === "new"} disabled={addressMode === "saved"} />
                     </div>
                     <div>
                       <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" name="lastName" required disabled={addressMode === "saved"} />
+                      <Input id="lastName" name="lastName" required={addressMode === "new"} disabled={addressMode === "saved"} />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="company">Company Name</Label>
-                      <Input id="company" name="company" required disabled={addressMode === "saved"} />
+                      <Input id="company" name="company" required={addressMode === "new"} disabled={addressMode === "saved"} />
                     </div>
                     <div>
                       <Label htmlFor="gst">GST (Orders with hazardous chemicals won't be accepted without verifying GST details)</Label>
@@ -414,7 +498,7 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <Label htmlFor="address">Address</Label>
-                    <Textarea id="address" name="address" required disabled={addressMode === "saved"} />
+                    <Textarea id="address" name="address" required={addressMode === "new"} disabled={addressMode === "saved"} />
                   </div>
                   <div>
                     <Label htmlFor="address2">Address 2 (optional)</Label>
@@ -423,15 +507,23 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="city">City</Label>
-                      <Input id="city" name="city" required disabled={addressMode === "saved"} />
+                      <Input id="city" name="city" required={addressMode === "new"} disabled={addressMode === "saved"} />
                     </div>
                     <div>
                       <Label htmlFor="state">State</Label>
-                      <Input id="state" name="state" required disabled={addressMode === "saved"} />
+                      <Input id="state" name="state" required={addressMode === "new"} disabled={addressMode === "saved"} />
                     </div>
                     <div>
                       <Label htmlFor="pincode">PIN Code</Label>
-                      <Input id="pincode" name="pincode" required disabled={addressMode === "saved"} />
+                      <Input
+                        id="pincode"
+                        name="pincode"
+                        required={addressMode === "new"}
+                        disabled={addressMode === "saved"}
+                        inputMode="numeric"
+                        pattern="[1-9][0-9]{5}"
+                        title="Enter a valid 6-digit Indian PIN starting 1-9"
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -441,7 +533,16 @@ export default function CheckoutPage() {
                     </div>
                     <div>
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" name="phone" type="tel" required disabled={addressMode === "saved"} />
+                      <Input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        required={addressMode === "new"}
+                        disabled={addressMode === "saved"}
+                        inputMode="numeric"
+                        pattern="\d{10}"
+                        title="Enter a 10-digit phone number"
+                      />
                     </div>
                   </div>
                   <div>
@@ -489,14 +590,14 @@ export default function CheckoutPage() {
                       <RadioGroupItem value="credit_terms" id="credit_terms" />
                       <Label htmlFor="credit_terms" className="flex-1">
                         <div className="font-medium">Credit Terms</div>
-                        <div className="text-sm text-gray-600">Net 30 days payment terms(only on special approval)</div>
+                        <div className="text-sm text-gray-600">Net 30 days payment terms (only on special approval)</div>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 p-4 border rounded-lg">
                       <RadioGroupItem value="cheque" id="cheque" />
                       <Label htmlFor="cheque" className="flex-1">
                         <div className="font-medium">Cheque Payment</div>
-                        <div className="text-sm text-gray-600">Post-dated cheque on delivery(only on special approval)</div>
+                        <div className="text-sm text-gray-600">Post-dated cheque on delivery (only on special approval)</div>
                       </Label>
                     </div>
                   </RadioGroup>
@@ -507,7 +608,7 @@ export default function CheckoutPage() {
                       <div className="text-sm">
                         <div className="font-medium text-blue-900">Payment Security</div>
                         <div className="text-blue-700">
-                          Payment will only be made after we confirm your order and provide final pricing for shipping. 
+                          Payment will only be made after we confirm your order and provide final pricing for shipping.
                         </div>
                       </div>
                     </div>
@@ -591,7 +692,12 @@ export default function CheckoutPage() {
 
                   {errorMsg && <p className="text-red-600 text-sm">{errorMsg}</p>}
 
-                  <Button type="submit" className="w-full" size="lg" disabled={!acceptedTerms || isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={!acceptedTerms || isSubmitting || !canSubmit}
+                  >
                     {isSubmitting ? "Processing Order..." : "Place Order"}
                   </Button>
 
